@@ -1,0 +1,37 @@
+#' Sample of library database
+#'
+#' A list containing four data frames reflecting library management database.
+#'
+#' @format A list of four data frames:
+#'
+#' \strong{books} - books on store
+#' \describe{
+#'   \item{isbn}{book ISBN number}
+#'   \item{title}{book title}
+#'   \item{genre}{comma separated book genre}
+#'   \item{publisher}{name of book publisher}
+#'   \item{author}{name of book author}
+#'   \item{copies}{total number of book copies on store}
+#' }
+#' \strong{borrowers} - registered library members
+#' \describe{
+#'   \item{id}{member unique id}
+#'   \item{registered}{date the member joined library}
+#'   \item{address}{member address}
+#'   \item{name}{full member name}
+#'   \item{phone_number}{member phone number}
+#'   \item{program}{membership program type (standard, premium or vip)}
+#' }
+#' \strong{issues} - borrowed books events
+#' \describe{
+#'   \item{id}{unique event id}
+#'   \item{borrower_id}{id of the member that borrowed the book}
+#'   \item{isbn}{is of the borrowed book}
+#'   \item{date}{date of borrow event}
+#' }
+#' \strong{returns} - returned books events
+#' \describe{
+#'   \item{id}{event id equal to borrow issue id}
+#'   \item{date}{date of return event}
+#' }
+"librarian"

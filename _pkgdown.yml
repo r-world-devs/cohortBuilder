@@ -1,0 +1,33 @@
+title: cohortBuilder
+template:
+  bootstrap: 5
+url: https://r-world-devs.github.io/cohortBuilder/
+home:
+  strip_header: true
+navbar:
+  left:
+    - icon: fa fa-thumbs-o-up
+      text: "Get started"
+      href: articles/cohortBuilder.html
+    - icon: fa fa-file-code-o
+      text: "Functions"
+      href: reference/index.html
+    - icon: fa fa-thumbs-o-up
+      text: "Articles"
+      menu:
+      - text: "Managing Cohort Object"
+        href: articles/managing-cohort.html
+      - text: "Variants for Cohort Configuration"
+        href: articles/cohort-configuration.html
+      - text: "Specifying data relations with Binding Keys"
+        href: articles/binding-keys.html
+      - text: "Implementing custom filters"
+        href: articles/custom-filters.html
+      - text: "Writing custom extensions"
+        href: articles/custom-extensions.html
+    - icon: fa fa-newspaper-o
+      text: "News"
+      href: news/index.html
+    - icon: fa fa-ambulance
+      text: "Issues"
+      href: https://r-world-devs.github.io/cohortBuilder/issues

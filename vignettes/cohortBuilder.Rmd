@@ -1,0 +1,431 @@
+---
+title: "Introduction to cohortBuilder"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to cohortBuilder}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options("tibble.print_min" = 5, "tibble.print_max" = 5)
+library(magrittr)
+library(cohortBuilder)
+```
+
+This document presents to you basic functionality offered by `cohortBuilder` package.
+You'll learn here about Source and Cohort objects, how to configure them with filters 
+and filtering steps.
+Later on, we'll present most common Cohort methods that allow to manipulate the object and 
+extract useful information about Cohort data and state.
+
+## cohortBuilder vs. dplyr
+
+If you're familiar with `dplyr` (or any other data manipulation package) you
+may be wondering what `cohortBuilder` has been created for.
+
+Our main goal for creating `cohortBuilder` was to provide a common syntax for operating (filtering)
+on any data source you need. 
+This follows the idea for having `dplyr` and its database counterpart `dbplyr` package.
+
+In order to achieve the goal, we put an emphasis on possibility to write custom extensions 
+in terms of data source type, or operating backend (underneath `cohortBuilder` uses `dplyr` 
+to operate on data frames, but you may create an extension using e.g. `data.table`). 
+See `vignette("custom-extensions")`.
+
+The second goal was integration of `cohortBuilder` with `shiny`.
+The GUI for `cohortBuilder` is provided by `shinyCohortBuilder` package.
+With this extension you may easily open Cohort configuration panel locally,
+or include it in you custom dashboard.
+
+## Data: librarian
+
+To present `cohortBuilder`'s functionality we'll be operating on `librarian` dataset.
+`librarian` is a list of four tables, storing a sample of book library management database.
+
+```{r}
+cohortBuilder::librarian
+```
+
+To learn more check `?librarian`.
+
+## Source object
+
+Every time you work with `cohortBuilder` the crucial part is to properly define the data
+source with `set_source` function.
+Source is an R6 object storing metadata about data and its origin. 
+The metadata allows `cohortBuilder` to distinct what methods to use when performing operations on it.
+
+To define a new source you need to provide data (connection).
+
+Let's create now a new source storing `librarian` data.
+To do so, we pass one obligatory parameter `dtconn` to `set_source` method.
+
+`dtconn` stores data connection responsible for informing `cohortBuilder` on what data 
+are we gonna work (and what extension to use, if any).
+
+If you want to operate on R-loaded list of tables, provide `tblist` class object.
+`tblist` is just a named list of data frames having `tblist` class.
+
+**Note.** In order to create 'tblist' object use `tblist`, e.g. `tblist(mtcars, iris)`.
+**Note.** In order to convert list of data frames to 'tblist' just use `as.tblist`.
+
+```{r}
+str(as.tblist(librarian), max.level = 1)
+```
+
+Let's proceed with creating the source:
+
+```{r}
+librarian_source <- set_source(
+  as.tblist(librarian)
+)
+class(librarian_source)
+```
+
+To learn more about `set_source`'s arguments check `?set_source`.
+
+## Cohort object
+
+When `Source` object is ready, the next step is to create a `Cohort` object.
+`Cohort` is again an R6 object, providing methods for operating on data included in `Source`.
+
+`Cohort` is responsible in particular for:
+
+- storing definitions of filters (and filtering steps),
+- running filtering and keeping result of it,
+- computing and caching filter and data statistics,
+- keeping and updating filtering configuration state.
+
+In the standard workflow we build `Cohort` on top of `Source`.
+We achieve it with `cohort` function:
+
+```{r}
+librarian_cohort <- librarian_source %>% 
+  cohort()
+class(librarian_cohort)
+```
+
+With the existing `Cohort` we may get underlying data with `get_data`:
+
+```{r}
+get_data(librarian_cohort)
+```
+
+We'll present more methods in the next sections.
+
+## Configuring and running filters
+
+The next step in `cohortBuilder` workflow is configuration of filters.
+Filters are responsible for providing necessary logic for performing related data filtering. 
+
+The extensive description of filters can be found at `vignette("custom-filters")`.
+
+The current version of `cohortBuilder` provides five types of build-in filters:
+
+- **discrete** - return values (in column) matching provided set,
+- **discrete_text** - return values based on provided comma separated values,
+- **range** - return values within the provided range,
+- **date_range** - range version for Date type data,
+- **multi_discrete** - extended version of discrete filter working with multiple conditions.
+
+Let's define discrete filter that will subset `books` table listing books written by Dan Brown.  
+To do so, we have to define the following parameters calling `filter` function:
+
+- `type` - type of the filter (one of the above),
+- `dataset` - name of the dataset to apply the filter to,
+- `variable` - name of the variable in `dataset` to apply the filter to,
+- `value` - vector of values to be applied in filter.
+
+So in our case:
+
+```{r}
+author_filter <- filter(
+  "discrete",
+  dataset = "books",
+  variable = "author",
+  value = "Dan Brown"
+)
+```
+
+In order to add the filter to existing Cohort we may use `add_filter` method:
+
+```{r}
+librarian_cohort <- librarian_cohort %>%
+  add_filter(author_filter)
+```
+
+Alternatively we may use `%->%` operator that calls `add_filter` underneath:
+
+```{r}
+librarian_cohort <- librarian_cohort %->%
+  author_filter
+```
+
+Or define the filter while creating Cohort:
+
+```{r}
+librarian_cohort <- librarian_source %>% 
+  cohort(
+    author_filter
+  )
+```
+
+There are much more options for defining filters. 
+To learn more check `vignette("cohort-configuration")`.
+
+**Note.** Cohort is an R6 object, so you may skip reassignment above.
+
+For example:
+
+```{r, eval = FALSE}
+librarian_cohort %>%
+  add_filter(author_filter)
+```
+
+will also work.
+
+**Note.** To verify if the filter was configured properly just run:
+
+```{r}
+sum_up(librarian_cohort)
+```
+
+The output highlights list of configured filters along with their parameters.
+You can see here the id attached to filter and some extra parameters such as `keep_na`
+or `active` which we describe in the next sections.
+
+More to that we can realize the filter was defined in the step with ID equals to 1.
+That's because `cohortBuilder` allows to perform [multi-stage filtering](#multi-stage-filtering).
+
+Let's get back to filtering the `books`. 
+Configuring filters only adds proper metadata in the Cohort object, which means 
+data filtering is not performed automatically. 
+This allows to set the proper configuration first, and run calculation only once.
+
+If you want to run data filtering, just call `run`:
+
+```{r}
+run(librarian_cohort)
+```
+
+Let's check if the operation worked fine by checking the resulting data:
+
+```{r}
+get_data(librarian_cohort)
+```
+
+If you want to run data filtering automatically when the filter is defined you can
+set `run_flow = TRUE`:
+
+```{r}
+librarian_cohort <- librarian_source %>% 
+  cohort() %>% 
+  add_filter(author_filter, run_flow = TRUE)
+```
+
+when using `add_filter` or:
+
+```{r}
+librarian_cohort <- librarian_source %>% 
+  cohort(
+    author_filter,
+    run_flow = TRUE
+  )
+```
+
+when configuring filter along with creating cohort.
+
+Now when the data filtered, how can we get data state before filtering?
+With `get_data` it's easy, just set `state = "pre"`:
+
+```{r}
+get_data(librarian_cohort, state = "pre")
+```
+
+## Multi-stage filtering
+
+With `cohortBuilder` you can define filters in groups named 'steps' or 'filtering steps'.
+
+Filtering steps allow you to sequentially perform groups of filtering operations.
+In order to define step, just wrap set of filters in `step` function.
+
+We will define three filters:
+
+1. Taking all the books written by Dan Brown.
+2. Filtering only the members (borrowers) with "standard" program.
+3. Taking only the books with less than 5 copies.
+
+We'll include filters 1. and 2. in the first step - filter 3. in the second one.
+
+The below code does the job:
+
+```{r}
+librarian_cohort <- librarian_source %>% 
+  cohort(
+    step(
+      filter(
+        "discrete", id = "author", dataset = "books", 
+        variable = "author", value = "Dan Brown"
+      ),
+      filter(
+        "discrete", id = "program", dataset = "borrowers", 
+        variable = "program", value = "premium", keep_na = FALSE
+      )
+    ),
+    step(
+      filter(
+        "range", id = "copies", dataset = "books", 
+        variable = "copies", range = c(-Inf, 5)
+      )
+    )
+  )
+```
+
+
+Let's note a few parts that occurred above:
+
+- For each filter we defined `id` parameter. 
+This assigns provided id to each filter what makes accessing it later much easier.
+- For 'program' filter we set `keep_na = FALSE` what results with excluding `NA` values 
+(the parameter is available for each filter type).
+- For filtering number of copies we've used `range` filter, for which sub-setting value 
+is defined with `range` parameter.
+
+Let's check the Cohort configuration:,
+
+```{r}
+sum_up(librarian_cohort)
+```
+
+We can see filters were correctly assigned to each step.
+
+Having multiple steps defined, we can use `get_data` to extract resulting data after each step.
+In order to precise the step we want to get data from, just pass its id as `step_id` parameter:
+
+```{r}
+run(librarian_cohort)
+get_data(librarian_cohort, step_id = 1)
+get_data(librarian_cohort, step_id = 2)
+```
+
+**Note.** When `step_id` is not provided, the method returns the last step data.
+
+**Note.** You may precise if you want to extract data before or after filtering using `state` parameter.
+Because the proceeding step uses result from the previous one, we have:
+
+```{r}
+identical(
+  get_data(librarian_cohort, step_id = 1, state = "post"),
+  get_data(librarian_cohort, step_id = 2, state = "pre")
+)
+```
+
+## Exploring the Cohort object methods
+
+### Learning more about the source data
+
+Having Cohort object created, you may want to use its methods for exploring underlying data.
+
+With methods such as:
+
+- `stat`,
+- `plot_data`,
+- `attrition`
+
+you can:
+
+- get filter related data statistics,
+- display filter related data on plot,
+- display data changes across filtering steps.
+
+```{r}
+stat(librarian_cohort, step_id = 1, filter_id = "program")
+stat(librarian_cohort, step_id = 2, filter_id = "copies")
+```
+
+```{r}
+plot_data(librarian_cohort, step_id = 1, filter_id = "program")
+```
+```{r}
+plot_data(librarian_cohort, step_id = 2, filter_id = "copies")
+```
+
+```{r}
+attrition(librarian_cohort, dataset = "books")
+```
+```{r}
+attrition(librarian_cohort, dataset = "borrowers")
+```
+
+
+### Sharing code and reproducibility
+
+The `cohortBuilder` package offers some methods to make sharing the workflow easier.
+
+With `code`, you may get the reproducible code written using methods operating on 
+specific source (i.e. `dplyr` for `tblist` and `dbplyr` for `db` source):
+
+```{r}
+code(librarian_cohort)
+```
+
+We can see above, the resulting code uses `source` object, which creation can be
+defined separately while creating it:
+
+```{r}
+librarian_source <- set_source(
+  as.tblist(librarian),
+  source_code = quote({
+    source <- list(attributes = list(datasets = librarian))
+  })
+)
+
+librarian_cohort <- librarian_source %>% 
+  cohort(
+    step(
+      filter(
+        "discrete", id = "author", dataset = "books", 
+        variable = "author", value = "Dan Brown"
+      ),
+      filter(
+        "discrete", id = "program", dataset = "borrowers", 
+        variable = "program", value = "premium", keep_na = FALSE
+      )
+    ),
+    step(
+      filter(
+        "range", id = "copies", dataset = "books", 
+        variable = "copies", range = c(-Inf, 5)
+      )
+    ),
+    run_flow = TRUE
+  )
+
+code(librarian_cohort)
+```
+
+The second option allows to restore cohort configuration using its state.
+The cohort state is a list (or json) storing information about all the steps and filters configuration.
+
+You may get the state with `get_state` method:
+
+```{r}
+state <- get_state(librarian_cohort, json = TRUE)
+state
+```
+
+Then, having an empty cohort, use `restore` to apply the configuration:
+
+```{r}
+librarian_cohort <- librarian_source %>%
+  cohort()
+
+restore(librarian_cohort, state = state)
+
+sum_up(librarian_cohort)
+```

@@ -1,0 +1,11 @@
+^renv$
+^renv\.lock$
+^.*\.Rproj$
+^\.Rproj\.user$
+examples/*
+README_files/*
+README.Rmd
+.publish_rpackage
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

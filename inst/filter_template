@@ -1,0 +1,106 @@
+filter.{filter_type} <- function(type, id, name, ..., active = getOption("cb_active_filter", default = TRUE)) {{
+  # Skip missing parameters passed and attach `...`
+  args <- append(
+    environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
+    list(...)
+  )
+
+  # Return function of source parameter calling valid S3 method based on source type
+  function(source) {{
+    do.call(
+      cb_filter.{filter_type},
+      append(list(source = source), args)
+    )
+  }}
+}}
+
+# Delete when method already defined
+cb_filter.{filter_type} <- function(source, ...) {{
+  UseMethod("cb_filter.{filter_type}", source)
+}}
+
+cb_filter.{filter_type}.{source_type} <- function(
+  source, type = "{filter_type}", id = .gen_id(), name = id, {input_param} = NA,
+  {extra_params} keep_na = TRUE, ..., active = TRUE) {{
+  args <- list(...)
+
+  def_filter(
+    type = type,
+    id = id,
+    name = name,
+    input_param = "{input_param}",
+    filter_data = function(data_object) {{
+
+      # keep the below comments unchanged to make reproducible code functioning
+      selected_value <- value # code include
+      if (keep_na && !identical(selected_value, NA)) {{
+        # keep_na !value_na start
+        # _COMPLETE_ e.g.
+        # selected_value <- c(selected_value, NA)
+        # data_object[[dataset]] <- data_object[[dataset]] %>%
+        #   dplyr::filter(!!sym(variable) %in% !!selected_value)
+        # keep_na !value_na end
+      }}
+      if (!keep_na && identical(selected_value, NA)) {{
+        # !keep_na value_na start
+        # _COMPLETE_ e.g.
+        # data_object[[dataset]] <- data_object[[dataset]] %>%
+        #   dplyr::filter(!is.na(!!sym(variable)))
+        # !keep_na value_na end
+      }}
+      if (!keep_na && !identical(selected_value, NA)) {{
+        # !keep_na !value_na start
+        # _COMPLETE_ e.g.
+        # data_object[[dataset]] <- data_object[[dataset]] %>%
+        #   dplyr::filter(!!sym(variable) %in% !!selected_value)
+        # !keep_na !value_na end
+      }}
+      # Mark modified data_object element as filtered. Required by binding keys.
+      # _COMPLETE_ e.g.
+      # attr(data_object[[dataset]], "filtered") <- TRUE # code include
+      data_object
+    }},
+    get_stats = function(data_object, name) {{
+      if (missing(name)) {{
+        name <- c("n_data", "n_missing") # _COMPLETE_ - add more if needed
+      }}
+      stats <- list(
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% na.omit() %>% length(),
+        n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum(),
+        #_COMPLETE_ - add more if needed, e.g.
+        # choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% na.omit() %>% table() %>% as.list()
+      )
+      if (length(name) == 1) {{
+        return(stats[[name]])
+      }} else {{
+        return(stats[name])
+      }}
+    }},
+    plot_data = function(data_object) {{
+     #  if (_COMPLETE_ - when data if correct e.g. nrow(data_object[[dataset]]) > 0) {{
+     #     _COMPLETE_ - plot generation code, e.g.
+     #     data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% barplot()
+     #  }} else {{
+          barplot(0, ylim = c(0, 0.1), main = "No data")
+     #  }}
+    }},
+    get_params = function(data_object) {{
+      list(
+        {input_param} = {input_param},
+        keep_na = keep_na,
+        active = active,
+        {extra_params_assign}
+        ...
+      )
+    }},
+    get_data = function(data_object) {{
+      # _COMPLETE_ - code for getting filter attached data e.g. data_object[[dataset]][[variable]] when dataset and variable provided
+    }},
+    get_defaults = function(data_object, cache_object) {{
+      # Code for getting default input parameter value when not specified
+      # You may use data_object or cache_object storing filter stats returned by get_stats method.
+      # _COMPLETE_ e.g.
+      # list(value = names(cache_object$choices))
+    }}
+  )
+}}

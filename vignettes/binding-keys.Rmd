@@ -1,0 +1,180 @@
+---
+title: "Specifying data relations with Binding Keys"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Specifying data relations with Binding Keys}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options("tibble.print_min" = 5, "tibble.print_max" = 5)
+library(magrittr)
+library(cohortBuilder)
+```
+
+When source consists of multiple datasets, binding keys allow to define what relations occur between them. When binding keys are defined, applying filtering on one dataset may result with updating (filtering) the other ones.
+
+To explain how binding keys work and how to define them we'll be using `cohortBuilder::librarian` dataset:
+
+```{r}
+str(librarian)
+```
+
+Let's say we want to get list of all the library members that borrowed a selected book in 2016. 
+
+To start with, we define a Source storing `librarian` object, create Cohort and configure required filters in it (we choose "Birdsong" book as an example):
+
+```{r}
+librarian_source <- set_source(
+  as.tblist(librarian)
+)
+
+librarian_cohort <- librarian_source %>% 
+  cohort(
+    step(
+      filter(
+        "discrete", id = "title", dataset = "books", 
+        variable = "title", value = "Birdsong"
+      ),
+      filter(
+        "date_range", id = "issue_date", dataset = "issues", 
+        variable = "date", range = c(as.Date("2016-01-01"), as.Date("2016-12-31"))
+      )
+    )
+  )
+```
+
+The above filters cover only part of our case scenario condition:
+
+- filtering selected book,
+- filtering all the issues from 2016.
+
+Configuring filters for borrowers is impossible - we don't know upfront which issues were related to the selected book.
+
+How can we overcome the issue?
+
+## Classic approach
+
+With the classic approach, we may iteratively extract each information and extend cohort filters, 
+for example we can define a new condition in the next filtering step:
+
+```{r}
+run(librarian_cohort)
+selected_isbn <- get_data(librarian_cohort)$books$isbn
+librarian_cohort %->% 
+  step(
+    filter("discrete", id = "isbn", dataset = "issues", variable = "isbn", value = selected_isbn)  
+  ) %>% 
+  run(step_id = 2)
+```
+
+Now `librarian_cohort` should store all the issues related to selected book.
+For the final part we need to filter borrowers based on those issues. We'll do this filtering in the third step:
+
+```{r}
+selected_borrower_id <- get_data(librarian_cohort)$issues$borrower_id
+librarian_cohort %->% 
+  step(
+    filter("discrete", id = "borr_id", dataset = "borrowers", variable = "id", value = selected_borrower_id)  
+  ) %>% 
+  run(step_id = 3)
+
+```
+
+Resulting third-step data should contain desired information:
+
+```{r}
+get_data(librarian_cohort)$borrowers
+```
+
+## Binding Keys
+
+Now we're going to get the same result with using binding-keys.
+
+A single binding key describes relation of specified table, with the other set of 
+tables included in source.
+
+**Note.** We relate here to tables, but this can be any other object to which 
+bindings abstraction is valid (i.e. relation between lists).
+
+Let's define relation between books and issues first and then we'll explain the syntax:
+
+```{r}
+issue_books_bk <- bind_key(
+  update = data_key(dataset = "issues", key = "isbn"),
+  data_key(dataset = "books", key = "isbn")
+)
+```
+
+Shortly we should understand this key as: 
+
+**Whenever table `books` is filtered, filter `issues` table as well (by inner join on `isbn` of both tables)**
+
+To make binding keys description easier, let's name the table passed to `update` parameter as **dependent** one,
+and tables defined at `...` as **triggering** ones.
+
+As we could see above, we define both dependent and triggering tables using data keys (`data_key`).
+The first parameter of `data_key`, `dataset` stores information about source object name 
+whereas `key` is a vector of keys used in join.
+
+**Note.** We can define only one dependent table in each binding key, but any number of triggering 
+tables (keeping in mind the defined keys are of the same length). 
+
+**Note.** Dependent table is updated if any of triggering tables changes.
+
+**Note.** The triggering table is considered to be **changed** when it has at least active filter attached.
+
+**Note.** The `dependent` table is marked as **changed** when updated (so that can trigger some bindings even if no active filters were attach to it). You may change this behavior by specifying `activate = FALSE` in `bind_key`.
+
+No we can define full list of binding keys solving our case.
+We wrap multiple keys together using `bind_keys`:
+
+```{r}
+case_bks <- bind_keys(
+  bind_key(
+    update = data_key(dataset = "issues", key = "isbn"),
+    data_key(dataset = "books", key = "isbn")
+  ),
+  bind_key(
+    update = data_key(dataset = "borrowers", key = "id"),
+    data_key(dataset = "issues", key = "borrower_id")
+  )
+)
+```
+
+We define binding keys while creating source, so we need to:
+
+```{r}
+librarian_source <- set_source(
+  as.tblist(librarian),
+  binding_keys = case_bks
+)
+
+librarian_cohort <- librarian_source %>% 
+  cohort(
+    step(
+      filter(
+        "discrete", id = "title", dataset = "books", 
+        variable = "title", value = "Birdsong"
+      ),
+      filter(
+        "date_range", id = "issue_date", dataset = "issues", 
+        variable = "date", range = c(as.Date("2016-01-01"), as.Date("2016-12-31"))
+      )
+    )
+  )
+```
+
+Now:
+
+```{r}
+run(librarian_cohort)
+get_data(librarian_cohort)
+```
+
+returns desired result within a single step.

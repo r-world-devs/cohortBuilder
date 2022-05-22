@@ -1,0 +1,391 @@
+---
+title: "Writing custom extensions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Writing custom extensions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options("tibble.print_min" = 5, "tibble.print_max" = 5)
+library(magrittr)
+library(cohortBuilder)
+```
+
+`cohortBuilder` package is adapted to work with various data sources and custom backends.
+Currently there exists one official extension `cohortBuilder.db` package that allows you to use `cohortBuilder` with database connections.
+
+The goal of this document is to explain how to create custom extensions to `cohortBuilder`.
+
+In general to create the custom layer you need to:
+ 
+1. Define set of S3 methods operating on your custom source.
+2. Define selected filters (see `vignette("custom-filters")`).
+
+It's recommended to include all of the methods in your custom R package.
+
+Before you start creating a new layer, you need to choose what data (connection) should your layer operate on.
+
+For example, cohortBuilder uses `tblist` class object to operate on list of data frames , or `db` class for operating on database connections.
+
+To start with create a function that will take required parameters to define data connection, such as `tblist` or `dbtables` in case of `cohortBuilder.db`. The function should return an object of selected class which is used to define required extension methods.
+
+Below we describe all the required and optional methods you need to define within the created package.
+
+1. **`set_source` - method used for defining a new source**
+
+Required parameters:
+
+- `dtconn`
+
+Details:
+
+- Define the method calling `Source$new` inside.
+- Declare necessary parameters used for defining data source (and pass them to `Source$new`). The arguments are then available at source$attributes object.
+- If valid, you may declare `primary_keys` and `binding_keys` parameters (see `vignette("binding-keys")`).
+- It's also worth to declare `source_code` parameter that allows users to define code for creating source (visible in reproducible code) and `description` storing list of useful source objects descriptions.
+
+Example:
+
+- `cohortBuilder` - `tblist` object (same for `cohortBuilder.db` - `db` object)
+
+```{r, eval = FALSE}
+set_source.tblist <- function(dtconn, primary_keys = NULL, binding_keys = NULL, 
+                           source_code = NULL, description = NULL, ...) {
+  Source$new(
+    dtconn, primary_keys = primary_keys,
+    binding_keys = binding_keys, source_code = source_code,
+    ...
+  )
+}
+```
+
+2. **`.init_source` - structure data passed between filtering steps**
+
+Required parameters:
+
+- `source` - Source object
+
+Details:
+
+- Within the function body define how data should be extracted from source, and structured.
+- A structure of the output is then used as an input for filter's method (`data_object` argument).
+
+Examples:
+
+- `cohortBuilder` - 'tblist' class. Operating on list of tables in each step.
+
+```{r, eval = FALSE}
+.init_step.tblist <- function(source, ...) {
+  source$dtconn
+}
+```
+
+- `cohortBuilder.db` - 'db' class.
+
+`cohortBuilder.db` operates on `db` class object which is list of `connection`, `tables` and `schema` fields. 
+
+```{r, eval = FALSE}
+.init_step.db <- function(source) {
+  purrr::map(
+    stats::setNames(source$dtconn$tables, source$dtconn$tables),
+    function(table) {
+      tbl_conn <- dplyr::tbl(
+        source$dtconn$connection,
+        dbplyr::in_schema(source$dtconn$schema, table)
+      )
+      attr(tbl_conn, "tbl_name") <- table
+      tbl_conn
+    }
+  )
+}
+```
+
+3. **`.pre_filtering` (optional) - modify data object before filtering**
+
+Required parameters:
+
+- `source`, 
+- `data_object` - an object following the structure of `.init_step`, 
+- `step_id` - id of the filtering step
+
+Details:
+
+- An optional method used to prepare data for filtering (cleaning up attributes, creating middle step objects etc.).
+
+Examples:
+
+- `cohortBuilder` - tblist class. Cleaning up `filtered` attribute for new step data.
+
+```{r, eval = FALSE}
+.pre_filtering.tblist <- function(source, data_object, step_id) {
+  for (dataset in names(data_object)) {
+    attr(data_object[[dataset]], "filtered") <- FALSE
+  }
+  return(data_object)
+}
+```
+
+- `cohortBuilder.db` - creating temp tables for the current step in database and cleaning up `filtered` attributes.
+
+```{r, eval = FALSE}
+.pre_filtering.db <- function(source, data_object, step_id) {
+  purrr::map(
+    stats::setNames(source$dtconn$tables, source$dtconn$tables),
+    function(table) {
+      table_name <- tmp_table_name(attr(data_object[[table]], "tbl_name"), step_id)
+      DBI::dbRemoveTable(source$dtconn$connection, table_name, temporary = TRUE, fail_if_missing = FALSE)
+      data_object[[table]] <- dplyr::compute(
+        data_object[[table]],
+        name = table_name
+      )
+      attr(data_object[[table]], "filtered") <- FALSE
+      return(data_object[[table]])
+    }
+  )
+}
+```
+
+4. **`.post_filtering` (optional) - data object modification after filtering (before running binding).**
+
+Required parameters:
+
+- source, 
+- data_object - an object following the structure of `.init_step`, 
+- step_id - id of the filtering step
+
+5. **`.collect_data` - define how to collect data object into R.**
+
+Required parameters:
+
+- source, 
+- data_object - an object following the structure of `.init_step`
+
+Details:
+
+- `cohortBuilder`'s equivalent of `collect` method known for sourcing the object into R memory when working with remote environment (e.g. database).
+- When operating in R memory it's enough to return `data_object`.
+
+Examples:
+
+- `cohortBuilder` - operating in R memory, so return `data_object`.
+
+```{r, eval = FALSE}
+.collect_data.tblist <- function(source, data_object) {
+  data_object
+}
+```
+
+- `cohortBuilder.db` - collect tables from database and return as a named list.
+
+```{r, eval = FALSE}
+.collect_data.db <- function(source, data_object) {
+  purrr::map(
+    stats::setNames(source$dtconn$tables, source$dtconn$tables),
+    ~dplyr::collect(data_object[[.x]])
+  )
+}
+```
+
+6. **`.get_stats` - collect data object stats**
+
+Required parameters:
+
+- `source`, 
+- `data_object`
+
+Details:
+
+- There are no obligatory statistics to be returned.
+- The calculated statistic is cached within Cohort object after each step filtering.
+- Returned stats plays mostly read-only role. The only situation the stats are used is within `.get_attrition_count` and `shinyCohortBuilder` integration.
+
+Examples:
+
+- `cohortBuilder` - operating in R memory, so return `data_object`.
+
+```{r, eval = FALSE}
+.get_stats.tblist <- function(source, data_object) {
+  dataset_names <- names(source$dtconn)
+  dataset_names %>%
+    purrr::map(
+      ~ list(n_rows = nrow(data_object[[.x]]))
+    ) %>%
+    stats::setNames(dataset_names)
+}
+```
+
+- `cohortBuilder.db` - collect tables from database and return as a named list.
+
+```{r, eval = FALSE}
+.get_stats.db <- function(source, data_object) {
+  dataset_names <- source$dtconn$tables
+  dataset_names %>%
+    purrr::map(
+      ~ list(
+        n_rows = data_object[[.x]] %>%
+          dplyr::summarise(n = n()) %>%
+          dplyr::collect() %>%
+          dplyr::pull(n) %>%
+          as.integer()
+      )
+    ) %>%
+    stats::setNames(dataset_names)
+}
+```
+
+7. **`.run_binding` - method defining how [binding](binding-keys.html) should be handled**
+
+Required parameters:
+
+- `source`, 
+- `binding_key` - binding key definition, 
+- `data_object_pre` - data object state before filtering in the current step, 
+- `data_object_post` - data object state after filtering in the current step (including effect of previous bindings)
+
+Details:
+
+- Binding is run after applying all the filters in the current filtering step (and applying `.post_filtering` if defined).
+- When filtering is finished, binding loop starts iterating over all the defined bindings. `.run_binding` takes care of handling a single iteration.
+- The returned bound data, should preserve the structure of `.init_step` method output.
+- You should preserve the assumed binding rules described in [bindings-keys](binding-keys.html) (i.e. handling `post = TRUE/FALSE`, `activate = TRUE/FALSE` and `filtered` attribute) but this is not obligatory.
+
+Examples:
+
+- `cohortBuilder`
+
+```{r, eval = FALSE}
+.run_binding.tblist <- function(source, binding_key, data_object_pre, data_object_post, ...) {
+  binding_dataset <- binding_key$update$dataset
+  dependent_datasets <- names(binding_key$data_keys)
+  active_datasets <- data_object_post %>%
+    purrr::keep(~ attr(., "filtered")) %>%
+    names()
+
+  if (!any(dependent_datasets %in% active_datasets)) {
+    return(data_object_post)
+  }
+
+  key_values <- NULL
+  common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))
+  for (dependent_dataset in dependent_datasets) {
+    key_names <- binding_key$data_keys[[dependent_dataset]]$key
+    tmp_key_values <- dplyr::distinct(data_object_post[[dependent_dataset]][, key_names, drop = FALSE]) %>%
+      stats::setNames(common_key_names)
+    if (is.null(key_values)) {
+      key_values <- tmp_key_values
+    } else {
+      key_values <- dplyr::inner_join(key_values, tmp_key_values, by = common_key_names)
+    }
+  }
+
+  data_object_post[[binding_dataset]] <- dplyr::inner_join(
+    switch(
+      as.character(binding_key$post),
+      "FALSE" = data_object_pre[[binding_dataset]],
+      "TRUE" = data_object_post[[binding_dataset]]
+    ),
+    key_values,
+    by = stats::setNames(common_key_names, binding_key$update$key)
+  )
+  if (binding_key$activate) {
+    attr(data_object_post[[binding_dataset]], "filtered") <- TRUE
+  }
+
+  return(data_object_post)
+}
+```
+
+- `cohortBuilder.db` - not implemented yet
+
+8. **`.get_attrition_count` - define how to get metric used for attrition data plot**
+
+Required parameters:
+
+- `source`, 
+- `data_stats` - statistics related to each step data - list of `.get_stats` results for each step (and original data, assigned to `step_id = 0`), 
+
+Details:
+
+- The output should return vector of length `n+1` where `n` is number of steps. The first element of the vector should describe statistic for the base, unfiltered data.
+- You may define additional parameters which can be passed to `attrition` method of Cohort object (e.g. `dataset` in the below example).
+
+Examples:
+
+- `cohortBuilder`
+
+```{r, eval = FALSE}
+.get_attrition_count.tblist <- function(source, data_stats, dataset, ...) {
+  data_stats %>%
+    purrr::map_int(~.[[dataset]][["n_rows"]])
+}
+```
+
+- `cohortBuilder.db` - not implemented yet
+
+9. **`.get_attrition_label` - define label displayed in attrition plot for the specified step**
+
+Required parameters:
+
+- `source`, 
+- `step_id` - id of the step (`"0"` for original data case),
+- `step_filters` - list storing filters configuration for the selected step (`NULL` for original data case),
+
+Details:
+
+- Please remember to define label for the initial data state (`step_id = "0"` case).
+- You may define additional parameters which can be passed to `attrition` method of Cohort object (e.g. `dataset` in the below example).
+
+Examples:
+
+- `cohortBuilder`
+
+```{r, eval = FALSE}
+get_attrition_label.tblist <- function(source, step_id, step_filters, dataset, ...) {
+  pkey <- source$primary_keys
+  binding_keys <- source$binding_keys
+  if (step_id == "0") {
+    if (is.null(pkey)) {
+      return(dataset)
+    } else {
+      dataset_pkey <- .get_item(pkey, "dataset", dataset)[1][[1]]$key
+      if (is.null(dataset_pkey)) return(dataset)
+      return(glue::glue("{dataset}\n primary key: {paste(dataset_pkey, collapse = ', ')}"))
+    }
+  }
+  filters_section <- step_filters %>%
+    purrr::keep(~.$dataset == dataset) %>%
+    purrr::map(~get_attrition_filter_label(.$name, .$value_name, .$value)) %>%
+    paste(collapse = "\n")
+  bind_keys_section <- ""
+  if (!is.null(binding_keys)) {
+    dependent_datasets <- .get_item(
+      binding_keys, attribute = "update", value = dataset,
+      operator = function(value, target) {
+        value == target$dataset
+      }
+    ) %>%
+      purrr::map(~names(.[["data_keys"]])) %>%
+      unlist() %>%
+      unique()
+    if (length(dependent_datasets) > 0) {
+      bind_keys_section <- glue::glue(
+        "\nData linked with external datasets: {paste(dependent_datasets, collapse = ', ')}",
+        .trim = FALSE
+      )
+    }
+  }
+  gsub(
+    "\n$",
+    "",
+    glue::glue("Step: {step_id}\n{filters_section}{bind_keys_section}")
+  )
+}
+```
+
+- `cohortBuilder.db` - not implemented yet

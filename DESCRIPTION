@@ -1,0 +1,54 @@
+Package: cohortBuilder
+Type: Package
+Title: Data Source Agnostic Filtering Tools
+Version: 0.0.0.9037
+Authors@R: 
+    c(person('Krystian', 'Igras', 
+             email = 'krystian8207@gmail.com', 
+             role = c('cre', 'aut')),
+      person('Adam', 'Foryś',
+             role = "ctb"))
+Maintainer: The package maintainer <krystian8207@gmail.com>
+Description: Common API for filtering data stored in sources of different kind.
+    The package offers multiple steps filtering in which various filtering methods can be used. 
+    Works standalone or can be used as a backend for shinyCohortBuilder package.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    yaml,
+    jsonlite,
+    purrr,
+    dplyr (>= 1.0.0),
+    tidyr,
+    magrittr,
+    glue,
+    R6,
+    ggplot2,
+    rlang (>= 1.0),
+    formatR
+KeepSource: true
+RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0),
+    shiny,
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+Collate:
+    'cohortBuilder-package.R'
+    'cohort_methods.R'
+    'source_methods.R'
+    'step.R'
+    'filter.R'
+    'attrition.R'
+    'bind_keys.R'
+    'hooks.R'
+    'list_operators.R'
+    'repro_code_utils.R'
+    'source_tblist.R'
+    'data.R'
+VignetteBuilder: knitr
+URL: https://github.com/r-world-devs/shinyGizmo/,  https://r-world-devs.github.io/cohortBuilder/
+Depends: 
+    R (>= 3.5.0)

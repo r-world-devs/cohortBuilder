@@ -1,0 +1,222 @@
+---
+title: "Managing Cohort Object"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Managing Cohort Object}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options("tibble.print_min" = 5, "tibble.print_max" = 5)
+library(magrittr)
+library(cohortBuilder)
+```
+
+When working with already defined cohort, you may want to manipulate its 
+configuration (i.e. filter value) without the need to create the cohort from scratch.
+
+`cohortBuilder` offers various methods that perform common Cohort management operations.
+
+To present the functionality we'll be working on the below `librarian_cohort` object:
+
+```{r}
+librarian_source <- set_source(
+  as.tblist(librarian)
+)
+
+librarian_cohort <- librarian_source %>% 
+  cohort(
+    step(
+      filter(
+        "discrete", id = "author", dataset = "books", 
+        variable = "author", value = "Dan Brown"
+      ),
+      filter(
+        "discrete", id = "program", dataset = "borrowers", 
+        variable = "program", value = "premium", keep_na = FALSE
+      )
+    ),
+    step(
+      filter(
+        "range", id = "copies", dataset = "books", 
+        variable = "copies", range = c(-Inf, 5)
+      )
+    ),
+    run_flow = TRUE
+  )
+```
+
+## Managing filters
+
+In order to manage filters configuration you may call the following methods:
+
+- `update_filter` - to update filter configuration,
+- `add_filter` - to add new filter in the selected step,
+- `rm_filter` - to remove filter in the existing step.
+
+Updating filter:
+
+```{r}
+librarian_cohort %>% 
+  update_filter(
+    step_id = 1, filter_id = "author", value = c("Dan Brown", "Khaled Hosseini")
+  )
+
+sum_up(librarian_cohort)
+```
+
+Adding new filter:
+
+```{r}
+librarian_cohort %>% 
+  add_filter(
+    filter(
+      "date_range", id = "issue_date", dataset = "issues", 
+      variable = "date", range = c(as.Date("2010-01-01"), Inf)
+    ),
+    step_id = 2
+  )
+
+sum_up(librarian_cohort)
+```
+
+Removing filter:
+
+```{r}
+librarian_cohort %>% 
+  rm_filter(step_id = 2, filter_id = "copies")
+
+sum_up(librarian_cohort)
+```
+
+By default the above configuration doesn't trigger data recalculation so we need to call `run` method.
+
+Calling `run` we trigger all steps computations. In our case we've updated only the 
+second step so we can optimize workflow skipping the previous steps calculation by specifying `min_step_id` parameter:
+
+```{r}
+run(librarian_cohort, min_step_id = 2)
+
+get_data(librarian_cohort)
+```
+
+**Note.** If you want to run data computation directly after calling one of the 
+above methods just set `run_flow = TRUE` within the method.
+
+## Managing steps
+
+Similar to filter, you can operate on the Cohort to manage steps.
+`cohortBuilder` offers `add_step` and `rm_step` methods to add new, or remove existing step respectively.
+
+```{r}
+librarian_cohort %>% 
+  rm_step(step_id = 1)
+
+sum_up(librarian_cohort)
+```
+
+**Note.** Removing not the last step results with renaming all step ids (so that we always have steps numbering starting with 1).
+
+```{r}
+librarian_cohort %>% 
+  add_step(
+    step(
+      filter(
+        "discrete", id = "author", dataset = "books", 
+        variable = "author", value = "Dan Brown"
+      ),
+      filter(
+        "discrete", id = "program", dataset = "borrowers", 
+        variable = "program", value = "premium", keep_na = FALSE
+      )
+    )
+  )
+
+sum_up(librarian_cohort)
+```
+
+**Note.** All the methods used for managing steps and filters can be also called on Source object itself.
+See `vignette("cohort-configuration")`.
+
+## Managing source
+
+The last Cohort configuration component - source, can be also managed within the Cohort itself.
+With `update_source` method you can change the source defined in the existing Cohort.
+
+Below we update cohort with Source having `source_code` parameter defined:
+```{r}
+code(librarian_cohort)
+
+new_source <- set_source(
+  as.tblist(librarian),
+  source_code = quote({
+    source <- list(attributes = list(datasets = librarian))
+  })
+)
+
+update_source(librarian_cohort, new_source)
+code(librarian_cohort)
+sum_up(librarian_cohort)
+code(librarian_cohort)
+```
+
+Note that updating source doesn't remove Cohort configuration (steps and filters).
+If you want to clear the configuration just set `keep_steps = FALSE`:
+
+```{r}
+update_source(librarian_cohort, new_source, keep_steps = FALSE)
+sum_up(librarian_cohort)
+```
+
+You can also use `update_source` to add Source to an empty Cohort:
+
+```{r}
+empty_cohort <- cohort()
+update_source(librarian_cohort, new_source)
+sum_up(empty_cohort)
+```
+
+The `update_source` method can be also useful if you want to update source along with steps and filters configuration.
+
+In this case, the good practice is to keep the configuration directly in Source:
+
+```{r}
+source_one <- set_source(
+  as.tblist(librarian)
+) %>% 
+  add_step(
+    step(
+      filter(
+        "discrete", id = "author", dataset = "books", 
+        variable = "author", value = "Dan Brown"
+      ),
+      filter(
+        "discrete", id = "program", dataset = "borrowers", 
+        variable = "program", value = "premium", keep_na = FALSE
+      )
+    )
+  )
+
+source_two <- set_source(
+  as.tblist(librarian)
+) %>% 
+  add_step(
+    step(
+      filter(
+        "range", id = "copies", dataset = "books", 
+        variable = "copies", range = c(-Inf, 5)
+      )
+    )
+  )
+
+my_cohort <- cohort(source_one)
+sum_up(my_cohort)
+
+update_source(my_cohort, source_two)
+sum_up(my_cohort)
+```
