@@ -136,7 +136,7 @@
 <span class="co">#&gt; function(type, ...) {</span>
 <span class="co">#&gt;   UseMethod("filter", type)</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x562c8b1e8208&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x555712e496d8&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></code></pre></div>
 <p>So in case of <code>discrete</code> filter, the proper used method is:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -156,7 +156,7 @@
 <span class="co">#&gt;     }</span>
 <span class="co">#&gt;   )</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x562c8b7717b8&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x5557133d2c88&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></code></pre></div>
 <p>that gathers provided parameters and returns function of <code>source</code> argument:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -168,8 +168,8 @@
 <span class="co">#&gt;         append(list(source = source), args)</span>
 <span class="co">#&gt;       )</span>
 <span class="co">#&gt;     }</span>
-<span class="co">#&gt; &lt;bytecode: 0x562c8b76a880&gt;</span>
-<span class="co">#&gt; &lt;environment: 0x562c8b9e16c8&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x5557133cbd50&gt;</span>
+<span class="co">#&gt; &lt;environment: 0x555713642c18&gt;</span>
 <span class="co">#&gt; attr(,"class")</span>
 <span class="co">#&gt; [1] "function"              "cb_filter_constructor"</span></code></pre></div>
 <p>So whenever we define filter of specific type it returns unevaluated function of <code>source</code> parameter.</p>
@@ -179,7 +179,7 @@
 <span class="co">#&gt; function(source, ...) {</span>
 <span class="co">#&gt;   UseMethod("cb_filter.discrete", source)</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x562c8b1d7868&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x555712e38d38&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></code></pre></div>
 <p>With such approach for having two layers of S3 methods, we are allowed to to build various filter types, for various source types. For example discrete filter for tblist source, discrete filter for db source, range filter for raw source etc.</p>
 <p>Now, let’s check what object stores filter evaluated on source:</p>
@@ -192,9 +192,9 @@
   give.attr <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span>
 <span class="co">#&gt; List of 10</span>
-<span class="co">#&gt;  $ id          : chr "WNXUZ1653245482319"</span>
+<span class="co">#&gt;  $ id          : chr "PZJPX1653245702998"</span>
 <span class="co">#&gt;  $ type        : 'discrete' chr "discrete"</span>
-<span class="co">#&gt;  $ name        : chr "WNXUZ1653245482319"</span>
+<span class="co">#&gt;  $ name        : chr "PZJPX1653245702998"</span>
 <span class="co">#&gt;  $ input_param : chr "value"</span>
 <span class="co">#&gt;  $ filter_data :function (data_object)  </span>
 <span class="co">#&gt;  $ get_stats   :function (data_object, name)  </span>
