@@ -122,7 +122,7 @@ Cohort <- R6::R6Class(
         )
       )
       if (run_flow) {
-        self$run_flow()
+        self$run_flow(min_step = step_config$step)
       }
     },
     #' @description
@@ -634,11 +634,13 @@ Cohort <- R6::R6Class(
       filter_ids <- names(self$get_step(step_id)$filters)
       is_cached <- !is.null(self$get_cache(step_id, state = "pre"))
 
+      # todo make sure is_cached logic is correct
       if (!is_cached) {
         self$update_cache(step_id, state = "pre")
       }
       self$update_cache(step_id, state = "post")
       for (filter_id in filter_ids) {
+        is_cached <- !is.null(self$get_cache(step_id, filter_id, state = "pre"))
         if (!is_cached) {
           self$update_cache(step_id, filter_id, state = "pre")
         }

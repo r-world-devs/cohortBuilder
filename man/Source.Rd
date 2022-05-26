@@ -34,20 +34,20 @@ primary keys and relations between stored data.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Source$new()}}
-\item \href{#method-get}{\code{Source$get()}}
-\item \href{#method-get_steps}{\code{Source$get_steps()}}
-\item \href{#method-add_step}{\code{Source$add_step()}}
-\item \href{#method-rm_step}{\code{Source$rm_step()}}
-\item \href{#method-add_filter}{\code{Source$add_filter()}}
-\item \href{#method-rm_filter}{\code{Source$rm_filter()}}
-\item \href{#method-update_filter}{\code{Source$update_filter()}}
-\item \href{#method-clone}{\code{Source$clone()}}
+\item \href{#method-Source-new}{\code{Source$new()}}
+\item \href{#method-Source-get}{\code{Source$get()}}
+\item \href{#method-Source-get_steps}{\code{Source$get_steps()}}
+\item \href{#method-Source-add_step}{\code{Source$add_step()}}
+\item \href{#method-Source-rm_step}{\code{Source$rm_step()}}
+\item \href{#method-Source-add_filter}{\code{Source$add_filter()}}
+\item \href{#method-Source-rm_filter}{\code{Source$rm_filter()}}
+\item \href{#method-Source-update_filter}{\code{Source$update_filter()}}
+\item \href{#method-Source-clone}{\code{Source$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Source-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new `Source` object.
 \subsection{Usage}{
@@ -89,8 +89,8 @@ A new `Source` object of class `Source` (and `dtconn` class appended).
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get"></a>}}
-\if{latex}{\out{\hypertarget{method-get}{}}}
+\if{html}{\out{<a id="method-Source-get"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-get}{}}}
 \subsection{Method \code{get()}}{
 Get selected `Source` object `attribute`.
 \subsection{Usage}{
@@ -106,8 +106,8 @@ Get selected `Source` object `attribute`.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_steps"></a>}}
-\if{latex}{\out{\hypertarget{method-get_steps}{}}}
+\if{html}{\out{<a id="method-Source-get_steps"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-get_steps}{}}}
 \subsection{Method \code{get_steps()}}{
 Returns filtering steps definition, if defined for `Source`.
 \subsection{Usage}{
@@ -116,8 +116,8 @@ Returns filtering steps definition, if defined for `Source`.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_step"></a>}}
-\if{latex}{\out{\hypertarget{method-add_step}{}}}
+\if{html}{\out{<a id="method-Source-add_step"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-add_step}{}}}
 \subsection{Method \code{add_step()}}{
 Add filtering step definition.
 \subsection{Usage}{
@@ -133,8 +133,8 @@ Add filtering step definition.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-rm_step"></a>}}
-\if{latex}{\out{\hypertarget{method-rm_step}{}}}
+\if{html}{\out{<a id="method-Source-rm_step"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-rm_step}{}}}
 \subsection{Method \code{rm_step()}}{
 Remove filtering step definition.
 \subsection{Usage}{
@@ -150,8 +150,8 @@ Remove filtering step definition.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_filter"></a>}}
-\if{latex}{\out{\hypertarget{method-add_filter}{}}}
+\if{html}{\out{<a id="method-Source-add_filter"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-add_filter}{}}}
 \subsection{Method \code{add_filter()}}{
 Add filter definition to selected step.
 \subsection{Usage}{
@@ -170,8 +170,8 @@ If skipped the last step is used.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-rm_filter"></a>}}
-\if{latex}{\out{\hypertarget{method-rm_filter}{}}}
+\if{html}{\out{<a id="method-Source-rm_filter"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-rm_filter}{}}}
 \subsection{Method \code{rm_filter()}}{
 Remove filter definition from selected step.
 \subsection{Usage}{
@@ -189,8 +189,8 @@ Remove filter definition from selected step.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-update_filter"></a>}}
-\if{latex}{\out{\hypertarget{method-update_filter}{}}}
+\if{html}{\out{<a id="method-Source-update_filter"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-update_filter}{}}}
 \subsection{Method \code{update_filter()}}{
 Update filter definition.
 \subsection{Usage}{
@@ -210,8 +210,8 @@ Update filter definition.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Source-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

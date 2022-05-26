@@ -21,44 +21,44 @@ Cohort object is designed to make operations on source data possible.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Cohort$new()}}
-\item \href{#method-add_source}{\code{Cohort$add_source()}}
-\item \href{#method-update_source}{\code{Cohort$update_source()}}
-\item \href{#method-get_source}{\code{Cohort$get_source()}}
-\item \href{#method-add_step}{\code{Cohort$add_step()}}
-\item \href{#method-copy_step}{\code{Cohort$copy_step()}}
-\item \href{#method-remove_step}{\code{Cohort$remove_step()}}
-\item \href{#method-add_filter}{\code{Cohort$add_filter()}}
-\item \href{#method-remove_filter}{\code{Cohort$remove_filter()}}
-\item \href{#method-update_filter}{\code{Cohort$update_filter()}}
-\item \href{#method-clear_filter}{\code{Cohort$clear_filter()}}
-\item \href{#method-clear_step}{\code{Cohort$clear_step()}}
-\item \href{#method-sum_up_state}{\code{Cohort$sum_up_state()}}
-\item \href{#method-get_state}{\code{Cohort$get_state()}}
-\item \href{#method-restore}{\code{Cohort$restore()}}
-\item \href{#method-get_data}{\code{Cohort$get_data()}}
-\item \href{#method-plot_data}{\code{Cohort$plot_data()}}
-\item \href{#method-show_attrition}{\code{Cohort$show_attrition()}}
-\item \href{#method-get_stats}{\code{Cohort$get_stats()}}
-\item \href{#method-show_help}{\code{Cohort$show_help()}}
-\item \href{#method-get_code}{\code{Cohort$get_code()}}
-\item \href{#method-run_flow}{\code{Cohort$run_flow()}}
-\item \href{#method-run_step}{\code{Cohort$run_step()}}
-\item \href{#method-bind_data}{\code{Cohort$bind_data()}}
-\item \href{#method-describe_state}{\code{Cohort$describe_state()}}
-\item \href{#method-get_step}{\code{Cohort$get_step()}}
-\item \href{#method-get_filter}{\code{Cohort$get_filter()}}
-\item \href{#method-update_cache}{\code{Cohort$update_cache()}}
-\item \href{#method-get_cache}{\code{Cohort$get_cache()}}
-\item \href{#method-list_active_filters}{\code{Cohort$list_active_filters()}}
-\item \href{#method-last_step_id}{\code{Cohort$last_step_id()}}
-\item \href{#method-modify}{\code{Cohort$modify()}}
-\item \href{#method-clone}{\code{Cohort$clone()}}
+\item \href{#method-Cohort-new}{\code{Cohort$new()}}
+\item \href{#method-Cohort-add_source}{\code{Cohort$add_source()}}
+\item \href{#method-Cohort-update_source}{\code{Cohort$update_source()}}
+\item \href{#method-Cohort-get_source}{\code{Cohort$get_source()}}
+\item \href{#method-Cohort-add_step}{\code{Cohort$add_step()}}
+\item \href{#method-Cohort-copy_step}{\code{Cohort$copy_step()}}
+\item \href{#method-Cohort-remove_step}{\code{Cohort$remove_step()}}
+\item \href{#method-Cohort-add_filter}{\code{Cohort$add_filter()}}
+\item \href{#method-Cohort-remove_filter}{\code{Cohort$remove_filter()}}
+\item \href{#method-Cohort-update_filter}{\code{Cohort$update_filter()}}
+\item \href{#method-Cohort-clear_filter}{\code{Cohort$clear_filter()}}
+\item \href{#method-Cohort-clear_step}{\code{Cohort$clear_step()}}
+\item \href{#method-Cohort-sum_up_state}{\code{Cohort$sum_up_state()}}
+\item \href{#method-Cohort-get_state}{\code{Cohort$get_state()}}
+\item \href{#method-Cohort-restore}{\code{Cohort$restore()}}
+\item \href{#method-Cohort-get_data}{\code{Cohort$get_data()}}
+\item \href{#method-Cohort-plot_data}{\code{Cohort$plot_data()}}
+\item \href{#method-Cohort-show_attrition}{\code{Cohort$show_attrition()}}
+\item \href{#method-Cohort-get_stats}{\code{Cohort$get_stats()}}
+\item \href{#method-Cohort-show_help}{\code{Cohort$show_help()}}
+\item \href{#method-Cohort-get_code}{\code{Cohort$get_code()}}
+\item \href{#method-Cohort-run_flow}{\code{Cohort$run_flow()}}
+\item \href{#method-Cohort-run_step}{\code{Cohort$run_step()}}
+\item \href{#method-Cohort-bind_data}{\code{Cohort$bind_data()}}
+\item \href{#method-Cohort-describe_state}{\code{Cohort$describe_state()}}
+\item \href{#method-Cohort-get_step}{\code{Cohort$get_step()}}
+\item \href{#method-Cohort-get_filter}{\code{Cohort$get_filter()}}
+\item \href{#method-Cohort-update_cache}{\code{Cohort$update_cache()}}
+\item \href{#method-Cohort-get_cache}{\code{Cohort$get_cache()}}
+\item \href{#method-Cohort-list_active_filters}{\code{Cohort$list_active_filters()}}
+\item \href{#method-Cohort-last_step_id}{\code{Cohort$last_step_id()}}
+\item \href{#method-Cohort-modify}{\code{Cohort$modify()}}
+\item \href{#method-Cohort-clone}{\code{Cohort$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Cohort-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-new}{}}}
 \subsection{Method \code{new()}}{
 Create Cohort object.
 \subsection{Usage}{
@@ -87,8 +87,8 @@ See \link{hooks} for more details.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_source"></a>}}
-\if{latex}{\out{\hypertarget{method-add_source}{}}}
+\if{html}{\out{<a id="method-Cohort-add_source"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-add_source}{}}}
 \subsection{Method \code{add_source()}}{
 Add Source to Cohort object.
 \subsection{Usage}{
@@ -104,8 +104,8 @@ Add Source to Cohort object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-update_source"></a>}}
-\if{latex}{\out{\hypertarget{method-update_source}{}}}
+\if{html}{\out{<a id="method-Cohort-update_source"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-update_source}{}}}
 \subsection{Method \code{update_source()}}{
 Update Source in the Cohort object.
 \subsection{Usage}{
@@ -136,8 +136,8 @@ See \link{hooks} for more details.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_source"></a>}}
-\if{latex}{\out{\hypertarget{method-get_source}{}}}
+\if{html}{\out{<a id="method-Cohort-get_source"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_source}{}}}
 \subsection{Method \code{get_source()}}{
 Return Source object attached to Cohort.
 \subsection{Usage}{
@@ -146,8 +146,8 @@ Return Source object attached to Cohort.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_step"></a>}}
-\if{latex}{\out{\hypertarget{method-add_step}{}}}
+\if{html}{\out{<a id="method-Cohort-add_step"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-add_step}{}}}
 \subsection{Method \code{add_step()}}{
 Add filtering step definition
 \subsection{Usage}{
@@ -173,8 +173,8 @@ See \link{hooks} for more details.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-copy_step"></a>}}
-\if{latex}{\out{\hypertarget{method-copy_step}{}}}
+\if{html}{\out{<a id="method-Cohort-copy_step"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-copy_step}{}}}
 \subsection{Method \code{copy_step()}}{
 Copy selected step.
 \subsection{Usage}{
@@ -193,8 +193,8 @@ The copied step is added as the last one in the Cohort.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-remove_step"></a>}}
-\if{latex}{\out{\hypertarget{method-remove_step}{}}}
+\if{html}{\out{<a id="method-Cohort-remove_step"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-remove_step}{}}}
 \subsection{Method \code{remove_step()}}{
 Remove filtering step definition
 \subsection{Usage}{
@@ -219,8 +219,8 @@ See \link{hooks} for more details.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_filter"></a>}}
-\if{latex}{\out{\hypertarget{method-add_filter}{}}}
+\if{html}{\out{<a id="method-Cohort-add_filter"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-add_filter}{}}}
 \subsection{Method \code{add_filter()}}{
 Add filter definition
 \subsection{Usage}{
@@ -241,8 +241,8 @@ If missing, filter is added to the last step.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-remove_filter"></a>}}
-\if{latex}{\out{\hypertarget{method-remove_filter}{}}}
+\if{html}{\out{<a id="method-Cohort-remove_filter"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-remove_filter}{}}}
 \subsection{Method \code{remove_filter()}}{
 Remove filter definition
 \subsection{Usage}{
@@ -262,8 +262,8 @@ Remove filter definition
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-update_filter"></a>}}
-\if{latex}{\out{\hypertarget{method-update_filter}{}}}
+\if{html}{\out{<a id="method-Cohort-update_filter"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-update_filter}{}}}
 \subsection{Method \code{update_filter()}}{
 Update filter definition
 \subsection{Usage}{
@@ -287,8 +287,8 @@ Update filter definition
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clear_filter"></a>}}
-\if{latex}{\out{\hypertarget{method-clear_filter}{}}}
+\if{html}{\out{<a id="method-Cohort-clear_filter"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-clear_filter}{}}}
 \subsection{Method \code{clear_filter()}}{
 Reset filter to its default values.
 \subsection{Usage}{
@@ -308,8 +308,8 @@ Reset filter to its default values.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clear_step"></a>}}
-\if{latex}{\out{\hypertarget{method-clear_step}{}}}
+\if{html}{\out{<a id="method-Cohort-clear_step"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-clear_step}{}}}
 \subsection{Method \code{clear_step()}}{
 Reset all filters included in selected step.
 \subsection{Usage}{
@@ -327,8 +327,8 @@ Reset all filters included in selected step.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sum_up_state"></a>}}
-\if{latex}{\out{\hypertarget{method-sum_up_state}{}}}
+\if{html}{\out{<a id="method-Cohort-sum_up_state"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-sum_up_state}{}}}
 \subsection{Method \code{sum_up_state()}}{
 Sum up Cohort configuration - Source, steps definition and evaluated data.
 \subsection{Usage}{
@@ -337,8 +337,8 @@ Sum up Cohort configuration - Source, steps definition and evaluated data.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_state"></a>}}
-\if{latex}{\out{\hypertarget{method-get_state}{}}}
+\if{html}{\out{<a id="method-Cohort-get_state"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_state}{}}}
 \subsection{Method \code{get_state()}}{
 Get Cohort configuration state.
 \subsection{Usage}{
@@ -359,13 +359,15 @@ Restore Cohort configuration.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-restore"></a>}}
-\if{latex}{\out{\hypertarget{method-restore}{}}}
+\if{html}{\out{<a id="method-Cohort-restore"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-restore}{}}}
 \subsection{Method \code{restore()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Cohort$restore(
   state,
-  modifier = function(prev_state, state) {     state },
+  modifier = function(prev_state, state) {
+     state
+ },
   run_flow = FALSE,
   hook = list(pre = get_hook("pre_restore_hook"), post = get_hook("post_restore_hook"))
 )}\if{html}{\out{</div>}}
@@ -388,8 +390,8 @@ See \link{hooks} for more details.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_data"></a>}}
-\if{latex}{\out{\hypertarget{method-get_data}{}}}
+\if{html}{\out{<a id="method-Cohort-get_data"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_data}{}}}
 \subsection{Method \code{get_data()}}{
 Get step related data
 \subsection{Usage}{
@@ -409,8 +411,8 @@ Get step related data
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot_data"></a>}}
-\if{latex}{\out{\hypertarget{method-plot_data}{}}}
+\if{html}{\out{<a id="method-Cohort-plot_data"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-plot_data}{}}}
 \subsection{Method \code{plot_data()}}{
 Plot filter specific data summary.
 \subsection{Usage}{
@@ -432,8 +434,8 @@ Plot filter specific data summary.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-show_attrition"></a>}}
-\if{latex}{\out{\hypertarget{method-show_attrition}{}}}
+\if{html}{\out{<a id="method-Cohort-show_attrition"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-show_attrition}{}}}
 \subsection{Method \code{show_attrition()}}{
 Show attrition plot.
 \subsection{Usage}{
@@ -451,8 +453,8 @@ Show attrition plot.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_stats"></a>}}
-\if{latex}{\out{\hypertarget{method-get_stats}{}}}
+\if{html}{\out{<a id="method-Cohort-get_stats"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_stats}{}}}
 \subsection{Method \code{get_stats()}}{
 Get Cohort related statistics.
 \subsection{Usage}{
@@ -476,8 +478,8 @@ filtering in specified step.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-show_help"></a>}}
-\if{latex}{\out{\hypertarget{method-show_help}{}}}
+\if{html}{\out{<a id="method-Cohort-show_help"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-show_help}{}}}
 \subsection{Method \code{show_help()}}{
 Show source data or filter description
 \subsection{Usage}{
@@ -506,8 +508,8 @@ The function can be used to modify its argument (convert to html, display in bro
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_code"></a>}}
-\if{latex}{\out{\hypertarget{method-get_code}{}}}
+\if{html}{\out{<a id="method-Cohort-get_code"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_code}{}}}
 \subsection{Method \code{get_code()}}{
 Return reproducible data filtering code.
 \subsection{Usage}{
@@ -529,8 +531,8 @@ If `filter_id` not missing, `step_id` defines from which step the filter should 
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run_flow"></a>}}
-\if{latex}{\out{\hypertarget{method-run_flow}{}}}
+\if{html}{\out{<a id="method-Cohort-run_flow"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-run_flow}{}}}
 \subsection{Method \code{run_flow()}}{
 Trigger data calculations sequentially.
 \subsection{Usage}{
@@ -553,8 +555,8 @@ See \link{hooks} for more details.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-run_step"></a>}}
-\if{latex}{\out{\hypertarget{method-run_step}{}}}
+\if{html}{\out{<a id="method-Cohort-run_step"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-run_step}{}}}
 \subsection{Method \code{run_step()}}{
 Trigger data calculations for selected step.
 \subsection{Usage}{
@@ -577,8 +579,8 @@ See \link{hooks} for more details.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-bind_data"></a>}}
-\if{latex}{\out{\hypertarget{method-bind_data}{}}}
+\if{html}{\out{<a id="method-Cohort-bind_data"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-bind_data}{}}}
 \subsection{Method \code{bind_data()}}{
 Run data binding for selected step.
   See more at \link{binding-keys}.
@@ -595,8 +597,8 @@ Run data binding for selected step.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-describe_state"></a>}}
-\if{latex}{\out{\hypertarget{method-describe_state}{}}}
+\if{html}{\out{<a id="method-Cohort-describe_state"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-describe_state}{}}}
 \subsection{Method \code{describe_state()}}{
 Print defined steps configuration.
 \subsection{Usage}{
@@ -605,8 +607,8 @@ Print defined steps configuration.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_step"></a>}}
-\if{latex}{\out{\hypertarget{method-get_step}{}}}
+\if{html}{\out{<a id="method-Cohort-get_step"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_step}{}}}
 \subsection{Method \code{get_step()}}{
 Get selected step configuration.
 \subsection{Usage}{
@@ -622,8 +624,8 @@ Get selected step configuration.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_filter"></a>}}
-\if{latex}{\out{\hypertarget{method-get_filter}{}}}
+\if{html}{\out{<a id="method-Cohort-get_filter"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_filter}{}}}
 \subsection{Method \code{get_filter()}}{
 Get selected filter configuration.
 \subsection{Usage}{
@@ -643,8 +645,8 @@ Get selected filter configuration.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-update_cache"></a>}}
-\if{latex}{\out{\hypertarget{method-update_cache}{}}}
+\if{html}{\out{<a id="method-Cohort-update_cache"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-update_cache}{}}}
 \subsection{Method \code{update_cache()}}{
 Update filter or step cache.
 Caching is saving step and filter attached data statistics such as number of
@@ -668,8 +670,8 @@ filtering in specified step.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_cache"></a>}}
-\if{latex}{\out{\hypertarget{method-get_cache}{}}}
+\if{html}{\out{<a id="method-Cohort-get_cache"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_cache}{}}}
 \subsection{Method \code{get_cache()}}{
 Return step of filter specific cache.
 \subsection{Usage}{
@@ -691,8 +693,8 @@ filtering in specified step.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-list_active_filters"></a>}}
-\if{latex}{\out{\hypertarget{method-list_active_filters}{}}}
+\if{html}{\out{<a id="method-Cohort-list_active_filters"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-list_active_filters}{}}}
 \subsection{Method \code{list_active_filters()}}{
 List active filters included in selected step.
 \subsection{Usage}{
@@ -708,8 +710,8 @@ List active filters included in selected step.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-last_step_id"></a>}}
-\if{latex}{\out{\hypertarget{method-last_step_id}{}}}
+\if{html}{\out{<a id="method-Cohort-last_step_id"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-last_step_id}{}}}
 \subsection{Method \code{last_step_id()}}{
 Return id of the last existing step in Cohort.
 \subsection{Usage}{
@@ -718,8 +720,8 @@ Return id of the last existing step in Cohort.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-modify"></a>}}
-\if{latex}{\out{\hypertarget{method-modify}{}}}
+\if{html}{\out{<a id="method-Cohort-modify"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-modify}{}}}
 \subsection{Method \code{modify()}}{
 Helper method enabling to run non-standard operation on Cohort object.
 \subsection{Usage}{
@@ -735,8 +737,8 @@ Helper method enabling to run non-standard operation on Cohort object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Cohort-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{
