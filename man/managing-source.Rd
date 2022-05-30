@@ -3,6 +3,9 @@
 \name{managing-source}
 \alias{managing-source}
 \title{Managing the Source object}
+\value{
+The object of class `Source` having the modified configuration dependent on the used method.
+}
 \description{
 The list of methods designed for managing the Source configuration and state.
 

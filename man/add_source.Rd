@@ -11,6 +11,9 @@ add_source(x, source)
 
 \item{source}{Source object to be attached.}
 }
+\value{
+The `Cohort` class object with `Source` attached to it.
+}
 \description{
 When Cohort object has been created without source, the method allows to
 attach it.

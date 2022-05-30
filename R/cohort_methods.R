@@ -108,12 +108,21 @@ Cohort <- R6::R6Class(
     #' Copy selected step.
     #' @param step_id Id of the step to be copied. If missing the last step is taken.
     #' The copied step is added as the last one in the Cohort.
-    copy_step = function(step_id, run_flow = FALSE) {
+    #' @param filters List of Source-evaluated filters to copy to new step.
+    copy_step = function(step_id, filters, run_flow = FALSE) {
       if (missing(step_id)) {
         step_id <- self$last_step_id()
       }
-      step_config <- self$get_state(step_id, json = FALSE)[[1]]
-      step_config$step <- next_step(step_id)
+      if (!missing(filters)) {
+        step_id <- self$last_step_id()
+        step_config <- list(
+          step = next_step(step_id),
+          filters = purrr::map(filters, get_filter_state)
+        )
+      } else {
+        step_config <- self$get_state(step_id, json = FALSE)[[1]]
+        step_config$step <- next_step(step_id)
+      }
 
       self$add_step(
         do.call(
@@ -275,25 +284,6 @@ Cohort <- R6::R6Class(
 
       if (missing(step_id)) {
         step_id <- names(private$steps)
-      }
-
-      get_filter_state <- function(filter, extra_fields) {
-        filter_params <- as.list(environment(filter$filter_data))
-        filter_params <- append(
-          filter_params,
-          filter_params$args
-        )
-        filter_params$args <- NULL
-        filter_params$source <- NULL
-        filter_params$type <- as.character(filter_params$type)
-
-        if (!is.null(extra_fields)) {
-          for (field in extra_fields) {
-            filter_params[[field]] <- filter[[field]]
-          }
-        }
-
-        return(filter_params)
       }
 
       get_filters_state <- function(filters) {
@@ -838,6 +828,7 @@ cohort <- function(source, ..., run_flow = FALSE,
 #'    \item{\link{run}}{ Run data filtering.}
 #' }
 #'
+#' @return The object of class `Cohort` having the modified configuration dependent on the used method.
 #' @name managing-cohort
 NULL
 
@@ -848,6 +839,7 @@ NULL
 #'
 #' @param x Cohort object.
 #' @param source Source object to be attached.
+#' @return The `Cohort` class object with `Source` attached to it.
 #' @seealso \link{managing-cohort}
 #' @export
 add_source <- function(x, source) {

@@ -17,6 +17,25 @@ eval_filter <- function(filter_fun, step_id, source) {
   )
 }
 
+get_filter_state <- function(filter, extra_fields) {
+  filter_params <- as.list(environment(filter$filter_data))
+  filter_params <- append(
+    filter_params,
+    filter_params$args
+  )
+  filter_params$args <- NULL
+  filter_params$source <- NULL
+  filter_params$type <- as.character(filter_params$type)
+
+  if (!is.null(extra_fields)) {
+    for (field in extra_fields) {
+      filter_params[[field]] <- filter[[field]]
+    }
+  }
+
+  return(filter_params)
+}
+
 #' Define custom filter.
 #'
 #' Methods available for creating new filters easier.

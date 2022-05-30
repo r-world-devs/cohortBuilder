@@ -84,6 +84,9 @@
 
 \item{data_object_post}{Object storing current data (including active filtering and previously done bindings).}
 }
+\value{
+Depends on specific method. See `vignette("custom-extensions")` for more details.
+}
 \description{
 List of methods that allow compatibility of different source types.
 Most of the methods should be defined in order to make new source layer functioning.
@@ -113,5 +116,5 @@ should be defined:
 }
 Except from the above methods, you may extend the existing or new source with providing
 custom filtering methods. See \link{creating-filters}.
-In order to see more details about how to implement custom source check `vignette("defining-source")`.
+In order to see more details about how to implement custom source check `vignette("custom-extensions")`.
 }

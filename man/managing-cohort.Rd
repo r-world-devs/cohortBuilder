@@ -3,6 +3,9 @@
 \name{managing-cohort}
 \alias{managing-cohort}
 \title{Managing the Cohort object}
+\value{
+The object of class `Cohort` having the modified configuration dependent on the used method.
+}
 \description{
 The list of methods designed for managing the Cohort configuration and state.
 

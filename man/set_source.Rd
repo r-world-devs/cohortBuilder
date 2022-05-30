@@ -41,7 +41,7 @@ When provided, used as a part of reproducible code output.}
 Can be accessed with \link{description} Cohort method.}
 }
 \value{
-R6 object of class provided in `type` parameter.
+R6 object of class inherited from `dtconn`.
 }
 \description{
 Source is an object storing information about data source such as source type,

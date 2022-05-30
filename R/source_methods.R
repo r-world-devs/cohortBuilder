@@ -213,7 +213,7 @@ check_layer <- function(dtconn) {
 #'   })
 #' )
 #' mtcars_source$attributes
-#' @returns R6 object of class provided in `type` parameter.
+#' @returns R6 object of class inherited from `dtconn`.
 #' @export
 set_source <- function(dtconn, ..., primary_keys = NULL, binding_keys = NULL,
                        source_code = NULL, description = NULL) {
@@ -254,13 +254,14 @@ set_source <- function(dtconn, ..., primary_keys = NULL, binding_keys = NULL,
 #' }
 #' Except from the above methods, you may extend the existing or new source with providing
 #' custom filtering methods. See \link{creating-filters}.
-#' In order to see more details about how to implement custom source check `vignette("defining-source")`.
+#' In order to see more details about how to implement custom source check `vignette("custom-extensions")`.
 #'
 #' @name source-layer
 #' @param source Source object.
 #' @param data_object Object that allows source data access.
 #'     `data_object` is the result of `.init_step` method (or object of the same structure).
 #' @param step_id Id of the filtering step.
+#' @return Depends on specific method. See `vignette("custom-extensions")` for more details.
 NULL
 
 #' @rdname source-layer
@@ -325,6 +326,7 @@ NULL
 #' }
 #'
 #' @name managing-source
+#' @return The object of class `Source` having the modified configuration dependent on the used method.
 #' @seealso managing-cohort
 NULL
 
