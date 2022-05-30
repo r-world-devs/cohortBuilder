@@ -74,3 +74,14 @@ rename_item <- function(list_obj, old_name, new_name) {
 .get_item <- function(list_obj, attribute, value, operator = `==`) {
   purrr::keep(list_obj, ~operator(value, .[[attribute]]))
 }
+
+#' Return default value if values are equal
+#'
+#' @param x Condition to be compared with value.
+#' @param value Value to be compared with x.
+#' @param default Default value to be returned when `x` is identical to `value`.
+#' @export
+.if_value <- function(x, value, default) {
+  if (identical(x, value)) return(default)
+  return(x)
+}
