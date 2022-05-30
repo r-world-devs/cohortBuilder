@@ -117,7 +117,7 @@ Cohort <- R6::R6Class(
         step_id <- self$last_step_id()
         step_config <- list(
           step = next_step(step_id),
-          filters = purrr::map(filters, get_filter_state)
+          filters = purrr::map(filters, get_filter_state, extra_fields = NULL)
         )
       } else {
         step_config <- self$get_state(step_id, json = FALSE)[[1]]
