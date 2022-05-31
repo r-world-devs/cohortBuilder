@@ -1,7 +1,7 @@
 
 # cohortBuilder <img src="man/figures/logo.png" align="right" width="120" />
 
-[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.0.0.9037&color=ff69b4)](https://github.io/r-world-devs/cohortBuilder/)
+[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.1&color=ff69b4)](https://github.io/r-world-devs/cohortBuilder/)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
 ## Overview
@@ -348,38 +348,30 @@ get_data(coh, step_id = 2)
 
 ``` r
 code(coh)
-#> {
-#>     .pre_filtering <- function(source, data_object, step_id) {
-#>         for (dataset in names(data_object)) {
-#>             attr(data_object[[dataset]], "filtered") <- FALSE
-#>         }
-#>         return(data_object)
+#> .pre_filtering <- function(source, data_object, step_id) {
+#>     for (dataset in names(data_object)) {
+#>         attr(data_object[[dataset]], "filtered") <- FALSE
 #>     }
-#>     source <- list(dtconn = as.tblist(librarian))
-#>     data_object <- source$dtconn
-#>     "-- step 1 --"
-#>     step_id <- "1"
-#>     data_object <- .pre_filtering(source, data_object, step_id)
-#>     selected_value <- "Dan Brown"
-#>     selected_value <- c(selected_value, NA)
-#>     data_object[["books"]] <- data_object[["books"]] %>% dplyr::filter(!!sym("author") %in% 
-#>         !!selected_value)
-#>     attr(data_object[["books"]], "filtered") <- TRUE
-#>     selected_value <- c(14610, Inf)
-#>     data_object[["borrowers"]] <- data_object[["borrowers"]] %>% 
-#>         dplyr::filter((!!sym("registered") <= !!selected_value[2] & 
-#>             !!sym("registered") >= !!selected_value[1]) | is.na(!!sym("registered")))
-#>     attr(data_object[["borrowers"]], "filtered") <- TRUE
-#>     "-- step 2 --"
-#>     step_id <- "2"
-#>     data_object <- .pre_filtering(source, data_object, step_id)
-#>     selected_value <- c(5, 10)
-#>     data_object[["books"]] <- data_object[["books"]] %>% dplyr::filter((!!sym("copies") <= 
-#>         !!selected_value[2] & !!sym("copies") >= !!selected_value[1]) | 
-#>         is.na(!!sym("copies")))
-#>     attr(data_object[["books"]], "filtered") <- TRUE
-#>     data_object
+#>     return(data_object)
 #> }
+#> source <- list(dtconn = as.tblist(librarian))
+#> data_object <- source$dtconn
+#> # step 1
+#> step_id <- "1"
+#> data_object <- .pre_filtering(source, data_object, step_id)
+#> data_object[["books"]] <- data_object[["books"]] %>%
+#>     dplyr::filter(author %in% c("Dan Brown", NA))
+#> attr(data_object[["books"]], "filtered") <- TRUE
+#> data_object[["borrowers"]] <- data_object[["borrowers"]] %>%
+#>     dplyr::filter((registered <= Inf & registered >= 14610) | is.na(registered))
+#> attr(data_object[["borrowers"]], "filtered") <- TRUE
+#> # step 2
+#> step_id <- "2"
+#> data_object <- .pre_filtering(source, data_object, step_id)
+#> data_object[["books"]] <- data_object[["books"]] %>%
+#>     dplyr::filter((copies <= 10 & copies >= 5) | is.na(copies))
+#> attr(data_object[["books"]], "filtered") <- TRUE
+#> data_object
 ```
 
 ``` r
@@ -390,7 +382,7 @@ attrition(coh, dataset = "books")
 
 ``` r
 get_state(coh, json = TRUE)
-#> [{"step":"1","filters":[{"range":[5,6],"type":"discrete","id":"author","name":"author","variable":"author","value":"Dan Brown","dataset":"books","keep_na":true,"description":{},"active":true},{"type":"date_range","id":"registered","name":"registered","variable":"registered","range":["2010-01-01","NA"],"dataset":"borrowers","keep_na":true,"description":{},"active":true}]},{"step":"2","filters":[{"type":"range","id":"copies","name":"copies","variable":"copies","range":[5,10],"dataset":"books","keep_na":true,"description":{},"active":true}]}]
+#> [{"step":"1","filters":[{"range":[5,6],"type":"discrete","id":"author","name":"author","variable":"author","value":"Dan Brown","dataset":"books","keep_na":true,"description":null,"active":true},{"type":"date_range","id":"registered","name":"registered","variable":"registered","range":["2010-01-01","NA"],"dataset":"borrowers","keep_na":true,"description":null,"active":true}]},{"step":"2","filters":[{"type":"range","id":"copies","name":"copies","variable":"copies","range":[5,10],"dataset":"books","keep_na":true,"description":null,"active":true}]}]
 ```
 
 ## Acknowledgement

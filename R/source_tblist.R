@@ -686,6 +686,11 @@ cb_filter.multi_discrete.tblist <- function(
 
 #' @export
 .get_attrition_label.tblist <- function(source, step_id, step_filters, dataset, ...) {
+  if (missing(dataset)) {
+    stop(glue::glue(
+      "Argument {sQuote('dataset')} is required to print attrition plot for 'tblist' Source."
+    ))
+  }
   pkey <- source$primary_keys
   binding_keys <- source$binding_keys
   if (step_id == "0") {
@@ -726,8 +731,14 @@ cb_filter.multi_discrete.tblist <- function(
   )
 }
 
+#' @param dataset Dataset name.
 #' @export
 .get_attrition_count.tblist <- function(source, data_stats, dataset, ...) {
+  if (missing(dataset)) {
+    stop(glue::glue(
+      "Argument {sQuote('dataset')} is required to print attrition plot for 'tblist' Source."
+    ))
+  }
   data_stats %>%
     purrr::map_int(~.[[dataset]][["n_rows"]])
 }
