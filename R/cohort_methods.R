@@ -1154,7 +1154,7 @@ attrition <- function(x, ..., percent = FALSE) {
 
 #' Show source data or filter description
 #'
-#' If defined allows to check the provided description realted to source data or configured filters.
+#' If defined allows to check the provided description related to source data or configured filters.
 #'
 #' @param x Cohort object.
 #' @param field Name of the source description field provided as `description` argument to \link{set_source}.

@@ -10,7 +10,7 @@
 #' )
 #'
 #' @param ... Data keys describing tables primary keys.
-#' @return List of class `primary_kays` storing \link{data_key}s objects.
+#' @return List of class `primary_keys` storing \link{data_key}s objects.
 #'
 #' @export
 primary_keys <- function(...) {

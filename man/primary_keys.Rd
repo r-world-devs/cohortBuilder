@@ -10,7 +10,7 @@ primary_keys(...)
 \item{...}{Data keys describing tables primary keys.}
 }
 \value{
-List of class `primary_kays` storing \link{data_key}s objects.
+List of class `primary_keys` storing \link{data_key}s objects.
 }
 \description{
 Primary keys can be defined as `primary_keys` parameter of \link{set_source} method.
