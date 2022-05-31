@@ -21,7 +21,7 @@ parse_func_expr <- function(func) {
   if (is.null(func)) {
     return(quote({}))
   }
-  func_body <- capture.output(body(func))
+  func_body <- utils::capture.output(body(func))
   n_lines <- length(func_body)
   func_body[n_lines - 1] <- glue::glue("data_object <- {func_body[n_lines - 1]}")
   func_expr <- parse(text = func_body)[[1]]
@@ -37,7 +37,7 @@ func_to_expr <- function(func, name) {
     return(quote({}))
   }
 
-  func_expr <- c(paste(name, "<-"), capture.output(func))
+  func_expr <- c(paste(name, "<-"), utils::capture.output(func))
   # in case function comes from namespace
   closing_idx <- rev(which("}" == func_expr))[1]
   return(
@@ -75,7 +75,7 @@ parse_filter_expr <- function(filter) {
   filter_env <- environment(filter$filter_data)
   keep_na <- identical(filter_env$keep_na, TRUE)
   selected_value <- filter_env[[filter$input_param]]
-  filter_expr <- capture.output(filter$filter_data)
+  filter_expr <- utils::capture.output(filter$filter_data)
 
   keep_na_ind <- if (keep_na) "keep_na" else "!keep_na"
   value_na_ind <- if (identical(selected_value, NA)) "value_na" else "!value_na"

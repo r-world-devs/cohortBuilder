@@ -54,7 +54,7 @@ rename_item <- function(list_obj, old_name, new_name) {
     "namespace:", "", fixed = TRUE,
     grep("namespace:", found_methods$where, value = TRUE, fixed = TRUE)[1]
   )
-  getFromNamespace(name, namespace)
+  utils::getFromNamespace(name, namespace)
 }
 
 #' Return list of objects matching provided condition.

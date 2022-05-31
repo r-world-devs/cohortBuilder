@@ -8,7 +8,7 @@ Authors@R:
              role = c('cre', 'aut')),
       person('Adam', 'Foryś',
              role = "ctb"))
-Maintainer: The package maintainer <krystian8207@gmail.com>
+Maintainer: Krystian Igras <krystian8207@gmail.com>
 Description: Common API for filtering data stored in sources of different kind.
     The package offers multiple steps filtering in which various filtering methods can be used. 
     Works standalone or can be used as a backend for shinyCohortBuilder package.

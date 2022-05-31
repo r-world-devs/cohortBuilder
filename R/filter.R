@@ -106,7 +106,7 @@ new_filter <- function(filter_type, source_type, input_param = "value", extra_pa
     do.call(glue::glue, as.list(template_content)),
     con = file
   )
-  file.edit(file)
+  utils::file.edit(file)
 }
 
 print_filter <- function(filter, data_objects) {

@@ -146,8 +146,10 @@ cb_filter.discrete.tblist <- function(
         name <- c("n_data", "choices", "n_missing")
       }
       stats <- list(
-        choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% na.omit() %>% table() %>% as.list(),
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% na.omit() %>% length(),
+        choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>%
+          stats::na.omit() %>% table() %>% as.list(),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>%
+          stats::na.omit() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
       if (length(name) == 1) {
@@ -158,9 +160,9 @@ cb_filter.discrete.tblist <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% barplot()
+        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
       } else {
-        barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
@@ -219,7 +221,7 @@ cb_filter.discrete_text.tblist <- function(
       }
       stats <- list(
         choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% unique() %>% paste(collapse = ","),
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% na.omit() %>% unique() %>% length(),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% unique() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
       if (length(name) == 1) {
@@ -252,7 +254,7 @@ cb_filter.discrete_text.tblist <- function(
 
 get_range_frequencies <- function(data_object, dataset, variable, extra_params) {
   step <- 1
-  if (length(na.omit(data_object[[dataset]][[variable]])) == 0) {
+  if (length(stats::na.omit(data_object[[dataset]][[variable]])) == 0) {
     return(
       data.frame(
         level = character(0),
@@ -355,7 +357,7 @@ cb_filter.range.tblist <- function(
         frequencies = if ("frequencies" %in% name) {
           get_range_frequencies(data_object, dataset, variable, extra_params)
         },
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% na.omit() %>% length(),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
       if (length(name) == 1) {
@@ -366,9 +368,9 @@ cb_filter.range.tblist <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% hist()
+        data_object[[dataset]][[variable]] %>% graphics::hist()
       } else {
-        barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
@@ -400,7 +402,7 @@ cb_filter.range.tblist <- function(
 
 get_date_range_frequencies <- function(data_object, dataset, variable, extra_params) {
   step <- "day"
-  if (length(na.omit(data_object[[dataset]][[variable]])) == 0) {
+  if (length(stats::na.omit(data_object[[dataset]][[variable]])) == 0) {
     return(
       data.frame(
         level = character(0),
@@ -497,7 +499,7 @@ cb_filter.date_range.tblist <- function(
         frequencies = if ("frequencies" %in% name) {
           get_date_range_frequencies(data_object, dataset, variable, extra_params)
         },
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% na.omit() %>% length(),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
       if (length(name) == 1) {
@@ -508,9 +510,9 @@ cb_filter.date_range.tblist <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% hist()
+        data_object[[dataset]][[variable]] %>% graphics::hist()
       } else {
-        barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
@@ -616,9 +618,9 @@ cb_filter.multi_discrete.tblist <- function(
           purrr::map(table) %>%
           purrr::imap_dfc(group_stats) %>%
           as.matrix() %>%
-          barplot()
+          graphics::barplot()
       } else {
-        barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
@@ -731,7 +733,6 @@ cb_filter.multi_discrete.tblist <- function(
   )
 }
 
-#' @param dataset Dataset name.
 #' @export
 .get_attrition_count.tblist <- function(source, data_stats, dataset, ...) {
   if (missing(dataset)) {
