@@ -65,10 +65,10 @@ cb_filter.{filter_type}.{source_type} <- function(
         name <- c("n_data", "n_missing") # _COMPLETE_ - add more if needed
       }}
       stats <- list(
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% na.omit() %>% length(),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum(),
         #_COMPLETE_ - add more if needed, e.g.
-        # choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% na.omit() %>% table() %>% as.list()
+        # choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% stats::na.omit() %>% table() %>% as.list()
       )
       if (length(name) == 1) {{
         return(stats[[name]])
@@ -79,9 +79,9 @@ cb_filter.{filter_type}.{source_type} <- function(
     plot_data = function(data_object) {{
      #  if (_COMPLETE_ - when data if correct e.g. nrow(data_object[[dataset]]) > 0) {{
      #     _COMPLETE_ - plot generation code, e.g.
-     #     data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% barplot()
+     #     data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
      #  }} else {{
-          barplot(0, ylim = c(0, 0.1), main = "No data")
+          graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
      #  }}
     }},
     get_params = function(data_object) {{

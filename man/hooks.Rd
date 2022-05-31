@@ -15,6 +15,9 @@ get_hook(name)
 
 \item{method}{Function to be assigned as hook.}
 }
+\value{
+No returned value (`add_hook`) or the list of functions (`get_hook`).
+}
 \description{
 In order to make integration of `cohortBuilder` package with other layers/packages easier,
 hooks system was introduced.

@@ -25,6 +25,12 @@ If missing, `step_id` and `filter_id` are used to return filter description.}
 \item{modifier}{A function taking the description as argument.
 The function can be used to modify its argument (convert to html, display in browser etc.).}
 }
+\value{
+Any object (or its subset) attached to Source of filter via description argument.
+}
 \description{
-If defined allows to check the provided description realted to source data or configured filters.
+If defined allows to check the provided description related to source data or configured filters.
+}
+\seealso{
+\link{cohort-methods}
 }

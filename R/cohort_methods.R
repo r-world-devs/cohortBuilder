@@ -12,6 +12,7 @@ Cohort <- R6::R6Class(
     #' Create Cohort object.
     #' @param ... Steps definition (optional). Can be also defined as a sequence of
     #'     filters - the filters will be added to the first step.
+    #' @return The object of class `Cohort`.
     initialize = function(source, ..., run_flow = FALSE,
                           hook = list(
                             pre = get_hook("pre_cohort_hook"),
@@ -802,6 +803,8 @@ Cohort <- R6::R6Class(
 #'     See \link{hooks} for more details.
 #' @param ... Steps definition (optional). Can be also defined as a sequence of
 #'     filters - the filters will be added to the first step.
+#' @return The object of class `Cohort`.
+#'
 #' @name create-cohort
 #' @export
 cohort <- function(source, ..., run_flow = FALSE,
@@ -840,6 +843,7 @@ NULL
 #' @param x Cohort object.
 #' @param source Source object to be attached.
 #' @return The `Cohort` class object with `Source` attached to it.
+#'
 #' @seealso \link{managing-cohort}
 #' @export
 add_source <- function(x, source) {
@@ -855,6 +859,8 @@ add_source <- function(x, source) {
 #'    If `FALSE` steps configuration is deleted.
 #'    If vector of type integer, specified steps will remain.
 #' @param run_flow If `TRUE`, data flow is run after the source is updated.
+#' @return The `Cohort` class object with updated `Source` definition.
+#'
 #' @seealso \link{managing-cohort}
 #' @export
 update_source <- function(x, source, keep_steps = !has_steps(source), run_flow = FALSE) {
@@ -867,6 +873,8 @@ update_source <- function(x, source, keep_steps = !has_steps(source), run_flow =
 #' @param x An object to add step to.
 #' @param step Step definition created with \link{step}.
 #' @param ... Other parameters passed to specific S3 method.
+#' @return Method dependent object (i.e. `Cohort` or `Source`) having new step added.
+#'
 #' @seealso \link{managing-cohort}, \link{managing-source}
 #' @export
 add_step <- function(x, step, ...) {
@@ -892,6 +900,8 @@ add_step.Cohort <- function(x, step, run_flow = FALSE,
 #' @param x An object from which step should be removed.
 #' @param step_id Id of the step to remove.
 #' @param ... Other parameters passed to specific S3 method.
+#' @return Method dependent object (i.e. `Cohort` or `Source`) having selected step removed.
+#'
 #' @seealso \link{managing-cohort}, \link{managing-source}
 #' @export
 rm_step <- function(x, step_id, ...) {
@@ -919,6 +929,8 @@ rm_step.Cohort <- function(x, step_id, run_flow = FALSE,
 #' @param step_id Id of the step to add the filter to.
 #'     If missing, filter is added to the last step.
 #' @param ... Other parameters passed to specific S3 method.
+#' @return Method dependent object (i.e. `Cohort` or `Source`) having filter added in selected step.
+#'
 #' @seealso \link{managing-cohort}, \link{managing-source}
 #' @export
 add_filter <- function(x, filter, step_id, ...) {
@@ -939,6 +951,8 @@ add_filter.Cohort <- function(x, filter, step_id, run_flow = FALSE, ...) {
 #' @param step_id Id of the step from which filter should be removed.
 #' @param filter_id Id of the filter to be removed.
 #' @param ... Other parameters passed to specific S3 method.
+#' @return Method dependent object (i.e. `Cohort` or `Source`) having selected filter removed.
+#'
 #' @seealso \link{managing-cohort}, \link{managing-source}
 #' @export
 rm_filter <- function(x, step_id, filter_id, ...) {
@@ -959,6 +973,8 @@ rm_filter.Cohort <- function(x, step_id, filter_id, run_flow = FALSE, ...) {
 #' @param step_id Id of the step where filter is defined.
 #' @param filter_id Id of the filter to be updated.
 #' @param ... Filter parameters that should be updated.
+#' @return Method dependent object (i.e. `Cohort` or `Source`) having selected filter updated.
+#'
 #' @seealso \link{managing-cohort}, \link{managing-source}
 #' @export
 update_filter <- function(x, step_id, filter_id, ...) {
@@ -979,6 +995,8 @@ update_filter.Cohort <- function(x, step_id, filter_id, ..., run_flow = FALSE) {
 #' @param min_step_id Step id starting from the calculation will be started.
 #'     Used only when `step_id` is missing.
 #' @param step_id Id of the step for which to run data calculation.
+#' @return The object of class `Cohort` having up-to-date data based on the Cohort state.
+#'
 #' @seealso \link{managing-cohort}
 #' @export
 run <- function(x, min_step_id, step_id) {
@@ -1004,8 +1022,11 @@ run <- function(x, min_step_id, step_id) {
 #'    \item{\link{get_state}}{ Save Cohort state.}
 #'    \item{\link{restore}}{ Restore Cohort state.}
 #'    \item{\link{attrition}}{ Show attrition plot.}
+#'    \item{\link{description}}{ Show Source or filter related description.}
 #' }
 #'
+#' @return Various type outputs dependent on the selected method.
+#'   See each method documentation for details.
 #' @name cohort-methods
 NULL
 
@@ -1018,6 +1039,8 @@ NULL
 #' @param filter_id Filter id.
 #' @param ... Another parameters passed to filter plotting method.
 #' @param state Generate plot based on data before ("pre") or after ("post") filtering.
+#' @return Filter-specific plot.
+#'
 #' @seealso \link{cohort-methods}
 #' @export
 plot_data <- function(x, step_id, filter_id, ..., state = "post") {
@@ -1035,6 +1058,8 @@ plot_data <- function(x, step_id, filter_id, ..., state = "post") {
 #' @param ... Specific parameters passed to filter related method.
 #' @param state Should the stats be calculated on data before ("pre") or after ("post")
 #'    filtering in specified step.
+#' @return List of filter-specific values summing up underlying filter data.
+#'
 #' @seealso \link{cohort-methods}
 #' @export
 stat <- function(x, step_id, filter_id, ..., state = "post") {
@@ -1049,6 +1074,8 @@ stat <- function(x, step_id, filter_id, ..., state = "post") {
 #'     If `filter_id` not missing, `step_id` defines from which step the filter should be taken.
 #' @param filter_id If not missing, precises the filter for which reproducible code should be returned.
 #' @param ... Other parameters passed to \link[formatR]{tidy_source}.
+#' @return \link[formatR]{tidy_source} output storing reproducible code for generating final step data.
+#'
 #' @seealso \link{cohort-methods}
 #' @export
 code <- function(x, step_id, filter_id, ...) {
@@ -1061,6 +1088,8 @@ code <- function(x, step_id, filter_id, ...) {
 #' @param step_id Id of the step from which to source data.
 #' @param state Return data before ("pre") or after ("post") step filtering?
 #' @param collect Return raw data source (`FALSE`) object or collected (to R memory) data (`TRUE`).
+#' @return Subset of Source-specific data connection object or its evaluated version.
+#'
 #' @seealso \link{cohort-methods}
 #' @export
 get_data <- function(x, step_id, state = "post", collect = FALSE) {
@@ -1070,6 +1099,8 @@ get_data <- function(x, step_id, state = "post", collect = FALSE) {
 #' Sum up Cohort state.
 #'
 #' @param x Cohort object.
+#' @return None (invisible NULL). Printed summary of Cohort state.
+#'
 #' @seealso \link{cohort-methods}
 #' @export
 sum_up <- function(x) {
@@ -1082,6 +1113,8 @@ sum_up <- function(x) {
 #' @param step_id If provided, the selected step state is returned.
 #' @param json If TRUE, return state in JSON format.
 #' @param extra_fields Names of extra fields included in filter to be added to state.
+#' @return List object of character string being the list convertion to JSON format.
+#'
 #' @seealso \link{cohort-methods}
 #' @export
 get_state <- function(x, step_id, json = FALSE, extra_fields = NULL) {
@@ -1097,6 +1130,8 @@ get_state <- function(x, step_id, json = FALSE, extra_fields = NULL) {
 #' @param modifier Function two parameters combining the previous and provided state.
 #'   The returned state is then restored.
 #' @param run_flow If TRUE, filtering flow is applied when the operation is finished.
+#' @return The `Cohort` class object having the state restored based on provided config.
+#'
 #' @seealso \link{cohort-methods}
 #' @export
 restore <- function(x, state, modifier = function(prev_state, state) state, run_flow = FALSE) {
@@ -1109,6 +1144,8 @@ restore <- function(x, state, modifier = function(prev_state, state) state, run_
 #' @param x Cohort object.
 #' @param ... Source specific parameters required to generate attrition.
 #' @param percent Should attrition changes be presented with percentage values.
+#' @return Plot object of class `ggplot`.
+#'
 #' @seealso \link{cohort-methods}
 #' @export
 attrition <- function(x, ..., percent = FALSE) {
@@ -1117,7 +1154,7 @@ attrition <- function(x, ..., percent = FALSE) {
 
 #' Show source data or filter description
 #'
-#' If defined allows to check the provided description realted to source data or configured filters.
+#' If defined allows to check the provided description related to source data or configured filters.
 #'
 #' @param x Cohort object.
 #' @param field Name of the source description field provided as `description` argument to \link{set_source}.
@@ -1126,6 +1163,10 @@ attrition <- function(x, ..., percent = FALSE) {
 #' @param step_id Id of the filter step to return description of.
 #' @param modifier A function taking the description as argument.
 #'     The function can be used to modify its argument (convert to html, display in browser etc.).
+#' @return Any object (or its subset) attached to Source of filter via description argument.
+#'
+#' @seealso \link{cohort-methods}
+#' @export
 description <- function(x, field, step_id, filter_id,
                       modifier = getOption("cb_help_modifier", default = function(x) x)) {
   x$show_help(field = field, step_id = step_id, filter_id = filter_id, modifier = modifier)

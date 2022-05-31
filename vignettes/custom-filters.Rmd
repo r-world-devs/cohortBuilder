@@ -201,8 +201,11 @@ cb_filter.logical.tblist <- function(
         name <- c("n_data", "choices", "n_missing")
       }
       stats <- list(
-        choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% na.omit() %>% table() %>% as.list(),
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% na.omit() %>% length(),
+        choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% 
+          stats::na.omit() %>% table() %>% as.list(),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% 
+          stats::na.omit() %>% 
+          length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
       if (length(name) == 1) {
@@ -213,9 +216,9 @@ cb_filter.logical.tblist <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% barplot()
+        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
       } else {
-        barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {

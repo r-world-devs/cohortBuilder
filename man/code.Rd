@@ -17,6 +17,9 @@ If `filter_id` not missing, `step_id` defines from which step the filter should 
 
 \item{...}{Other parameters passed to \link[formatR]{tidy_source}.}
 }
+\value{
+\link[formatR]{tidy_source} output storing reproducible code for generating final step data.
+}
 \description{
 Return reproducible data filtering code.
 }

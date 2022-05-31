@@ -55,6 +55,8 @@
 #' @rdname hooks
 #' @param name Name of the hook. See Details section.
 #' @param method Function to be assigned as hook.
+#' @returns No returned value (`add_hook`) or the list of functions (`get_hook`).
+#'
 #' @export
 add_hook <- function(name, method) {
 

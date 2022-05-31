@@ -11,6 +11,10 @@ data_key(dataset, key)
 
 \item{key}{Character or character vector storing column names to be used as table keys.}
 }
+\value{
+`data_key` class list of two objects: `dataset` and `key` storing name and vector of
+    data key names respectively.
+}
 \description{
 Data keys are used to define \link{primary_keys} and \link{binding-keys}.
 }

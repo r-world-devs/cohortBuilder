@@ -11,6 +11,9 @@ x \%->\% object
 
 \item{object}{Filter or step to be added to `x`.}
 }
+\value{
+And object (`Source` or `Cohort`) having new filter of step added.
+}
 \description{
 When called with filter or step object, runs add_filter and add_step respectively.
 }

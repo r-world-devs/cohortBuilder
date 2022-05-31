@@ -16,6 +16,9 @@
 \item{operator}{Logical operator - two-argument function taking `list_obj` attribute
 value as the first one, and `value` as the second one.}
 }
+\value{
+A subset of list object matching provided condition.
+}
 \description{
 Return list of objects matching provided condition.
 }
@@ -26,4 +29,5 @@ my_list <- list(
 )
 .get_item(my_list, "id", 1)
 .get_item(my_list, "name", c("b", "c"), identical)
+
 }

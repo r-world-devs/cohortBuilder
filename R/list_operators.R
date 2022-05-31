@@ -42,6 +42,8 @@ rename_item <- function(list_obj, old_name, new_name) {
 #' Return NULL otherwise.
 #'
 #' @param name Name of the function.
+#' @return Function - when found in any namespace or NULL otherwise.
+#'
 #' @export
 .get_method <- function(name) {
   found_methods <- utils::getAnywhere(name)
@@ -52,7 +54,7 @@ rename_item <- function(list_obj, old_name, new_name) {
     "namespace:", "", fixed = TRUE,
     grep("namespace:", found_methods$where, value = TRUE, fixed = TRUE)[1]
   )
-  getFromNamespace(name, namespace)
+  utils::getFromNamespace(name, namespace)
 }
 
 #' Return list of objects matching provided condition.
@@ -62,6 +64,7 @@ rename_item <- function(list_obj, old_name, new_name) {
 #' @param value Object value.
 #' @param operator Logical operator - two-argument function taking `list_obj` attribute
 #'   value as the first one, and `value` as the second one.
+#' @return A subset of list object matching provided condition.
 #'
 #' @examples
 #' my_list <- list(
@@ -70,6 +73,7 @@ rename_item <- function(list_obj, old_name, new_name) {
 #' )
 #' .get_item(my_list, "id", 1)
 #' .get_item(my_list, "name", c("b", "c"), identical)
+#'
 #' @export
 .get_item <- function(list_obj, attribute, value, operator = `==`) {
   purrr::keep(list_obj, ~operator(value, .[[attribute]]))
@@ -80,6 +84,8 @@ rename_item <- function(list_obj, old_name, new_name) {
 #' @param x Condition to be compared with value.
 #' @param value Value to be compared with x.
 #' @param default Default value to be returned when `x` is identical to `value`.
+#' @return Evaluated condition or provided default value.
+#'
 #' @export
 .if_value <- function(x, value, default) {
   if (identical(x, value)) return(default)

@@ -50,7 +50,7 @@
 
 .get_attrition_count(source, data_stats, ...)
 
-\method{.get_attrition_count}{default}(source, data_stats, dataset, ...)
+\method{.get_attrition_count}{default}(source, data_stats, ...)
 
 .run_binding(source, ...)
 
@@ -75,8 +75,6 @@
 \item{step_filters}{List of step filters.}
 
 \item{data_stats}{Data frame presenting statistics for each filtering step.}
-
-\item{dataset}{Dataset name.}
 
 \item{binding_key}{Binding key describing currently processed relation.}
 

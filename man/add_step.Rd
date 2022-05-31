@@ -31,6 +31,9 @@ add_step(x, step, ...)
 \item{hook}{List of hooks describing methods to run before/after the step is added.
 See \link{hooks} for more details.}
 }
+\value{
+Method dependent object (i.e. `Cohort` or `Source`) having new step added.
+}
 \description{
 Add filtering step definition
 }

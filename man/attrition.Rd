@@ -13,6 +13,9 @@ attrition(x, ..., percent = FALSE)
 
 \item{percent}{Should attrition changes be presented with percentage values.}
 }
+\value{
+Plot object of class `ggplot`.
+}
 \description{
 Show attrition plot.
 }

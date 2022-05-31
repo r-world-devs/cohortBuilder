@@ -137,6 +137,8 @@ print_step <- function(step) {
 #'   run()
 #'
 #' @param ... Filters. See \link{filter}.
+#' @return List of class `cb_step` storing filters configuration.
+#'
 #' @export
 step <- function(...) {
   structure(

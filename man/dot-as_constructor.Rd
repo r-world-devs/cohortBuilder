@@ -9,6 +9,9 @@
 \arguments{
 \item{filter_constructor}{Function defining filter.}
 }
+\value{
+A function having `cb_filter_constructor` class attached.
+}
 \description{
 Attach proper class to filter constructor
 }

@@ -15,10 +15,10 @@ Source <- R6::R6Class(
     #' @param source_code A quote object that allows to recreate basic source structure.
     #'   Used as a part of reproducible code output, see \link{code}.
     #' @param description A named list storing the source objects description.
-    #'   Can be accessed with \link{show_help} Cohort method.
+    #'   Can be accessed with \link{description} Cohort method.
     #' @param options List of options affecting methods output. Currently supported only `display_binding`
     #'   specifying whether reproducible code should include bindings definition.
-    #' @return A new `Source` object of class `Source` (and `dtconn` class appended).
+    #' @return A new `Source` object of class `Source` (and `dtconn` object class appended).
     initialize = function(
       dtconn, ..., primary_keys = NULL, binding_keys = NULL, source_code = NULL,
       description = NULL,  options = list(display_binding = TRUE)

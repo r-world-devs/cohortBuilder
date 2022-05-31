@@ -14,6 +14,9 @@ Used only when `step_id` is missing.}
 
 \item{step_id}{Id of the step for which to run data calculation.}
 }
+\value{
+The object of class `Cohort` having up-to-date data based on the Cohort state.
+}
 \description{
 Trigger data calculations.
 }

@@ -129,9 +129,8 @@ get_attrition_filter_label <- function(name, value_name, value) {
 }
 
 #' @rdname source-layer
-#' @param dataset Dataset name.
 #' @export
-.get_attrition_count.default <- function(source, data_stats, dataset, ...) {
+.get_attrition_count.default <- function(source, data_stats, ...) {
   data_stats %>%
     purrr::map_int("n_rows")
 }

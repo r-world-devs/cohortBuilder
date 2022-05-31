@@ -9,6 +9,7 @@ eval_filter <- function(filter_fun, step_id, source) {
 
 #' Generate random ID
 #'
+#' @return A character type value.
 #' @export
 .gen_id <- function() {
   paste0(
@@ -57,6 +58,8 @@ get_filter_state <- function(filter, extra_fields) {
 #' @param get_params Function of `name` parameter returning filter parameters (if names is skipped all the parameters are returned).
 #' @param get_data Function of `data_object` returning filter related data.
 #' @param get_defaults Function of `data_object` and `cache_object` parameters returning default `input_param` parameter value.
+#' @return A list of filter specific values and methods (`def_filter`) or no value (`new_filter`).
+#'
 #' @export
 def_filter <- function(type, id = .gen_id(), name = id, input_param = NULL,
   filter_data, get_stats, plot_data, get_params, get_data, get_defaults) {
@@ -103,7 +106,7 @@ new_filter <- function(filter_type, source_type, input_param = "value", extra_pa
     do.call(glue::glue, as.list(template_content)),
     con = file
   )
-  file.edit(file)
+  utils::file.edit(file)
 }
 
 print_filter <- function(filter, data_objects) {
@@ -123,6 +126,8 @@ print_filter <- function(filter, data_objects) {
 #'
 #' @param x Source or Cohort object. Otherwise works as a standard pipe operator.
 #' @param object Filter or step to be added to `x`.
+#' @return And object (`Source` or `Cohort`) having new filter of step added.
+#'
 #' @export
 `%->%` <- function(x, object) {
   method <- NULL
@@ -141,6 +146,8 @@ print_filter <- function(filter, data_objects) {
 #' Attach proper class to filter constructor
 #'
 #' @param filter_constructor Function defining filter.
+#' @return A function having `cb_filter_constructor` class attached.
+#'
 #' @export
 .as_constructor <- function(filter_constructor) {
   class(filter_constructor) <- c(class(filter_constructor), "cb_filter_constructor")
@@ -152,6 +159,8 @@ print_filter <- function(filter, data_objects) {
 #' @param type Type of filter to use.
 #' @param ... Filter type-specific parameters (see \link{filter-types}),
 #'   and filter source-specific parameters (see \link{filter-source-types}).
+#' @return A function of class `cb_filter_constructor`.
+#'
 #' @export
 filter <- function(type, ...) {
   UseMethod("filter", type)
@@ -174,7 +183,9 @@ filter.character <- function(type, ...) {
 #' @param id Id of the filter.
 #' @param name Filter name.
 #' @param active If FALSE filter will be skipped during Cohort filtering.
+#' @param description Filter description object. Preferable a character value.
 #' @param ... Source specific parameters passed to filter (see \link{filter-source-types}).
+#' @return A function of class `cb_filter_constructor`.
 NULL
 
 #' Filter Source types methods
@@ -183,6 +194,8 @@ NULL
 #' @name filter-source-types
 #' @param source Source object.
 #' @param ... Source type specific parameters (or extra ones if not matching specific S3 method arguments).
+#' @return List of filter-specific metadata and methods - result of evaluation of
+#'    `cb_filter_constructor` function on `Source` object.
 NULL
 
 #' @rdname filter-types

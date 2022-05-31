@@ -4,7 +4,12 @@
 #' @importFrom magrittr %>%
 #' @importFrom dplyr sym
 
-globalVariables(c(":=", "!!", ".data"))
+globalVariables(c(
+  ":=", "!!", ".data",
+  "arrow_end_position_y", "excl_end_position_x", "excl_position_x",
+  "excl_position_y", "label", "label_excl",
+  "label_heights", "label_position_x", "label_position_y", "level"
+))
 
 NULL
 

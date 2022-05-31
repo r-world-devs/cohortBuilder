@@ -15,6 +15,9 @@ filter(type, ...)
 \item{...}{Filter type-specific parameters (see \link{filter-types}),
 and filter source-specific parameters (see \link{filter-source-types}).}
 }
+\value{
+A function of class `cb_filter_constructor`.
+}
 \description{
 Define Cohort filter
 }

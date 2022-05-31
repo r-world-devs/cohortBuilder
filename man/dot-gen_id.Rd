@@ -6,6 +6,9 @@
 \usage{
 .gen_id()
 }
+\value{
+A character type value.
+}
 \description{
 Generate random ID
 }

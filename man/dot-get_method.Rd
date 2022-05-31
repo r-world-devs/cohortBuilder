@@ -9,6 +9,9 @@
 \arguments{
 \item{name}{Name of the function.}
 }
+\value{
+Function - when found in any namespace or NULL otherwise.
+}
 \description{
 Whenever the function with provided name exists anywhere, the one is
 returned (or the first one if multiple found).

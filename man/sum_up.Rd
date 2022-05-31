@@ -9,6 +9,9 @@ sum_up(x)
 \arguments{
 \item{x}{Cohort object.}
 }
+\value{
+None (invisible NULL). Printed summary of Cohort state.
+}
 \description{
 Sum up Cohort state.
 }

@@ -19,6 +19,9 @@ Otherwise data from specified step is used to calculate required statistics.}
 \item{state}{Should the stats be calculated on data before ("pre") or after ("post")
 filtering in specified step.}
 }
+\value{
+List of filter-specific values summing up underlying filter data.
+}
 \description{
 Display data statistics related to specified step or filter.
 }
