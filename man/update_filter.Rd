@@ -23,6 +23,9 @@ update_filter(x, step_id, filter_id, ...)
 
 \item{run_flow}{If `TRUE`, data flow is run after the filter is updated.}
 }
+\value{
+Method dependent object (i.e. `Cohort` or `Source`) having selected filter updated.
+}
 \description{
 Update filter definition
 }

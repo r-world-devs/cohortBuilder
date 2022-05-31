@@ -17,6 +17,9 @@ plot_data(x, step_id, filter_id, ..., state = "post")
 
 \item{state}{Generate plot based on data before ("pre") or after ("post") filtering.}
 }
+\value{
+Filter-specific plot.
+}
 \description{
 For specified filter the method calls filter-related plot method to present data.
 }

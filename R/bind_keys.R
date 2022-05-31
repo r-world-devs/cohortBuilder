@@ -10,6 +10,8 @@
 #' )
 #'
 #' @param ... Data keys describing tables primary keys.
+#' @return List of class `primary_kays` storing \link{data_key}s objects.
+#'
 #' @export
 primary_keys <- function(...) {
   structure(
@@ -209,6 +211,9 @@ primary_keys <- function(...) {
 #' @rdname binding-keys
 #' @param ... In case of `bind_keys`, binding keys created with `bind_key`.
 #'   In case of `bind_key`, data keys describing triggering tables.
+#' @return List of class `bind_keys` storing `bind_key` class objects (`bind_keys`) or
+#'   `bind_key` class list (`bind_key`).
+#'
 #' @export
 bind_keys <- function(...) {
   structure(
@@ -242,6 +247,9 @@ bind_key <- function(update, ..., post = TRUE, activate = TRUE) {
 #'
 #' @param dataset Name of the dataset included in Source.
 #' @param key Character or character vector storing column names to be used as table keys.
+#' @return `data_key` class list of two objects: `dataset` and `key` storing name and vector of
+#'     data key names respectively.
+#'
 #' @export
 data_key <- function(dataset, key) {
   structure(
@@ -250,13 +258,13 @@ data_key <- function(dataset, key) {
   )
 }
 
-##' @rdname source-layer
+#' @rdname source-layer
 #' @export
 .run_binding <- function(source, ...) {
   UseMethod(".run_binding", source)
 }
 
-##' @rdname source-layer
+#' @rdname source-layer
 #' @param binding_key Binding key describing currently processed relation.
 #' @param data_object_pre Object storing unfiltered data in the current step (previous step result).
 #' @param data_object_post Object storing current data (including active filtering and previously done bindings).

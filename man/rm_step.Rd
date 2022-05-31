@@ -30,6 +30,9 @@ rm_step(x, step_id, ...)
 \item{hook}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
 }
+\value{
+Method dependent object (i.e. `Cohort` or `Source`) having selected step removed.
+}
 \description{
 Remove filtering step definition
 }

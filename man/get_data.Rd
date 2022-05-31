@@ -15,6 +15,9 @@ get_data(x, step_id, state = "post", collect = FALSE)
 
 \item{collect}{Return raw data source (`FALSE`) object or collected (to R memory) data (`TRUE`).}
 }
+\value{
+Subset of Source-specific data connection object or its evaluated version.
+}
 \description{
 Get step related data
 }

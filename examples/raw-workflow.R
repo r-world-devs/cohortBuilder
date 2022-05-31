@@ -1,5 +1,5 @@
 # Operating on cohort object
-
+library(cohortBuilder)
 coh <- cohort(
   source = set_source(
     tblist(

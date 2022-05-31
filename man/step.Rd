@@ -9,6 +9,9 @@ step(...)
 \arguments{
 \item{...}{Filters. See \link{filter}.}
 }
+\value{
+List of class `cb_step` storing filters configuration.
+}
 \description{
 Steps all to perform multiple stages of Source data filtering.
 }

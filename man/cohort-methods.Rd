@@ -3,6 +3,10 @@
 \name{cohort-methods}
 \alias{cohort-methods}
 \title{Cohort related methods}
+\value{
+Various type outputs dependent on the selected method.
+  See each method documentation for details.
+}
 \description{
 The list of methods designed for getting Cohort-related details.
 
@@ -15,5 +19,6 @@ The list of methods designed for getting Cohort-related details.
    \item{\link{get_state}}{ Save Cohort state.}
    \item{\link{restore}}{ Restore Cohort state.}
    \item{\link{attrition}}{ Show attrition plot.}
+   \item{\link{description}}{ Show Source or filter related description.}
 }
 }

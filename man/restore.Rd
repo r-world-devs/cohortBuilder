@@ -22,6 +22,9 @@ The returned state is then restored.}
 
 \item{run_flow}{If TRUE, filtering flow is applied when the operation is finished.}
 }
+\value{
+The `Cohort` class object having the state restored based on provided config.
+}
 \description{
 The method allows to restore Cohort object with provided configuration state.
 }

@@ -17,6 +17,9 @@ If vector of type integer, specified steps will remain.}
 
 \item{run_flow}{If `TRUE`, data flow is run after the source is updated.}
 }
+\value{
+The `Cohort` class object with updated `Source` definition.
+}
 \description{
 Update source in Cohort object.
 }

@@ -20,6 +20,10 @@ In case of `bind_key`, data keys describing triggering tables.}
 
 \item{activate}{Mark bound table as active.}
 }
+\value{
+List of class `bind_keys` storing `bind_key` class objects (`bind_keys`) or
+  `bind_key` class list (`bind_key`).
+}
 \description{
 When source consists of multiple datasets, binding keys allow to define what
 relations occur between them.

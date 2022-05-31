@@ -23,6 +23,9 @@ rm_filter(x, step_id, filter_id, ...)
 
 \item{run_flow}{If `TRUE`, data flow is run after the filter is removed.}
 }
+\value{
+Method dependent object (i.e. `Cohort` or `Source`) having selected filter removed.
+}
 \description{
 Remove filter definition
 }

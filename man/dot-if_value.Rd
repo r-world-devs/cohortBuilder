@@ -13,6 +13,9 @@
 
 \item{default}{Default value to be returned when `x` is identical to `value`.}
 }
+\value{
+Evaluated condition or provided default value.
+}
 \description{
 Return default value if values are equal
 }

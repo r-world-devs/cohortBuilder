@@ -123,6 +123,10 @@ The names should relate to the ones included in `variables` parameter.}
 
 \item{variables}{Vector of variable names to be used in filtering.}
 }
+\value{
+List of filter-specific metadata and methods - result of evaluation of
+   `cb_filter_constructor` function on `Source` object.
+}
 \description{
 Filter Source types methods
 }

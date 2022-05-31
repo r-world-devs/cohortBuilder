@@ -24,6 +24,9 @@ If missing, filter is added to the last step.}
 
 \item{run_flow}{If `TRUE`, data flow is run after the filter is added.}
 }
+\value{
+Method dependent object (i.e. `Cohort` or `Source`) having filter added in selected step.
+}
 \description{
 Add filter definition
 }

@@ -23,6 +23,9 @@ filters - the filters will be added to the first step.}
 \item{hook}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
 }
+\value{
+The object of class `Cohort`.
+}
 \description{
 Cohort object is designed to make operations on source data possible.
 }

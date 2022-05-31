@@ -63,6 +63,11 @@
 \item{...}{Source specific parameters passed to filter (see \link{filter-source-types}).}
 
 \item{active}{If FALSE filter will be skipped during Cohort filtering.}
+
+\item{description}{Filter description object. Preferable a character value.}
+}
+\value{
+A function of class `cb_filter_constructor`.
 }
 \description{
 Filter types

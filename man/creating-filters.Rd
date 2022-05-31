@@ -56,6 +56,9 @@ new_filter(
 
 \item{file}{File path where filter should be created.}
 }
+\value{
+A list of filter specific values and methods (`def_filter`) or no value (`new_filter`).
+}
 \description{
 Methods available for creating new filters easier.
 }
