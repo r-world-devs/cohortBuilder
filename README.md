@@ -404,4 +404,4 @@ In a case you found any bugs, have feature request or general question
 please file an issue at the package
 [Github](https://github.com/r-world-devs/cohortBuilder/issues). You may
 also contact the package author directly via email at
-[krystian8207@gmail.com](krystian8207@gmail.com).
+[krystian8207@gmail.com](mailto:krystian8207@gmail.com).
