@@ -14,7 +14,7 @@ See 'Details' section for more information."><meta property="og:image" content="
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9037</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@ See 'Details' section for more information."><meta property="og:image" content="
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/r-world-devs/shinyGizmo/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/r-world-devs/cohortBuilder/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -81,7 +81,7 @@ See 'Details' section for more information."><meta property="og:image" content="
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Source compatibility methods.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/r-world-devs/shinyGizmo/blob/HEAD/R/source_methods.R" class="external-link"><code>R/source_methods.R</code></a>, <a href="https://github.com/r-world-devs/shinyGizmo/blob/HEAD/R/attrition.R" class="external-link"><code>R/attrition.R</code></a>, <a href="https://github.com/r-world-devs/shinyGizmo/blob/HEAD/R/bind_keys.R" class="external-link"><code>R/bind_keys.R</code></a>, and 1 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/r-world-devs/cohortBuilder/blob/HEAD/R/source_methods.R" class="external-link"><code>R/source_methods.R</code></a>, <a href="https://github.com/r-world-devs/cohortBuilder/blob/HEAD/R/attrition.R" class="external-link"><code>R/attrition.R</code></a>, <a href="https://github.com/r-world-devs/cohortBuilder/blob/HEAD/R/bind_keys.R" class="external-link"><code>R/bind_keys.R</code></a>, and 1 more</small>
       <div class="d-none name"><code>source-layer.Rd</code></div>
     </div>
 
@@ -126,7 +126,7 @@ See 'Details' section for more information.</p>
 <span class="fu">.get_attrition_count</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_stats</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S3 method for default</span>
-<span class="fu">.get_attrition_count</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_stats</span>, <span class="va">dataset</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu">.get_attrition_count</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_stats</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="fu">.run_binding</span><span class="op">(</span><span class="va">source</span>, <span class="va">...</span><span class="op">)</span>
 
@@ -158,8 +158,6 @@ See 'Details' section for more information.</p>
 <dd><p>List of step filters.</p></dd>
 <dt>data_stats</dt>
 <dd><p>Data frame presenting statistics for each filtering step.</p></dd>
-<dt>dataset</dt>
-<dd><p>Dataset name.</p></dd>
 <dt>binding_key</dt>
 <dd><p>Binding key describing currently processed relation.</p></dd>
 <dt>data_object_pre</dt>
@@ -167,6 +165,10 @@ See 'Details' section for more information.</p>
 <dt>data_object_post</dt>
 <dd><p>Object storing current data (including active filtering and previously done bindings).</p></dd>
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>Depends on specific method. See `vignette("custom-extensions")` for more details.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The package is designed to make the functionality work with multiple data sources.
@@ -189,7 +191,7 @@ should be defined:</p><ul><li><p>.init_source Defines how to extract data object
   get statistics and labels for attrition plot.</p></li>
 </ul><p>Except from the above methods, you may extend the existing or new source with providing
 custom filtering methods. See <a href="creating-filters.html">creating-filters</a>.
-In order to see more details about how to implement custom source check `vignette("defining-source")`.</p>
+In order to see more details about how to implement custom source check `vignette("custom-extensions")`.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

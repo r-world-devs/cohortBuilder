@@ -12,7 +12,7 @@ R6 class representing Cohort object."><meta property="og:image" content="https:/
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9037</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,7 @@ R6 class representing Cohort object."><meta property="og:image" content="https:/
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/r-world-devs/shinyGizmo/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/r-world-devs/cohortBuilder/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -79,7 +79,7 @@ R6 class representing Cohort object."><meta property="og:image" content="https:/
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>R6 class representing Cohort object.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/r-world-devs/shinyGizmo/blob/HEAD/R/cohort_methods.R" class="external-link"><code>R/cohort_methods.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/r-world-devs/cohortBuilder/blob/HEAD/R/cohort_methods.R" class="external-link"><code>R/cohort_methods.R</code></a></small>
       <div class="d-none name"><code>Cohort.Rd</code></div>
     </div>
 
@@ -107,40 +107,40 @@ R6 class representing Cohort object."><meta property="og:image" content="https:/
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-new"><code>Cohort$new()</code></a></p></li>
-<li><p><a href="#method-add_source"><code>Cohort$add_source()</code></a></p></li>
-<li><p><a href="#method-update_source"><code>Cohort$update_source()</code></a></p></li>
-<li><p><a href="#method-get_source"><code>Cohort$get_source()</code></a></p></li>
-<li><p><a href="#method-add_step"><code>Cohort$add_step()</code></a></p></li>
-<li><p><a href="#method-copy_step"><code>Cohort$copy_step()</code></a></p></li>
-<li><p><a href="#method-remove_step"><code>Cohort$remove_step()</code></a></p></li>
-<li><p><a href="#method-add_filter"><code>Cohort$add_filter()</code></a></p></li>
-<li><p><a href="#method-remove_filter"><code>Cohort$remove_filter()</code></a></p></li>
-<li><p><a href="#method-update_filter"><code>Cohort$update_filter()</code></a></p></li>
-<li><p><a href="#method-clear_filter"><code>Cohort$clear_filter()</code></a></p></li>
-<li><p><a href="#method-clear_step"><code>Cohort$clear_step()</code></a></p></li>
-<li><p><a href="#method-sum_up_state"><code>Cohort$sum_up_state()</code></a></p></li>
-<li><p><a href="#method-get_state"><code>Cohort$get_state()</code></a></p></li>
-<li><p><a href="#method-restore"><code>Cohort$restore()</code></a></p></li>
-<li><p><a href="#method-get_data"><code>Cohort$get_data()</code></a></p></li>
-<li><p><a href="#method-plot_data"><code>Cohort$plot_data()</code></a></p></li>
-<li><p><a href="#method-show_attrition"><code>Cohort$show_attrition()</code></a></p></li>
-<li><p><a href="#method-get_stats"><code>Cohort$get_stats()</code></a></p></li>
-<li><p><a href="#method-show_help"><code>Cohort$show_help()</code></a></p></li>
-<li><p><a href="#method-get_code"><code>Cohort$get_code()</code></a></p></li>
-<li><p><a href="#method-run_flow"><code>Cohort$run_flow()</code></a></p></li>
-<li><p><a href="#method-run_step"><code>Cohort$run_step()</code></a></p></li>
-<li><p><a href="#method-bind_data"><code>Cohort$bind_data()</code></a></p></li>
-<li><p><a href="#method-describe_state"><code>Cohort$describe_state()</code></a></p></li>
-<li><p><a href="#method-get_step"><code>Cohort$get_step()</code></a></p></li>
-<li><p><a href="#method-get_filter"><code>Cohort$get_filter()</code></a></p></li>
-<li><p><a href="#method-update_cache"><code>Cohort$update_cache()</code></a></p></li>
-<li><p><a href="#method-get_cache"><code>Cohort$get_cache()</code></a></p></li>
-<li><p><a href="#method-list_active_filters"><code>Cohort$list_active_filters()</code></a></p></li>
-<li><p><a href="#method-last_step_id"><code>Cohort$last_step_id()</code></a></p></li>
-<li><p><a href="#method-modify"><code>Cohort$modify()</code></a></p></li>
-<li><p><a href="#method-clone"><code>Cohort$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-new"></a><div class="section">
+<ul><li><p><a href="#method-Cohort-new"><code>Cohort$new()</code></a></p></li>
+<li><p><a href="#method-Cohort-add_source"><code>Cohort$add_source()</code></a></p></li>
+<li><p><a href="#method-Cohort-update_source"><code>Cohort$update_source()</code></a></p></li>
+<li><p><a href="#method-Cohort-get_source"><code>Cohort$get_source()</code></a></p></li>
+<li><p><a href="#method-Cohort-add_step"><code>Cohort$add_step()</code></a></p></li>
+<li><p><a href="#method-Cohort-copy_step"><code>Cohort$copy_step()</code></a></p></li>
+<li><p><a href="#method-Cohort-remove_step"><code>Cohort$remove_step()</code></a></p></li>
+<li><p><a href="#method-Cohort-add_filter"><code>Cohort$add_filter()</code></a></p></li>
+<li><p><a href="#method-Cohort-remove_filter"><code>Cohort$remove_filter()</code></a></p></li>
+<li><p><a href="#method-Cohort-update_filter"><code>Cohort$update_filter()</code></a></p></li>
+<li><p><a href="#method-Cohort-clear_filter"><code>Cohort$clear_filter()</code></a></p></li>
+<li><p><a href="#method-Cohort-clear_step"><code>Cohort$clear_step()</code></a></p></li>
+<li><p><a href="#method-Cohort-sum_up_state"><code>Cohort$sum_up_state()</code></a></p></li>
+<li><p><a href="#method-Cohort-get_state"><code>Cohort$get_state()</code></a></p></li>
+<li><p><a href="#method-Cohort-restore"><code>Cohort$restore()</code></a></p></li>
+<li><p><a href="#method-Cohort-get_data"><code>Cohort$get_data()</code></a></p></li>
+<li><p><a href="#method-Cohort-plot_data"><code>Cohort$plot_data()</code></a></p></li>
+<li><p><a href="#method-Cohort-show_attrition"><code>Cohort$show_attrition()</code></a></p></li>
+<li><p><a href="#method-Cohort-get_stats"><code>Cohort$get_stats()</code></a></p></li>
+<li><p><a href="#method-Cohort-show_help"><code>Cohort$show_help()</code></a></p></li>
+<li><p><a href="#method-Cohort-get_code"><code>Cohort$get_code()</code></a></p></li>
+<li><p><a href="#method-Cohort-run_flow"><code>Cohort$run_flow()</code></a></p></li>
+<li><p><a href="#method-Cohort-run_step"><code>Cohort$run_step()</code></a></p></li>
+<li><p><a href="#method-Cohort-bind_data"><code>Cohort$bind_data()</code></a></p></li>
+<li><p><a href="#method-Cohort-describe_state"><code>Cohort$describe_state()</code></a></p></li>
+<li><p><a href="#method-Cohort-get_step"><code>Cohort$get_step()</code></a></p></li>
+<li><p><a href="#method-Cohort-get_filter"><code>Cohort$get_filter()</code></a></p></li>
+<li><p><a href="#method-Cohort-update_cache"><code>Cohort$update_cache()</code></a></p></li>
+<li><p><a href="#method-Cohort-get_cache"><code>Cohort$get_cache()</code></a></p></li>
+<li><p><a href="#method-Cohort-list_active_filters"><code>Cohort$list_active_filters()</code></a></p></li>
+<li><p><a href="#method-Cohort-last_step_id"><code>Cohort$last_step_id()</code></a></p></li>
+<li><p><a href="#method-Cohort-modify"><code>Cohort$modify()</code></a></p></li>
+<li><p><a href="#method-Cohort-clone"><code>Cohort$clone()</code></a></p></li>
+</ul></div><p></p><hr><a id="method-Cohort-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create Cohort object.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
@@ -174,8 +174,12 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 
 </dl><p></p></div>
 </div>
+<div class="section">
+<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
+<p>The object of class `Cohort`.</p>
+</div>
 
-</div><p></p><hr><a id="method-add_source"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-add_source"></a><div class="section">
 <h3 id="method-add-source-">Method <code><a href="add_source.html">add_source()</a></code><a class="anchor" aria-label="anchor" href="#method-add-source-"></a></h3>
 <p>Add Source to Cohort object.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
@@ -191,7 +195,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-update_source"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-update_source"></a><div class="section">
 <h3 id="method-update-source-">Method <code><a href="update_source.html">update_source()</a></code><a class="anchor" aria-label="anchor" href="#method-update-source-"></a></h3>
 <p>Update Source in the Cohort object.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
@@ -228,7 +232,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-get_source"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-get_source"></a><div class="section">
 <h3 id="method-get-source-">Method <code>get_source()</code><a class="anchor" aria-label="anchor" href="#method-get-source-"></a></h3>
 <p>Return Source object attached to Cohort.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
@@ -236,7 +240,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </div>
 
 
-</div><p></p><hr><a id="method-add_step"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-add_step"></a><div class="section">
 <h3 id="method-add-step-">Method <code><a href="add_step.html">add_step()</a></code><a class="anchor" aria-label="anchor" href="#method-add-step-"></a></h3>
 <p>Add filtering step definition</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
@@ -266,11 +270,11 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-copy_step"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-copy_step"></a><div class="section">
 <h3 id="method-copy-step-">Method <code>copy_step()</code><a class="anchor" aria-label="anchor" href="#method-copy-step-"></a></h3>
 <p>Copy selected step.</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Cohort</span><span class="op">$</span><span class="fu">copy_step</span><span class="op">(</span><span class="va">step_id</span>, run_flow <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Cohort</span><span class="op">$</span><span class="fu">copy_step</span><span class="op">(</span><span class="va">step_id</span>, <span class="va">filters</span>, run_flow <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -280,6 +284,10 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 The copied step is added as the last one in the Cohort.</p></dd>
 
 
+<dt><code>filters</code></dt>
+<dd><p>List of Source-evaluated filters to copy to new step.</p></dd>
+
+
 <dt><code>run_flow</code></dt>
 <dd><p>If `TRUE`, data flow is run after the operation is completed.</p></dd>
 
@@ -287,7 +295,7 @@ The copied step is added as the last one in the Cohort.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-remove_step"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-remove_step"></a><div class="section">
 <h3 id="method-remove-step-">Method <code>remove_step()</code><a class="anchor" aria-label="anchor" href="#method-remove-step-"></a></h3>
 <p>Remove filtering step definition</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
@@ -316,7 +324,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-add_filter"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-add_filter"></a><div class="section">
 <h3 id="method-add-filter-">Method <code><a href="add_filter.html">add_filter()</a></code><a class="anchor" aria-label="anchor" href="#method-add-filter-"></a></h3>
 <p>Add filter definition</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
@@ -341,7 +349,7 @@ If missing, filter is added to the last step.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-remove_filter"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-remove_filter"></a><div class="section">
 <h3 id="method-remove-filter-">Method <code>remove_filter()</code><a class="anchor" aria-label="anchor" href="#method-remove-filter-"></a></h3>
 <p>Remove filter definition</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
@@ -365,7 +373,7 @@ If missing, filter is added to the last step.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-update_filter"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-update_filter"></a><div class="section">
 <h3 id="method-update-filter-">Method <code><a href="update_filter.html">update_filter()</a></code><a class="anchor" aria-label="anchor" href="#method-update-filter-"></a></h3>
 <p>Update filter definition</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
@@ -397,7 +405,7 @@ If missing, filter is added to the last step.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-clear_filter"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-clear_filter"></a><div class="section">
 <h3 id="method-clear-filter-">Method <code>clear_filter()</code><a class="anchor" aria-label="anchor" href="#method-clear-filter-"></a></h3>
 <p>Reset filter to its default values.</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
@@ -421,7 +429,7 @@ If missing, filter is added to the last step.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-clear_step"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-clear_step"></a><div class="section">
 <h3 id="method-clear-step-">Method <code>clear_step()</code><a class="anchor" aria-label="anchor" href="#method-clear-step-"></a></h3>
 <p>Reset all filters included in selected step.</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
@@ -441,7 +449,7 @@ If missing, filter is added to the last step.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-sum_up_state"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-sum_up_state"></a><div class="section">
 <h3 id="method-sum-up-state-">Method <code>sum_up_state()</code><a class="anchor" aria-label="anchor" href="#method-sum-up-state-"></a></h3>
 <p>Sum up Cohort configuration - Source, steps definition and evaluated data.</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
@@ -449,7 +457,7 @@ If missing, filter is added to the last step.</p></dd>
 </div>
 
 
-</div><p></p><hr><a id="method-get_state"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-get_state"></a><div class="section">
 <h3 id="method-get-state-">Method <code><a href="get_state.html">get_state()</a></code><a class="anchor" aria-label="anchor" href="#method-get-state-"></a></h3>
 <p>Get Cohort configuration state.</p><div class="section">
 <h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
@@ -474,14 +482,16 @@ Restore Cohort configuration.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-restore"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-restore"></a><div class="section">
 <h3 id="method-restore-">Method <code><a href="restore.html">restore()</a></code><a class="anchor" aria-label="anchor" href="#method-restore-"></a></h3>
 
 <div class="section">
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Cohort</span><span class="op">$</span><span class="fu">restore</span><span class="op">(</span>
   <span class="va">state</span>,
-  modifier <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">prev_state</span>, <span class="va">state</span><span class="op">)</span> <span class="op">{</span>     <span class="va">state</span> <span class="op">}</span>,
+  modifier <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">prev_state</span>, <span class="va">state</span><span class="op">)</span> <span class="op">{</span>
+     <span class="va">state</span>
+ <span class="op">}</span>,
   run_flow <span class="op">=</span> <span class="cn">FALSE</span>,
   hook <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pre <span class="op">=</span> <span class="fu"><a href="../reference/hooks.html">get_hook</a></span><span class="op">(</span><span class="st">"pre_restore_hook"</span><span class="op">)</span>, post <span class="op">=</span> <span class="fu"><a href="../reference/hooks.html">get_hook</a></span><span class="op">(</span><span class="st">"post_restore_hook"</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div><p></p></div>
@@ -510,7 +520,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-get_data"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-get_data"></a><div class="section">
 <h3 id="method-get-data-">Method <code><a href="get_data.html">get_data()</a></code><a class="anchor" aria-label="anchor" href="#method-get-data-"></a></h3>
 <p>Get step related data</p><div class="section">
 <h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
@@ -534,7 +544,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-plot_data"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-plot_data"></a><div class="section">
 <h3 id="method-plot-data-">Method <code><a href="plot_data.html">plot_data()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-data-"></a></h3>
 <p>Plot filter specific data summary.</p><div class="section">
 <h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
@@ -562,7 +572,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-show_attrition"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-show_attrition"></a><div class="section">
 <h3 id="method-show-attrition-">Method <code>show_attrition()</code><a class="anchor" aria-label="anchor" href="#method-show-attrition-"></a></h3>
 <p>Show attrition plot.</p><div class="section">
 <h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
@@ -582,7 +592,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-get_stats"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-get_stats"></a><div class="section">
 <h3 id="method-get-stats-">Method <code>get_stats()</code><a class="anchor" aria-label="anchor" href="#method-get-stats-"></a></h3>
 <p>Get Cohort related statistics.</p><div class="section">
 <h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
@@ -612,7 +622,7 @@ filtering in specified step.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-show_help"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-show_help"></a><div class="section">
 <h3 id="method-show-help-">Method <code>show_help()</code><a class="anchor" aria-label="anchor" href="#method-show-help-"></a></h3>
 <p>Show source data or filter description</p><div class="section">
 <h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
@@ -647,7 +657,7 @@ The function can be used to modify its argument (convert to html, display in bro
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-get_code"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-get_code"></a><div class="section">
 <h3 id="method-get-code-">Method <code>get_code()</code><a class="anchor" aria-label="anchor" href="#method-get-code-"></a></h3>
 <p>Return reproducible data filtering code.</p><div class="section">
 <h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
@@ -673,7 +683,7 @@ If `filter_id` not missing, `step_id` defines from which step the filter should 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-run_flow"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-run_flow"></a><div class="section">
 <h3 id="method-run-flow-">Method <code>run_flow()</code><a class="anchor" aria-label="anchor" href="#method-run-flow-"></a></h3>
 <p>Trigger data calculations sequentially.</p><div class="section">
 <h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
@@ -698,7 +708,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-run_step"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-run_step"></a><div class="section">
 <h3 id="method-run-step-">Method <code>run_step()</code><a class="anchor" aria-label="anchor" href="#method-run-step-"></a></h3>
 <p>Trigger data calculations for selected step.</p><div class="section">
 <h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
@@ -723,7 +733,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-bind_data"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-bind_data"></a><div class="section">
 <h3 id="method-bind-data-">Method <code>bind_data()</code><a class="anchor" aria-label="anchor" href="#method-bind-data-"></a></h3>
 <p>Run data binding for selected step.
   See more at <a href="binding-keys.html">binding-keys</a>.</p><div class="section">
@@ -740,7 +750,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-describe_state"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-describe_state"></a><div class="section">
 <h3 id="method-describe-state-">Method <code>describe_state()</code><a class="anchor" aria-label="anchor" href="#method-describe-state-"></a></h3>
 <p>Print defined steps configuration.</p><div class="section">
 <h4 id="usage-24">Usage<a class="anchor" aria-label="anchor" href="#usage-24"></a></h4>
@@ -748,7 +758,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </div>
 
 
-</div><p></p><hr><a id="method-get_step"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-get_step"></a><div class="section">
 <h3 id="method-get-step-">Method <code>get_step()</code><a class="anchor" aria-label="anchor" href="#method-get-step-"></a></h3>
 <p>Get selected step configuration.</p><div class="section">
 <h4 id="usage-25">Usage<a class="anchor" aria-label="anchor" href="#usage-25"></a></h4>
@@ -764,7 +774,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-get_filter"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-get_filter"></a><div class="section">
 <h3 id="method-get-filter-">Method <code>get_filter()</code><a class="anchor" aria-label="anchor" href="#method-get-filter-"></a></h3>
 <p>Get selected filter configuration.</p><div class="section">
 <h4 id="usage-26">Usage<a class="anchor" aria-label="anchor" href="#usage-26"></a></h4>
@@ -788,7 +798,7 @@ See <a href="hooks.html">hooks</a> for more details.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-update_cache"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-update_cache"></a><div class="section">
 <h3 id="method-update-cache-">Method <code>update_cache()</code><a class="anchor" aria-label="anchor" href="#method-update-cache-"></a></h3>
 <p>Update filter or step cache.
 Caching is saving step and filter attached data statistics such as number of
@@ -816,7 +826,7 @@ filtering in specified step.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-get_cache"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-get_cache"></a><div class="section">
 <h3 id="method-get-cache-">Method <code>get_cache()</code><a class="anchor" aria-label="anchor" href="#method-get-cache-"></a></h3>
 <p>Return step of filter specific cache.</p><div class="section">
 <h4 id="usage-28">Usage<a class="anchor" aria-label="anchor" href="#usage-28"></a></h4>
@@ -842,7 +852,7 @@ filtering in specified step.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-list_active_filters"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-list_active_filters"></a><div class="section">
 <h3 id="method-list-active-filters-">Method <code>list_active_filters()</code><a class="anchor" aria-label="anchor" href="#method-list-active-filters-"></a></h3>
 <p>List active filters included in selected step.</p><div class="section">
 <h4 id="usage-29">Usage<a class="anchor" aria-label="anchor" href="#usage-29"></a></h4>
@@ -858,7 +868,7 @@ filtering in specified step.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-last_step_id"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-last_step_id"></a><div class="section">
 <h3 id="method-last-step-id-">Method <code>last_step_id()</code><a class="anchor" aria-label="anchor" href="#method-last-step-id-"></a></h3>
 <p>Return id of the last existing step in Cohort.</p><div class="section">
 <h4 id="usage-30">Usage<a class="anchor" aria-label="anchor" href="#usage-30"></a></h4>
@@ -866,7 +876,7 @@ filtering in specified step.</p></dd>
 </div>
 
 
-</div><p></p><hr><a id="method-modify"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-modify"></a><div class="section">
 <h3 id="method-modify-">Method <code>modify()</code><a class="anchor" aria-label="anchor" href="#method-modify-"></a></h3>
 <p>Helper method enabling to run non-standard operation on Cohort object.</p><div class="section">
 <h4 id="usage-31">Usage<a class="anchor" aria-label="anchor" href="#usage-31"></a></h4>
@@ -882,7 +892,7 @@ filtering in specified step.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-clone"></a><div class="section">
+</div><p></p><hr><a id="method-Cohort-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-32">Usage<a class="anchor" aria-label="anchor" href="#usage-32"></a></h4>

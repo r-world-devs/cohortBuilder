@@ -12,7 +12,7 @@ R6 class representing a data source"><meta property="og:image" content="https://
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9037</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,7 @@ R6 class representing a data source"><meta property="og:image" content="https://
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/r-world-devs/shinyGizmo/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/r-world-devs/cohortBuilder/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -79,7 +79,7 @@ R6 class representing a data source"><meta property="og:image" content="https://
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>R6 class representing a data source</h1>
-      <small class="dont-index">Source: <a href="https://github.com/r-world-devs/shinyGizmo/blob/HEAD/R/source_methods.R" class="external-link"><code>R/source_methods.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/r-world-devs/cohortBuilder/blob/HEAD/R/source_methods.R" class="external-link"><code>R/source_methods.R</code></a></small>
       <div class="d-none name"><code>Source.Rd</code></div>
     </div>
 
@@ -132,16 +132,16 @@ primary keys and relations between stored data.</p>
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-new"><code>Source$new()</code></a></p></li>
-<li><p><a href="#method-get"><code>Source$get()</code></a></p></li>
-<li><p><a href="#method-get_steps"><code>Source$get_steps()</code></a></p></li>
-<li><p><a href="#method-add_step"><code>Source$add_step()</code></a></p></li>
-<li><p><a href="#method-rm_step"><code>Source$rm_step()</code></a></p></li>
-<li><p><a href="#method-add_filter"><code>Source$add_filter()</code></a></p></li>
-<li><p><a href="#method-rm_filter"><code>Source$rm_filter()</code></a></p></li>
-<li><p><a href="#method-update_filter"><code>Source$update_filter()</code></a></p></li>
-<li><p><a href="#method-clone"><code>Source$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-new"></a><div class="section">
+<ul><li><p><a href="#method-Source-new"><code>Source$new()</code></a></p></li>
+<li><p><a href="#method-Source-get"><code>Source$get()</code></a></p></li>
+<li><p><a href="#method-Source-get_steps"><code>Source$get_steps()</code></a></p></li>
+<li><p><a href="#method-Source-add_step"><code>Source$add_step()</code></a></p></li>
+<li><p><a href="#method-Source-rm_step"><code>Source$rm_step()</code></a></p></li>
+<li><p><a href="#method-Source-add_filter"><code>Source$add_filter()</code></a></p></li>
+<li><p><a href="#method-Source-rm_filter"><code>Source$rm_filter()</code></a></p></li>
+<li><p><a href="#method-Source-update_filter"><code>Source$update_filter()</code></a></p></li>
+<li><p><a href="#method-Source-clone"><code>Source$clone()</code></a></p></li>
+</ul></div><p></p><hr><a id="method-Source-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create a new `Source` object.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
@@ -181,7 +181,7 @@ Used as a part of reproducible code output, see <a href="code.html">code</a>.</p
 
 <dt><code>description</code></dt>
 <dd><p>A named list storing the source objects description.
-Can be accessed with show_help Cohort method.</p></dd>
+Can be accessed with <a href="description.html">description</a> Cohort method.</p></dd>
 
 
 <dt><code>options</code></dt>
@@ -193,10 +193,10 @@ specifying whether reproducible code should include bindings definition.</p></dd
 </div>
 <div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>A new `Source` object of class `Source` (and `dtconn` class appended).</p>
+<p>A new `Source` object of class `Source` (and `dtconn` object class appended).</p>
 </div>
 
-</div><p></p><hr><a id="method-get"></a><div class="section">
+</div><p></p><hr><a id="method-Source-get"></a><div class="section">
 <h3 id="method-get-">Method <code><a href="https://rdrr.io/r/base/get.html" class="external-link">get()</a></code><a class="anchor" aria-label="anchor" href="#method-get-"></a></h3>
 <p>Get selected `Source` object `attribute`.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
@@ -212,7 +212,7 @@ specifying whether reproducible code should include bindings definition.</p></dd
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-get_steps"></a><div class="section">
+</div><p></p><hr><a id="method-Source-get_steps"></a><div class="section">
 <h3 id="method-get-steps-">Method <code>get_steps()</code><a class="anchor" aria-label="anchor" href="#method-get-steps-"></a></h3>
 <p>Returns filtering steps definition, if defined for `Source`.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
@@ -220,7 +220,7 @@ specifying whether reproducible code should include bindings definition.</p></dd
 </div>
 
 
-</div><p></p><hr><a id="method-add_step"></a><div class="section">
+</div><p></p><hr><a id="method-Source-add_step"></a><div class="section">
 <h3 id="method-add-step-">Method <code><a href="add_step.html">add_step()</a></code><a class="anchor" aria-label="anchor" href="#method-add-step-"></a></h3>
 <p>Add filtering step definition.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
@@ -236,7 +236,7 @@ specifying whether reproducible code should include bindings definition.</p></dd
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-rm_step"></a><div class="section">
+</div><p></p><hr><a id="method-Source-rm_step"></a><div class="section">
 <h3 id="method-rm-step-">Method <code><a href="rm_step.html">rm_step()</a></code><a class="anchor" aria-label="anchor" href="#method-rm-step-"></a></h3>
 <p>Remove filtering step definition.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
@@ -252,7 +252,7 @@ specifying whether reproducible code should include bindings definition.</p></dd
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-add_filter"></a><div class="section">
+</div><p></p><hr><a id="method-Source-add_filter"></a><div class="section">
 <h3 id="method-add-filter-">Method <code><a href="add_filter.html">add_filter()</a></code><a class="anchor" aria-label="anchor" href="#method-add-filter-"></a></h3>
 <p>Add filter definition to selected step.</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
@@ -273,7 +273,7 @@ If skipped the last step is used.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-rm_filter"></a><div class="section">
+</div><p></p><hr><a id="method-Source-rm_filter"></a><div class="section">
 <h3 id="method-rm-filter-">Method <code><a href="rm_filter.html">rm_filter()</a></code><a class="anchor" aria-label="anchor" href="#method-rm-filter-"></a></h3>
 <p>Remove filter definition from selected step.</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
@@ -293,7 +293,7 @@ If skipped the last step is used.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-update_filter"></a><div class="section">
+</div><p></p><hr><a id="method-Source-update_filter"></a><div class="section">
 <h3 id="method-update-filter-">Method <code><a href="update_filter.html">update_filter()</a></code><a class="anchor" aria-label="anchor" href="#method-update-filter-"></a></h3>
 <p>Update filter definition.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
@@ -317,7 +317,7 @@ If skipped the last step is used.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-clone"></a><div class="section">
+</div><p></p><hr><a id="method-Source-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
