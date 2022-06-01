@@ -11,7 +11,7 @@ Authors@R:
 Maintainer: Krystian Igras <krystian8207@gmail.com>
 Description: Common API for filtering data stored in different data models.
     Provides multiple filter types and reproducible R code.
-    Works standalone or with 'shinyCohortBuilder' as the GUI for interactive shiny apps.
+    Works standalone or with 'shinyCohortBuilder' as the GUI for interactive Shiny apps.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

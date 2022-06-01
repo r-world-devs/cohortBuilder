@@ -9,6 +9,15 @@
 ## `R CMD check cohortBuilder_0.1.tar.gz --as-cran` results
 
 ```
+* using log directory ‘/home/krystian/Projects/Packages/cohortBuilder.Rcheck’
+* using R version 4.1.2 (2021-11-01)
+* using platform: x86_64-pc-linux-gnu (64-bit)
+...
+* checking CRAN incoming feasibility ... NOTE
+Maintainer: ‘Krystian Igras <krystian8207@gmail.com>’
+
+New submission
+...
 Status: 1 NOTE
 ```
 
@@ -32,9 +41,6 @@ Note regarding checking CRAN incoming feasibility.
 Maintainer: 'Krystian Igras <krystian8207@gmail.com>'
 
 New submission
-
-Possibly mis-spelled words in DESCRIPTION:
-  shinyCohortBuilder (14:54)
 ...
 Status: 1 NOTE
 ```
@@ -48,30 +54,19 @@ Status: 1 NOTE
 Maintainer: 'Krystian Igras <krystian8207@gmail.com>'
 
 New submission
-
-Possibly misspelled words in DESCRIPTION:
-  backend (14:42)
-  shinyCohortBuilder (14:54)
 ...
 Status: 1 NOTE
 ```
 
 ```
 * using log directory 'd:/RCompile/CRANguest/R-devel/cohortBuilder.Rcheck'
-* using R Under development (unstable) (2022-05-30 r82436 ucrt)
+* using R Under development (unstable) (2022-05-31 r82437 ucrt)
 * using platform: x86_64-w64-mingw32 (64-bit)
 ...
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: 'Krystian Igras <krystian8207@gmail.com>'
 
 New submission
-
-Possibly misspelled words in DESCRIPTION:
-  backend (14:42)
-  shinyCohortBuilder (14:54)
 ...
 Status: 1 NOTE
 ```
-
-Notes mention usage of 'backend' and 'shinyCohortBuilder' words in the description. 
-The words are correct and intentionally used.
