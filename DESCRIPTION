@@ -9,9 +9,9 @@ Authors@R:
       person('Adam', 'Foryś',
              role = "ctb"))
 Maintainer: Krystian Igras <krystian8207@gmail.com>
-Description: Common API for filtering data stored in sources of different kind.
-    The package offers multiple steps filtering in which various filtering methods can be used. 
-    Works standalone or can be used as a backend for shinyCohortBuilder package.
+Description: Common API for filtering data stored in different data models.
+    Provides multiple filter types and reproducible R code.
+    Works standalone or with 'shinyCohortBuilder' as the GUI for interactive shiny apps.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -49,6 +49,6 @@ Collate:
     'source_tblist.R'
     'data.R'
 VignetteBuilder: knitr
-URL: https://github.com/r-world-devs/shinyGizmo/,  https://r-world-devs.github.io/cohortBuilder/
+URL: https://github.com/r-world-devs/cohortBuilder/,  https://r-world-devs.github.io/cohortBuilder/
 Depends: 
     R (>= 3.5.0)
