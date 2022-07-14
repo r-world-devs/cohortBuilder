@@ -317,7 +317,7 @@ NULL
 #' @rdname source-layer
 #' @export
 .post_binding <- function(source, data_object, step_id) {
-  UseMethod(".post_filtering", source)
+  UseMethod(".post_binding", source)
 }
 
 #' @title Managing the Source object
