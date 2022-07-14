@@ -159,7 +159,15 @@ Required parameters:
 - data_object - an object following the structure of `.init_step`, 
 - step_id - id of the filtering step
 
-5. **`.collect_data` - define how to collect data object into R.**
+5. **`.post_binding` (optional) - data object modification after running binding.**
+
+Required parameters:
+
+- source, 
+- data_object - an object following the structure of `.init_step`, 
+- step_id - id of the filtering step
+
+6. **`.collect_data` - define how to collect data object into R.**
 
 Required parameters:
 
@@ -192,7 +200,7 @@ Examples:
 }
 ```
 
-6. **`.get_stats` - collect data object stats**
+7. **`.get_stats` - collect data object stats**
 
 Required parameters:
 
@@ -239,7 +247,7 @@ Examples:
 }
 ```
 
-7. **`.run_binding` - method defining how [binding](binding-keys.html) should be handled**
+8. **`.run_binding` - method defining how [binding](binding-keys.html) should be handled**
 
 Required parameters:
 
@@ -303,7 +311,7 @@ Examples:
 
 - `cohortBuilder.db` - not implemented yet
 
-8. **`.get_attrition_count` - define how to get metric used for attrition data plot**
+9. **`.get_attrition_count` - define how to get metric used for attrition data plot**
 
 Required parameters:
 
@@ -328,7 +336,7 @@ Examples:
 
 - `cohortBuilder.db` - not implemented yet
 
-9. **`.get_attrition_label` - define label displayed in attrition plot for the specified step**
+10. **`.get_attrition_label` - define label displayed in attrition plot for the specified step**
 
 Required parameters:
 
