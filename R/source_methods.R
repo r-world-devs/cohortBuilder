@@ -246,7 +246,9 @@ set_source <- function(dtconn, ..., primary_keys = NULL, binding_keys = NULL,
 #'   \item{.pre_filtering}{ (optional) Defines what operation on `data_object` should be
 #'   performed before applying filtering in the step.}
 #'   \item{.post_filtering}{ (optional) Defines what operation on `data_object` should be
-#'   performed after applying filtering in the step.}
+#'   performed after applying filtering in the step (before running binding).}
+#'   \item{.post_binding}{ (optional) Defines what operation on `data_object` should be
+#'   performed after applying binding in the step.}
 #'   \item{.run_binding}{ (optional) Defines how to handle post filtering data binding.
 #'   See more about binding keys at \link{binding-keys}.}
 #'   \item{.get_attrition_count and .get_attrition_label}{ Methods defining how to
@@ -312,6 +314,12 @@ NULL
   UseMethod(".post_filtering", source)
 }
 
+#' @rdname source-layer
+#' @export
+.post_binding <- function(source, data_object, step_id) {
+  UseMethod(".post_binding", source)
+}
+
 #' @title Managing the Source object
 #'
 #' @description
@@ -339,6 +347,12 @@ NULL
 #' @rdname source-layer
 #' @export
 .post_filtering.default <- function(source, data_object, step_id) {
+  return(data_object)
+}
+
+#' @rdname source-layer
+#' @export
+.post_binding.default <- function(source, data_object, step_id) {
   return(data_object)
 }
 

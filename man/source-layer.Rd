@@ -11,8 +11,10 @@
 \alias{.get_stats.default}
 \alias{.pre_filtering}
 \alias{.post_filtering}
+\alias{.post_binding}
 \alias{.pre_filtering.default}
 \alias{.post_filtering.default}
+\alias{.post_binding.default}
 \alias{.get_attrition_label}
 \alias{.get_attrition_label.default}
 \alias{.get_attrition_count}
@@ -40,9 +42,13 @@
 
 .post_filtering(source, data_object, step_id)
 
+.post_binding(source, data_object, step_id)
+
 \method{.pre_filtering}{default}(source, data_object, step_id)
 
 \method{.post_filtering}{default}(source, data_object, step_id)
+
+\method{.post_binding}{default}(source, data_object, step_id)
 
 .get_attrition_label(source, step_id, step_filters, ...)
 
@@ -106,7 +112,9 @@ should be defined:
   \item{.pre_filtering}{ (optional) Defines what operation on `data_object` should be
   performed before applying filtering in the step.}
   \item{.post_filtering}{ (optional) Defines what operation on `data_object` should be
-  performed after applying filtering in the step.}
+  performed after applying filtering in the step (before running binding).}
+  \item{.post_binding}{ (optional) Defines what operation on `data_object` should be
+  performed after applying binding in the step.}
   \item{.run_binding}{ (optional) Defines how to handle post filtering data binding.
   See more about binding keys at \link{binding-keys}.}
   \item{.get_attrition_count and .get_attrition_label}{ Methods defining how to

@@ -622,6 +622,12 @@ Cohort <- R6::R6Class(
       )
       self$bind_data(step_id)
 
+      private$data_objects[[step_id]] <- .post_binding(
+        source = private$source,
+        data_object = private$data_objects[[step_id]],
+        step_id = step_id
+      )
+
       filter_ids <- names(self$get_step(step_id)$filters)
       is_cached <- !is.null(self$get_cache(step_id, state = "pre"))
 
