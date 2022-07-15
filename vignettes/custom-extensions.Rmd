@@ -58,14 +58,14 @@ Example:
 set_source.tblist <- function(dtconn, primary_keys = NULL, binding_keys = NULL, 
                            source_code = NULL, description = NULL, ...) {
   Source$new(
-    dtconn, primary_keys = primary_keys,
-    binding_keys = binding_keys, source_code = source_code,
+    dtconn, primary_keys = primary_keys, binding_keys = binding_keys,
+    source_code = source_code, description = description,
     ...
   )
 }
 ```
 
-2. **`.init_source` - structure data passed between filtering steps**
+2. **`.init_step` - structure data passed between filtering steps**
 
 Required parameters:
 
@@ -138,12 +138,8 @@ Examples:
   purrr::map(
     stats::setNames(source$dtconn$tables, source$dtconn$tables),
     function(table) {
-      table_name <- tmp_table_name(attr(data_object[[table]], "tbl_name"), step_id)
-      DBI::dbRemoveTable(source$dtconn$connection, table_name, temporary = TRUE, fail_if_missing = FALSE)
-      data_object[[table]] <- dplyr::compute(
-        data_object[[table]],
-        name = table_name
-      )
+      table_name <- tmp_table_name(table, step_id)
+      DBI::dbRemoveTable(source$dtconn$conn, table_name, temporary = TRUE, fail_if_missing = FALSE)
       attr(data_object[[table]], "filtered") <- FALSE
       return(data_object[[table]])
     }
@@ -309,7 +305,7 @@ Examples:
 }
 ```
 
-- `cohortBuilder.db` - not implemented yet
+- `cohortBuilder.db` - slight modification of the above function
 
 9. **`.get_attrition_count` - define how to get metric used for attrition data plot**
 
@@ -334,7 +330,7 @@ Examples:
 }
 ```
 
-- `cohortBuilder.db` - not implemented yet
+- `cohortBuilder.db` - same as above
 
 10. **`.get_attrition_label` - define label displayed in attrition plot for the specified step**
 
@@ -396,4 +392,4 @@ get_attrition_label.tblist <- function(source, step_id, step_filters, dataset, .
 }
 ```
 
-- `cohortBuilder.db` - not implemented yet
+- `cohortBuilder.db` - same as above
