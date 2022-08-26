@@ -495,12 +495,14 @@ Cohort <- R6::R6Class(
 
       source_type <- class(private$source)[1]
       # todo improve
+      fun_args <- environment()
       code_params <- c(
         "include_source", "include_methods", "include_action", "modifier", "mark_step"
       ) %>%
+        stats::setNames(nm = .) %>%
         purrr::map(
           ~if (is.null(self$attributes[[.x]])) {
-            environment()[[.x]]
+            fun_args[[.x]]
           } else {
             self$attributes[[.x]]
           }
