@@ -245,7 +245,12 @@ pipe_filtering <- function(filtering_exprs) {
     }
   }
   assignment <- rlang::expr(!!filtering_exprs[[1]][[2]] <- x)
-  res_expr[[2]] <- substitute_q(assignment, list(x = res_expr[[2]]))
+  if (res_expr[[1]] == as.symbol("{")) {
+    res_expr[[2]] <- substitute_q(assignment, list(x = res_expr[[2]]))
+  } else {
+    res_expr <- substitute_q(assignment, list(x = res_expr))
+  }
+
   return(list(res_expr))
 }
 
