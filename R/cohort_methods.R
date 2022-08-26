@@ -494,15 +494,27 @@ Cohort <- R6::R6Class(
       modifier = .repro_code_tweak, mark_step = TRUE, ...) {
 
       source_type <- class(private$source)[1]
+      # todo improve
+      code_params <- c(
+        "include_source", "include_methods", "include_action", "modifier", "mark_step"
+      ) %>%
+        purrr::map(
+          ~if (is.null(self$attributes[[.x]])) {
+            environment()[[.x]]
+          } else {
+            self$attributes[[.x]]
+          }
+        )
+
       code_components <- list()
 
-      for (extra_method in include_methods) {
+      for (extra_method in code_params$include_methods) {
         code_components <- append(
           code_components,
           type_expr(type = "meta", expr = method_to_expr(extra_method, source_type))
         )
       }
-      if (include_source) {
+      if (code_params$include_source) {
         code_components <- append(
           code_components,
           type_expr(type = "source", expr = get_source_expr(source_type, self, private))
@@ -519,7 +531,7 @@ Cohort <- R6::R6Class(
           )
         }
         # todo add binding keys
-        if ("run_binding" %in% include_action) {
+        if ("run_binding" %in% code_params$include_action) {
           code_components <- append(
             code_components,
             type_expr(
@@ -530,7 +542,7 @@ Cohort <- R6::R6Class(
             )
           )
         }
-        if ("pre_filtering" %in% include_action) {
+        if ("pre_filtering" %in% code_params$include_action) {
           code_components <- append(
             code_components,
             type_expr(
@@ -554,7 +566,7 @@ Cohort <- R6::R6Class(
             )
           )
         }
-        if ("post_filtering" %in% include_action) {
+        if ("post_filtering" %in% code_params$include_action) {
           code_components <- append(
             code_components,
             type_expr(
@@ -565,7 +577,7 @@ Cohort <- R6::R6Class(
             )
           )
         }
-        if ("run_binding" %in% include_action) {
+        if ("run_binding" %in% code_params$include_action) {
           code_components <- append(
             code_components,
             type_expr(
