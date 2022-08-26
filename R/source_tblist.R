@@ -119,6 +119,10 @@ cb_filter.discrete.tblist <- function(
     name = name,
     input_param = "value",
     filter_data = function(data_object) {
+      # code eval start
+      a <- paste("Hello", name)
+      # code eval end
+      b <- "There" # code eval
 
       if (keep_na && !identical(value, NA)) {
         # keep_na !value_na start
@@ -750,4 +754,9 @@ cb_filter.multi_discrete.tblist <- function(
     attr(data_object[[dataset]], "filtered") <- FALSE
   }
   return(data_object)
+}
+
+#' @export
+.repro_code_tweak.tblist <- function(source, code_data) {
+  pipe_all_filters(code_data)
 }

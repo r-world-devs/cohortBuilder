@@ -12,6 +12,7 @@
 \alias{.pre_filtering}
 \alias{.post_filtering}
 \alias{.post_binding}
+\alias{.repro_code_tweak}
 \alias{.pre_filtering.default}
 \alias{.post_filtering.default}
 \alias{.post_binding.default}
@@ -43,6 +44,8 @@
 .post_filtering(source, data_object, step_id)
 
 .post_binding(source, data_object, step_id)
+
+.repro_code_tweak(source, code_data)
 
 \method{.pre_filtering}{default}(source, data_object, step_id)
 

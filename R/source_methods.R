@@ -320,6 +320,12 @@ NULL
   UseMethod(".post_binding", source)
 }
 
+#' @rdname source-layer
+#' @export
+.repro_code_tweak <- function(source, code_data) {
+  UseMethod(".repro_code_tweak", source)
+}
+
 #' @title Managing the Source object
 #'
 #' @description

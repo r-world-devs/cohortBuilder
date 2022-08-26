@@ -488,89 +488,108 @@ Cohort <- R6::R6Class(
     #'     If `filter_id` not missing, `step_id` defines from which step the filter should be taken.
     #' @param filter_id If not missing, precises the filter for which reproducible code should be returned.
     #' @param ... Other parameters passed to \link[formatR]{tidy_source}.
-    get_code = function(step_id, filter_id, ...) {
-      source_expr <- if (!is.null(private$source$source_code)) {
-        private$source$source_code
-      } else {
-        substitute(source <- list(dtconn = x), list(x = attr(private$source$dtconn, "call")))
-      }
-      source_type <- class(private$source)[1]
+    get_code = function(
+      include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
+      include_action = c("pre_filtering", "post_filtering", "run_binding"),
+      modifier = .repro_code_tweak, mark_step = TRUE, ...) {
 
-      init_step_expr <- parse_func_expr(
-        .get_method(paste0(".init_step", ".", source_type))
-      )
-      run_binding_fun_expr <- quote({})
-      bind_keys_expr <- quote({})
-      pre_run_binding_expr <- quote({})
-      run_binding_expr <- quote({})
-      pre_filtering_expr <- post_filtering_expr <- quote({})
-      pre_filtering_fun_expr <- method_to_expr(".pre_filtering", source_type)
-      post_filtering_fun_expr <- method_to_expr(".post_filtering", source_type)
-      if (length(pre_filtering_fun_expr) > 1) {
-        pre_filtering_expr <- quote({
-          data_object <- .pre_filtering(source, data_object, step_id)
-        })
-      }
-      if (length(post_filtering_fun_expr) > 1) {
-        post_filtering_expr <- quote({
-          data_object <- .post_filtering(source, data_object, step_id)
-        })
-      }
-      if (!is.null(private$source$binding_keys)) {
-        run_binding_fun_expr <- method_to_expr(".run_binding", source_type)
-        if (isTRUE(private$source$options$display_binding)) {
-          bind_keys_expr <- assign_expr(quote(binding_keys), private$source$binding_keys)
-        }
-        pre_run_binding_expr <- quote({
-          pre_data_object <- data_object
-        })
-        run_binding_expr <- quote({
-          for (binding_key in binding_keys) {
-            data_object <- .run_binding(
-              source, binding_key,
-              pre_data_object,
-              data_object
-            )
-          }
-        })
-      }
-      if (!missing(filter_id)) {
-        exprs_list <- parse_filter_expr(private$steps[[step_id]]$filters[[filter_id]])
-        return(combine_expressions(exprs_list))
-      }
-      get_step_code <- function(step_id, private) {
-        filtering_expr <- private$steps[[step_id]]$filters %>%
-          purrr::keep(~ .x$get_params("active")) %>%
-          purrr::map(~ parse_filter_expr(.x))
-        list(
-          glue::glue("# step {step_id} "),
-          substitute({step_id <- step_value}, list(step_value = step_id)),
-          pre_filtering_expr,
-          filtering_expr,
-          post_filtering_expr,
-          pre_run_binding_expr
+      source_type <- class(private$source)[1]
+      code_components <- list()
+
+      for (extra_method in include_methods) {
+        code_components <- append(
+          code_components,
+          type_expr(type = "meta", expr = method_to_expr(extra_method, source_type))
         )
       }
-      if (!missing(step_id)) {
-        exprs_list <- get_step_code(step_id, private)
-      } else {
-        exprs_list <- names(self$get_step()) %>%
-          purrr::map(get_step_code, private = private)
+      if (include_source) {
+        code_components <- append(
+          code_components,
+          type_expr(type = "source", expr = get_source_expr(source_type, self, private))
+        )
+      }
+      for (step_id in names(self$get_step())) {
+        if (mark_step) {
+          code_components <- append(
+            code_components,
+            type_expr(
+              type = "step_init", step = step_id,
+              expr = rlang::expr(step_id <- !!step_id)
+            )
+          )
+        }
+        # todo add binding keys
+        if ("run_binding" %in% include_action) {
+          code_components <- append(
+            code_components,
+            type_expr(
+              type = "run_binding", step = step_id,
+              expr = rlang::expr(
+                pre_data_object <- data_object
+              )
+            )
+          )
+        }
+        if ("pre_filtering" %in% include_action) {
+          code_components <- append(
+            code_components,
+            type_expr(
+              type = "pre_filtering", step = step_id,
+              expr = rlang::expr(
+                data_object <- .pre_filtering(source, data_object, !!step_id)
+              )
+            )
+          )
+        }
+        active_filters <- private$steps[[step_id]]$filters %>%
+          purrr::keep(~ .x$get_params("active"))
+        for (filter in active_filters) {
+          filter_params <- filter$get_params()
+          code_components <- append(
+            code_components,
+            type_expr(
+              type = "filtering", step = step_id,
+              expr = parse_filter_expr(filter),
+              !!!filter_params
+            )
+          )
+        }
+        if ("post_filtering" %in% include_action) {
+          code_components <- append(
+            code_components,
+            type_expr(
+              type = "post_filtering", step = step_id,
+              expr = rlang::expr(
+                data_object <- .post_filtering(source, data_object, !!step_id)
+              )
+            )
+          )
+        }
+        if ("run_binding" %in% include_action) {
+          code_components <- append(
+            code_components,
+            type_expr(
+              type = "run_binding", step = step_id,
+              expr = rlang::expr(
+                for (binding_key in binding_keys) {
+                  data_object <- .run_binding(
+                    source, binding_key,
+                    pre_data_object, data_object
+                  )
+                }
+              )
+            )
+          )
+        }
       }
 
-      exprs_list <- append(
-        append(
-          list(
-            bind_keys_expr, run_binding_fun_expr, pre_filtering_fun_expr, post_filtering_fun_expr,
-            source_expr, init_step_expr
-          ),
-          exprs_list
-        ),
-        list(run_binding_expr, quote({data_object}))
-      )
+      code_components_df <- code_components %>%
+        purrr::map_dfr(function(x) x) %>%
+        dplyr::filter(purrr::map_lgl(expr, ~!is.null(.)))
 
-      # todo code include once
-      res_quote <- combine_expressions(unlist(exprs_list))
+      code_components_df <- modifier(private$source, code_components_df)
+      # todo code include once?
+      res_quote <- combine_expressions(unlist(code_components_df$expr))
       formatR::tidy_source(
         text = as.character(res_quote)[-1],
         ...
@@ -1084,8 +1103,12 @@ stat <- function(x, step_id, filter_id, ..., state = "post") {
 #'
 #' @seealso \link{cohort-methods}
 #' @export
-code <- function(x, step_id, filter_id, ...) {
-  x$get_code(step_id, filter_id, ...)
+code <- function(x, include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
+                 include_action = c("pre_filtering", "post_filtering", "run_binding"),
+                 modifier = .repro_code_tweak, mark_step = TRUE, ...) {
+  x$get_code(include_source = include_source, include_methods = include_methods,
+             include_action = include_action,
+             modifier = modifier, mark_step = mark_step, ...)
 }
 
 #' Get step related data

@@ -518,19 +518,26 @@ The function can be used to modify its argument (convert to html, display in bro
 \subsection{Method \code{get_code()}}{
 Return reproducible data filtering code.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_code(step_id, filter_id, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_code(
+  include_source = TRUE,
+  include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
+  include_action = c("pre_filtering", "post_filtering", "run_binding"),
+  modifier = .repro_code_tweak,
+  mark_step = TRUE,
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{...}}{Other parameters passed to \link[formatR]{tidy_source}.}
+
 \item{\code{step_id}}{If `step_id` specified and `filter_id` missing, reproducible
 code for specified step is returned.
 If `filter_id` not missing, `step_id` defines from which step the filter should be taken.}
 
 \item{\code{filter_id}}{If not missing, precises the filter for which reproducible code should be returned.}
-
-\item{\code{...}}{Other parameters passed to \link[formatR]{tidy_source}.}
 }
 \if{html}{\out{</div>}}
 }

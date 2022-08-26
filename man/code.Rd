@@ -4,18 +4,26 @@
 \alias{code}
 \title{Return reproducible data filtering code.}
 \usage{
-code(x, step_id, filter_id, ...)
+code(
+  x,
+  include_source = TRUE,
+  include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
+  include_action = c("pre_filtering", "post_filtering", "run_binding"),
+  modifier = .repro_code_tweak,
+  mark_step = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{Cohort object.}
+
+\item{...}{Other parameters passed to \link[formatR]{tidy_source}.}
 
 \item{step_id}{If `step_id` specified and `filter_id` missing, reproducible
 code for specified step is returned.
 If `filter_id` not missing, `step_id` defines from which step the filter should be taken.}
 
 \item{filter_id}{If not missing, precises the filter for which reproducible code should be returned.}
-
-\item{...}{Other parameters passed to \link[formatR]{tidy_source}.}
 }
 \value{
 \link[formatR]{tidy_source} output storing reproducible code for generating final step data.
