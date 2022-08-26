@@ -523,7 +523,7 @@ Cohort <- R6::R6Class(
         )
       }
       for (step_id in names(self$get_step())) {
-        if (mark_step) {
+        if (code_params$mark_step) {
           code_components <- append(
             code_components,
             type_expr(
@@ -601,7 +601,7 @@ Cohort <- R6::R6Class(
         purrr::map_dfr(function(x) x) %>%
         dplyr::filter(purrr::map_lgl(expr, ~!is.null(.)))
 
-      code_components_df <- modifier(private$source, code_components_df)
+      code_components_df <- code_params$modifier(private$source, code_components_df)
       # todo code include once?
       res_quote <- combine_expressions(unlist(code_components_df$expr))
       formatR::tidy_source(
