@@ -501,7 +501,7 @@ Cohort <- R6::R6Class(
       ) %>%
         stats::setNames(nm = .) %>%
         purrr::map(
-          ~if (is.null(self$attributes[[.x]])) {
+          ~if (is.null(self$attributes[[.x]]) & !.x %in% names(self$attributes)) {
             fun_args[[.x]]
           } else {
             self$attributes[[.x]]
