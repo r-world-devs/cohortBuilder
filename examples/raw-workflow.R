@@ -26,7 +26,7 @@ sum_up(coh)
 
 coh <- coh %>% run()
 
-coh %>% code()
+coh %>% code(include_methods = NULL)
 
 
 get_data(coh, 1, state = "post")

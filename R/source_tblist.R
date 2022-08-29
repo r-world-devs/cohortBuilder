@@ -119,11 +119,6 @@ cb_filter.discrete.tblist <- function(
     name = name,
     input_param = "value",
     filter_data = function(data_object) {
-      # code eval start
-      a <- paste("Hello", name)
-      # code eval end
-      b <- "There" # code eval
-
       if (keep_na && !identical(value, NA)) {
         # keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
