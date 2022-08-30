@@ -76,6 +76,7 @@ parse_filter_expr <- function(filter) {
   keep_na <- identical(filter_env$keep_na, TRUE)
   selected_value <- filter_env[[filter$input_param]]
   filter_expr <- utils::capture.output(filter$filter_data)
+  vars_env <- as.list(filter_env)
 
   code_eval_idx <- sort(c(
     pair_seq(grep("# code eval ", filter_expr, fixed = TRUE)),
@@ -102,7 +103,7 @@ parse_filter_expr <- function(filter) {
   }
 
   filter_expr <- parse(text = c("{", filter_expr[sub_expr_idx], "}"))[[1]]
-  sub_vars <- substitute_q(filter_expr, filter_env)
+  sub_vars <- substitute_q(filter_expr, vars_env)
   sub_syms <-   rlang::inject((!!rlang::expr)(!!sub_vars), filter_env)
   return(sub_syms)
 }

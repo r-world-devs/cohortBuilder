@@ -613,7 +613,7 @@ cb_filter.multi_discrete.tblist <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][names(values)] %>%
+        data_object[[dataset]][names(variables)] %>%
           purrr::map(table) %>%
           purrr::imap_dfc(group_stats) %>%
           as.matrix() %>%
