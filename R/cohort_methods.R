@@ -674,7 +674,9 @@ Cohort <- R6::R6Class(
         if (!is_cached) {
           self$update_cache(step_id, filter_id, state = "pre")
         }
-        self$update_cache(step_id, filter_id, state = "post")
+        if (data_filter$get_params("active")) {
+          self$update_cache(step_id, filter_id, state = "post")
+        }
       }
 
       run_hooks(hook$post, self, private, step_id)
