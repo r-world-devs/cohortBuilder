@@ -641,11 +641,11 @@ Cohort <- R6::R6Class(
         data_object = private$data_objects[[prev_step(step_id)]],
         step_id = step_id
       )
-      for (data_filter in self$get_filter(step_id)) {
-        if (data_filter$get_params("active")) {
-          temp_data_object <- temp_data_object %>%
-            data_filter$filter_data()
-        }
+      active_filters <- self$list_active_filters(step_id)
+      for (filter_id in active_filters) {
+        data_filter <- self$get_filter(step_id, filter_id)
+        temp_data_object <- temp_data_object %>%
+          data_filter$filter_data()
       }
 
       private$data_objects[[step_id]] <- .post_filtering(
@@ -674,9 +674,9 @@ Cohort <- R6::R6Class(
         if (!is_cached) {
           self$update_cache(step_id, filter_id, state = "pre")
         }
-        if (data_filter$get_params("active")) {
-          self$update_cache(step_id, filter_id, state = "post")
-        }
+      }
+      for (filter_id in active_filters) {
+        self$update_cache(step_id, filter_id, state = "post")
       }
 
       run_hooks(hook$post, self, private, step_id)
