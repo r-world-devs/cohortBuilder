@@ -483,10 +483,16 @@ Cohort <- R6::R6Class(
     },
     #' @description
     #' Return reproducible data filtering code.
-    #' @param step_id If `step_id` specified and `filter_id` missing, reproducible
-    #'     code for specified step is returned.
-    #'     If `filter_id` not missing, `step_id` defines from which step the filter should be taken.
-    #' @param filter_id If not missing, precises the filter for which reproducible code should be returned.
+    #' @param include_source If `TRUE` source generating code will be included.
+    #' @param include_methods Which methods definition should be included in the result.
+    #' @param include_action Which action should be returned in the result.
+    #'     `pre_filtering`/`.post_filtering` - to include data transformation before/after filtering.
+    #'     s`run_binding` - data binding transformation.
+    #' @param modifier A function taking data frame (storing reproducible code metadata) as
+    #'     an argument, and returning data frame with `expr` column which is then
+    #'     combined into a single expression (final result of `get_code`).
+    #'     See \link{.repro_code_tweak}.
+    #' @param mark_step Include information which filtering step is performed.
     #' @param ... Other parameters passed to \link[formatR]{tidy_source}.
     get_code = function(
       include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
@@ -1110,10 +1116,16 @@ stat <- function(x, step_id, filter_id, ..., state = "post") {
 #' Return reproducible data filtering code.
 #'
 #' @param x Cohort object.
-#' @param step_id If `step_id` specified and `filter_id` missing, reproducible
-#'     code for specified step is returned.
-#'     If `filter_id` not missing, `step_id` defines from which step the filter should be taken.
-#' @param filter_id If not missing, precises the filter for which reproducible code should be returned.
+#' @param include_source If `TRUE` source generating code will be included.
+#' @param include_methods Which methods definition should be included in the result.
+#' @param include_action Which action should be returned in the result.
+#'     `pre_filtering`/`.post_filtering` - to include data transformation before/after filtering.
+#'     s`run_binding` - data binding transformation.
+#' @param modifier A function taking data frame (storing reproducible code metadata) as
+#'     an argument, and returning data frame with `expr` column which is then
+#'     combined into a single expression (final result of `get_code`).
+#'     See \link{.repro_code_tweak}.
+#' @param mark_step Include information which filtering step is performed.
 #' @param ... Other parameters passed to \link[formatR]{tidy_source}.
 #' @return \link[formatR]{tidy_source} output storing reproducible code for generating final step data.
 #'

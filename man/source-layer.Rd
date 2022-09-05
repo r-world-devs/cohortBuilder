@@ -81,6 +81,8 @@
 
 \item{step_id}{Name of the step visible in resulting plot.}
 
+\item{code_data}{Data frame storing `type`, `expr` and filter or step related columns.}
+
 \item{step_filters}{List of step filters.}
 
 \item{data_stats}{Data frame presenting statistics for each filtering step.}
@@ -122,6 +124,8 @@ should be defined:
   See more about binding keys at \link{binding-keys}.}
   \item{.get_attrition_count and .get_attrition_label}{ Methods defining how to
   get statistics and labels for attrition plot.}
+  \item{.repro_code_tweak}{ (optional) Default method passed as a `modifier`
+  argument of \link{code} function. Aims to modify reproducible code into the final format.}
 }
 Except from the above methods, you may extend the existing or new source with providing
 custom filtering methods. See \link{creating-filters}.

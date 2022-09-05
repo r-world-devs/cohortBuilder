@@ -253,6 +253,8 @@ set_source <- function(dtconn, ..., primary_keys = NULL, binding_keys = NULL,
 #'   See more about binding keys at \link{binding-keys}.}
 #'   \item{.get_attrition_count and .get_attrition_label}{ Methods defining how to
 #'   get statistics and labels for attrition plot.}
+#'   \item{.repro_code_tweak}{ (optional) Default method passed as a `modifier`
+#'   argument of \link{code} function. Aims to modify reproducible code into the final format.}
 #' }
 #' Except from the above methods, you may extend the existing or new source with providing
 #' custom filtering methods. See \link{creating-filters}.
@@ -263,6 +265,7 @@ set_source <- function(dtconn, ..., primary_keys = NULL, binding_keys = NULL,
 #' @param data_object Object that allows source data access.
 #'     `data_object` is the result of `.init_step` method (or object of the same structure).
 #' @param step_id Id of the filtering step.
+#' @param code_data Data frame storing `type`, `expr` and filter or step related columns.
 #' @return Depends on specific method. See `vignette("custom-extensions")` for more details.
 NULL
 

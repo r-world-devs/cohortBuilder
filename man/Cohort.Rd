@@ -531,13 +531,22 @@ Return reproducible data filtering code.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{include_source}}{If `TRUE` source generating code will be included.}
+
+\item{\code{include_methods}}{Which methods definition should be included in the result.}
+
+\item{\code{include_action}}{Which action should be returned in the result.
+`pre_filtering`/`.post_filtering` - to include data transformation before/after filtering.
+s`run_binding` - data binding transformation.}
+
+\item{\code{modifier}}{A function taking data frame (storing reproducible code metadata) as
+an argument, and returning data frame with `expr` column which is then
+combined into a single expression (final result of `get_code`).
+See \link{.repro_code_tweak}.}
+
+\item{\code{mark_step}}{Include information which filtering step is performed.}
+
 \item{\code{...}}{Other parameters passed to \link[formatR]{tidy_source}.}
-
-\item{\code{step_id}}{If `step_id` specified and `filter_id` missing, reproducible
-code for specified step is returned.
-If `filter_id` not missing, `step_id` defines from which step the filter should be taken.}
-
-\item{\code{filter_id}}{If not missing, precises the filter for which reproducible code should be returned.}
 }
 \if{html}{\out{</div>}}
 }
