@@ -26,7 +26,8 @@ Imports:
     glue,
     ggplot2,
     rlang (>= 1.0),
-    formatR
+    formatR,
+    shinyQuery
 KeepSource: true
 RoxygenNote: 7.2.3
 Suggests: 
