@@ -27,7 +27,7 @@ Imports:
     ggplot2,
     rlang (>= 1.0),
     formatR,
-    shinyQuery
+    queryBuilder
 KeepSource: true
 RoxygenNote: 7.2.3
 Suggests: 
