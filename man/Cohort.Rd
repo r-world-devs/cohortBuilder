@@ -518,17 +518,33 @@ The function can be used to modify its argument (convert to html, display in bro
 \subsection{Method \code{get_code()}}{
 Return reproducible data filtering code.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_code(step_id, filter_id, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_code(
+  include_source = TRUE,
+  include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
+  include_action = c("pre_filtering", "post_filtering", "run_binding"),
+  modifier = .repro_code_tweak,
+  mark_step = TRUE,
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{step_id}}{If `step_id` specified and `filter_id` missing, reproducible
-code for specified step is returned.
-If `filter_id` not missing, `step_id` defines from which step the filter should be taken.}
+\item{\code{include_source}}{If `TRUE` source generating code will be included.}
 
-\item{\code{filter_id}}{If not missing, precises the filter for which reproducible code should be returned.}
+\item{\code{include_methods}}{Which methods definition should be included in the result.}
+
+\item{\code{include_action}}{Which action should be returned in the result.
+`pre_filtering`/`.post_filtering` - to include data transformation before/after filtering.
+s`run_binding` - data binding transformation.}
+
+\item{\code{modifier}}{A function taking data frame (storing reproducible code metadata) as
+an argument, and returning data frame with `expr` column which is then
+combined into a single expression (final result of `get_code`).
+See \link{.repro_code_tweak}.}
+
+\item{\code{mark_step}}{Include information which filtering step is performed.}
 
 \item{\code{...}}{Other parameters passed to \link[formatR]{tidy_source}.}
 }

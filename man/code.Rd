@@ -4,16 +4,33 @@
 \alias{code}
 \title{Return reproducible data filtering code.}
 \usage{
-code(x, step_id, filter_id, ...)
+code(
+  x,
+  include_source = TRUE,
+  include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
+  include_action = c("pre_filtering", "post_filtering", "run_binding"),
+  modifier = .repro_code_tweak,
+  mark_step = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{Cohort object.}
 
-\item{step_id}{If `step_id` specified and `filter_id` missing, reproducible
-code for specified step is returned.
-If `filter_id` not missing, `step_id` defines from which step the filter should be taken.}
+\item{include_source}{If `TRUE` source generating code will be included.}
 
-\item{filter_id}{If not missing, precises the filter for which reproducible code should be returned.}
+\item{include_methods}{Which methods definition should be included in the result.}
+
+\item{include_action}{Which action should be returned in the result.
+`pre_filtering`/`.post_filtering` - to include data transformation before/after filtering.
+s`run_binding` - data binding transformation.}
+
+\item{modifier}{A function taking data frame (storing reproducible code metadata) as
+an argument, and returning data frame with `expr` column which is then
+combined into a single expression (final result of `get_code`).
+See \link{.repro_code_tweak}.}
+
+\item{mark_step}{Include information which filtering step is performed.}
 
 \item{...}{Other parameters passed to \link[formatR]{tidy_source}.}
 }

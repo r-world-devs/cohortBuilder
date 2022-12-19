@@ -26,6 +26,9 @@ sum_up(coh)
 
 coh <- coh %>% run()
 
+coh %>% code(include_methods = NULL)
+
+
 get_data(coh, 1, state = "post")
 
 coh <- coh %>%
@@ -60,7 +63,7 @@ plot(coh, 1, 2, state = "post")
 plot(coh, 2, 1, state = "pre")
 plot(coh, 2, 1, state = "post")
 
-coh %>% code(1)
+coh %>% code()
 coh %>% code(1, 1)
 coh %>% code(2, 1)
 

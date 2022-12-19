@@ -119,7 +119,6 @@ cb_filter.discrete.tblist <- function(
     name = name,
     input_param = "value",
     filter_data = function(data_object) {
-
       if (keep_na && !identical(value, NA)) {
         # keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
@@ -614,7 +613,7 @@ cb_filter.multi_discrete.tblist <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][names(values)] %>%
+        data_object[[dataset]][names(variables)] %>%
           purrr::map(table) %>%
           purrr::imap_dfc(group_stats) %>%
           as.matrix() %>%
@@ -750,4 +749,9 @@ cb_filter.multi_discrete.tblist <- function(
     attr(data_object[[dataset]], "filtered") <- FALSE
   }
   return(data_object)
+}
+
+#' @export
+.repro_code_tweak.tblist <- function(source, code_data) {
+  pipe_all_filters(code_data)
 }
