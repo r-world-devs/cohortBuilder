@@ -209,7 +209,7 @@ nos <- rlang::expr({
 
 pipe_filtering <- function(filtering_exprs) {
   n_exprs <- length(filtering_exprs)
-  if (n_exprs == 1) {
+  if (n_exprs <= 1) {
     return(filtering_exprs)
   }
   if (n_exprs > 1) {
@@ -270,6 +270,11 @@ flatten_listcol <- function(x) {
 }
 
 pipe_all_filters <- function(expr_df) {
+  # Add `dataset` column when don't exists
+  cols <- c(dataset = NA)
+  expr_df <-
+    tibble::add_column(expr_df, !!!cols[!names(cols) %in% names(.)])
+
   expr_df <- expr_df %>%
     dplyr::mutate(dataset = purrr::map_chr(dataset, flatten_listcol))
   expr_df %>% dplyr::left_join(
