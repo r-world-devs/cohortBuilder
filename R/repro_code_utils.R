@@ -272,8 +272,8 @@ flatten_listcol <- function(x) {
 pipe_all_filters <- function(expr_df) {
   # Add `dataset` column when don't exists
   cols <- c(dataset = NA)
-  expr_df <-
-    tibble::add_column(expr_df, !!!cols[!names(cols) %in% names(.)])
+  expr_df <- expr_df %>%
+    tibble::add_column(!!!cols[!names(cols) %in% names(.)])
 
   expr_df <- expr_df %>%
     dplyr::mutate(dataset = purrr::map_chr(dataset, flatten_listcol))
