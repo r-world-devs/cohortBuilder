@@ -28,7 +28,6 @@ coh <- coh %>% run()
 
 coh %>% code(include_methods = NULL)
 
-
 get_data(coh, 1, state = "post")
 
 coh <- coh %>%
