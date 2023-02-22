@@ -28,7 +28,7 @@ Imports:
     rlang (>= 1.0),
     formatR
 KeepSource: true
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
     shiny,

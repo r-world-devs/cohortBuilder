@@ -270,16 +270,20 @@ flatten_listcol <- function(x) {
 }
 
 pipe_all_filters <- function(expr_df) {
-  # Add `dataset` column when don't exists
-  cols <- c(dataset = NA)
-  expr_df <- expr_df %>%
-    tibble::add_column(!!!cols[!names(cols) %in% names(.)])
 
-  expr_df <- expr_df %>%
-    dplyr::mutate(dataset = purrr::map_chr(dataset, flatten_listcol))
+  if (!"dataset" %in% colnames(expr_df)) {
+    expr_df <- expr_df %>% dplyr::mutate(dataset = NA)
+  }
+
+  expr_df <- expr_df %>% dplyr::mutate(dataset = purrr::map_chr(dataset, flatten_listcol))
+  filtering_expr_df <- expr_df %>% dplyr::filter(type == "filtering")
+
+  if (nrow(filtering_expr_df) == 0) {
+    return(dplyr::select(expr_df, type, expr))
+  }
+
   expr_df %>% dplyr::left_join(
-    expr_df %>%
-      dplyr::filter(type == "filtering") %>%
+    filtering_expr_df %>%
       dplyr::group_by(type, step, dataset) %>%
       dplyr::summarise(new_expr = pipe_filtering(expr)) %>%
       dplyr::ungroup(),

@@ -157,8 +157,7 @@ Add filtering step definition
 \if{html}{\out{<div class="r">}}\preformatted{Cohort$add_step(
   step,
   run_flow = FALSE,
-  hook = list(pre = get_hook("pre_add_step_hook"), post =
-    get_hook("post_add_step_hook"))
+  hook = list(pre = get_hook("pre_add_step_hook"), post = get_hook("post_add_step_hook"))
 )}\if{html}{\out{</div>}}
 }
 
@@ -559,8 +558,7 @@ Trigger data calculations sequentially.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Cohort$run_flow(
   min_step,
-  hook = list(pre = get_hook("pre_run_flow_hook"), post =
-    get_hook("post_run_flow_hook"))
+  hook = list(pre = get_hook("pre_run_flow_hook"), post = get_hook("post_run_flow_hook"))
 )}\if{html}{\out{</div>}}
 }
 
@@ -583,8 +581,7 @@ Trigger data calculations for selected step.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Cohort$run_step(
   step_id,
-  hook = list(pre = get_hook("pre_run_step_hook"), post =
-    get_hook("post_run_step_hook"))
+  hook = list(pre = get_hook("pre_run_step_hook"), post = get_hook("post_run_step_hook"))
 )}\if{html}{\out{</div>}}
 }
 
