@@ -16,14 +16,14 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    yaml,
+    R6,
     jsonlite,
     purrr,
+    tibble,
     dplyr (>= 1.0.0),
     tidyr,
     magrittr,
     glue,
-    R6,
     ggplot2,
     rlang (>= 1.0),
     formatR
