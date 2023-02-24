@@ -1,16 +1,16 @@
 ## Test environments
 * local check
-  Ubuntu 18.04.6 LTS, R 4.1.2 (2021-11-01)
+  Ubuntu 20.04.5 LTS, R 4.1.2 (2021-11-01)
 * win-builder
   R version 4.1.3 (2022-03-10)
   R version 4.2.1 (2022-06-23 ucrt)
   R Under development (unstable) (2022-07-26 r82626 ucrt)
 
-## `R CMD check cohortBuilder_0.1.1.tar.gz --as-cran` results
+## `R CMD check cohortBuilder_0.2.0.tar.gz --as-cran` results
 
 ```
-* using log directory ‘/home/krystian/Projects/Packages/cohortBuilder.Rcheck’
-* using R version 4.1.2 (2021-11-01)
+* using log directory ‘/home/krystian/projects/cohortBuilder.Rcheck’
+* using R version 4.2.1 (2022-06-23)
 * using platform: x86_64-pc-linux-gnu (64-bit)
 ...
 Status: OK
