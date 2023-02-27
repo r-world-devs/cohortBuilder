@@ -150,10 +150,12 @@ Cohort <- R6::R6Class(
       run_hooks(hook$pre, self, private, step_id)
 
       step_id <- as.character(step_id)
+      clear_data_ids <- steps_range(step_id, rev(names(private$steps))[1])
       private$steps[[step_id]] <- NULL
-      private$cache[[step_id]] <- NULL
-      private$data_objects[steps_range(step_id, length(private$data_objects))] <- NULL
+      private$cache[clear_data_ids] <- NULL
+      private$data_objects[clear_data_ids] <- NULL
       private$steps <- adjust_names(private$steps)
+      private$steps <- purrr::imodify(private$steps, readjust_step)
       if (!is.null(private$steps) && run_flow) {
         self$run_flow(min_step = step_id)
       }
