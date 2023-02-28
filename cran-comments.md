@@ -4,7 +4,7 @@
 * win-builder
   R version 4.1.3 (2022-03-10)
   R version 4.2.2 (2022-10-31 ucrt)
-  R Under development (unstable) (2023-02-23 r83894 ucrt)
+  R Under development (unstable) (2023-02-27 r83911 ucrt)
 
 ## `R CMD check cohortBuilder_0.2.0.tar.gz --as-cran` results
 
@@ -49,7 +49,7 @@ Status: OK
 
 ```
 * using log directory 'd:/RCompile/CRANguest/R-devel/cohortBuilder.Rcheck'
-* using R Under development (unstable) (2023-02-23 r83894 ucrt)
+* using R Under development (unstable) (2023-02-27 r83911 ucrt)
 * using platform: x86_64-w64-mingw32 (64-bit)
 ...
 * checking CRAN incoming feasibility ... [10s] Note_to_CRAN_maintainers
