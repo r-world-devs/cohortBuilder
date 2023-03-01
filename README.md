@@ -1,7 +1,7 @@
 
 # cohortBuilder <img src="man/figures/logo.png" align="right" width="120" />
 
-[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.1.1&color=ff69b4)](https://r-world-devs.github.io/cohortBuilder/)
+[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.2.0&color=ff69b4)](https://r-world-devs.github.io/cohortBuilder/)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
 ## Overview
@@ -17,24 +17,24 @@ With only two steps:
 
 You can operate on data using common methods, such as:
 
--   `filter` - to define and `run` to apply filtering rules,
--   `step` - to perform multi-stage filtering,
--   `get_data`, `stat`, `attrition`, `plot_data` - to extract, sum up or
-    visualize your cohort data.
+- `filter` - to define and `run` to apply filtering rules,
+- `step` - to perform multi-stage filtering,
+- `get_data`, `stat`, `attrition`, `plot_data` - to extract, sum up or
+  visualize your cohort data.
 
 With `cohortBuilder` you can share the cohort easier with useful
 methods:
 
--   `code` - to get reproducible cohort creation code,
--   `get_state` - to get cohort state (e.g. in JSON) that can be then
-    easily restored with `restore`.
+- `code` - to get reproducible cohort creation code,
+- `get_state` - to get cohort state (e.g. in JSON) that can be then
+  easily restored with `restore`.
 
 Or modify the cohort configuration with:
 
--   `add_filter`, `rm_filter`, `update_filter` - to manage filters
-    definition
--   `add_step`, `rm_step` - to manage filtering steps,
--   `update_source` - to manage the cohort source.
+- `add_filter`, `rm_filter`, `update_filter` - to manage filters
+  definition
+- `add_step`, `rm_step` - to manage filtering steps,
+- `update_source` - to manage the cohort source.
 
 ## Data sources and extensions
 
@@ -354,24 +354,58 @@ code(coh)
 #>     }
 #>     return(data_object)
 #> }
+#> .run_binding <- function(source, binding_key, data_object_pre, data_object_post,
+#>     ...) {
+#>     binding_dataset <- binding_key$update$dataset
+#>     dependent_datasets <- names(binding_key$data_keys)
+#>     active_datasets <- data_object_post %>%
+#>         purrr::keep(~attr(., "filtered")) %>%
+#>         names()
+#>     if (!any(dependent_datasets %in% active_datasets)) {
+#>         return(data_object_post)
+#>     }
+#>     key_values <- NULL
+#>     common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))
+#>     for (dependent_dataset in dependent_datasets) {
+#>         key_names <- binding_key$data_keys[[dependent_dataset]]$key
+#>         tmp_key_values <- dplyr::distinct(data_object_post[[dependent_dataset]][,
+#>             key_names, drop = FALSE]) %>%
+#>             stats::setNames(common_key_names)
+#>         if (is.null(key_values)) {
+#>             key_values <- tmp_key_values
+#>         } else {
+#>             key_values <- dplyr::inner_join(key_values, tmp_key_values, by = common_key_names)
+#>         }
+#>     }
+#>     data_object_post[[binding_dataset]] <- dplyr::inner_join(switch(as.character(binding_key$post),
+#>         `FALSE` = data_object_pre[[binding_dataset]], `TRUE` = data_object_post[[binding_dataset]]),
+#>         key_values, by = stats::setNames(common_key_names, binding_key$update$key))
+#>     if (binding_key$activate) {
+#>         attr(data_object_post[[binding_dataset]], "filtered") <- TRUE
+#>     }
+#>     return(data_object_post)
+#> }
 #> source <- list(dtconn = as.tblist(librarian))
 #> data_object <- source$dtconn
-#> # step 1
 #> step_id <- "1"
-#> data_object <- .pre_filtering(source, data_object, step_id)
+#> pre_data_object <- data_object
+#> data_object <- .pre_filtering(source, data_object, "1")
 #> data_object[["books"]] <- data_object[["books"]] %>%
 #>     dplyr::filter(author %in% c("Dan Brown", NA))
 #> attr(data_object[["books"]], "filtered") <- TRUE
 #> data_object[["borrowers"]] <- data_object[["borrowers"]] %>%
 #>     dplyr::filter((registered <= Inf & registered >= 14610) | is.na(registered))
 #> attr(data_object[["borrowers"]], "filtered") <- TRUE
-#> # step 2
+#> data_object <- .post_filtering(source, data_object, "1")
+#> for (binding_key in binding_keys) {
+#>     data_object <- .run_binding(source, binding_key, pre_data_object, data_object)
+#> }
 #> step_id <- "2"
-#> data_object <- .pre_filtering(source, data_object, step_id)
+#> data_object <- .pre_filtering(source, data_object, "2")
 #> data_object[["books"]] <- data_object[["books"]] %>%
 #>     dplyr::filter((copies <= 10 & copies >= 5) | is.na(copies))
 #> attr(data_object[["books"]], "filtered") <- TRUE
-#> data_object
+#> data_object <- .post_filtering(source, data_object, "2")
 ```
 
 ``` r
@@ -382,21 +416,21 @@ attrition(coh, dataset = "books")
 
 ``` r
 get_state(coh, json = TRUE)
-#> [{"step":"1","filters":[{"range":[5,6],"type":"discrete","id":"author","name":"author","variable":"author","value":"Dan Brown","dataset":"books","keep_na":true,"description":null,"active":true},{"type":"date_range","id":"registered","name":"registered","variable":"registered","range":["2010-01-01","NA"],"dataset":"borrowers","keep_na":true,"description":null,"active":true}]},{"step":"2","filters":[{"type":"range","id":"copies","name":"copies","variable":"copies","range":[5,10],"dataset":"books","keep_na":true,"description":null,"active":true}]}]
+#> [{"step":"1","filters":[{"range":[5,6],"type":"discrete","id":"author","name":"author","variable":"author","value":"Dan Brown","dataset":"books","keep_na":true,"description":null,"active":true},{"type":"date_range","id":"registered","name":"registered","variable":"registered","range":["2010-01-01","Inf"],"dataset":"borrowers","keep_na":true,"description":null,"active":true}]},{"step":"2","filters":[{"type":"range","id":"copies","name":"copies","variable":"copies","range":[5,10],"dataset":"books","keep_na":true,"description":null,"active":true}]}]
 ```
 
 ## Acknowledgement
 
 Special thanks to:
 
--   [Kamil Wais](mailto:kamil.wais@gmail.com) for highlighting the need
-    for the package and its relevance to real-world applications.
--   [Adam Foryś](mailto:adam.forys@gmail.com) for technical support,
-    numerous suggestions for the current and future implementation of
-    the package.
--   [Paweł Kawski](mailto:pawel.kawski@gmail.com) for indication of
-    initial assumptions about the package based on real-world medical
-    data.
+- [Kamil Wais](mailto:kamil.wais@gmail.com) for highlighting the need
+  for the package and its relevance to real-world applications.
+- [Adam Foryś](mailto:adam.forys@gmail.com) for technical support,
+  numerous suggestions for the current and future implementation of the
+  package.
+- [Paweł Kawski](mailto:pawel.kawski@gmail.com) for indication of
+  initial assumptions about the package based on real-world medical
+  data.
 
 ## Getting help
 
