@@ -148,21 +148,23 @@ See `vignette("cohort-configuration")`.
 The last Cohort configuration component - source, can be also managed within the Cohort itself.
 With `update_source` method you can change the source defined in the existing Cohort.
 
-Below we update cohort with Source having `source_code` parameter defined:
+Below we update cohort with Source having `source_code` parameter defined.
+The argument is responsible to generate `source` object definition printed in the reproducible code (you can use it when the default method doesn't print reasonable output).
+
 ```{r}
-code(librarian_cohort)
+code(librarian_cohort, include_methods = NULL)
 
 new_source <- set_source(
   as.tblist(librarian),
   source_code = quote({
-    source <- list(attributes = list(datasets = librarian))
+    source <- list()
+    source$dtconn <- as.tblist(librarian)
   })
 )
 
 update_source(librarian_cohort, new_source)
-code(librarian_cohort)
 sum_up(librarian_cohort)
-code(librarian_cohort)
+code(librarian_cohort, include_methods = NULL)
 ```
 
 Note that updating source doesn't remove Cohort configuration (steps and filters).
@@ -176,9 +178,12 @@ sum_up(librarian_cohort)
 You can also use `update_source` to add Source to an empty Cohort:
 
 ```{r}
+new_source <- set_source(
+  as.tblist(librarian)
+)
 empty_cohort <- cohort()
-update_source(librarian_cohort, new_source)
-sum_up(empty_cohort)
+update_source(empty_cohort, new_source)
+code(empty_cohort, include_methods = NULL)
 ```
 
 The `update_source` method can be also useful if you want to update source along with steps and filters configuration.
