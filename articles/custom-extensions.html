@@ -14,10 +14,10 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Writing custom extensions">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Writing custom extensions">
 <meta property="og:description" content="cohortBuilder">
 <meta property="og:image" content="https://r-world-devs.github.io/cohortBuilder/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,7 +107,7 @@
 
 
 <div class="row">
-  <main id="main"><div class="page-header">
+  <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Writing custom extensions</h1>
             
       
@@ -117,20 +117,35 @@
 
     
     
-<p><code>cohortBuilder</code> package is adapted to work with various data sources and custom backends. Currently there exists one official extension <code>cohortBuilder.db</code> package that allows you to use <code>cohortBuilder</code> with database connections.</p>
-<p>The goal of this document is to explain how to create custom extensions to <code>cohortBuilder</code>.</p>
+<p><code>cohortBuilder</code> package is adapted to work with various
+data sources and custom backends. Currently there exists one official
+extension <code>cohortBuilder.db</code> package that allows you to use
+<code>cohortBuilder</code> with database connections.</p>
+<p>The goal of this document is to explain how to create custom
+extensions to <code>cohortBuilder</code>.</p>
 <p>In general to create the custom layer you need to:</p>
 <ol style="list-style-type: decimal">
 <li>Define set of S3 methods operating on your custom source.</li>
-<li>Define selected filters (see <code><a href="../articles/custom-filters.html">vignette("custom-filters")</a></code>).</li>
+<li>Define selected filters (see
+<code><a href="../articles/custom-filters.html">vignette("custom-filters")</a></code>).</li>
 </ol>
-<p>It’s recommended to include all of the methods in your custom R package.</p>
-<p>Before you start creating a new layer, you need to choose what data (connection) should your layer operate on.</p>
-<p>For example, cohortBuilder uses <code>tblist</code> class object to operate on list of data frames , or <code>db</code> class for operating on database connections.</p>
-<p>To start with create a function that will take required parameters to define data connection, such as <code>tblist</code> or <code>dbtables</code> in case of <code>cohortBuilder.db</code>. The function should return an object of selected class which is used to define required extension methods.</p>
-<p>Below we describe all the required and optional methods you need to define within the created package.</p>
+<p>It’s recommended to include all of the methods in your custom R
+package.</p>
+<p>Before you start creating a new layer, you need to choose what data
+(connection) should your layer operate on.</p>
+<p>For example, cohortBuilder uses <code>tblist</code> class object to
+operate on list of data frames , or <code>db</code> class for operating
+on database connections.</p>
+<p>To start with create a function that will take required parameters to
+define data connection, such as <code>tblist</code> or
+<code>dbtables</code> in case of <code>cohortBuilder.db</code>. The
+function should return an object of selected class which is used to
+define required extension methods.</p>
+<p>Below we describe all the required and optional methods you need to
+define within the created package.</p>
 <ol style="list-style-type: decimal">
-<li><strong><code>set_source</code> - method used for defining a new source</strong></li>
+<li><strong><code>set_source</code> - method used for defining a new
+source</strong></li>
 </ol>
 <p>Required parameters:</p>
 <ul>
@@ -139,26 +154,35 @@
 <p>Details:</p>
 <ul>
 <li>Define the method calling <code>Source$new</code> inside.</li>
-<li>Declare necessary parameters used for defining data source (and pass them to <code>Source$new</code>). The arguments are then available at source$attributes object.</li>
-<li>If valid, you may declare <code>primary_keys</code> and <code>binding_keys</code> parameters (see <code><a href="../articles/binding-keys.html">vignette("binding-keys")</a></code>).</li>
-<li>It’s also worth to declare <code>source_code</code> parameter that allows users to define code for creating source (visible in reproducible code) and <code>description</code> storing list of useful source objects descriptions.</li>
+<li>Declare necessary parameters used for defining data source (and pass
+them to <code>Source$new</code>). The arguments are then available at
+source$attributes object.</li>
+<li>If valid, you may declare <code>primary_keys</code> and
+<code>binding_keys</code> parameters (see
+<code><a href="../articles/binding-keys.html">vignette("binding-keys")</a></code>).</li>
+<li>It’s also worth to declare <code>source_code</code> parameter that
+allows users to define code for creating source (visible in reproducible
+code) and <code>description</code> storing list of useful source objects
+descriptions.</li>
 </ul>
 <p>Example:</p>
 <ul>
 <li>
-<code>cohortBuilder</code> - <code>tblist</code> object (same for <code>cohortBuilder.db</code> - <code>db</code> object)</li>
+<code>cohortBuilder</code> - <code>tblist</code> object (same for
+<code>cohortBuilder.db</code> - <code>db</code> object)</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">set_source.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dtconn</span>, <span class="va">primary_keys</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">binding_keys</span> <span class="op">=</span> <span class="cn">NULL</span>, 
-                           <span class="va">source_code</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">description</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va"><a href="../reference/Source.html">Source</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>
-    <span class="va">dtconn</span>, primary_keys <span class="op">=</span> <span class="va">primary_keys</span>,
-    binding_keys <span class="op">=</span> <span class="va">binding_keys</span>, source_code <span class="op">=</span> <span class="va">source_code</span>,
-    <span class="va">...</span>
-  <span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">set_source.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dtconn</span>, <span class="va">primary_keys</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">binding_keys</span> <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>                           <span class="va">source_code</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">description</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va"><a href="../reference/Source.html">Source</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>    <span class="va">dtconn</span>, primary_keys <span class="op">=</span> <span class="va">primary_keys</span>, binding_keys <span class="op">=</span> <span class="va">binding_keys</span>,</span>
+<span>    source_code <span class="op">=</span> <span class="va">source_code</span>, description <span class="op">=</span> <span class="va">description</span>,</span>
+<span>    <span class="va">...</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
-<li><strong><code>.init_source</code> - structure data passed between filtering steps</strong></li>
+<li><strong><code>.init_step</code> - structure data passed between
+filtering steps</strong></li>
 </ol>
 <p>Required parameters:</p>
 <ul>
@@ -167,131 +191,158 @@
 </ul>
 <p>Details:</p>
 <ul>
-<li>Within the function body define how data should be extracted from source, and structured.</li>
-<li>A structure of the output is then used as an input for filter’s method (<code>data_object</code> argument).</li>
+<li>Within the function body define how data should be extracted from
+source, and structured.</li>
+<li>A structure of the output is then used as an input for filter’s
+method (<code>data_object</code> argument).</li>
 </ul>
 <p>Examples:</p>
 <ul>
 <li>
-<code>cohortBuilder</code> - ‘tblist’ class. Operating on list of tables in each step.</li>
+<code>cohortBuilder</code> - ‘tblist’ class. Operating on list of
+tables in each step.</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">.init_step.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">.init_step.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ul>
 <li>
 <code>cohortBuilder.db</code> - ‘db’ class.</li>
 </ul>
-<p><code>cohortBuilder.db</code> operates on <code>db</code> class object which is list of <code>connection</code>, <code>tables</code> and <code>schema</code> fields.</p>
+<p><code>cohortBuilder.db</code> operates on <code>db</code> class
+object which is list of <code>connection</code>, <code>tables</code> and
+<code>schema</code> fields.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">.init_step.db</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span>
-    <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span>, <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span>,
-    <span class="kw">function</span><span class="op">(</span><span class="va">table</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">tbl_conn</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span>
-        <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">connection</span>,
-        <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu">in_schema</span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">schema</span>, <span class="va">table</span><span class="op">)</span>
-      <span class="op">)</span>
-      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">tbl_conn</span>, <span class="st">"tbl_name"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">table</span>
-      <span class="va">tbl_conn</span>
-    <span class="op">}</span>
-  <span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">.init_step.db</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span></span>
+<span>    <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span>, <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span>,</span>
+<span>    <span class="kw">function</span><span class="op">(</span><span class="va">table</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">tbl_conn</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span></span>
+<span>        <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">connection</span>,</span>
+<span>        <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu">in_schema</span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">schema</span>, <span class="va">table</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">tbl_conn</span>, <span class="st">"tbl_name"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">table</span></span>
+<span>      <span class="va">tbl_conn</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
-<li><strong><code>.pre_filtering</code> (optional) - modify data object before filtering</strong></li>
+<li><strong><code>.pre_filtering</code> (optional) - modify data object
+before filtering</strong></li>
 </ol>
 <p>Required parameters:</p>
 <ul>
 <li>
 <code>source</code>,</li>
 <li>
-<code>data_object</code> - an object following the structure of <code>.init_step</code>,</li>
+<code>data_object</code> - an object following the structure of
+<code>.init_step</code>,</li>
 <li>
 <code>step_id</code> - id of the filtering step</li>
 </ul>
 <p>Details:</p>
 <ul>
-<li>An optional method used to prepare data for filtering (cleaning up attributes, creating middle step objects etc.).</li>
+<li>An optional method used to prepare data for filtering (cleaning up
+attributes, creating middle step objects etc.).</li>
 </ul>
 <p>Examples:</p>
 <ul>
 <li>
-<code>cohortBuilder</code> - tblist class. Cleaning up <code>filtered</code> attribute for new step data.</li>
+<code>cohortBuilder</code> - tblist class. Cleaning up
+<code>filtered</code> attribute for new step data.</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">.pre_filtering.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span>, <span class="va">step_id</span><span class="op">)</span> <span class="op">{</span>
-  <span class="kw">for</span> <span class="op">(</span><span class="va">dataset</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span>, <span class="st">"filtered"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span>
-  <span class="op">}</span>
-  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">.pre_filtering.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span>, <span class="va">step_id</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">dataset</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span>, <span class="st">"filtered"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ul>
 <li>
-<code>cohortBuilder.db</code> - creating temp tables for the current step in database and cleaning up <code>filtered</code> attributes.</li>
+<code>cohortBuilder.db</code> - creating temp tables for the current
+step in database and cleaning up <code>filtered</code> attributes.</li>
 </ul>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">.pre_filtering.db</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span>, <span class="va">step_id</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span>
-    <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span>, <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span>,
-    <span class="kw">function</span><span class="op">(</span><span class="va">table</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">table_name</span> <span class="op">&lt;-</span> <span class="fu">tmp_table_name</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">table</span><span class="op">]</span><span class="op">]</span>, <span class="st">"tbl_name"</span><span class="op">)</span>, <span class="va">step_id</span><span class="op">)</span>
-      <span class="fu">DBI</span><span class="fu">::</span><span class="fu">dbRemoveTable</span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">connection</span>, <span class="va">table_name</span>, temporary <span class="op">=</span> <span class="cn">TRUE</span>, fail_if_missing <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-      <span class="va">data_object</span><span class="op">[[</span><span class="va">table</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">compute</a></span><span class="op">(</span>
-        <span class="va">data_object</span><span class="op">[[</span><span class="va">table</span><span class="op">]</span><span class="op">]</span>,
-        name <span class="op">=</span> <span class="va">table_name</span>
-      <span class="op">)</span>
-      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">table</span><span class="op">]</span><span class="op">]</span>, <span class="st">"filtered"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span>
-      <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">table</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-    <span class="op">}</span>
-  <span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">.pre_filtering.db</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span>, <span class="va">step_id</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span></span>
+<span>    <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span>, <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span>,</span>
+<span>    <span class="kw">function</span><span class="op">(</span><span class="va">table</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">table_name</span> <span class="op">&lt;-</span> <span class="fu">tmp_table_name</span><span class="op">(</span><span class="va">table</span>, <span class="va">step_id</span><span class="op">)</span></span>
+<span>      <span class="fu">DBI</span><span class="fu">::</span><span class="fu">dbRemoveTable</span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">conn</span>, <span class="va">table_name</span>, temporary <span class="op">=</span> <span class="cn">TRUE</span>, fail_if_missing <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">table</span><span class="op">]</span><span class="op">]</span>, <span class="st">"filtered"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span>      <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">table</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
-<li><strong><code>.post_filtering</code> (optional) - data object modification after filtering (before running binding).</strong></li>
+<li><strong><code>.post_filtering</code> (optional) - data object
+modification after filtering (before running binding).</strong></li>
 </ol>
 <p>Required parameters:</p>
 <ul>
 <li>source,</li>
-<li>data_object - an object following the structure of <code>.init_step</code>,</li>
+<li>data_object - an object following the structure of
+<code>.init_step</code>,</li>
 <li>step_id - id of the filtering step</li>
 </ul>
 <ol start="5" style="list-style-type: decimal">
-<li><strong><code>.collect_data</code> - define how to collect data object into R.</strong></li>
+<li><strong><code>.post_binding</code> (optional) - data object
+modification after running binding.</strong></li>
 </ol>
 <p>Required parameters:</p>
 <ul>
 <li>source,</li>
-<li>data_object - an object following the structure of <code>.init_step</code>
+<li>data_object - an object following the structure of
+<code>.init_step</code>,</li>
+<li>step_id - id of the filtering step</li>
+</ul>
+<ol start="6" style="list-style-type: decimal">
+<li><strong><code>.collect_data</code> - define how to collect data
+object into R.</strong></li>
+</ol>
+<p>Required parameters:</p>
+<ul>
+<li>source,</li>
+<li>data_object - an object following the structure of
+<code>.init_step</code>
 </li>
 </ul>
 <p>Details:</p>
 <ul>
 <li>
-<code>cohortBuilder</code>’s equivalent of <code>collect</code> method known for sourcing the object into R memory when working with remote environment (e.g. database).</li>
-<li>When operating in R memory it’s enough to return <code>data_object</code>.</li>
+<code>cohortBuilder</code>’s equivalent of <code>collect</code>
+method known for sourcing the object into R memory when working with
+remote environment (e.g. database).</li>
+<li>When operating in R memory it’s enough to return
+<code>data_object</code>.</li>
 </ul>
 <p>Examples:</p>
 <ul>
 <li>
-<code>cohortBuilder</code> - operating in R memory, so return <code>data_object</code>.</li>
+<code>cohortBuilder</code> - operating in R memory, so return
+<code>data_object</code>.</li>
 </ul>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">.collect_data.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">data_object</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">.collect_data.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">data_object</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ul>
 <li>
-<code>cohortBuilder.db</code> - collect tables from database and return as a named list.</li>
+<code>cohortBuilder.db</code> - collect tables from database and
+return as a named list.</li>
 </ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">.collect_data.db</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span>
-    <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span>, <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span>,
-    <span class="op">~</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">.x</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="op">}</span></code></pre></div>
-<ol start="6" style="list-style-type: decimal">
-<li><strong><code>.get_stats</code> - collect data object stats</strong></li>
+<code class="sourceCode R"><span><span class="va">.collect_data.db</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span></span>
+<span>    <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span>, <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span>,</span>
+<span>    <span class="op">~</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">.x</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<ol start="7" style="list-style-type: decimal">
+<li><strong><code>.get_stats</code> - collect data object
+stats</strong></li>
 </ol>
 <p>Required parameters:</p>
 <ul>
@@ -302,43 +353,48 @@
 <p>Details:</p>
 <ul>
 <li>There are no obligatory statistics to be returned.</li>
-<li>The calculated statistic is cached within Cohort object after each step filtering.</li>
-<li>Returned stats plays mostly read-only role. The only situation the stats are used is within <code>.get_attrition_count</code> and <code>shinyCohortBuilder</code> integration.</li>
+<li>The calculated statistic is cached within Cohort object after each
+step filtering.</li>
+<li>Returned stats plays mostly read-only role. The only situation the
+stats are used is within <code>.get_attrition_count</code> and
+<code>shinyCohortBuilder</code> integration.</li>
 </ul>
 <p>Examples:</p>
 <ul>
 <li>
-<code>cohortBuilder</code> - operating in R memory, so return <code>data_object</code>.</li>
+<code>cohortBuilder</code> - operating in R memory, so return
+<code>data_object</code>.</li>
 </ul>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">.get_stats.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">dataset_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">)</span>
-  <span class="va">dataset_names</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span>
-      <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">.x</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
-    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">dataset_names</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">.get_stats.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">dataset_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">)</span></span>
+<span>  <span class="va">dataset_names</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span></span>
+<span>      <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">.x</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">dataset_names</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ul>
 <li>
-<code>cohortBuilder.db</code> - collect tables from database and return as a named list.</li>
+<code>cohortBuilder.db</code> - collect tables from database and
+return as a named list.</li>
 </ul>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">.get_stats.db</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">dataset_names</span> <span class="op">&lt;-</span> <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span>
-  <span class="va">dataset_names</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span>
-      <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-        n_rows <span class="op">=</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">.x</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-          <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="op">)</span>
-      <span class="op">)</span>
-    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">dataset_names</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
-<ol start="7" style="list-style-type: decimal">
+<code class="sourceCode R"><span><span class="va">.get_stats.db</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_object</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">dataset_names</span> <span class="op">&lt;-</span> <span class="va">source</span><span class="op">$</span><span class="va">dtconn</span><span class="op">$</span><span class="va">tables</span></span>
+<span>  <span class="va">dataset_names</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span></span>
+<span>      <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>        n_rows <span class="op">=</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">.x</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>          <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">dataset_names</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<ol start="8" style="list-style-type: decimal">
 <li><strong><code>.run_binding</code> - method defining how <a href="binding-keys.html">binding</a> should be handled</strong></li>
 </ol>
 <p>Required parameters:</p>
@@ -348,158 +404,181 @@
 <li>
 <code>binding_key</code> - binding key definition,</li>
 <li>
-<code>data_object_pre</code> - data object state before filtering in the current step,</li>
+<code>data_object_pre</code> - data object state before filtering in
+the current step,</li>
 <li>
-<code>data_object_post</code> - data object state after filtering in the current step (including effect of previous bindings)</li>
+<code>data_object_post</code> - data object state after filtering in
+the current step (including effect of previous bindings)</li>
 </ul>
 <p>Details:</p>
 <ul>
-<li>Binding is run after applying all the filters in the current filtering step (and applying <code>.post_filtering</code> if defined).</li>
-<li>When filtering is finished, binding loop starts iterating over all the defined bindings. <code>.run_binding</code> takes care of handling a single iteration.</li>
-<li>The returned bound data, should preserve the structure of <code>.init_step</code> method output.</li>
-<li>You should preserve the assumed binding rules described in <a href="binding-keys.html">bindings-keys</a> (i.e. handling <code>post = TRUE/FALSE</code>, <code>activate = TRUE/FALSE</code> and <code>filtered</code> attribute) but this is not obligatory.</li>
+<li>Binding is run after applying all the filters in the current
+filtering step (and applying <code>.post_filtering</code> if
+defined).</li>
+<li>When filtering is finished, binding loop starts iterating over all
+the defined bindings. <code>.run_binding</code> takes care of handling a
+single iteration.</li>
+<li>The returned bound data, should preserve the structure of
+<code>.init_step</code> method output.</li>
+<li>You should preserve the assumed binding rules described in <a href="binding-keys.html">bindings-keys</a> (i.e. handling
+<code>post = TRUE/FALSE</code>, <code>activate = TRUE/FALSE</code> and
+<code>filtered</code> attribute) but this is not obligatory.</li>
 </ul>
 <p>Examples:</p>
 <ul>
 <li><code>cohortBuilder</code></li>
 </ul>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">.run_binding.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">binding_key</span>, <span class="va">data_object_pre</span>, <span class="va">data_object_post</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">binding_dataset</span> <span class="op">&lt;-</span> <span class="va">binding_key</span><span class="op">$</span><span class="va">update</span><span class="op">$</span><span class="va">dataset</span>
-  <span class="va">dependent_datasets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">binding_key</span><span class="op">$</span><span class="va">data_keys</span><span class="op">)</span>
-  <span class="va">active_datasets</span> <span class="op">&lt;-</span> <span class="va">data_object_post</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/keep.html" class="external-link">keep</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">.</span>, <span class="st">"filtered"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span>
-
-  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">dependent_datasets</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">active_datasets</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data_object_post</span><span class="op">)</span>
-  <span class="op">}</span>
-
-  <span class="va">key_values</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>
-  <span class="va">common_key_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"key_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">binding_key</span><span class="op">$</span><span class="va">data_keys</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">key</span><span class="op">)</span><span class="op">)</span>
-  <span class="kw">for</span> <span class="op">(</span><span class="va">dependent_dataset</span> <span class="kw">in</span> <span class="va">dependent_datasets</span><span class="op">)</span> <span class="op">{</span>
-    <span class="va">key_names</span> <span class="op">&lt;-</span> <span class="va">binding_key</span><span class="op">$</span><span class="va">data_keys</span><span class="op">[[</span><span class="va">dependent_dataset</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">key</span>
-    <span class="va">tmp_key_values</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">data_object_post</span><span class="op">[[</span><span class="va">dependent_dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="va">key_names</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-      <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">common_key_names</span><span class="op">)</span>
-    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">key_values</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">key_values</span> <span class="op">&lt;-</span> <span class="va">tmp_key_values</span>
-    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
-      <span class="va">key_values</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">key_values</span>, <span class="va">tmp_key_values</span>, by <span class="op">=</span> <span class="va">common_key_names</span><span class="op">)</span>
-    <span class="op">}</span>
-  <span class="op">}</span>
-
-  <span class="va">data_object_post</span><span class="op">[[</span><span class="va">binding_dataset</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span>
-    <span class="kw"><a href="https://rdrr.io/r/base/switch.html" class="external-link">switch</a></span><span class="op">(</span>
-      <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">binding_key</span><span class="op">$</span><span class="va">post</span><span class="op">)</span>,
-      <span class="st">"FALSE"</span> <span class="op">=</span> <span class="va">data_object_pre</span><span class="op">[[</span><span class="va">binding_dataset</span><span class="op">]</span><span class="op">]</span>,
-      <span class="st">"TRUE"</span> <span class="op">=</span> <span class="va">data_object_post</span><span class="op">[[</span><span class="va">binding_dataset</span><span class="op">]</span><span class="op">]</span>
-    <span class="op">)</span>,
-    <span class="va">key_values</span>,
-    by <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">common_key_names</span>, <span class="va">binding_key</span><span class="op">$</span><span class="va">update</span><span class="op">$</span><span class="va">key</span><span class="op">)</span>
-  <span class="op">)</span>
-  <span class="kw">if</span> <span class="op">(</span><span class="va">binding_key</span><span class="op">$</span><span class="va">activate</span><span class="op">)</span> <span class="op">{</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">data_object_post</span><span class="op">[[</span><span class="va">binding_dataset</span><span class="op">]</span><span class="op">]</span>, <span class="st">"filtered"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span>
-  <span class="op">}</span>
-
-  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data_object_post</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">.run_binding.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">binding_key</span>, <span class="va">data_object_pre</span>, <span class="va">data_object_post</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">binding_dataset</span> <span class="op">&lt;-</span> <span class="va">binding_key</span><span class="op">$</span><span class="va">update</span><span class="op">$</span><span class="va">dataset</span></span>
+<span>  <span class="va">dependent_datasets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">binding_key</span><span class="op">$</span><span class="va">data_keys</span><span class="op">)</span></span>
+<span>  <span class="va">active_datasets</span> <span class="op">&lt;-</span> <span class="va">data_object_post</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/keep.html" class="external-link">keep</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">.</span>, <span class="st">"filtered"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">dependent_datasets</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">active_datasets</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data_object_post</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="va">key_values</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span>  <span class="va">common_key_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"key_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">binding_key</span><span class="op">$</span><span class="va">data_keys</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">key</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">dependent_dataset</span> <span class="kw">in</span> <span class="va">dependent_datasets</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">key_names</span> <span class="op">&lt;-</span> <span class="va">binding_key</span><span class="op">$</span><span class="va">data_keys</span><span class="op">[[</span><span class="va">dependent_dataset</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">key</span></span>
+<span>    <span class="va">tmp_key_values</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">data_object_post</span><span class="op">[[</span><span class="va">dependent_dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="va">key_names</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">common_key_names</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">key_values</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">key_values</span> <span class="op">&lt;-</span> <span class="va">tmp_key_values</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="va">key_values</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">key_values</span>, <span class="va">tmp_key_values</span>, by <span class="op">=</span> <span class="va">common_key_names</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="va">data_object_post</span><span class="op">[[</span><span class="va">binding_dataset</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/switch.html" class="external-link">switch</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">binding_key</span><span class="op">$</span><span class="va">post</span><span class="op">)</span>,</span>
+<span>      <span class="st">"FALSE"</span> <span class="op">=</span> <span class="va">data_object_pre</span><span class="op">[[</span><span class="va">binding_dataset</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      <span class="st">"TRUE"</span> <span class="op">=</span> <span class="va">data_object_post</span><span class="op">[[</span><span class="va">binding_dataset</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="va">key_values</span>,</span>
+<span>    by <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">common_key_names</span>, <span class="va">binding_key</span><span class="op">$</span><span class="va">update</span><span class="op">$</span><span class="va">key</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">binding_key</span><span class="op">$</span><span class="va">activate</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">data_object_post</span><span class="op">[[</span><span class="va">binding_dataset</span><span class="op">]</span><span class="op">]</span>, <span class="st">"filtered"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data_object_post</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ul>
 <li>
-<code>cohortBuilder.db</code> - not implemented yet</li>
+<code>cohortBuilder.db</code> - slight modification of the above
+function</li>
 </ul>
-<ol start="8" style="list-style-type: decimal">
-<li><strong><code>.get_attrition_count</code> - define how to get metric used for attrition data plot</strong></li>
+<ol start="9" style="list-style-type: decimal">
+<li><strong><code>.get_attrition_count</code> - define how to get metric
+used for attrition data plot</strong></li>
 </ol>
 <p>Required parameters:</p>
 <ul>
 <li>
 <code>source</code>,</li>
 <li>
-<code>data_stats</code> - statistics related to each step data - list of <code>.get_stats</code> results for each step (and original data, assigned to <code>step_id = 0</code>),</li>
+<code>data_stats</code> - statistics related to each step data -
+list of <code>.get_stats</code> results for each step (and original
+data, assigned to <code>step_id = 0</code>),</li>
 </ul>
 <p>Details:</p>
 <ul>
-<li>The output should return vector of length <code>n+1</code> where <code>n</code> is number of steps. The first element of the vector should describe statistic for the base, unfiltered data.</li>
-<li>You may define additional parameters which can be passed to <code>attrition</code> method of Cohort object (e.g. <code>dataset</code> in the below example).</li>
+<li>The output should return vector of length <code>n+1</code> where
+<code>n</code> is number of steps. The first element of the vector
+should describe statistic for the base, unfiltered data.</li>
+<li>You may define additional parameters which can be passed to
+<code>attrition</code> method of Cohort object
+(e.g. <code>dataset</code> in the below example).</li>
 </ul>
 <p>Examples:</p>
 <ul>
 <li><code>cohortBuilder</code></li>
 </ul>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">.get_attrition_count.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_stats</span>, <span class="va">dataset</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">data_stats</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"n_rows"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">.get_attrition_count.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">data_stats</span>, <span class="va">dataset</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">data_stats</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"n_rows"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ul>
 <li>
-<code>cohortBuilder.db</code> - not implemented yet</li>
+<code>cohortBuilder.db</code> - same as above</li>
 </ul>
-<ol start="9" style="list-style-type: decimal">
-<li><strong><code>.get_attrition_label</code> - define label displayed in attrition plot for the specified step</strong></li>
+<ol start="10" style="list-style-type: decimal">
+<li><strong><code>.get_attrition_label</code> - define label displayed
+in attrition plot for the specified step</strong></li>
 </ol>
 <p>Required parameters:</p>
 <ul>
 <li>
 <code>source</code>,</li>
 <li>
-<code>step_id</code> - id of the step (<code>"0"</code> for original data case),</li>
+<code>step_id</code> - id of the step (<code>"0"</code> for original
+data case),</li>
 <li>
-<code>step_filters</code> - list storing filters configuration for the selected step (<code>NULL</code> for original data case),</li>
+<code>step_filters</code> - list storing filters configuration for
+the selected step (<code>NULL</code> for original data case),</li>
 </ul>
 <p>Details:</p>
 <ul>
-<li>Please remember to define label for the initial data state (<code>step_id = "0"</code> case).</li>
-<li>You may define additional parameters which can be passed to <code>attrition</code> method of Cohort object (e.g. <code>dataset</code> in the below example).</li>
+<li>Please remember to define label for the initial data state
+(<code>step_id = "0"</code> case).</li>
+<li>You may define additional parameters which can be passed to
+<code>attrition</code> method of Cohort object
+(e.g. <code>dataset</code> in the below example).</li>
 </ul>
 <p>Examples:</p>
 <ul>
 <li><code>cohortBuilder</code></li>
 </ul>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">get_attrition_label.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">step_id</span>, <span class="va">step_filters</span>, <span class="va">dataset</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">pkey</span> <span class="op">&lt;-</span> <span class="va">source</span><span class="op">$</span><span class="va">primary_keys</span>
-  <span class="va">binding_keys</span> <span class="op">&lt;-</span> <span class="va">source</span><span class="op">$</span><span class="va">binding_keys</span>
-  <span class="kw">if</span> <span class="op">(</span><span class="va">step_id</span> <span class="op">==</span> <span class="st">"0"</span><span class="op">)</span> <span class="op">{</span>
-    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">pkey</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-      <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">)</span>
-    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
-      <span class="va">dataset_pkey</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dot-get_item.html">.get_item</a></span><span class="op">(</span><span class="va">pkey</span>, <span class="st">"dataset"</span>, <span class="va">dataset</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">key</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">dataset_pkey</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">)</span>
-      <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span><span class="st">"{dataset}\n primary key: {paste(dataset_pkey, collapse = ', ')}"</span><span class="op">)</span><span class="op">)</span>
-    <span class="op">}</span>
-  <span class="op">}</span>
-  <span class="va">filters_section</span> <span class="op">&lt;-</span> <span class="va">step_filters</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/keep.html" class="external-link">keep</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span><span class="op">$</span><span class="va">dataset</span> <span class="op">==</span> <span class="va">dataset</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span><span class="fu">get_attrition_filter_label</span><span class="op">(</span><span class="va">.</span><span class="op">$</span><span class="va">name</span>, <span class="va">.</span><span class="op">$</span><span class="va">value_name</span>, <span class="va">.</span><span class="op">$</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span>collapse <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span>
-  <span class="va">bind_keys_section</span> <span class="op">&lt;-</span> <span class="st">""</span>
-  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">binding_keys</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-    <span class="va">dependent_datasets</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dot-get_item.html">.get_item</a></span><span class="op">(</span>
-      <span class="va">binding_keys</span>, attribute <span class="op">=</span> <span class="st">"update"</span>, value <span class="op">=</span> <span class="va">dataset</span>,
-      operator <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">value</span>, <span class="va">target</span><span class="op">)</span> <span class="op">{</span>
-        <span class="va">value</span> <span class="op">==</span> <span class="va">target</span><span class="op">$</span><span class="va">dataset</span>
-      <span class="op">}</span>
-    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-      <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">.</span><span class="op">[[</span><span class="st">"data_keys"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-      <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-      <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span>
-    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">dependent_datasets</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">bind_keys_section</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span>
-        <span class="st">"\nData linked with external datasets: {paste(dependent_datasets, collapse = ', ')}"</span>,
-        .trim <span class="op">=</span> <span class="cn">FALSE</span>
-      <span class="op">)</span>
-    <span class="op">}</span>
-  <span class="op">}</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span>
-    <span class="st">"\n$"</span>,
-    <span class="st">""</span>,
-    <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span><span class="st">"Step: {step_id}\n{filters_section}{bind_keys_section}"</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">get_attrition_label.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">step_id</span>, <span class="va">step_filters</span>, <span class="va">dataset</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">pkey</span> <span class="op">&lt;-</span> <span class="va">source</span><span class="op">$</span><span class="va">primary_keys</span></span>
+<span>  <span class="va">binding_keys</span> <span class="op">&lt;-</span> <span class="va">source</span><span class="op">$</span><span class="va">binding_keys</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">step_id</span> <span class="op">==</span> <span class="st">"0"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">pkey</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="va">dataset_pkey</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dot-get_item.html">.get_item</a></span><span class="op">(</span><span class="va">pkey</span>, <span class="st">"dataset"</span>, <span class="va">dataset</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">key</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">dataset_pkey</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">)</span></span>
+<span>      <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span><span class="st">"{dataset}\n primary key: {paste(dataset_pkey, collapse = ', ')}"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">filters_section</span> <span class="op">&lt;-</span> <span class="va">step_filters</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/keep.html" class="external-link">keep</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span><span class="op">$</span><span class="va">dataset</span> <span class="op">==</span> <span class="va">dataset</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span><span class="fu">get_attrition_filter_label</span><span class="op">(</span><span class="va">.</span><span class="op">$</span><span class="va">name</span>, <span class="va">.</span><span class="op">$</span><span class="va">value_name</span>, <span class="va">.</span><span class="op">$</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span>collapse <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span>
+<span>  <span class="va">bind_keys_section</span> <span class="op">&lt;-</span> <span class="st">""</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">binding_keys</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">dependent_datasets</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dot-get_item.html">.get_item</a></span><span class="op">(</span></span>
+<span>      <span class="va">binding_keys</span>, attribute <span class="op">=</span> <span class="st">"update"</span>, value <span class="op">=</span> <span class="va">dataset</span>,</span>
+<span>      operator <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">value</span>, <span class="va">target</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="va">value</span> <span class="op">==</span> <span class="va">target</span><span class="op">$</span><span class="va">dataset</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">.</span><span class="op">[[</span><span class="st">"data_keys"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">dependent_datasets</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">bind_keys_section</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span></span>
+<span>        <span class="st">"\nData linked with external datasets: {paste(dependent_datasets, collapse = ', ')}"</span>,</span>
+<span>        .trim <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span>
+<span>    <span class="st">"\n$"</span>,</span>
+<span>    <span class="st">""</span>,</span>
+<span>    <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span><span class="st">"Step: {step_id}\n{filters_section}{bind_keys_section}"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ul>
 <li>
-<code>cohortBuilder.db</code> - not implemented yet</li>
+<code>cohortBuilder.db</code> - same as above</li>
 </ul></main>
 </div>
 
@@ -512,7 +591,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer>

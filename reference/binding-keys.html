@@ -143,7 +143,7 @@ There might be the situation when table was already bound but there is another
 one binding key to be executed on the same table.
 In this case `post = FALSE` case will remain the same - unfiltered table will be taken.
 More to that filtering and previous binding related to this table will be ignored.
-In case of `post = TRUE` the previously bound table will be updated."><title>Describe data relations with binding keys — binding-keys • cohortBuilder</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Describe data relations with binding keys — binding-keys"><meta property="og:description" content="When source consists of multiple datasets, binding keys allow to define what
+In case of `post = TRUE` the previously bound table will be updated."><title>Describe data relations with binding keys — binding-keys • cohortBuilder</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Describe data relations with binding keys — binding-keys"><meta property="og:description" content="When source consists of multiple datasets, binding keys allow to define what
 relations occur between them.
 When binding keys are defined, applying filtering on one dataset may result with
 updating (filtering) the other ones.
@@ -298,7 +298,7 @@ In case of `post = TRUE` the previously bound table will be updated."><meta prop
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -379,23 +379,25 @@ updating (filtering) the other ones.</p>
 `authors(author_id, name, surname)`
 if we filter `authors` table, we way want to return only books for the selected authors.</p>
 <p>With binding keys you could achieve it by providing `binding_keys` parameter for Source
-as below:</p><div class="sourceCode"><pre><code><span class="va">binding_keys</span> <span class="op">=</span> <span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span>
-    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span>
-      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>,
-      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>
-    <span class="op">)</span>
-  <span class="op">)</span></code></pre></div>
+as below:</p><div class="sourceCode"><pre><code><span></span>
+<span>  <span class="va">binding_keys</span> <span class="op">=</span> <span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span></span>
+<span>      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 
-<p>Or if we want to have two-way relation, just define another binding key:</p><div class="sourceCode"><pre><code><span class="va">binding_keys</span> <span class="op">=</span> <span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span>
-    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span>
-      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>,
-      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>
-    <span class="op">)</span>,
-    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span>
-      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>,
-      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>
-    <span class="op">)</span>
-  <span class="op">)</span></code></pre></div>
+<p>Or if we want to have two-way relation, just define another binding key:</p><div class="sourceCode"><pre><code><span></span>
+<span>  <span class="va">binding_keys</span> <span class="op">=</span> <span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span></span>
+<span>      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span></span>
+<span>      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 
 <p>As a result, whenever `books` or `authors` is filtered, the other table will be updated as well.</p>
 <p>In order to understand binding keys concept we need to describe the following functions:</p><ul><li><p><a href="data_key.html">data_key</a> Defines which table column should be used to describe relation.</p></li>
@@ -421,26 +423,28 @@ sequentially, taking into account returned data from the previous bindings.</p>
 <li><p>post</p></li>
 </ul><p><strong>Active tables and `activate` parameter</strong></p>
 <p>We name a table `active` that is attached to at least one active filter (in a step).</p>
-<p>When having defined binding key, e.g.</p><div class="sourceCode"><pre><code><span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span>
-    update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>,
-    <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>
-  <span class="op">)</span></code></pre></div><p>the key is taken into account only when at least one triggering table is active.
+<p>When having defined binding key, e.g.</p><div class="sourceCode"><pre><code><span></span>
+<span>  <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span></span>
+<span>    update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div><p>the key is taken into account only when at least one triggering table is active.
 So in the above example binding key will update `books` only when `authors` was
 filtered (more precisely when any filter attached to `authors` is active).</p>
 <p>The `activate = TRUE` parameter setup, lets us to decide whether `update` table
 should be marked as active as well when the binding finish.
 This allows to build dependency chains between table.</p>
 <p>Let's explain this in the below example. Having defined another table in Source
-`borrowed(book_id, user_id, date)` and binding key:</p><div class="sourceCode"><pre><code><span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span>
-    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span>
-      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'book_id'</span><span class="op">)</span>,
-      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'borrowed'</span>, <span class="st">'book_id'</span><span class="op">)</span>
-    <span class="op">)</span>,
-    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span>
-      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>,
-      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>
-    <span class="op">)</span>
-  <span class="op">)</span></code></pre></div><p>Let's consider the case when table `borrowed` is active, `books` is not.
+`borrowed(book_id, user_id, date)` and binding key:</p><div class="sourceCode"><pre><code><span></span>
+<span>  <span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span></span>
+<span>      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'book_id'</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'borrowed'</span>, <span class="st">'book_id'</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span></span>
+<span>      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div><p>Let's consider the case when table `borrowed` is active, `books` is not.
 What happens during the binding process:
 1. Based on the first binding key, active `borrowed` triggers this one.
 2. As a result `books` is modified.</p>
@@ -453,38 +457,41 @@ It will be triggered only when `books` is directly filtered (activated).</p>
 respectively.</p>
 <p>So in the above example (because `activate = TRUE` by default) the authors table
 will also be modified by the second binding key.</p>
-<p>To turn off this behavior we just need to:</p><div class="sourceCode"><pre><code><span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span>
-    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span>
-      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'book_id'</span><span class="op">)</span>,
-      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'borrowed'</span>, <span class="st">'book_id'</span><span class="op">)</span>,
-      activate <span class="op">=</span> <span class="cn">TRUE</span>
-    <span class="op">)</span>,
-    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span>
-      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>,
-      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>
-    <span class="op">)</span>
-  <span class="op">)</span></code></pre></div>
+<p>To turn off this behavior we just need to:</p><div class="sourceCode"><pre><code><span></span>
+<span>  <span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span></span>
+<span>      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'book_id'</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'borrowed'</span>, <span class="st">'book_id'</span><span class="op">)</span>,</span>
+<span>      activate <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span></span>
+<span>      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 
 <p><strong>Bind filtered on unfiltered data - `post` parameter</strong></p>
-<p>Let's tart with the below binding key example:</p><div class="sourceCode"><pre><code><span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span>
-    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span>
-      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>,
-      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>
-    <span class="op">)</span>
-  <span class="op">)</span></code></pre></div>
+<p>Let's tart with the below binding key example:</p><div class="sourceCode"><pre><code><span></span>
+<span>  <span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span></span>
+<span>      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 
 <p>Let's assume `authors` table is filtered and we apply filtering for `books` table.
 We may want to achieve one of the two results:
 1. `authors` filters should be taken into account while binding.
 2. we should take unfiltered `authors` an apply binding based on `books` choices.</p>
 <p>We can achieve 1 and 2 with defining `post = TRUE` (the default) and `post = FALSE` respectively.</p>
-<p>So the following setup:</p><div class="sourceCode"><pre><code><span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span>
-    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span>
-      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>,
-      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>,
-      post <span class="op">=</span> <span class="cn">FALSE</span>
-    <span class="op">)</span>
-  <span class="op">)</span></code></pre></div>
+<p>So the following setup:</p><div class="sourceCode"><pre><code><span></span>
+<span>  <span class="fu"><a href="../reference/binding-keys.html">bind_keys</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/binding-keys.html">bind_key</a></span><span class="op">(</span></span>
+<span>      update <span class="op">=</span> <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'authors'</span>, <span class="st">'author_id'</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="../reference/data_key.html">data_key</a></span><span class="op">(</span><span class="st">'books'</span>, <span class="st">'author_id'</span><span class="op">)</span>,</span>
+<span>      post <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 
 <p>Whenever `books` is changed will result with filtering only the authors that written selected books -
 no extra `authors` filters will be applied.</p>
@@ -497,9 +504,9 @@ In case of `post = TRUE` the previously bound table will be updated.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bind_keys</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-
-<span class="fu">bind_key</span><span class="op">(</span><span class="va">update</span>, <span class="va">...</span>, post <span class="op">=</span> <span class="cn">TRUE</span>, activate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bind_keys</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bind_key</span><span class="op">(</span><span class="va">update</span>, <span class="va">...</span>, post <span class="op">=</span> <span class="cn">TRUE</span>, activate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -507,16 +514,25 @@ In case of `post = TRUE` the previously bound table will be updated.</p>
     <dl><dt>...</dt>
 <dd><p>In case of `bind_keys`, binding keys created with `bind_key`.
 In case of `bind_key`, data keys describing triggering tables.</p></dd>
+
+
 <dt>update</dt>
 <dd><p>Data key describing table to update.</p></dd>
+
+
 <dt>post</dt>
 <dd><p>Update filtered or unfiltered table.</p></dd>
+
+
 <dt>activate</dt>
 <dd><p>Mark bound table as active.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>List of class `bind_keys` storing `bind_key` class objects (`bind_keys`) or
+    
+
+<p>List of class `bind_keys` storing `bind_key` class objects (`bind_keys`) or
   `bind_key` class list (`bind_key`).</p>
     </div>
 
@@ -529,7 +545,7 @@ In case of `bind_key`, data keys describing triggering tables.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer></div>

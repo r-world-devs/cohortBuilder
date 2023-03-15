@@ -14,10 +14,10 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Implementing custom filters">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Implementing custom filters">
 <meta property="og:description" content="cohortBuilder">
 <meta property="og:image" content="https://r-world-devs.github.io/cohortBuilder/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,7 +107,7 @@
 
 
 <div class="row">
-  <main id="main"><div class="page-header">
+  <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Implementing custom filters</h1>
             
       
@@ -117,7 +117,8 @@
 
     
     
-<p><code>cohortBuilder</code> itself provides five types of filters that are suitable to perform most common filtering tasks:</p>
+<p><code>cohortBuilder</code> itself provides five types of filters that
+are suitable to perform most common filtering tasks:</p>
 <ul>
 <li>discrete,</li>
 <li>range,</li>
@@ -125,83 +126,96 @@
 <li>discrete_text,</li>
 <li>multi_discrete.</li>
 </ul>
-<p>If any of the above filters doesn’t meet your need, you may want to create a custom one. Below we describe in details how new filters can be created and provide an example for creating a new one - logical filter.</p>
+<p>If any of the above filters doesn’t meet your need, you may want to
+create a custom one. Below we describe in details how new filters can be
+created and provide an example for creating a new one - logical
+filter.</p>
 <div class="section level2">
 <h2 id="filter-structure">Filter structure<a class="anchor" aria-label="anchor" href="#filter-structure"></a>
 </h2>
-<p>Before we start let’s make a closer look about what R object the filter is.</p>
-<p>The <code>filter</code> function itself is S3 method taking <code>type</code> as a first argument.</p>
+<p>Before we start let’s make a closer look about what R object the
+filter is.</p>
+<p>The <code>filter</code> function itself is S3 method taking
+<code>type</code> as a first argument.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">filter</span>
-<span class="co">#&gt; function(type, ...) {</span>
-<span class="co">#&gt;   UseMethod("filter", type)</span>
-<span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x55dc85f76ff0&gt;</span>
-<span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></code></pre></div>
-<p>So in case of <code>discrete</code> filter, the proper used method is:</p>
+<code class="sourceCode R"><span><span class="va">filter</span></span>
+<span><span class="co">#&gt; function(type, ...) {</span></span>
+<span><span class="co">#&gt;   UseMethod("filter", type)</span></span>
+<span><span class="co">#&gt; }</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x555872617b98&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
+<p>So in case of <code>discrete</code> filter, the proper used method
+is:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">cohortBuilder</span><span class="fu">:::</span><span class="va"><a href="../reference/filter-types.html">filter.discrete</a></span>
-<span class="co">#&gt; function(type, id, name, ..., active = getOption("cb_active_filter", default = TRUE)) {</span>
-<span class="co">#&gt;   args &lt;- append(</span>
-<span class="co">#&gt;     environment() %&gt;% as.list() %&gt;% purrr::keep(~ !is.symbol(.x)),</span>
-<span class="co">#&gt;     list(...)</span>
-<span class="co">#&gt;   )</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   .as_constructor(</span>
-<span class="co">#&gt;     function(source) {</span>
-<span class="co">#&gt;       do.call(</span>
-<span class="co">#&gt;         cb_filter.discrete,</span>
-<span class="co">#&gt;         append(list(source = source), args)</span>
-<span class="co">#&gt;       )</span>
-<span class="co">#&gt;     }</span>
-<span class="co">#&gt;   )</span>
-<span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x55dc864f7568&gt;</span>
-<span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></code></pre></div>
-<p>that gathers provided parameters and returns function of <code>source</code> argument:</p>
+<code class="sourceCode R"><span><span class="fu">cohortBuilder</span><span class="fu">:::</span><span class="va"><a href="../reference/filter-types.html">filter.discrete</a></span></span>
+<span><span class="co">#&gt; function(type, id, name, ..., active = getOption("cb_active_filter", default = TRUE)) {</span></span>
+<span><span class="co">#&gt;   args &lt;- append(</span></span>
+<span><span class="co">#&gt;     environment() %&gt;% as.list() %&gt;% purrr::keep(~ !is.symbol(.x)),</span></span>
+<span><span class="co">#&gt;     list(...)</span></span>
+<span><span class="co">#&gt;   )</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   .as_constructor(</span></span>
+<span><span class="co">#&gt;     function(source) {</span></span>
+<span><span class="co">#&gt;       do.call(</span></span>
+<span><span class="co">#&gt;         cb_filter.discrete,</span></span>
+<span><span class="co">#&gt;         append(list(source = source), args)</span></span>
+<span><span class="co">#&gt;       )</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt;   )</span></span>
+<span><span class="co">#&gt; }</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5558730b64e8&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
+<p>that gathers provided parameters and returns function of
+<code>source</code> argument:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">spec_filter</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span><span class="st">"discrete"</span>, value <span class="op">=</span> <span class="st">"setosa"</span>, dataset <span class="op">=</span> <span class="st">"iris"</span>, variable <span class="op">=</span> <span class="st">"Species"</span><span class="op">)</span>
-<span class="va">spec_filter</span>
-<span class="co">#&gt; function(source) {</span>
-<span class="co">#&gt;       do.call(</span>
-<span class="co">#&gt;         cb_filter.discrete,</span>
-<span class="co">#&gt;         append(list(source = source), args)</span>
-<span class="co">#&gt;       )</span>
-<span class="co">#&gt;     }</span>
-<span class="co">#&gt; &lt;bytecode: 0x55dc86500df0&gt;</span>
-<span class="co">#&gt; &lt;environment: 0x55dc86791578&gt;</span>
-<span class="co">#&gt; attr(,"class")</span>
-<span class="co">#&gt; [1] "function"              "cb_filter_constructor"</span></code></pre></div>
-<p>So whenever we define filter of specific type it returns unevaluated function of <code>source</code> parameter.</p>
-<p>We can realize, the function itself calls another S3 method <code>cb_filter.discrete</code>, that takes into account type of the provided source.</p>
+<code class="sourceCode R"><span><span class="va">spec_filter</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span><span class="st">"discrete"</span>, value <span class="op">=</span> <span class="st">"setosa"</span>, dataset <span class="op">=</span> <span class="st">"iris"</span>, variable <span class="op">=</span> <span class="st">"Species"</span><span class="op">)</span></span>
+<span><span class="va">spec_filter</span></span>
+<span><span class="co">#&gt; function(source) {</span></span>
+<span><span class="co">#&gt;       do.call(</span></span>
+<span><span class="co">#&gt;         cb_filter.discrete,</span></span>
+<span><span class="co">#&gt;         append(list(source = source), args)</span></span>
+<span><span class="co">#&gt;       )</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5558730c3bb8&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x555873ea1048&gt;</span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "function"              "cb_filter_constructor"</span></span></code></pre></div>
+<p>So whenever we define filter of specific type it returns unevaluated
+function of <code>source</code> parameter.</p>
+<p>We can realize, the function itself calls another S3 method
+<code>cb_filter.discrete</code>, that takes into account type of the
+provided source.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cb_filter.discrete</span>
-<span class="co">#&gt; function(source, ...) {</span>
-<span class="co">#&gt;   UseMethod("cb_filter.discrete", source)</span>
-<span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x55dc85f64730&gt;</span>
-<span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></code></pre></div>
-<p>With such approach for having two layers of S3 methods, we are allowed to to build various filter types, for various source types. For example discrete filter for tblist source, discrete filter for db source, range filter for raw source etc.</p>
+<code class="sourceCode R"><span><span class="va">cb_filter.discrete</span></span>
+<span><span class="co">#&gt; function(source, ...) {</span></span>
+<span><span class="co">#&gt;   UseMethod("cb_filter.discrete", source)</span></span>
+<span><span class="co">#&gt; }</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55587381c2f8&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
+<p>With such approach for having two layers of S3 methods, we are
+allowed to to build various filter types, for various source types. For
+example discrete filter for tblist source, discrete filter for db
+source, range filter for raw source etc.</p>
 <p>Now, let’s check what object stores filter evaluated on source:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">iris_source</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_source.html">set_source</a></span><span class="op">(</span>
-  <span class="fu"><a href="../reference/tblist.html">tblist</a></span><span class="op">(</span>iris <span class="op">=</span> <span class="va">iris</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span>
-  <span class="fu">spec_filter</span><span class="op">(</span><span class="va">iris_source</span><span class="op">)</span>,
-  give.attr <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-<span class="co">#&gt; List of 10</span>
-<span class="co">#&gt;  $ id          : chr "TPWSC1654088262562"</span>
-<span class="co">#&gt;  $ type        : 'discrete' chr "discrete"</span>
-<span class="co">#&gt;  $ name        : chr "TPWSC1654088262562"</span>
-<span class="co">#&gt;  $ input_param : chr "value"</span>
-<span class="co">#&gt;  $ filter_data :function (data_object)  </span>
-<span class="co">#&gt;  $ get_stats   :function (data_object, name)  </span>
-<span class="co">#&gt;  $ plot_data   :function (data_object)  </span>
-<span class="co">#&gt;  $ get_params  :function (name)  </span>
-<span class="co">#&gt;  $ get_data    :function (data_object)  </span>
-<span class="co">#&gt;  $ get_defaults:function (data_object, cache_object)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">iris_source</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_source.html">set_source</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/tblist.html">tblist</a></span><span class="op">(</span>iris <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span></span>
+<span>  <span class="fu">spec_filter</span><span class="op">(</span><span class="va">iris_source</span><span class="op">)</span>,</span>
+<span>  give.attr <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 10</span></span>
+<span><span class="co">#&gt;  $ id          : chr "IFOXD1678911820670"</span></span>
+<span><span class="co">#&gt;  $ type        : 'discrete' chr "discrete"</span></span>
+<span><span class="co">#&gt;  $ name        : chr "IFOXD1678911820670"</span></span>
+<span><span class="co">#&gt;  $ input_param : chr "value"</span></span>
+<span><span class="co">#&gt;  $ filter_data :function (data_object)  </span></span>
+<span><span class="co">#&gt;  $ get_stats   :function (data_object, name)  </span></span>
+<span><span class="co">#&gt;  $ plot_data   :function (data_object)  </span></span>
+<span><span class="co">#&gt;  $ get_params  :function (name)  </span></span>
+<span><span class="co">#&gt;  $ get_data    :function (data_object)  </span></span>
+<span><span class="co">#&gt;  $ get_defaults:function (data_object, cache_object)</span></span></code></pre></div>
 <p>We can see, the evaluated filter is a list of 10 elements:</p>
 <ul>
 <li>
@@ -211,60 +225,79 @@
 <li>
 <code>name</code> - Filter name.</li>
 <li>
-<code>input_param</code> - Name of the parameter taking filtering value.</li>
+<code>input_param</code> - Name of the parameter taking filtering
+value.</li>
 <li>
-<code>filter_data</code> - Function of ‘data_object’ parameter defining filtering logic on Source data object.</li>
+<code>filter_data</code> - Function of ‘data_object’ parameter
+defining filtering logic on Source data object.</li>
 <li>
-<code>get_stats</code> - Function of ‘data_object’ and ‘name’ parameters defining what and how data statistics should be calculated.</li>
+<code>get_stats</code> - Function of ‘data_object’ and ‘name’
+parameters defining what and how data statistics should be
+calculated.</li>
 <li>
-<code>plot_data</code> - Function of ‘data_object’ parameter defining how filter data should be plotted.</li>
+<code>plot_data</code> - Function of ‘data_object’ parameter
+defining how filter data should be plotted.</li>
 <li>
-<code>get_params</code> - Function of ‘name’ parameter returning filter parameter (or all parameters when name is missing).</li>
+<code>get_params</code> - Function of ‘name’ parameter returning
+filter parameter (or all parameters when name is missing).</li>
 <li>
-<code>get_data</code> - Function of ‘data_object’ returning filter related data.</li>
+<code>get_data</code> - Function of ‘data_object’ returning filter
+related data.</li>
 <li>
-<code>get_defaults</code> - Function of ‘data_object’ and ‘cache_object’ parameters returning default ‘input_param’ parameter value.</li>
+<code>get_defaults</code> - Function of ‘data_object’ and
+‘cache_object’ parameters returning default ‘input_param’ parameter
+value.</li>
 </ul>
 <p>Where:</p>
 <ul>
 <li>
-<code>data_object</code> is an object passed to and returned from each filtering step (in more details, following the structure returned by <code>init_source</code> S3 method).</li>
+<code>data_object</code> is an object passed to and returned from
+each filtering step (in more details, following the structure returned
+by <code>init_source</code> S3 method).</li>
 <li>
-<code>cache_object</code> is result of <code>get_stats</code> method for the previous step.</li>
+<code>cache_object</code> is result of <code>get_stats</code> method
+for the previous step.</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="logical-filter">Logical filter<a class="anchor" aria-label="anchor" href="#logical-filter"></a>
 </h2>
-<p>In case you want to create a new filter definition, you may use <code>new_filter</code> to initialize it from template.</p>
-<p>Below we’ll create a new filter that takes logical value and filters logical column accordingly. Let’s name type of the filter as ‘logical’. The filter will work on ‘tblist’ source data (list of data frames).</p>
+<p>In case you want to create a new filter definition, you may use
+<code>new_filter</code> to initialize it from template.</p>
+<p>Below we’ll create a new filter that takes logical value and filters
+logical column accordingly. Let’s name type of the filter as ‘logical’.
+The filter will work on ‘tblist’ source data (list of data frames).</p>
 <p>To do so, we need to:</p>
 <ol style="list-style-type: decimal">
-<li>Create <code>filter.logical</code> S3 method that is called when type of filter is ‘logical’.</li>
-<li>Create generic <code>cb_filter.logical</code> that operates based on source type.</li>
+<li>Create <code>filter.logical</code> S3 method that is called when
+type of filter is ‘logical’.</li>
+<li>Create generic <code>cb_filter.logical</code> that operates based on
+source type.</li>
 </ol>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">filter.logical</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">type</span>, <span class="va">id</span>, <span class="va">name</span>, <span class="va">...</span>, <span class="va">active</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"cb_active_filter"</span>, default <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="co"># Skip missing parameters passed and attach `...`</span>
-  <span class="va">args</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/keep.html" class="external-link">keep</a></span><span class="op">(</span><span class="op">~</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/name.html" class="external-link">is.symbol</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-  <span class="op">)</span>
-
-  <span class="co"># Return function of source parameter calling valid S3 method based on source type</span>
-  <span class="kw">function</span><span class="op">(</span><span class="va">source</span><span class="op">)</span> <span class="op">{</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span>
-      <span class="va">cb_filter.logical</span>,
-      <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>source <span class="op">=</span> <span class="va">source</span><span class="op">)</span>, <span class="va">args</span><span class="op">)</span>
-    <span class="op">)</span>
-  <span class="op">}</span>
-<span class="op">}</span></code></pre></div>
-<p>Create <code>cb_filter.logical</code> generic used in the above method (skip when method already exists).</p>
+<code class="sourceCode R"><span><span class="va">filter.logical</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">type</span>, <span class="va">id</span>, <span class="va">name</span>, <span class="va">...</span>, <span class="va">active</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"cb_active_filter"</span>, default <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Skip missing parameters passed and attach `...`</span></span>
+<span>  <span class="va">args</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/keep.html" class="external-link">keep</a></span><span class="op">(</span><span class="op">~</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/name.html" class="external-link">is.symbol</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Return function of source parameter calling valid S3 method based on source type</span></span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">source</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span></span>
+<span>      <span class="va">cb_filter.logical</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>source <span class="op">=</span> <span class="va">source</span><span class="op">)</span>, <span class="va">args</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Create <code>cb_filter.logical</code> generic used in the above
+method (skip when method already exists).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cb_filter.logical</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span>
-  <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">UseMethod</a></span><span class="op">(</span><span class="st">"cb_filter.logical"</span>, <span class="va">source</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
-<p>Create S3 method for specific source data type (‘tblist’ in this case). Here we define list of parameters required by filter.</p>
+<code class="sourceCode R"><span><span class="va">cb_filter.logical</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">UseMethod</a></span><span class="op">(</span><span class="st">"cb_filter.logical"</span>, <span class="va">source</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Create S3 method for specific source data type (‘tblist’ in this
+case). Here we define list of parameters required by filter.</p>
 <p>The obligatory parameters are:</p>
 <ul>
 <li>
@@ -272,128 +305,157 @@
 <li>
 <code>type</code> - equals filter type by default,</li>
 <li>
-<code>id</code> - should be randomly generated by default, <code><a href="../reference/dot-gen_id.html">.gen_id()</a></code>,</li>
+<code>id</code> - should be randomly generated by default,
+<code><a href="../reference/dot-gen_id.html">.gen_id()</a></code>,</li>
 <li>
-<code>name</code> - used only for improving readiness of various outputs. Can be reassigned from id,</li>
+<code>name</code> - used only for improving readiness of various
+outputs. Can be reassigned from id,</li>
 <li>
-<code>active</code> - the parameter that configures whether filter should be used or not (even if defined).</li>
+<code>active</code> - the parameter that configures whether filter
+should be used or not (even if defined).</li>
 </ul>
-<p>More to that you should define parameters that allow filter configuration related to data.</p>
+<p>More to that you should define parameters that allow filter
+configuration related to data.</p>
 <p>In our case we need to configure:</p>
 <ul>
 <li>The dataset name to be used - <code>dataset</code>.</li>
 <li>The variable used for filtering - <code>variable</code>.</li>
-<li>Filtering value - <code>value</code>. Regarding value, <code>cohortBuilder</code> assumes <code>value = NA</code> means no filtering is applied. This needs to be handled while writing filtering logic.</li>
-<li>Extra filter parameters - <code>...</code>. Accessible via <code>get_params</code> method - see below.</li>
+<li>Filtering value - <code>value</code>. Regarding value,
+<code>cohortBuilder</code> assumes <code>value = NA</code> means no
+filtering is applied. This needs to be handled while writing filtering
+logic.</li>
+<li>Extra filter parameters - <code>...</code>. Accessible via
+<code>get_params</code> method - see below.</li>
 </ul>
-<p>We can also add an extra parameter <code>keep_na</code> which determines whether <code>NA</code> values should be included or not. It’s also worth to add <code>description</code> parameter, storing helpful information about the defined filter.</p>
-<p>Now we create source specific S3 method for <code>cb_filter.logical</code>. Inside of the method we call <code>def_filter</code> completing all of the parameters based on filter configuration.</p>
+<p>We can also add an extra parameter <code>keep_na</code> which
+determines whether <code>NA</code> values should be included or not.
+It’s also worth to add <code>description</code> parameter, storing
+helpful information about the defined filter.</p>
+<p>Now we create source specific S3 method for
+<code>cb_filter.logical</code>. Inside of the method we call
+<code>def_filter</code> completing all of the parameters based on filter
+configuration.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cb_filter.logical.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span>
-  <span class="va">source</span>, <span class="va">type</span> <span class="op">=</span> <span class="st">"logical"</span>, <span class="va">id</span> <span class="op">=</span> <span class="fu"><a href="../reference/dot-gen_id.html">.gen_id</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">name</span> <span class="op">=</span> <span class="va">id</span>, <span class="va">dataset</span>, <span class="va">variable</span>, 
-  <span class="va">value</span> <span class="op">=</span> <span class="cn">NA</span>, <span class="va">keep_na</span> <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">description</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, <span class="va">active</span> <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">args</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-
-  <span class="fu"><a href="../reference/creating-filters.html">def_filter</a></span><span class="op">(</span>
-    type <span class="op">=</span> <span class="va">type</span>,
-    id <span class="op">=</span> <span class="va">id</span>,
-    name <span class="op">=</span> <span class="va">name</span>,
-    input_param <span class="op">=</span> <span class="st">"value"</span>,
-    filter_data <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span> <span class="op">{</span>
-
-      <span class="va">selected_value</span> <span class="op">&lt;-</span> <span class="va">value</span> <span class="co"># code include</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="va">keep_na</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">selected_value</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-        <span class="co"># keep_na !value_na start</span>
-        <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="fu">sym</span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op">==</span> <span class="op">!</span><span class="op">!</span><span class="va">selected_value</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span><span class="op">)</span>
-        <span class="co"># keep_na !value_na end</span>
-      <span class="op">}</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">keep_na</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">selected_value</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-        <span class="co"># !keep_na value_na start</span>
-        <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="fu">sym</span><span class="op">(</span><span class="va">variable</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-        <span class="co"># !keep_na value_na end</span>
-      <span class="op">}</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">keep_na</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">selected_value</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-        <span class="co"># !keep_na !value_na start</span>
-        <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="fu">sym</span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="op">!</span><span class="op">!</span><span class="va">selected_value</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span><span class="op">)</span>
-        <span class="co"># !keep_na !value_na end</span>
-      <span class="op">}</span>
-      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span>, <span class="st">"filtered"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># code include</span>
-      <span class="va">data_object</span>
-    <span class="op">}</span>,
-    get_stats <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span>, <span class="va">name</span><span class="op">)</span> <span class="op">{</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-        <span class="va">name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n_data"</span>, <span class="st">"choices"</span>, <span class="st">"n_missing"</span><span class="op">)</span>
-      <span class="op">}</span>
-      <span class="va">stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-        choices <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="st">"choices"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">name</span><span class="op">)</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-          <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="op">)</span>,
-        n_data <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="st">"n_data"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">name</span><span class="op">)</span>  <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-          <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-          <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="op">)</span>,
-        n_missing <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="st">"n_missing"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">name</span><span class="op">)</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">)</span>
-      <span class="op">)</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
-        <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">stats</span><span class="op">[[</span><span class="va">name</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
-        <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">stats</span><span class="op">[</span><span class="va">name</span><span class="op">]</span><span class="op">)</span>
-      <span class="op">}</span>
-    <span class="op">}</span>,
-    plot_data <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span> <span class="op">{</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-        <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">table</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html" class="external-link">barplot</a></span><span class="op">(</span><span class="op">)</span>
-      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
-        <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html" class="external-link">barplot</a></span><span class="op">(</span><span class="fl">0</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"No data"</span><span class="op">)</span>
-      <span class="op">}</span>
-    <span class="op">}</span>,
-    get_params <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">name</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-        dataset <span class="op">=</span> <span class="va">dataset</span>,
-        variable <span class="op">=</span> <span class="va">variable</span>,
-        value <span class="op">=</span> <span class="va">value</span>,
-        description <span class="op">=</span> <span class="va">description</span>,
-        keep_na <span class="op">=</span> <span class="va">keep_na</span>,
-        active <span class="op">=</span> <span class="va">active</span>,
-        <span class="va">...</span>
-      <span class="op">)</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">params</span><span class="op">[[</span><span class="va">name</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-      <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span>
-    <span class="op">}</span>,
-    get_data <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span>
-    <span class="op">}</span>,
-    get_defaults <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span>, <span class="va">cache_object</span><span class="op">)</span> <span class="op">{</span>
-      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cache_object</span><span class="op">$</span><span class="va">choices</span><span class="op">)</span><span class="op">)</span>
-    <span class="op">}</span>
-  <span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cb_filter.logical.tblist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
+<span>  <span class="va">source</span>, <span class="va">type</span> <span class="op">=</span> <span class="st">"logical"</span>, <span class="va">id</span> <span class="op">=</span> <span class="fu"><a href="../reference/dot-gen_id.html">.gen_id</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">name</span> <span class="op">=</span> <span class="va">id</span>, <span class="va">dataset</span>, <span class="va">variable</span>, </span>
+<span>  <span class="va">value</span> <span class="op">=</span> <span class="cn">NA</span>, <span class="va">keep_na</span> <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">description</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, <span class="va">active</span> <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">args</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="fu"><a href="../reference/creating-filters.html">def_filter</a></span><span class="op">(</span></span>
+<span>    type <span class="op">=</span> <span class="va">type</span>,</span>
+<span>    id <span class="op">=</span> <span class="va">id</span>,</span>
+<span>    name <span class="op">=</span> <span class="va">name</span>,</span>
+<span>    input_param <span class="op">=</span> <span class="st">"value"</span>,</span>
+<span>    filter_data <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span> <span class="op">{</span></span>
+<span></span>
+<span>      <span class="va">selected_value</span> <span class="op">&lt;-</span> <span class="va">value</span> <span class="co"># code include</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="va">keep_na</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">selected_value</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="co"># keep_na !value_na start</span></span>
+<span>        <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="fu">sym</span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op">==</span> <span class="op">!</span><span class="op">!</span><span class="va">selected_value</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span><span class="op">)</span></span>
+<span>        <span class="co"># keep_na !value_na end</span></span>
+<span>      <span class="op">}</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">keep_na</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">selected_value</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="co"># !keep_na value_na start</span></span>
+<span>        <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="fu">sym</span><span class="op">(</span><span class="va">variable</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>        <span class="co"># !keep_na value_na end</span></span>
+<span>      <span class="op">}</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">keep_na</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">selected_value</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="co"># !keep_na !value_na start</span></span>
+<span>        <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>          <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="fu">sym</span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="op">!</span><span class="op">!</span><span class="va">selected_value</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span><span class="op">)</span></span>
+<span>        <span class="co"># !keep_na !value_na end</span></span>
+<span>      <span class="op">}</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span>, <span class="st">"filtered"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># code include</span></span>
+<span>      <span class="va">data_object</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    get_stats <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span>, <span class="va">name</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="va">name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n_data"</span>, <span class="st">"choices"</span>, <span class="st">"n_missing"</span><span class="op">)</span></span>
+<span>      <span class="op">}</span></span>
+<span>      <span class="va">stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>        choices <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="st">"choices"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">name</span><span class="op">)</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>          <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>        n_data <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="st">"n_data"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">name</span><span class="op">)</span>  <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>          <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>          <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>        n_missing <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="st">"n_missing"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">name</span><span class="op">)</span> <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">stats</span><span class="op">[[</span><span class="va">name</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span>      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>        <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">stats</span><span class="op">[</span><span class="va">name</span><span class="op">]</span><span class="op">)</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    plot_data <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">table</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html" class="external-link">barplot</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>        <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html" class="external-link">barplot</a></span><span class="op">(</span><span class="fl">0</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"No data"</span><span class="op">)</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    get_params <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">name</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>        dataset <span class="op">=</span> <span class="va">dataset</span>,</span>
+<span>        variable <span class="op">=</span> <span class="va">variable</span>,</span>
+<span>        value <span class="op">=</span> <span class="va">value</span>,</span>
+<span>        description <span class="op">=</span> <span class="va">description</span>,</span>
+<span>        keep_na <span class="op">=</span> <span class="va">keep_na</span>,</span>
+<span>        active <span class="op">=</span> <span class="va">active</span>,</span>
+<span>        <span class="va">...</span></span>
+<span>      <span class="op">)</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">params</span><span class="op">[[</span><span class="va">name</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span>      <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    get_data <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    get_defaults <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span>, <span class="va">cache_object</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cache_object</span><span class="op">$</span><span class="va">choices</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>Please note that:</p>
 <ol style="list-style-type: decimal">
-<li>When filter parameter value equals NA, we assume no filtering is done at all (unless we define <code>keep_na = TRUE</code>).</li>
-<li>While defining <code>filter_data</code> we add a few comment blocks that affect reproducible code output:</li>
+<li>When filter parameter value equals NA, we assume no filtering is
+done at all (unless we define <code>keep_na = TRUE</code>).</li>
+<li>While defining <code>filter_data</code> we add a few comment blocks
+that affect reproducible code output:</li>
 </ol>
 <ul>
-<li>configurations of <code>(!)keep_na (!)value_na (start|end)</code> - states which filtering case are we in.</li>
-<li>inline <code>code include</code> comments, or <code>code include (start|end)</code> designates which code lines to include in reproducible code. This way we can easily control which parts of filtering logic should reproducible code include. When writing custom filters in a separate package please add <code>keepSource: true</code> in the description to preserve comments after compilation.</li>
+<li>configurations of <code>(!)keep_na (!)value_na (start|end)</code> -
+states which filtering case are we in.</li>
+<li>inline <code>code include</code> comments, or
+<code>code include (start|end)</code> designates which code lines to
+include in reproducible code. This way we can easily control which parts
+of filtering logic should reproducible code include. When writing custom
+filters in a separate package please add <code>keepSource: true</code>
+in the description to preserve comments after compilation.</li>
 </ul>
 <ol start="3" style="list-style-type: decimal">
-<li>When defining <code>get_stats</code>, we took care to evaluate only the selected stat (if <code>name</code> is not missing). Such implementation is not obligatory, but helps to improve performance if we operate with large source data.</li>
+<li>When defining <code>get_stats</code>, we took care to evaluate only
+the selected stat (if <code>name</code> is not missing). Such
+implementation is not obligatory, but helps to improve performance if we
+operate with large source data.</li>
 <li>
-<code>filter_data</code> method doesn’t change the structure of <code>data_object</code>.</li>
+<code>filter_data</code> method doesn’t change the structure of
+<code>data_object</code>.</li>
 <li>
-<code>filter_data</code> attaches <code>filtered</code> attribute to affected dataset. This way, whenever <code>filter_data</code> is called (filter is active), we can handle such information while running bindings. If no bindings are used, this step can be skipped.</li>
+<code>filter_data</code> attaches <code>filtered</code> attribute to
+affected dataset. This way, whenever <code>filter_data</code> is called
+(filter is active), we can handle such information while running
+bindings. If no bindings are used, this step can be skipped.</li>
 </ol>
 <p>Now we can use our filter for building cohort.</p>
 <p>For the example we’ll use extended <code>iris</code> table:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">iris2</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">iris</span>, is_setosa <span class="op">=</span> <span class="va">Species</span> <span class="op">==</span> <span class="st">"setosa"</span><span class="op">)</span>
-<span class="va">coh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_source.html">set_source</a></span><span class="op">(</span><span class="fu"><a href="../reference/tblist.html">tblist</a></span><span class="op">(</span>iris <span class="op">=</span> <span class="va">iris2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="../reference/create-cohort.html">cohort</a></span><span class="op">(</span>
-    <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span><span class="st">"logical"</span>, dataset <span class="op">=</span> <span class="st">"iris"</span>, variable <span class="op">=</span> <span class="st">"is_setosa"</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="../reference/run.html">run</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">iris2</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">iris</span>, is_setosa <span class="op">=</span> <span class="va">Species</span> <span class="op">==</span> <span class="st">"setosa"</span><span class="op">)</span></span>
+<span><span class="va">coh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_source.html">set_source</a></span><span class="op">(</span><span class="fu"><a href="../reference/tblist.html">tblist</a></span><span class="op">(</span>iris <span class="op">=</span> <span class="va">iris2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/create-cohort.html">cohort</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span><span class="st">"logical"</span>, dataset <span class="op">=</span> <span class="st">"iris"</span>, variable <span class="op">=</span> <span class="st">"is_setosa"</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/run.html">run</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
@@ -408,7 +470,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer>
