@@ -930,25 +930,6 @@
         "vctrs"
       ]
     },
-    "queryBuilder": {
-      "Package": "queryBuilder",
-      "Version": "0.1.0",
-      "Source": "GitLab",
-      "RemoteType": "gitlab",
-      "RemoteHost": "https://code.roche.com",
-      "RemoteRepo": "queryBuilder",
-      "RemoteUsername": "RWDInsightsEngineering",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "7047766a342f1280fea66f4665dbabb874ee44c8",
-      "Hash": "d5ff37fa695a9580158898c61f8476d7",
-      "Requirements": [
-        "dplyr",
-        "glue",
-        "magrittr",
-        "purrr",
-        "rlang"
-      ]
-    },
     "ragg": {
       "Package": "ragg",
       "Version": "1.2.5",
