@@ -1,7 +1,7 @@
 Package: cohortBuilder
 Type: Package
 Title: Data Source Agnostic Filtering Tools
-Version: 0.2.0
+Version: 0.2.0.9000
 Authors@R: 
     c(person('Krystian', 'Igras', 
              email = 'krystian8207@gmail.com', 
