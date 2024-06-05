@@ -7,6 +7,7 @@
 \alias{filter.range}
 \alias{filter.date_range}
 \alias{filter.multi_discrete}
+\alias{filter.query}
 \title{Filter types}
 \usage{
 \method{filter}{discrete}(
@@ -50,6 +51,14 @@
   name,
   ...,
   description = NULL,
+  active = getOption("cb_active_filter", default = TRUE)
+)
+
+\method{filter}{query}(
+  type,
+  id,
+  name,
+  ...,
   active = getOption("cb_active_filter", default = TRUE)
 )
 }

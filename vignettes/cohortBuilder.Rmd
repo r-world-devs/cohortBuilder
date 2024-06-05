@@ -374,14 +374,15 @@ specific source (i.e. `dplyr` for `tblist` and `dbplyr` for `db` source):
 code(librarian_cohort)
 ```
 
-We can see above, the resulting code uses `source` object, which creation can be
+We can see above, the resulting code uses `source` object, which creation code can be
 defined separately while creating it:
 
 ```{r}
 librarian_source <- set_source(
   as.tblist(librarian),
   source_code = quote({
-    source <- list(attributes = list(datasets = librarian))
+    source <- list()
+    source$dtconn <- as.tblist(librarian)
   })
 )
 
@@ -409,7 +410,14 @@ librarian_cohort <- librarian_source %>%
 code(librarian_cohort)
 ```
 
-The second option allows to restore cohort configuration using its state.
+What's more, you can manipulate the output with additional arguments:
+
+- `include_methods` - list of methods names which definition should be printed in output,
+- `include_action` - list of actions names (such as "pre_filtering") that should be included in output,
+- `modifier` - a custom modifier of data.frame storing reproducible code parts,
+- `mark_step` - should step ID be presented in output.
+
+The second option for achieving reproducibility allows to restore cohort configuration using its state.
 The cohort state is a list (or json) storing information about all the steps and filters configuration.
 
 You may get the state with `get_state` method:

@@ -35,6 +35,11 @@ rename_item <- function(list_obj, old_name, new_name) {
   return(list_obj)
 }
 
+modify_item <- function(list_obj, new_val, what) {
+  list_obj[[what]] <- new_val
+  return(list_obj)
+}
+
 #' Get function definition
 #'
 #' Whenever the function with provided name exists anywhere, the one is

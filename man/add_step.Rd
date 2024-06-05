@@ -12,8 +12,7 @@ add_step(x, step, ...)
   x,
   step,
   run_flow = FALSE,
-  hook = list(pre = get_hook("pre_add_step_hook"), post =
-    get_hook("post_add_step_hook")),
+  hook = list(pre = get_hook("pre_add_step_hook"), post = get_hook("post_add_step_hook")),
   ...
 )
 

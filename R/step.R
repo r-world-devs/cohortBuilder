@@ -88,6 +88,13 @@ steps_range <- function(from, to) {
   )
 }
 
+readjust_step <- function(step, new_id) {
+  step$id <- new_id
+  step$filters <- purrr::modify(step$filters, modify_item, new_val = new_id, what = "step_id")
+
+  return(step)
+}
+
 prev_step <- function(idx) {
   as.character(as.integer(idx) - 1)
 }

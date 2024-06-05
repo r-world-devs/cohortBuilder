@@ -7,11 +7,13 @@
 \alias{cb_filter.range}
 \alias{cb_filter.date_range}
 \alias{cb_filter.multi_discrete}
+\alias{cb_filter.query}
 \alias{cb_filter.discrete.tblist}
 \alias{cb_filter.discrete_text.tblist}
 \alias{cb_filter.range.tblist}
 \alias{cb_filter.date_range.tblist}
 \alias{cb_filter.multi_discrete.tblist}
+\alias{cb_filter.query.tblist}
 \title{Filter Source types methods}
 \usage{
 cb_filter.discrete(source, ...)
@@ -23,6 +25,8 @@ cb_filter.range(source, ...)
 cb_filter.date_range(source, ...)
 
 cb_filter.multi_discrete(source, ...)
+
+cb_filter.query(source, ...)
 
 \method{cb_filter.discrete}{tblist}(
   source,
@@ -92,6 +96,20 @@ cb_filter.multi_discrete(source, ...)
   description = NULL,
   active = TRUE
 )
+
+\method{cb_filter.query}{tblist}(
+  source,
+  type = "query",
+  id = .gen_id(),
+  name = id,
+  variables,
+  value = NA,
+  dataset,
+  keep_na = TRUE,
+  ...,
+  description = NULL,
+  active = TRUE
+)
 }
 \arguments{
 \item{source}{Source object.}
@@ -121,7 +139,7 @@ cb_filter.multi_discrete(source, ...)
 \item{values}{Named list of values to be applied in filtering.
 The names should relate to the ones included in `variables` parameter.}
 
-\item{variables}{Vector of variable names to be used in filtering.}
+\item{variables}{Dataset variables used for filtering.}
 }
 \value{
 List of filter-specific metadata and methods - result of evaluation of

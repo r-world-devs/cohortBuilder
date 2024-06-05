@@ -1,16 +1,16 @@
 ## Test environments
 * local check
-  Ubuntu 18.04.6 LTS, R 4.1.2 (2021-11-01)
+  Ubuntu 20.04.5 LTS, R 4.1.2 (2021-11-01)
 * win-builder
   R version 4.1.3 (2022-03-10)
-  R version 4.2.1 (2022-06-23 ucrt)
-  R Under development (unstable) (2022-07-26 r82626 ucrt)
+  R version 4.2.2 (2022-10-31 ucrt)
+  R Under development (unstable) (2023-02-27 r83911 ucrt)
 
-## `R CMD check cohortBuilder_0.1.1.tar.gz --as-cran` results
+## `R CMD check cohortBuilder_0.2.0.tar.gz --as-cran` results
 
 ```
-* using log directory ‘/home/krystian/Projects/Packages/cohortBuilder.Rcheck’
-* using R version 4.1.2 (2021-11-01)
+* using log directory ‘/home/krystian/projects/cohortBuilder.Rcheck’
+* using R version 4.2.1 (2022-06-23)
 * using platform: x86_64-pc-linux-gnu (64-bit)
 ...
 Status: OK
@@ -38,7 +38,7 @@ Status: OK
 
 ```
 * using log directory 'd:/RCompile/CRANguest/R-release/cohortBuilder.Rcheck'
-* using R version 4.2.1 (2022-06-23 ucrt)
+* using R version 4.2.2 (2022-10-31 ucrt)
 * using platform: x86_64-w64-mingw32 (64-bit)
 ...
 * checking CRAN incoming feasibility ... Note_to_CRAN_maintainers
@@ -49,10 +49,10 @@ Status: OK
 
 ```
 * using log directory 'd:/RCompile/CRANguest/R-devel/cohortBuilder.Rcheck'
-* using R Under development (unstable) (2022-07-26 r82626 ucrt)
+* using R Under development (unstable) (2023-02-27 r83911 ucrt)
 * using platform: x86_64-w64-mingw32 (64-bit)
 ...
-* checking CRAN incoming feasibility ... Note_to_CRAN_maintainers
+* checking CRAN incoming feasibility ... [10s] Note_to_CRAN_maintainers
 Maintainer: 'Krystian Igras <krystian8207@gmail.com>'
 ...
 Status: OK
