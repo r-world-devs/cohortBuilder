@@ -68,7 +68,7 @@ get_attrition_filter_label <- function(name, value_name, value) {
       purrr::map_chr(~paste(., collapse = ",")) %>%
       purrr::imap(~paste(.y, " = ", .x)) %>%
       paste(collapse = ", ")
-  } else if (is.vector(value)) {
+  } else if (length(value) > 1) {
     value <- paste(value, collapse = ", ")
   }
   glue::glue("Filter: {name} ({value_name} = [{value}])")
