@@ -682,8 +682,9 @@ cb_filter.query.tblist <- function(
         name <- c("n_data", "specs", "n_missing")
       }
       variables <- unlist(variables)
+      stat_from_column <- base::get("stat_from_column", envir = asNamespace("queryBuilder"), inherits = FALSE)
       stats <- list(
-        specs = if ("specs" %in% name) data_object[[dataset]][variables] %>% purrr::imap(shinyQueryBuilder:::stat_from_column),
+        specs = if ("specs" %in% name) data_object[[dataset]][variables] %>% purrr::imap(stat_from_column),
         n_data = if ("n_data" %in% name)  data_object[[dataset]][variables] %>% nrow(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][variables] %>% is.na() %>% colSums() %>% as.list()
       )

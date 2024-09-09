@@ -109,7 +109,17 @@ new_filter <- function(filter_type, source_type, input_param = "value", extra_pa
   utils::file.edit(file)
 }
 
-print_filter <- function(filter, data_objects) {
+#' Method for printing filter details
+#'
+#' @param filter The defined filter object.
+#' @param data_objects List of data objects for the underlying filtering step.
+#' @export
+.print_filter <- function(filter, data_objects) {
+  UseMethod(".print_filter", filter)
+}
+
+#' @export
+.print_filter.default <- function(filter, data_objects) {
   meta <- filter$get_params()
   params <- meta[setdiff(names(meta), static_params)]
   cat(glue::glue("-> Filter ID: {filter$id}"), sep = "\n")
@@ -344,5 +354,21 @@ filter.query <- function(type, id, name, ..., active = getOption("cb_active_filt
 #' @export
 cb_filter.query <- function(source, ...) {
   UseMethod("cb_filter.query", source)
+}
+
+#' @export
+.print_filter.query <- function(filter, data_objects) {
+  meta <- filter$get_params()
+  params <- meta[setdiff(names(meta), static_params)]
+  cat(glue::glue("-> Filter ID: {filter$id}"), sep = "\n")
+  cat(glue::glue("   Filter Type: {filter$type}"), sep = "\n")
+  cat("   Filter Parameters:", sep = "\n")
+  for (param_name in names(params)) {
+    if (param_name == "value") {
+      cat(glue::glue("     {param_name}: {deparse(queryBuilder::queryToExpr(params[[param_name]]))}"), sep = "\n")
+    } else {
+      cat(glue::glue("     {param_name}: {paste(params[[param_name]], collapse = ', ')}"), sep = "\n")
+    }
+  }
 }
 

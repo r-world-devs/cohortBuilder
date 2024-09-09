@@ -106,7 +106,7 @@ next_step <- function(idx) {
 print_step <- function(step) {
   cat(glue::glue(">> Step ID: {step$id}"), sep = "\n")
   step$filters %>%
-    purrr::walk(print_filter, data_objects = NULL)
+    purrr::walk(.print_filter, data_objects = NULL)
 }
 
 #' Create filtering step
