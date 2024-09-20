@@ -338,6 +338,7 @@ Cohort <- R6::R6Class(
       for (step_state in state) {
         for (filter_state in step_state$filters) {
           if (filter_state$type == "date_range") {
+            filter_state$range <- na_fix(filter_state$range)
             filter_state$range <- as.Date(filter_state$range)
           }
           add_filter(
