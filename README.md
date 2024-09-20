@@ -1,7 +1,7 @@
 
 # cohortBuilder <img src="man/figures/logo.png" align="right" width="120" />
 
-[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.2.0&color=ff69b4)](https://r-world-devs.github.io/cohortBuilder/)
+[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.3.0&color=ff69b4)](https://r-world-devs.github.io/cohortBuilder/)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
 ## Overview
@@ -115,7 +115,7 @@ get_data(coh)
 #> 3 Mr. Brandan Oberbrunner 568-044-7463 vip     
 #> 4 Lloyd Adams III         001-017-0211 standard
 #> 5 Randy Ziemann           895-995-2326 premium 
-#> # … with 3 more rows
+#> # ℹ 3 more rows
 #> 
 #> $issues
 #> # A tibble: 50 × 4
@@ -126,7 +126,7 @@ get_data(coh)
 #> 3 000003 000016      0-09-177373-3     2014-09-28
 #> 4 000004 000005      0-224-06252-2     2005-11-14
 #> 5 000005 000004      0-340-89696-5     2006-03-19
-#> # … with 45 more rows
+#> # ℹ 45 more rows
 #> 
 #> $returns
 #> # A tibble: 30 × 2
@@ -137,7 +137,7 @@ get_data(coh)
 #> 3 000004 2005-12-29
 #> 4 000005 2006-03-26
 #> 5 000006 2016-08-30
-#> # … with 25 more rows
+#> # ℹ 25 more rows
 #> 
 #> attr(,"class")
 #> [1] "tblist"
@@ -196,7 +196,7 @@ get_data(coh, step_id = 1)
 #> 3 Mr. Brandan Oberbrunner 568-044-7463 vip     
 #> 4 Lloyd Adams III         001-017-0211 standard
 #> 5 Randy Ziemann           895-995-2326 premium 
-#> # … with 3 more rows
+#> # ℹ 3 more rows
 #> 
 #> $issues
 #> # A tibble: 50 × 4
@@ -207,7 +207,7 @@ get_data(coh, step_id = 1)
 #> 3 000003 000016      0-09-177373-3     2014-09-28
 #> 4 000004 000005      0-224-06252-2     2005-11-14
 #> 5 000005 000004      0-340-89696-5     2006-03-19
-#> # … with 45 more rows
+#> # ℹ 45 more rows
 #> 
 #> $returns
 #> # A tibble: 30 × 2
@@ -218,7 +218,7 @@ get_data(coh, step_id = 1)
 #> 3 000004 2005-12-29
 #> 4 000005 2006-03-26
 #> 5 000006 2016-08-30
-#> # … with 25 more rows
+#> # ℹ 25 more rows
 #> 
 #> attr(,"class")
 #> [1] "tblist"
@@ -253,7 +253,7 @@ get_data(coh, step_id = 2)
 #> 3 Mr. Brandan Oberbrunner 568-044-7463 vip     
 #> 4 Lloyd Adams III         001-017-0211 standard
 #> 5 Randy Ziemann           895-995-2326 premium 
-#> # … with 3 more rows
+#> # ℹ 3 more rows
 #> 
 #> $issues
 #> # A tibble: 50 × 4
@@ -264,7 +264,7 @@ get_data(coh, step_id = 2)
 #> 3 000003 000016      0-09-177373-3     2014-09-28
 #> 4 000004 000005      0-224-06252-2     2005-11-14
 #> 5 000005 000004      0-340-89696-5     2006-03-19
-#> # … with 45 more rows
+#> # ℹ 45 more rows
 #> 
 #> $returns
 #> # A tibble: 30 × 2
@@ -275,7 +275,7 @@ get_data(coh, step_id = 2)
 #> 3 000004 2005-12-29
 #> 4 000005 2006-03-26
 #> 5 000006 2016-08-30
-#> # … with 25 more rows
+#> # ℹ 25 more rows
 #> 
 #> attr(,"class")
 #> [1] "tblist"
@@ -316,7 +316,7 @@ get_data(coh, step_id = 2)
 #> 3 Mr. Brandan Oberbrunner 568-044-7463 vip     
 #> 4 Lloyd Adams III         001-017-0211 standard
 #> 5 Randy Ziemann           895-995-2326 premium 
-#> # … with 3 more rows
+#> # ℹ 3 more rows
 #> 
 #> $issues
 #> # A tibble: 50 × 4
@@ -327,7 +327,7 @@ get_data(coh, step_id = 2)
 #> 3 000003 000016      0-09-177373-3     2014-09-28
 #> 4 000004 000005      0-224-06252-2     2005-11-14
 #> 5 000005 000004      0-340-89696-5     2006-03-19
-#> # … with 45 more rows
+#> # ℹ 45 more rows
 #> 
 #> $returns
 #> # A tibble: 30 × 2
@@ -338,7 +338,7 @@ get_data(coh, step_id = 2)
 #> 3 000004 2005-12-29
 #> 4 000005 2006-03-26
 #> 5 000006 2016-08-30
-#> # … with 25 more rows
+#> # ℹ 25 more rows
 #> 
 #> attr(,"class")
 #> [1] "tblist"
