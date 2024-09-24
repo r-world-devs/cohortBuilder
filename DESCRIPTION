@@ -26,11 +26,11 @@ Imports:
     glue,
     ggplot2,
     rlang (>= 1.0),
-    formatR,
-    queryBuilder
+    formatR
 KeepSource: true
 RoxygenNote: 7.2.3
 Suggests: 
+    queryBuilder,
     testthat (>= 3.0.0),
     shiny,
     knitr,
