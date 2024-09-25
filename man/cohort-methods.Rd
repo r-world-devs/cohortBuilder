@@ -11,14 +11,14 @@ Various type outputs dependent on the selected method.
 The list of methods designed for getting Cohort-related details.
 
 \itemize{
-   \item{\link{plot_data}}{ Plot filter related Cohort data.}
-   \item{\link{stat}}{ Get Cohort related statistics.}
-   \item{\link{code}}{ Return reproducible data filtering code.}
-   \item{\link{get_data}}{ Get step related data.}
-   \item{\link{sum_up}}{ Sum up Cohort state.}
-   \item{\link{get_state}}{ Save Cohort state.}
-   \item{\link{restore}}{ Restore Cohort state.}
-   \item{\link{attrition}}{ Show attrition plot.}
-   \item{\link{description}}{ Show Source or filter related description.}
+   \item{\link{plot_data} - Plot filter related Cohort data.}
+   \item{\link{stat} - Get Cohort related statistics.}
+   \item{\link{code} - Return reproducible data filtering code.}
+   \item{\link{get_data} - Get step related data.}
+   \item{\link{sum_up} - Sum up Cohort state.}
+   \item{\link{get_state} - Save Cohort state.}
+   \item{\link{restore} - Restore Cohort state.}
+   \item{\link{attrition} - Show attrition plot.}
+   \item{\link{description} - Show Source or filter related description.}
 }
 }

@@ -237,23 +237,23 @@ set_source <- function(dtconn, ..., primary_keys = NULL, binding_keys = NULL,
 #' In order to make new source type layer functioning, the following list of methods
 #' should be defined:
 #' \itemize{
-#'   \item{.init_source}{ Defines how to extract data object from source.
+#'   \item{\code{.init_source} - Defines how to extract data object from source.
 #'   Each filtering step assumes to be operating on resulting data object
 #'   (further named data_object) and returns object of the same type and structure.}
-#'   \item{.collect_data}{ Defines how to collect data (into R memory) from `data_object`.}
-#'   \item{.get_stats}{ Defines what `data_object` statistics should be
+#'   \item{\code{.collect_data} - Defines how to collect data (into R memory) from `data_object`.}
+#'   \item{\code{.get_stats} - Defines what `data_object` statistics should be
 #'   calculated and how. When provided the stats can be extracted using \link{stat}.}
-#'   \item{.pre_filtering}{ (optional) Defines what operation on `data_object` should be
+#'   \item{\code{.pre_filtering} - (optional) Defines what operation on `data_object` should be
 #'   performed before applying filtering in the step.}
-#'   \item{.post_filtering}{ (optional) Defines what operation on `data_object` should be
+#'   \item{\code{.post_filtering} - (optional) Defines what operation on `data_object` should be
 #'   performed after applying filtering in the step (before running binding).}
-#'   \item{.post_binding}{ (optional) Defines what operation on `data_object` should be
+#'   \item{\code{.post_binding} - (optional) Defines what operation on `data_object` should be
 #'   performed after applying binding in the step.}
-#'   \item{.run_binding}{ (optional) Defines how to handle post filtering data binding.
+#'   \item{\code{.run_binding} - (optional) Defines how to handle post filtering data binding.
 #'   See more about binding keys at \link{binding-keys}.}
-#'   \item{.get_attrition_count and .get_attrition_label}{ Methods defining how to
+#'   \item{\code{.get_attrition_count and .get_attrition_label} - Methods defining how to
 #'   get statistics and labels for attrition plot.}
-#'   \item{.repro_code_tweak}{ (optional) Default method passed as a `modifier`
+#'   \item{\code{.repro_code_tweak} - (optional) Default method passed as a `modifier`
 #'   argument of \link{code} function. Aims to modify reproducible code into the final format.}
 #' }
 #' Except from the above methods, you may extend the existing or new source with providing
@@ -335,11 +335,11 @@ NULL
 #' The list of methods designed for managing the Source configuration and state.
 #'
 #' \itemize{
-#'    \item{\link{add_step}}{ Add step to Source object.}
-#'    \item{\link{rm_step}}{ Remove step from Source object.}
-#'    \item{\link{add_filter}}{ Add filter to Source step.}
-#'    \item{\link{rm_filter}}{ Remove filter from Source step.}
-#'    \item{\link{update_filter}}{ Update filter configuration.}
+#'    \item{\link{add_step} - Add step to Source object.}
+#'    \item{\link{rm_step} - Remove step from Source object.}
+#'    \item{\link{add_filter} - Add filter to Source step.}
+#'    \item{\link{rm_filter} - Remove filter from Source step.}
+#'    \item{\link{update_filter} - Update filter configuration.}
 #' }
 #'
 #' @name managing-source

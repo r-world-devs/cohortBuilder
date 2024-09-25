@@ -10,11 +10,11 @@ The object of class `Source` having the modified configuration dependent on the 
 The list of methods designed for managing the Source configuration and state.
 
 \itemize{
-   \item{\link{add_step}}{ Add step to Source object.}
-   \item{\link{rm_step}}{ Remove step from Source object.}
-   \item{\link{add_filter}}{ Add filter to Source step.}
-   \item{\link{rm_filter}}{ Remove filter from Source step.}
-   \item{\link{update_filter}}{ Update filter configuration.}
+   \item{\link{add_step} - Add step to Source object.}
+   \item{\link{rm_step} - Remove step from Source object.}
+   \item{\link{add_filter} - Add filter to Source step.}
+   \item{\link{rm_filter} - Remove filter from Source step.}
+   \item{\link{update_filter} - Update filter configuration.}
 }
 }
 \seealso{

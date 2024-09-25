@@ -10,13 +10,13 @@ The object of class `Cohort` having the modified configuration dependent on the 
 The list of methods designed for managing the Cohort configuration and state.
 
 \itemize{
-   \item{\link{add_source}}{ Add source to Cohort object.}
-   \item{\link{update_source}}{ Update Cohort object source.}
-   \item{\link{add_step}}{ Add step to Cohort object.}
-   \item{\link{rm_step}}{ Remove step from Cohort object.}
-   \item{\link{add_filter}}{ Add filter to Cohort step.}
-   \item{\link{rm_filter}}{ Remove filter from Cohort step.}
-   \item{\link{update_filter}}{ Update filter configuration.}
-   \item{\link{run}}{ Run data filtering.}
+   \item{\link{add_source} - Add source to Cohort object.}
+   \item{\link{update_source} - Update Cohort object source.}
+   \item{\link{add_step} - Add step to Cohort object.}
+   \item{\link{rm_step} - Remove step from Cohort object.}
+   \item{\link{add_filter} - Add filter to Cohort step.}
+   \item{\link{rm_filter} - Remove filter from Cohort step.}
+   \item{\link{update_filter} - Update filter configuration.}
+   \item{\link{run} - Run data filtering.}
 }
 }

@@ -9,8 +9,8 @@
 #'
 #' Each `hook` is a function of two obligatory parameters:
 #' \itemize{
-#'   \item{public}{ Cohort object.}
-#'   \item{private}{ Private environment of Cohort object.}
+#'   \item{\code{public} - Cohort object.}
+#'   \item{\code{private} - Private environment of Cohort object.}
 #' }
 #'
 #' When Cohort method, for which hook is defined, allow to pass custom parameters,
@@ -18,9 +18,9 @@
 #'
 #' For example `Cohort$remove_step` has three parameters:
 #' \itemize{
-#'   \item{step_id}{}
-#'   \item{run_flow}{}
-#'   \item{hook}{}
+#'   \item{\code{step_id}}
+#'   \item{\code{run_flow}}
+#'   \item{\code{hook}}
 #' }
 #' By the implementation, the parameters that we should skip are `run_flow` and `hook`,
 #' so the hook should have three parameters `public`, `private` and `step_id`.
