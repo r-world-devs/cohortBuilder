@@ -60,7 +60,13 @@ remove_step = function(step_id, run_flow = FALSE,
 }
 
 'Pre' hooks are defined with 'pre_<method_name>_hook' and 'Post' ones as 'post_<method_name>_hook'.
-As a result calling `add_hook("pre_remove_step_hook", function(public, private, step_id) {...})`
+As a result calling:
+\preformatted{
+add_hook(
+  "pre_remove_step_hook",
+  function(public, private, step_id) {...}
+)
+}
 will result with specifying a new pre-hook for `remove_step` method.
 
 You may add as many hooks as you want.
