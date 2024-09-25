@@ -636,10 +636,93 @@ cb_filter.multi_discrete.tblist <- function(
       return(params)
     },
     get_data = function(data_object) {
-      data_object[[dataset]][[variables]]
+      data_object[[dataset]][, variables]
     },
     get_defaults = function(data_object, cache_object) {
       list(values = names(cache_object$choices))
+    }
+  )
+}
+
+#' @rdname filter-source-types
+#' @param dataset Dataset name to be used for filtering.
+#' @param variables Dataset variables used for filtering.
+#' @param value Value(s) to be used for filtering.
+#' @param description Filter description (optional).
+#' @param keep_na If `TRUE`, NA values are included.
+#' @export
+cb_filter.query.tblist <- function(
+  source, type = "query", id = .gen_id(), name = id, variables, value = NA,
+  dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
+  args <- list(...)
+
+  def_filter(
+    type = type,
+    id = id,
+    name = name,
+    input_param = "value",
+    filter_data = function(data_object) {
+      if (keep_na && !identical(value, NA)) {
+        # keep_na !value_na start
+        data_object[[dataset]] <- data_object[[dataset]] %>%
+          dplyr::filter(!!queryBuilder::queryToExpr(value, keep_na = keep_na))
+        # keep_na !value_na end
+      }
+      if (!keep_na && !identical(value, NA)) {
+        # !keep_na !value_na start
+        data_object[[dataset]] <- data_object[[dataset]] %>%
+          dplyr::filter(!!queryBuilder::queryToExpr(value))
+        # !keep_na !value_na end
+      }
+      attr(data_object[[dataset]], "filtered") <- TRUE # code include
+      data_object
+    },
+    get_stats = function(data_object, name) {
+      if (missing(name)) {
+        name <- c("n_data", "specs", "n_missing")
+      }
+      variables <- unlist(variables)
+      stat_from_column <- base::get("stat_from_column", envir = asNamespace("queryBuilder"), inherits = FALSE)
+      stats <- list(
+        specs = if ("specs" %in% name) data_object[[dataset]][variables] %>% purrr::imap(stat_from_column),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][variables] %>% nrow(),
+        n_missing = if ("n_missing" %in% name) data_object[[dataset]][variables] %>% is.na() %>% colSums() %>% as.list()
+      )
+      if (length(name) == 1) {
+        return(stats[[name]])
+      } else {
+        return(stats[name])
+      }
+    },
+    plot_data = function(data_object) {
+      if (nrow(data_object[[dataset]])) {
+        data_object[[dataset]][variables] %>%
+          purrr::map(table) %>%
+          purrr::imap_dfc(group_stats) %>%
+          as.matrix() %>%
+          graphics::barplot()
+      } else {
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
+      }
+    },
+    get_params = function(name) {
+      params <- list(
+        dataset = dataset,
+        variables = variables,
+        value = value,
+        keep_na = keep_na,
+        description = description,
+        active = active,
+        ...
+      )
+      if (!missing(name)) return(params[[name]])
+      return(params)
+    },
+    get_data = function(data_object) {
+      data_object[[dataset]][, variables, drop = FALSE]
+    },
+    get_defaults = function(data_object, cache_object) {
+      list(value = names(cache_object$choices))
     }
   )
 }

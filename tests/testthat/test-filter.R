@@ -82,3 +82,47 @@ test_that("Multi discrete filter works fine", {
   )
 
 })
+
+test_that("Query discrete filter works fine", {
+  md_data <- data.frame(col1 = c("A", "B", "A", "B", "A"), col2 = c("C", "C", "C", "D", "D"))
+  md_source <- set_source(
+    tblist(md_data = md_data)
+  )
+  md_filter <- cohortBuilder::filter(
+    type = "query", id = "qcols", name = "Query Cols", dataset = "md_data",
+    variables = c("col1", "col2"),
+    value = queryBuilder::queryGroup(
+      condition = "AND",
+      queryBuilder::queryRule("col1", "equal", "A"),
+      queryBuilder::queryRule("col2", "in", "D")
+    )
+  )
+
+  coh <- Cohort$new(
+    md_source,
+    md_filter
+  )
+  expect_equal(coh$get_data(1, state = "pre")$md_data, md_data)
+
+  coh$run_flow()
+  expect_setequal(unique(coh$get_data(1, state = "post")$md_data$col1), c("A"))
+  expect_setequal(unique(coh$get_data(1, state = "post")$md_data$col2), c("D"))
+
+  expect_equal(
+    coh$get_cache("1", "qcols", state = "pre")$specs$col1$values,
+    unique(md_data$col1)
+  )
+  expect_equal(
+    coh$get_cache("1", "qcols", state = "pre")$specs$col2$values,
+    unique(md_data$col2)
+  )
+  expect_equal(
+    coh$get_cache("1", "qcols", state = "post")$specs$col1$values,
+    unique(c("A"))
+  )
+  expect_equal(
+    coh$get_cache("1", "qcols", state = "post")$specs$col2$values,
+    unique(c("D"))
+  )
+
+})

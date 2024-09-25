@@ -1,3 +1,8 @@
+# cohortBuilder 0.3.0
+
+* Add new filter of type `"query"` that allows to configure complex filtering rules with `queryBuilder` package.
+* Add filter-focused `.print_filter` method responsible for printing filter values when calling `sum_up` on cohort.
+
 # cohortBuilder 0.2.0
 
 * Changed the way reproducible code is returned. Now more flexibility is allowed with using e.g. `.repro_code_tweak` method.
