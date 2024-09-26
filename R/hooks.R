@@ -9,8 +9,8 @@
 #'
 #' Each `hook` is a function of two obligatory parameters:
 #' \itemize{
-#'   \item{public}{ Cohort object.}
-#'   \item{private}{ Private environment of Cohort object.}
+#'   \item{\code{public} - Cohort object.}
+#'   \item{\code{private} - Private environment of Cohort object.}
 #' }
 #'
 #' When Cohort method, for which hook is defined, allow to pass custom parameters,
@@ -18,9 +18,9 @@
 #'
 #' For example `Cohort$remove_step` has three parameters:
 #' \itemize{
-#'   \item{step_id}{}
-#'   \item{run_flow}{}
-#'   \item{hook}{}
+#'   \item{\code{step_id}}
+#'   \item{\code{run_flow}}
+#'   \item{\code{hook}}
 #' }
 #' By the implementation, the parameters that we should skip are `run_flow` and `hook`,
 #' so the hook should have three parameters `public`, `private` and `step_id`.
@@ -40,7 +40,13 @@
 #' }
 #'
 #' 'Pre' hooks are defined with 'pre_<method_name>_hook' and 'Post' ones as 'post_<method_name>_hook'.
-#' As a result calling `add_hook("pre_remove_step_hook", function(public, private, step_id) {...})`
+#' As a result calling:
+#' \preformatted{
+#' add_hook(
+#'   "pre_remove_step_hook",
+#'   function(public, private, step_id) {...}
+#' )
+#' }
 #' will result with specifying a new pre-hook for `remove_step` method.
 #'
 #' You may add as many hooks as you want.

@@ -63,22 +63,22 @@ primary_keys <- function(...) {
 #'
 #' In order to understand binding keys concept we need to describe the following functions:
 #' \itemize{
-#'   \item{\link{data_key}}{ Defines which table column should be used to describe relation.}
-#'   \item{bind_key}{ Defines what relation occur between datasets.}
-#'   \item{bind_keys}{ If needed, allows to define more than one relation.}
+#'   \item{\link{data_key} - Defines which table column should be used to describe relation.}
+#'   \item{\code{bind_key} - Defines what relation occur between datasets.}
+#'   \item{\code{bind_keys} - If needed, allows to define more than one relation.}
 #' }
 #'
 #' - `data_key` - requires to provide two parameters:
 #' \itemize{
-#'   \item{dataset}{ Name of the dataset existing in Source.}
-#'   \item{key}{ Single character string or vector storing column names that are keys, which should be used to describe relation.}
+#'   \item{\code{dataset} - Name of the dataset existing in Source.}
+#'   \item{\code{key} - Single character string or vector storing column names that are keys, which should be used to describe relation.}
 #' }
 #' For example `data_key('books', 'author_id')`.
 #'
 #' - `bind_key` - requires to provide two obligatory parameters
 #' \itemize{
-#'   \item{update}{ Data key describing which table should be updated.}
-#'   \item{...}{ \strong{Triggering data keys}. One or more data keys describing on which dataset(s) the one in `update` is dependent.}
+#'   \item{\code{update} - Data key describing which table should be updated.}
+#'   \item{\code{...} - \strong{Triggering data keys}. One or more data keys describing on which dataset(s) the one in `update` is dependent.}
 #' }
 #' The output of `bind_key` function is named \strong{binding key}.
 #' `bind_key` offers two extra parameters `post` and `activate`.
@@ -97,8 +97,8 @@ primary_keys <- function(...) {
 #'
 #' You may achieve more flexibility with two parameters:
 #' \itemize{
-#'   \item{activate}{}
-#'   \item{post}{}
+#'   \item{\code{activate}}
+#'   \item{\code{post}}
 #' }
 #'
 #' \strong{Active tables and `activate` parameter}

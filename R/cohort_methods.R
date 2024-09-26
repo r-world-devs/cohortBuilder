@@ -338,6 +338,7 @@ Cohort <- R6::R6Class(
       for (step_state in state) {
         for (filter_state in step_state$filters) {
           if (filter_state$type == "date_range") {
+            filter_state$range <- na_fix(filter_state$range)
             filter_state$range <- as.Date(filter_state$range)
           }
           add_filter(
@@ -870,14 +871,14 @@ cohort <- function(source, ..., run_flow = FALSE,
 #' The list of methods designed for managing the Cohort configuration and state.
 #'
 #' \itemize{
-#'    \item{\link{add_source}}{ Add source to Cohort object.}
-#'    \item{\link{update_source}}{ Update Cohort object source.}
-#'    \item{\link{add_step}}{ Add step to Cohort object.}
-#'    \item{\link{rm_step}}{ Remove step from Cohort object.}
-#'    \item{\link{add_filter}}{ Add filter to Cohort step.}
-#'    \item{\link{rm_filter}}{ Remove filter from Cohort step.}
-#'    \item{\link{update_filter}}{ Update filter configuration.}
-#'    \item{\link{run}}{ Run data filtering.}
+#'    \item{\link{add_source} - Add source to Cohort object.}
+#'    \item{\link{update_source} - Update Cohort object source.}
+#'    \item{\link{add_step} - Add step to Cohort object.}
+#'    \item{\link{rm_step} - Remove step from Cohort object.}
+#'    \item{\link{add_filter} - Add filter to Cohort step.}
+#'    \item{\link{rm_filter} - Remove filter from Cohort step.}
+#'    \item{\link{update_filter} - Update filter configuration.}
+#'    \item{\link{run} - Run data filtering.}
 #' }
 #'
 #' @return The object of class `Cohort` having the modified configuration dependent on the used method.
@@ -1063,15 +1064,15 @@ run <- function(x, min_step_id, step_id) {
 #' The list of methods designed for getting Cohort-related details.
 #'
 #' \itemize{
-#'    \item{\link{plot_data}}{ Plot filter related Cohort data.}
-#'    \item{\link{stat}}{ Get Cohort related statistics.}
-#'    \item{\link{code}}{ Return reproducible data filtering code.}
-#'    \item{\link{get_data}}{ Get step related data.}
-#'    \item{\link{sum_up}}{ Sum up Cohort state.}
-#'    \item{\link{get_state}}{ Save Cohort state.}
-#'    \item{\link{restore}}{ Restore Cohort state.}
-#'    \item{\link{attrition}}{ Show attrition plot.}
-#'    \item{\link{description}}{ Show Source or filter related description.}
+#'    \item{\link{plot_data} - Plot filter related Cohort data.}
+#'    \item{\link{stat} - Get Cohort related statistics.}
+#'    \item{\link{code} - Return reproducible data filtering code.}
+#'    \item{\link{get_data} - Get step related data.}
+#'    \item{\link{sum_up} - Sum up Cohort state.}
+#'    \item{\link{get_state} - Save Cohort state.}
+#'    \item{\link{restore} - Restore Cohort state.}
+#'    \item{\link{attrition} - Show attrition plot.}
+#'    \item{\link{description} - Show Source or filter related description.}
 #' }
 #'
 #' @return Various type outputs dependent on the selected method.

@@ -11,4 +11,4 @@ README.Rmd
 ^pkgdown$
 cran-comments.md
 .Rprofile
-
+meta_data.yaml

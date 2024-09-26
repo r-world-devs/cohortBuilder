@@ -6,32 +6,32 @@
 #'
 #' \strong{books} - books on store
 #' \describe{
-#'   \item{isbn}{book ISBN number}
-#'   \item{title}{book title}
-#'   \item{genre}{comma separated book genre}
-#'   \item{publisher}{name of book publisher}
-#'   \item{author}{name of book author}
-#'   \item{copies}{total number of book copies on store}
+#'   \item{\code{isbn}}{book ISBN number}
+#'   \item{\code{title}}{book title}
+#'   \item{\code{genre}}{comma separated book genre}
+#'   \item{\code{publisher}}{name of book publisher}
+#'   \item{\code{author}}{name of book author}
+#'   \item{\code{copies}}{total number of book copies on store}
 #' }
 #' \strong{borrowers} - registered library members
 #' \describe{
-#'   \item{id}{member unique id}
-#'   \item{registered}{date the member joined library}
-#'   \item{address}{member address}
-#'   \item{name}{full member name}
-#'   \item{phone_number}{member phone number}
-#'   \item{program}{membership program type (standard, premium or vip)}
+#'   \item{\code{id}}{member unique id}
+#'   \item{\code{registered}}{date the member joined library}
+#'   \item{\code{address}}{member address}
+#'   \item{\code{name}}{full member name}
+#'   \item{\code{phone_number}}{member phone number}
+#'   \item{\code{program}}{membership program type (standard, premium or vip)}
 #' }
 #' \strong{issues} - borrowed books events
 #' \describe{
-#'   \item{id}{unique event id}
-#'   \item{borrower_id}{id of the member that borrowed the book}
-#'   \item{isbn}{is of the borrowed book}
-#'   \item{date}{date of borrow event}
+#'   \item{\code{id}}{unique event id}
+#'   \item{\code{borrower_id}}{id of the member that borrowed the book}
+#'   \item{\code{isbn}}{is of the borrowed book}
+#'   \item{\code{date}}{date of borrow event}
 #' }
 #' \strong{returns} - returned books events
 #' \describe{
-#'   \item{id}{event id equal to borrow issue id}
-#'   \item{date}{date of return event}
+#'   \item{\code{id}}{event id equal to borrow issue id}
+#'   \item{\code{date}}{date of return event}
 #' }
 "librarian"
