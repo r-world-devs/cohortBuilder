@@ -14,7 +14,7 @@ See 'Details' section for more information."><meta property="og:image" content="
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -205,23 +205,23 @@ See 'Details' section for more information.</p>
 Data source can be based for example on list of tables, connection to database schema
 or API service that allows to access and operate on data.
 In order to make new source type layer functioning, the following list of methods
-should be defined:</p><ul><li><p>.init_source Defines how to extract data object from source.
+should be defined:</p><ul><li><p><code>.init_source</code> - Defines how to extract data object from source.
   Each filtering step assumes to be operating on resulting data object
   (further named data_object) and returns object of the same type and structure.</p></li>
-<li><p>.collect_data Defines how to collect data (into R memory) from `data_object`.</p></li>
-<li><p>.get_stats Defines what `data_object` statistics should be
+<li><p><code>.collect_data</code> - Defines how to collect data (into R memory) from `data_object`.</p></li>
+<li><p><code>.get_stats</code> - Defines what `data_object` statistics should be
   calculated and how. When provided the stats can be extracted using <a href="stat.html">stat</a>.</p></li>
-<li><p>.pre_filtering (optional) Defines what operation on `data_object` should be
+<li><p><code>.pre_filtering</code> - (optional) Defines what operation on `data_object` should be
   performed before applying filtering in the step.</p></li>
-<li><p>.post_filtering (optional) Defines what operation on `data_object` should be
+<li><p><code>.post_filtering</code> - (optional) Defines what operation on `data_object` should be
   performed after applying filtering in the step (before running binding).</p></li>
-<li><p>.post_binding (optional) Defines what operation on `data_object` should be
+<li><p><code>.post_binding</code> - (optional) Defines what operation on `data_object` should be
   performed after applying binding in the step.</p></li>
-<li><p>.run_binding (optional) Defines how to handle post filtering data binding.
+<li><p><code>.run_binding</code> - (optional) Defines how to handle post filtering data binding.
   See more about binding keys at <a href="binding-keys.html">binding-keys</a>.</p></li>
-<li><p>.get_attrition_count and .get_attrition_label Methods defining how to
+<li><p><code>.get_attrition_count and .get_attrition_label</code> - Methods defining how to
   get statistics and labels for attrition plot.</p></li>
-<li><p>.repro_code_tweak (optional) Default method passed as a `modifier`
+<li><p><code>.repro_code_tweak</code> - (optional) Default method passed as a `modifier`
   argument of <a href="code.html">code</a> function. Aims to modify reproducible code into the final format.</p></li>
 </ul><p>Except from the above methods, you may extend the existing or new source with providing
 custom filtering methods. See <a href="creating-filters.html">creating-filters</a>.

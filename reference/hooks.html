@@ -12,7 +12,7 @@ hooks system was introduced."><meta property="og:image" content="https://r-world
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -116,13 +116,13 @@ hooks system was introduced.</p>
     <p>Many <a href="Cohort.html">Cohort</a> methods allow to define `hook` parameter.
 For such method, `hook` is a list containing two values: `pre` and `post`,
 storing functions (hooks) executed before and after the method is run respectively.</p>
-<p>Each `hook` is a function of two obligatory parameters:</p><ul><li><p>public Cohort object.</p></li>
-<li><p>private Private environment of Cohort object.</p></li>
+<p>Each `hook` is a function of two obligatory parameters:</p><ul><li><p><code>public</code> - Cohort object.</p></li>
+<li><p><code>private</code> - Private environment of Cohort object.</p></li>
 </ul><p>When Cohort method, for which hook is defined, allow to pass custom parameters,
 the ones should be also available in hook definition (with some exclusions, see below).</p>
-<p>For example `Cohort$remove_step` has three parameters:</p><ul><li><p>step_id</p></li>
-<li><p>run_flow</p></li>
-<li><p>hook</p></li>
+<p>For example `Cohort$remove_step` has three parameters:</p><ul><li><p><code>step_id</code></p></li>
+<li><p><code>run_flow</code></p></li>
+<li><p><code>hook</code></p></li>
 </ul><p>By the implementation, the parameters that we should skip are `run_flow` and `hook`,
 so the hook should have three parameters `public`, `private` and `step_id`.</p>
 <p>There are two ways of defining hooks for the specific method.
@@ -138,8 +138,11 @@ remove_step = function(step_id, run_flow = FALSE,
 </code></pre></div>
 
 <p>'Pre' hooks are defined with 'pre_&lt;method_name&gt;_hook' and 'Post' ones as 'post_&lt;method_name&gt;_hook'.
-As a result calling `add_hook("pre_remove_step_hook", function(public, private, step_id) ...)`
-will result with specifying a new pre-hook for `remove_step` method.</p>
+As a result calling:</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="fu"><a href="../reference/hooks.html">add_hook</a></span><span class="op">(</span></span>
+<span>  <span class="st">"pre_remove_step_hook"</span>,</span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">public</span>, <span class="va">private</span>, <span class="va">step_id</span><span class="op">)</span> <span class="op">{</span><span class="va">...</span><span class="op">}</span></span>
+<span><span class="op">)</span></span></code></pre></div><p>will result with specifying a new pre-hook for `remove_step` method.</p>
 <p>You may add as many hooks as you want.
 The order of hooks execution is followed by the order or registering process.
 If you want to check currently registered hooks for the specific method, just use:</p><div class="sourceCode"><pre><code><span></span>

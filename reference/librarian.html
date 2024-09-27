@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,61 +93,61 @@
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
     <p>A list of four data frames:</p>
-<p><strong>books</strong> - books on store</p><dl><dt>isbn</dt>
+<p><strong>books</strong> - books on store</p><dl><dt><code>isbn</code></dt>
 <dd><p>book ISBN number</p></dd>
 
-  <dt>title</dt>
+  <dt><code>title</code></dt>
 <dd><p>book title</p></dd>
 
-  <dt>genre</dt>
+  <dt><code>genre</code></dt>
 <dd><p>comma separated book genre</p></dd>
 
-  <dt>publisher</dt>
+  <dt><code>publisher</code></dt>
 <dd><p>name of book publisher</p></dd>
 
-  <dt>author</dt>
+  <dt><code>author</code></dt>
 <dd><p>name of book author</p></dd>
 
-  <dt>copies</dt>
+  <dt><code>copies</code></dt>
 <dd><p>total number of book copies on store</p></dd>
 
 
-</dl><p><strong>borrowers</strong> - registered library members</p><dl><dt>id</dt>
+</dl><p><strong>borrowers</strong> - registered library members</p><dl><dt><code>id</code></dt>
 <dd><p>member unique id</p></dd>
 
-  <dt>registered</dt>
+  <dt><code>registered</code></dt>
 <dd><p>date the member joined library</p></dd>
 
-  <dt>address</dt>
+  <dt><code>address</code></dt>
 <dd><p>member address</p></dd>
 
-  <dt>name</dt>
+  <dt><code>name</code></dt>
 <dd><p>full member name</p></dd>
 
-  <dt>phone_number</dt>
+  <dt><code>phone_number</code></dt>
 <dd><p>member phone number</p></dd>
 
-  <dt>program</dt>
+  <dt><code>program</code></dt>
 <dd><p>membership program type (standard, premium or vip)</p></dd>
 
 
-</dl><p><strong>issues</strong> - borrowed books events</p><dl><dt>id</dt>
+</dl><p><strong>issues</strong> - borrowed books events</p><dl><dt><code>id</code></dt>
 <dd><p>unique event id</p></dd>
 
-  <dt>borrower_id</dt>
+  <dt><code>borrower_id</code></dt>
 <dd><p>id of the member that borrowed the book</p></dd>
 
-  <dt>isbn</dt>
+  <dt><code>isbn</code></dt>
 <dd><p>is of the borrowed book</p></dd>
 
-  <dt>date</dt>
+  <dt><code>date</code></dt>
 <dd><p>date of borrow event</p></dd>
 
 
-</dl><p><strong>returns</strong> - returned books events</p><dl><dt>id</dt>
+</dl><p><strong>returns</strong> - returned books events</p><dl><dt><code>id</code></dt>
 <dd><p>event id equal to borrow issue id</p></dd>
 
-  <dt>date</dt>
+  <dt><code>date</code></dt>
 <dd><p>date of return event</p></dd>
 
 

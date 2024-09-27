@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -156,25 +156,25 @@ database.</p>
 <code class="sourceCode R"><span><span class="fu">cohortBuilder</span><span class="fu">::</span><span class="va"><a href="../reference/librarian.html">librarian</a></span></span>
 <span><span class="co">#&gt; $books</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 17 × 6</span></span></span>
-<span><span class="co">#&gt;   isbn              title                            genre publi…¹ author copies</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-385-50420-9     The Da Vinci Code                Crim… Transw… Dan B…      7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0-7679-0817-1     A Short History of Nearly Every… Popu… Transw… Bill …      4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 978-0-15-602943-8 The Time Traveler's Wife         Gene… Random… Audre…      2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 0-224-06252-2     Atonement                        Gene… Random… Ian M…      8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 0-676-97376-0     Life of Pi                       Gene… Canong… Yann …     11</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 12 more rows, and abbreviated variable name ¹​publisher</span></span></span>
+<span><span class="co">#&gt;   isbn              title                          genre publisher author copies</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-385-50420-9     The Da Vinci Code              Crim… Transwor… Dan B…      7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0-7679-0817-1     A Short History of Nearly Eve… Popu… Transwor… Bill …      4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 978-0-15-602943-8 The Time Traveler's Wife       Gene… Random H… Audre…      2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 0-224-06252-2     Atonement                      Gene… Random H… Ian M…      8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 0-676-97376-0     Life of Pi                     Gene… Canongate Yann …     11</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 12 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $borrowers</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 20 × 6</span></span></span>
-<span><span class="co">#&gt;   id     registered address                                name  phone…¹ program</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown, PA 1… Mrs.… 626-59… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000002 2002-08-10 8196 Windsor Road Muscatine, IA 52761  Ms. … 919-53… standa…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 2003-02-15 6 Wood Lane Calumet City, IL 60409     Inga… 706-66… <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 2004-06-14 18 Nut Swamp Road Merrimack, NH 03054  Keys… 746-32… standa…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL 33445  Ferd… 127-36… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 15 more rows, and abbreviated variable name ¹​phone_number</span></span></span>
+<span><span class="co">#&gt;   id     registered address                           name  phone_number program</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown,… Mrs.… 626-594-4729 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000002 2002-08-10 8196 Windsor Road Muscatine, IA … Ms. … 919-530-5272 standa…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 2003-02-15 6 Wood Lane Calumet City, IL 604… Inga… 706-669-5694 <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 2004-06-14 18 Nut Swamp Road Merrimack, NH … Keys… 746-328-6598 standa…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL … Ferd… 127-363-0738 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 15 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $issues</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 50 × 4</span></span></span>
@@ -185,7 +185,7 @@ database.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 000016      0-09-177373-3     2014-09-28</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 000005      0-224-06252-2     2005-11-14</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 000004      0-340-89696-5     2006-03-19</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 45 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 45 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $returns</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 30 × 2</span></span></span>
@@ -196,7 +196,7 @@ database.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000004 2005-12-29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000005 2006-03-26</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000006 2016-08-30</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 25 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 25 more rows</span></span></span></code></pre></div>
 <p>To learn more check <code><a href="../reference/librarian.html">?librarian</a></code>.</p>
 </div>
 <div class="section level2">
@@ -267,25 +267,25 @@ function:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $books</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 17 × 6</span></span></span>
-<span><span class="co">#&gt;   isbn              title                            genre publi…¹ author copies</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-385-50420-9     The Da Vinci Code                Crim… Transw… Dan B…      7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0-7679-0817-1     A Short History of Nearly Every… Popu… Transw… Bill …      4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 978-0-15-602943-8 The Time Traveler's Wife         Gene… Random… Audre…      2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 0-224-06252-2     Atonement                        Gene… Random… Ian M…      8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 0-676-97376-0     Life of Pi                       Gene… Canong… Yann …     11</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 12 more rows, and abbreviated variable name ¹​publisher</span></span></span>
+<span><span class="co">#&gt;   isbn              title                          genre publisher author copies</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-385-50420-9     The Da Vinci Code              Crim… Transwor… Dan B…      7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0-7679-0817-1     A Short History of Nearly Eve… Popu… Transwor… Bill …      4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 978-0-15-602943-8 The Time Traveler's Wife       Gene… Random H… Audre…      2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 0-224-06252-2     Atonement                      Gene… Random H… Ian M…      8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 0-676-97376-0     Life of Pi                     Gene… Canongate Yann …     11</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 12 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $borrowers</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 20 × 6</span></span></span>
-<span><span class="co">#&gt;   id     registered address                                name  phone…¹ program</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown, PA 1… Mrs.… 626-59… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000002 2002-08-10 8196 Windsor Road Muscatine, IA 52761  Ms. … 919-53… standa…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 2003-02-15 6 Wood Lane Calumet City, IL 60409     Inga… 706-66… <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 2004-06-14 18 Nut Swamp Road Merrimack, NH 03054  Keys… 746-32… standa…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL 33445  Ferd… 127-36… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 15 more rows, and abbreviated variable name ¹​phone_number</span></span></span>
+<span><span class="co">#&gt;   id     registered address                           name  phone_number program</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown,… Mrs.… 626-594-4729 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000002 2002-08-10 8196 Windsor Road Muscatine, IA … Ms. … 919-530-5272 standa…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 2003-02-15 6 Wood Lane Calumet City, IL 604… Inga… 706-669-5694 <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 2004-06-14 18 Nut Swamp Road Merrimack, NH … Keys… 746-328-6598 standa…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL … Ferd… 127-363-0738 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 15 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $issues</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 50 × 4</span></span></span>
@@ -296,7 +296,7 @@ function:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 000016      0-09-177373-3     2014-09-28</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 000005      0-224-06252-2     2005-11-14</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 000004      0-340-89696-5     2006-03-19</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 45 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 45 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $returns</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 30 × 2</span></span></span>
@@ -307,7 +307,7 @@ function:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000004 2005-12-29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000005 2006-03-26</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000006 2016-08-30</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 25 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 25 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "tblist"</span></span>
@@ -395,7 +395,7 @@ properly just run:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sum_up.html">sum_up</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &gt;&gt; Step ID: 1</span></span>
-<span><span class="co">#&gt; -&gt; Filter ID: XPELO1678911806733</span></span>
+<span><span class="co">#&gt; -&gt; Filter ID: CZNWQ1727428005407</span></span>
 <span><span class="co">#&gt;    Filter Type: discrete</span></span>
 <span><span class="co">#&gt;    Filter Parameters:</span></span>
 <span><span class="co">#&gt;      dataset: books</span></span>
@@ -424,22 +424,21 @@ data:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $books</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
-<span><span class="co">#&gt;   isbn          title             genre                    publi…¹ author copies</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-385-50420-9 The Da Vinci Code Crime, Thriller &amp; Adven… Transw… Dan B…      7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0-671-02735-2 Angels and Demons Crime, Thriller &amp; Adven… Transw… Dan B…      4</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable name ¹​publisher</span></span></span>
+<span><span class="co">#&gt;   isbn          title             genre                  publisher author copies</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-385-50420-9 The Da Vinci Code Crime, Thriller &amp; Adv… Transwor… Dan B…      7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0-671-02735-2 Angels and Demons Crime, Thriller &amp; Adv… Transwor… Dan B…      4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $borrowers</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 20 × 6</span></span></span>
-<span><span class="co">#&gt;   id     registered address                                name  phone…¹ program</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown, PA 1… Mrs.… 626-59… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000002 2002-08-10 8196 Windsor Road Muscatine, IA 52761  Ms. … 919-53… standa…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 2003-02-15 6 Wood Lane Calumet City, IL 60409     Inga… 706-66… <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 2004-06-14 18 Nut Swamp Road Merrimack, NH 03054  Keys… 746-32… standa…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL 33445  Ferd… 127-36… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 15 more rows, and abbreviated variable name ¹​phone_number</span></span></span>
+<span><span class="co">#&gt;   id     registered address                           name  phone_number program</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown,… Mrs.… 626-594-4729 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000002 2002-08-10 8196 Windsor Road Muscatine, IA … Ms. … 919-530-5272 standa…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 2003-02-15 6 Wood Lane Calumet City, IL 604… Inga… 706-669-5694 <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 2004-06-14 18 Nut Swamp Road Merrimack, NH … Keys… 746-328-6598 standa…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL … Ferd… 127-363-0738 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 15 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $issues</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 50 × 4</span></span></span>
@@ -450,7 +449,7 @@ data:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 000016      0-09-177373-3     2014-09-28</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 000005      0-224-06252-2     2005-11-14</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 000004      0-340-89696-5     2006-03-19</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 45 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 45 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $returns</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 30 × 2</span></span></span>
@@ -461,7 +460,7 @@ data:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000004 2005-12-29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000005 2006-03-26</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000006 2016-08-30</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 25 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 25 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "tblist"</span></span>
@@ -488,25 +487,25 @@ filtering? With <code>get_data</code> it’s easy, just set
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, state <span class="op">=</span> <span class="st">"pre"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $books</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 17 × 6</span></span></span>
-<span><span class="co">#&gt;   isbn              title                            genre publi…¹ author copies</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-385-50420-9     The Da Vinci Code                Crim… Transw… Dan B…      7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0-7679-0817-1     A Short History of Nearly Every… Popu… Transw… Bill …      4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 978-0-15-602943-8 The Time Traveler's Wife         Gene… Random… Audre…      2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 0-224-06252-2     Atonement                        Gene… Random… Ian M…      8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 0-676-97376-0     Life of Pi                       Gene… Canong… Yann …     11</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 12 more rows, and abbreviated variable name ¹​publisher</span></span></span>
+<span><span class="co">#&gt;   isbn              title                          genre publisher author copies</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-385-50420-9     The Da Vinci Code              Crim… Transwor… Dan B…      7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0-7679-0817-1     A Short History of Nearly Eve… Popu… Transwor… Bill …      4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 978-0-15-602943-8 The Time Traveler's Wife       Gene… Random H… Audre…      2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 0-224-06252-2     Atonement                      Gene… Random H… Ian M…      8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 0-676-97376-0     Life of Pi                     Gene… Canongate Yann …     11</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 12 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $borrowers</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 20 × 6</span></span></span>
-<span><span class="co">#&gt;   id     registered address                                name  phone…¹ program</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown, PA 1… Mrs.… 626-59… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000002 2002-08-10 8196 Windsor Road Muscatine, IA 52761  Ms. … 919-53… standa…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 2003-02-15 6 Wood Lane Calumet City, IL 60409     Inga… 706-66… <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 2004-06-14 18 Nut Swamp Road Merrimack, NH 03054  Keys… 746-32… standa…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL 33445  Ferd… 127-36… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 15 more rows, and abbreviated variable name ¹​phone_number</span></span></span>
+<span><span class="co">#&gt;   id     registered address                           name  phone_number program</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown,… Mrs.… 626-594-4729 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000002 2002-08-10 8196 Windsor Road Muscatine, IA … Ms. … 919-530-5272 standa…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 2003-02-15 6 Wood Lane Calumet City, IL 604… Inga… 706-669-5694 <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 2004-06-14 18 Nut Swamp Road Merrimack, NH … Keys… 746-328-6598 standa…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL … Ferd… 127-363-0738 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 15 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $issues</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 50 × 4</span></span></span>
@@ -517,7 +516,7 @@ filtering? With <code>get_data</code> it’s easy, just set
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 000016      0-09-177373-3     2014-09-28</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 000005      0-224-06252-2     2005-11-14</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 000004      0-340-89696-5     2006-03-19</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 45 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 45 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $returns</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 30 × 2</span></span></span>
@@ -528,7 +527,7 @@ filtering? With <code>get_data</code> it’s easy, just set
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000004 2005-12-29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000005 2006-03-26</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000006 2016-08-30</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 25 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 25 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "tblist"</span></span>
@@ -626,22 +625,21 @@ parameter:</p>
 <span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $books</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
-<span><span class="co">#&gt;   isbn          title             genre                    publi…¹ author copies</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-385-50420-9 The Da Vinci Code Crime, Thriller &amp; Adven… Transw… Dan B…      7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0-671-02735-2 Angels and Demons Crime, Thriller &amp; Adven… Transw… Dan B…      4</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable name ¹​publisher</span></span></span>
+<span><span class="co">#&gt;   isbn          title             genre                  publisher author copies</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-385-50420-9 The Da Vinci Code Crime, Thriller &amp; Adv… Transwor… Dan B…      7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0-671-02735-2 Angels and Demons Crime, Thriller &amp; Adv… Transwor… Dan B…      4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $borrowers</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
-<span><span class="co">#&gt;   id     registered address                                name  phone…¹ program</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown, PA 1… Mrs.… 626-59… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL 33445  Ferd… 127-36… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000008 2006-11-15 9533 Delaware Dr. Peabody, MA 01960    Mrs.… 460-77… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000011 2009-03-24 745 E. Sussex Drive Mahwah, NJ 07430   Mr. … 378-88… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000013 2011-09-30 534 Iroquois Ave. Watertown, MA 02472  Dr. … 104-83… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 1 more row, and abbreviated variable name ¹​phone_number</span></span></span>
+<span><span class="co">#&gt;   id     registered address                           name  phone_number program</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown,… Mrs.… 626-594-4729 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL … Ferd… 127-363-0738 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000008 2006-11-15 9533 Delaware Dr. Peabody, MA 01… Mrs.… 460-779-8714 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000011 2009-03-24 745 E. Sussex Drive Mahwah, NJ 0… Mr. … 378-884-6509 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000013 2011-09-30 534 Iroquois Ave. Watertown, MA … Dr. … 104-832-8013 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more row</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $issues</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 50 × 4</span></span></span>
@@ -652,7 +650,7 @@ parameter:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 000016      0-09-177373-3     2014-09-28</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 000005      0-224-06252-2     2005-11-14</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 000004      0-340-89696-5     2006-03-19</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 45 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 45 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $returns</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 30 × 2</span></span></span>
@@ -663,7 +661,7 @@ parameter:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000004 2005-12-29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000005 2006-03-26</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000006 2016-08-30</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 25 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 25 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "tblist"</span></span>
@@ -672,21 +670,20 @@ parameter:</p>
 <span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $books</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
-<span><span class="co">#&gt;   isbn          title             genre                    publi…¹ author copies</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-671-02735-2 Angels and Demons Crime, Thriller &amp; Adven… Transw… Dan B…      4</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable name ¹​publisher</span></span></span>
+<span><span class="co">#&gt;   isbn          title             genre                  publisher author copies</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0-671-02735-2 Angels and Demons Crime, Thriller &amp; Adv… Transwor… Dan B…      4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $borrowers</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
-<span><span class="co">#&gt;   id     registered address                                name  phone…¹ program</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown, PA 1… Mrs.… 626-59… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL 33445  Ferd… 127-36… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000008 2006-11-15 9533 Delaware Dr. Peabody, MA 01960    Mrs.… 460-77… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000011 2009-03-24 745 E. Sussex Drive Mahwah, NJ 07430   Mr. … 378-88… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000013 2011-09-30 534 Iroquois Ave. Watertown, MA 02472  Dr. … 104-83… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 1 more row, and abbreviated variable name ¹​phone_number</span></span></span>
+<span><span class="co">#&gt;   id     registered address                           name  phone_number program</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000001 2001-06-09 66 N. Evergreen Ave. Norristown,… Mrs.… 626-594-4729 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000005 2005-01-15 580 Chapel Rd. Delray Beach, FL … Ferd… 127-363-0738 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000008 2006-11-15 9533 Delaware Dr. Peabody, MA 01… Mrs.… 460-779-8714 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000011 2009-03-24 745 E. Sussex Drive Mahwah, NJ 0… Mr. … 378-884-6509 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000013 2011-09-30 534 Iroquois Ave. Watertown, MA … Dr. … 104-832-8013 premium</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more row</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $issues</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 50 × 4</span></span></span>
@@ -697,7 +694,7 @@ parameter:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000003 000016      0-09-177373-3     2014-09-28</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000004 000005      0-224-06252-2     2005-11-14</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000005 000004      0-340-89696-5     2006-03-19</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 45 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 45 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $returns</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 30 × 2</span></span></span>
@@ -708,7 +705,7 @@ parameter:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000004 2005-12-29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000005 2006-03-26</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000006 2016-08-30</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 25 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 25 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "tblist"</span></span>

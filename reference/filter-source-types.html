@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,6 +97,8 @@
 <span></span>
 <span><span class="fu">cb_filter.multi_discrete</span><span class="op">(</span><span class="va">source</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">cb_filter.query</span><span class="op">(</span><span class="va">source</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for tblist</span></span>
 <span><span class="fu">cb_filter.discrete</span><span class="op">(</span></span>
 <span>  <span class="va">source</span>,</span>
@@ -169,6 +171,21 @@
 <span>  <span class="va">...</span>,</span>
 <span>  description <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  active <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for tblist</span></span>
+<span><span class="fu">cb_filter.query</span><span class="op">(</span></span>
+<span>  <span class="va">source</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"query"</span>,</span>
+<span>  id <span class="op">=</span> <span class="fu"><a href="dot-gen_id.html">.gen_id</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  name <span class="op">=</span> <span class="va">id</span>,</span>
+<span>  <span class="va">variables</span>,</span>
+<span>  value <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  <span class="va">dataset</span>,</span>
+<span>  keep_na <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  description <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  active <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -228,7 +245,7 @@ The names should relate to the ones included in `variables` parameter.</p></dd>
 
 
 <dt>variables</dt>
-<dd><p>Vector of variable names to be used in filtering.</p></dd>
+<dd><p>Dataset variables used for filtering.</p></dd>
 
 </dl></div>
     <div class="section level2">

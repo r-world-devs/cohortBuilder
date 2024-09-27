@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -207,11 +207,10 @@ on those issues. We’ll do this filtering in the third step:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span><span class="op">$</span><span class="va">borrowers</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
-<span><span class="co">#&gt;   id     registered address                                name  phone…¹ program</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000009 2007-07-19 9692 E. Fifth Dr. Waterbury, CT 06705  Mari… 669-97… standa…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000017 2014-04-07 8501 Lawrence Rd. Terre Haute, IN 478… Rand… 895-99… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable name ¹​phone_number</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   id     registered address                           name  phone_number program</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000009 2007-07-19 9692 E. Fifth Dr. Waterbury, CT … Mari… 669-975-6908 standa…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000017 2014-04-07 8501 Lawrence Rd. Terre Haute, I… Rand… 895-995-2326 premium</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="binding-keys">Binding Keys<a class="anchor" aria-label="anchor" href="#binding-keys"></a>
@@ -300,11 +299,10 @@ multiple keys together using <code>bind_keys</code>:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $borrowers</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
-<span><span class="co">#&gt;   id     registered address                                name  phone…¹ program</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000009 2007-07-19 9692 E. Fifth Dr. Waterbury, CT 06705  Mari… 669-97… standa…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000017 2014-04-07 8501 Lawrence Rd. Terre Haute, IN 478… Rand… 895-99… premium</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable name ¹​phone_number</span></span></span>
+<span><span class="co">#&gt;   id     registered address                           name  phone_number program</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 000009 2007-07-19 9692 E. Fifth Dr. Waterbury, CT … Mari… 669-975-6908 standa…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 000017 2014-04-07 8501 Lawrence Rd. Terre Haute, I… Rand… 895-995-2326 premium</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $issues</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
@@ -322,7 +320,7 @@ multiple keys together using <code>bind_keys</code>:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 000004 2005-12-29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 000005 2006-03-26</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 000006 2016-08-30</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 25 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 25 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "tblist"</span></span>
