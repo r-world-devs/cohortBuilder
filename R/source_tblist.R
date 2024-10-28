@@ -427,6 +427,8 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
   if (!is.null(extra_params$step)) {
     step <- extra_params$step
   }
+  min_val <- as.Date(min_val)
+  max_val <- as.Date(max_val)
   breaks <- seq.Date(min_val, max_val, by = step)
   if (rev(breaks)[1] != max_val) {
     breaks[length(breaks) + 1]  <- max_val
@@ -549,6 +551,121 @@ col_choices <- function(vec) {
 group_stats <- function(vec_stats, name) {
   data.frame(val = as.vector(vec_stats), row.names = names(vec_stats)) %>%
     stats::setNames(name)
+}
+
+#' @rdname filter-source-types
+#' @export
+cb_filter.date_time_range.tblist <- function(
+    source, type = "date_time_range", id = .gen_id(), name = id, variable, range = NA,
+    dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
+  
+  args <- list(...)
+  
+  def_filter(
+    type = type,
+    id = id,
+    name = name,
+    input_param = "range",
+    filter_data = function(data_object) {
+      
+      # Convert the variable to POSIXct if it's not already
+      if (!inherits(data_object[[dataset]][[variable]], "POSIXct")) {
+        data_object[[dataset]][[variable]] <- as.POSIXct(data_object[[dataset]][[variable]], tz = "UTC")
+      }
+
+      if (keep_na && !identical(range, NA)) {
+        # Keep NAs and apply the range filter
+        data_object[[dataset]] <- data_object[[dataset]] %>%
+          dplyr::filter(
+            (!!sym(variable) >= !!range[1] & !!sym(variable) <= !!range[2]) |
+              is.na(!!sym(variable))
+          )
+      }
+      if (!keep_na && identical(range, NA)) {
+        # Exclude NAs without applying a range filter
+        data_object[[dataset]] <- data_object[[dataset]] %>%
+          dplyr::filter(!is.na(!!sym(variable)))
+      }
+      if (!keep_na && !identical(range, NA)) {
+        # Exclude NAs and apply the range filter
+        data_object[[dataset]] <- data_object[[dataset]] %>%
+          dplyr::filter(
+            !!sym(variable) >= !!range[1] & !!sym(variable) <= !!range[2]
+          )
+      }
+      
+      # Indicate that the data has been filtered
+      attr(data_object[[dataset]], "filtered") <- TRUE
+      return(data_object)
+    },
+    get_stats = function(data_object, name) {
+      if (missing(name)) {
+        name <- c("n_data", "frequencies", "n_missing")
+      }
+      extra_params <- list(...)
+      
+      # Ensure the variable is in POSIXct format for statistics
+      if (!inherits(data_object[[dataset]][[variable]], "POSIXct")) {
+        data_object[[dataset]][[variable]] <- as.POSIXct(data_object[[dataset]][[variable]], tz = "UTC")
+      }
+      
+      stats <- list(
+        frequencies = if ("frequencies" %in% name) {
+          get_date_range_frequencies(data_object, dataset, variable, extra_params)
+        },
+        n_data = if ("n_data" %in% name) {
+          data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length()
+        },
+        n_missing = if ("n_missing" %in% name) {
+          data_object[[dataset]][[variable]] %>% is.na() %>% sum()
+        }
+      )
+      
+      if (length(name) == 1) {
+        return(stats[[name]])
+      } else {
+        return(stats[name])
+      }
+    },
+    plot_data = function(data_object) {
+      if (nrow(data_object[[dataset]])) {
+        hist(
+          data_object[[dataset]][[variable]],
+          main = paste("Histogram of", variable),
+          xlab = variable,
+          breaks = 30,
+          col = "skyblue",
+          border = "white"
+        )
+      } else {
+        barplot(0, ylim = c(0, 1), main = "No data")
+      }
+    },
+    get_params = function(name) {
+      params <- list(
+        dataset = dataset,
+        variable = variable,
+        range = range,
+        keep_na = keep_na,
+        description = description,
+        active = active,
+        ...
+      )
+      if (!missing(name)) return(params[[name]])
+      return(params)
+    },
+    get_data = function(data_object) {
+      data_object[[dataset]][[variable]]
+    },
+    get_defaults = function(data_object, cache_object) {
+      list(
+        range = c(
+          cache_object$frequencies$l_bound[1],
+          rev(cache_object$frequencies$u_bound)[1]
+        )
+      )
+    }
+  )
 }
 
 #' @rdname filter-source-types
