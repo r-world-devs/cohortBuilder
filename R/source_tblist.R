@@ -595,12 +595,22 @@ cb_filter.date_time_range.tblist <- function(
       if (!inherits(data_object[[dataset]][[variable]], "POSIXct")) {
         data_object[[dataset]][[variable]] <- as.POSIXct(data_object[[dataset]][[variable]], tz = "UTC")
       }
+      
+      if (identical(range, NULL)) {
+        range <- c(Inf, -Inf) %>% as.POSIXct()
+      }
 
       if (keep_na && !identical(range, NA)) {
+        # Handle end range for single range value, NULL, NA or Inf(as character)
+        end_range <- range[2]
+        if (identical(end_range, NULL) || anyNA(end_range, NA) || identical(end_range, "Inf")) {
+          end_range <- Inf
+        }
+        
         # Keep NAs and apply the range filter
         data_object[[dataset]] <- data_object[[dataset]] %>%
           dplyr::filter(
-            (!!sym(variable) >= !!range[1] & !!sym(variable) <= !!range[2]) |
+            (!!sym(variable) >= !!range[1] & !!sym(variable) <= !!end_range) |
               is.na(!!sym(variable))
           )
       }
