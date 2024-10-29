@@ -571,7 +571,7 @@ calculate_date_time_step <- function(min_date, max_date) {
     }
   }
   
-  # If no step fits within 500 elements, return the largest step (yearly step)
+  # If no step fits within 200 elements, return the largest step (yearly step)
   return(steps[length(steps)])
 }
 
