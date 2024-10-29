@@ -427,8 +427,6 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
   if (!is.null(extra_params$step)) {
     step <- extra_params$step
   }
-  min_val <- as.Date(min_val)
-  max_val <- as.Date(max_val)
   breaks <- seq.Date(min_val, max_val, by = step)
   if (rev(breaks)[1] != max_val) {
     breaks[length(breaks) + 1]  <- max_val
@@ -553,6 +551,31 @@ group_stats <- function(vec_stats, name) {
     stats::setNames(name)
 }
 
+calculate_date_time_step <- function(min_date, max_date) {
+  # Define possible steps
+  steps <- c(60,            # 1 minute
+             60 * 60,       # 1 hour
+             60 * 60 * 24,  # 1 day
+             60 * 60 * 24 * 30,     # 1 month (approx.)
+             60 * 60 * 24 * 30 * 12 # 1 year (approx.)
+  )
+  
+  # Calculate total time span
+  time_span <- as.numeric(max_date) - as.numeric(min_date)
+  
+  # Iterate through the steps to find the appropriate one
+  for (step in steps) {
+    num_elements <- time_span / step
+    if (num_elements <= 200) {
+      return(step)
+    }
+  }
+  
+  # If no step fits within 500 elements, return the largest step (yearly step)
+  return(steps[length(steps)])
+}
+
+
 #' @rdname filter-source-types
 #' @export
 cb_filter.date_time_range.tblist <- function(
@@ -604,14 +627,18 @@ cb_filter.date_time_range.tblist <- function(
       }
       extra_params <- list(...)
       
-      # Ensure the variable is in POSIXct format for statistics
-      if (!inherits(data_object[[dataset]][[variable]], "POSIXct")) {
-        data_object[[dataset]][[variable]] <- as.POSIXct(data_object[[dataset]][[variable]], tz = "UTC")
+      data_object[[dataset]][[variable]] <- as.numeric(data_object[[dataset]][[variable]])
+
+      if (is.null(extra_params$step) && !identical(length(data_object[[dataset]][[variable]]), 0L)) {
+        min <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
+        max <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
+        
+        extra_params$step <- calculate_date_time_step(min, max)
       }
       
       stats <- list(
         frequencies = if ("frequencies" %in% name) {
-          get_date_range_frequencies(data_object, dataset, variable, extra_params)
+          get_range_frequencies(data_object, dataset, variable, extra_params)
         },
         n_data = if ("n_data" %in% name) {
           data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length()
@@ -629,16 +656,10 @@ cb_filter.date_time_range.tblist <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        hist(
-          data_object[[dataset]][[variable]],
-          main = paste("Histogram of", variable),
-          xlab = variable,
-          breaks = 30,
-          col = "skyblue",
-          border = "white"
-        )
+        data_object[[dataset]][[variable]] %>% 
+          graphics::hist(breaks = "days")
       } else {
-        barplot(0, ylim = c(0, 1), main = "No data")
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
