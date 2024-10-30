@@ -553,21 +553,22 @@ group_stats <- function(vec_stats, name) {
 
 calculate_date_time_step <- function(min_date, max_date) {
   # Define possible steps
-  steps <- c(60,            # 1 minute
-             60 * 60,       # 1 hour
-             60 * 60 * 24,  # 1 day
-             60 * 60 * 24 * 30,     # 1 month (approx.)
-             60 * 60 * 24 * 30 * 12 # 1 year (approx.)
+  steps <- c("mins" = 60,
+             "hours" = 60 * 60,
+             "days" = 60 * 60 * 24,
+             "weeks" = 60 * 60 * 24 * 7,
+             "months" = 60 * 60 * 24 * 30,
+             "years" = 60 * 60 * 24 * 30 * 12
   )
   
   # Calculate total time span
   time_span <- as.numeric(max_date) - as.numeric(min_date)
   
   # Iterate through the steps to find the appropriate one
-  for (step in steps) {
-    num_elements <- time_span / step
+  for (step_i in seq_len(length(steps))) {
+    num_elements <- time_span / steps[step_i]
     if (num_elements <= 200) {
-      return(step)
+      return(steps[step_i])
     }
   }
   
@@ -643,7 +644,7 @@ cb_filter.date_time_range.tblist <- function(
         min <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
         max <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
         
-        extra_params$step <- calculate_date_time_step(min, max)
+        extra_params$step <- calculate_date_time_step(min, max) |> unname()
       }
       
       stats <- list(
@@ -666,8 +667,13 @@ cb_filter.date_time_range.tblist <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
+        breaks <- calculate_date_time_step(
+          min(data_object[[dataset]][[variable]], na.rm = TRUE),
+          max(data_object[[dataset]][[variable]], na.rm = TRUE)
+        ) |> names()
+        
         data_object[[dataset]][[variable]] %>% 
-          graphics::hist(breaks = "days")
+          graphics::hist(breaks = breaks)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
