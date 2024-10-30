@@ -553,29 +553,22 @@ group_stats <- function(vec_stats, name) {
 
 calculate_date_time_step <- function(min_date, max_date) {
   # Define possible steps
-  steps <- c("mins" = 60,
-             "hours" = 60 * 60,
-             "days" = 60 * 60 * 24,
-             "weeks" = 60 * 60 * 24 * 7,
-             "months" = 60 * 60 * 24 * 30,
-             "years" = 60 * 60 * 24 * 30 * 12
+  steps <- c(
+    "mins" = 60,
+    "hours" = 3600,
+    "days" = 86400,
+    "weeks" = 604800,
+    "months" = 2592000,
+    "years" = 31104000
   )
-  
-  # Calculate total time span
   time_span <- as.numeric(max_date) - as.numeric(min_date)
-  
-  # Iterate through the steps to find the appropriate one
-  for (step_i in seq_len(length(steps))) {
-    num_elements <- time_span / steps[step_i]
-    if (num_elements <= 200) {
-      return(steps[step_i])
-    }
-  }
-  
-  # If no step fits within 200 elements, return the largest step (yearly step)
-  return(steps[length(steps)])
+  num_elements <- time_span / steps
+  idx <- which(num_elements <= 200)[1]
+  if (!is.na(idx))
+    return(steps[idx])
+  else
+    return(steps[length(steps)])
 }
-
 
 #' @rdname filter-source-types
 #' @export
@@ -597,7 +590,7 @@ cb_filter.date_time_range.tblist <- function(
         data_object[[dataset]][[variable]] <- as.POSIXct(data_object[[dataset]][[variable]], tz = "UTC")
       }
       
-      if (identical(range, NULL)) {
+      if (identical(range, NULL) || length(range) == 0) {
         range <- c(Inf, -Inf) %>% as.POSIXct()
       }
 
