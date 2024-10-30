@@ -344,6 +344,7 @@ Cohort <- R6::R6Class(
           
           if (filter_state$type == "date_time_range") {
             filter_state$range <- na_fix(filter_state$range)
+            if (length(filter_state$range) == 0) filter_state$range <- NULL
             filter_state$range <- as.POSIXct(filter_state$range)
           }
           add_filter(
