@@ -562,7 +562,7 @@ calculate_date_time_step <- function(min_date, max_date) {
     "years" = 31104000
   )
   time_span <- as.numeric(max_date) - as.numeric(min_date)
-  num_elements <- time_span / steps
+  num_elements <- as.integer(time_span / steps)
   idx <- which(num_elements <= 200)[1]
   if (!is.na(idx))
     return(steps[idx])
