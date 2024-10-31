@@ -309,7 +309,7 @@ cb_filter.date_range <- function(source, ...) {
 
 #' @rdname filter-types
 #' @export
-filter.date_time_range <- function(type, id, name, ..., description = NULL,
+filter.datetime_range <- function(type, id, name, ..., description = NULL,
                                    active = getOption("cb_active_filter", default = TRUE)) {
   args <- append(
     environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
@@ -319,7 +319,7 @@ filter.date_time_range <- function(type, id, name, ..., description = NULL,
   .as_constructor(
     function(source) {
       do.call(
-        cb_filter.date_time_range,
+        cb_filter.datetime_range,
         append(list(source = source), args)
       )
     }
@@ -328,8 +328,8 @@ filter.date_time_range <- function(type, id, name, ..., description = NULL,
 
 #' @rdname filter-source-types
 #' @export
-cb_filter.date_time_range <- function(source, ...) {
-  UseMethod("cb_filter.date_time_range", source)
+cb_filter.datetime_range <- function(source, ...) {
+  UseMethod("cb_filter.datetime_range", source)
 }
 
 #' @rdname filter-types

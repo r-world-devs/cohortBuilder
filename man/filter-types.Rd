@@ -6,7 +6,7 @@
 \alias{filter.discrete_text}
 \alias{filter.range}
 \alias{filter.date_range}
-\alias{filter.date_time_range}
+\alias{filter.datetime_range}
 \alias{filter.multi_discrete}
 \alias{filter.query}
 \title{Filter types}
@@ -46,7 +46,7 @@
   active = getOption("cb_active_filter", default = TRUE)
 )
 
-\method{filter}{date_time_range}(
+\method{filter}{datetime_range}(
   type,
   id,
   name,

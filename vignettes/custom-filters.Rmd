@@ -24,7 +24,7 @@ most common filtering tasks:
 - discrete,
 - range,
 - date_range,
-- date_time_range,
+- datetime_range,
 - discrete_text,
 - multi_discrete.
 

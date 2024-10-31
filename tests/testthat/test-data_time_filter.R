@@ -1,38 +1,38 @@
-test_that("calculate_date_time_step selects appropriate step", {
+test_that("calculate_datetime_step selects appropriate step", {
   # Define min and max dates for different ranges
   
   # 1. Test for a small range in minutes (expecting "mins" step)
   min_date <- as.POSIXct("2023-01-01 12:00:00")
   max_date <- as.POSIXct("2023-01-01 15:00:00")  # 3 hours later
-  expect_equal(calculate_date_time_step(min_date, max_date) |> unname(), 60)
+  expect_equal(calculate_datetime_step(min_date, max_date) |> unname(), 60)
   
   # 2. Test for a range in hours (expecting "hours" step)
   min_date <- as.POSIXct("2023-01-01 12:00:00")
   max_date <- as.POSIXct("2023-01-02 12:00:00")  # 1 day later
-  expect_equal(calculate_date_time_step(min_date, max_date) |> unname(), 3600)
+  expect_equal(calculate_datetime_step(min_date, max_date) |> unname(), 3600)
   
   # 3. Test for a range in days (expecting "days" step)
   min_date <- as.POSIXct("2023-01-01 12:00:00")
   max_date <- as.POSIXct("2023-03-01 12:00:00")  # 7 month later
-  expect_equal(calculate_date_time_step(min_date, max_date) |> unname(), 86400)
+  expect_equal(calculate_datetime_step(min_date, max_date) |> unname(), 86400)
   
   # 4. Test for a range in weeks (expecting "weeks" step)
   min_date <- as.POSIXct("2023-01-01 12:00:00")
   max_date <- as.POSIXct("2023-08-01 12:00:00")  # 10 months later
-  expect_equal(calculate_date_time_step(min_date, max_date) |> unname(), 604800)
+  expect_equal(calculate_datetime_step(min_date, max_date) |> unname(), 604800)
   
   # 5. Test for a range in months (expecting "months" step)
   min_date <- as.POSIXct("2023-01-01 12:00:00")
   max_date <- as.POSIXct("2033-01-01 12:00:00")  # 10 year later
-  expect_equal(calculate_date_time_step(min_date, max_date) |> unname(), 2592000)
+  expect_equal(calculate_datetime_step(min_date, max_date) |> unname(), 2592000)
   
   # 6. Test for a range in years (expecting "years" step)
   min_date <- as.POSIXct("1900-01-01 12:00:00")
   max_date <- as.POSIXct("2000-01-01 12:00:00")  # 100 years later
-  expect_equal(calculate_date_time_step(min_date, max_date) |> unname(), 31104000)
+  expect_equal(calculate_datetime_step(min_date, max_date) |> unname(), 31104000)
 })
 
-test_that("cb_filter.date_time_range.tblist applies date time range filter correctly", {
+test_that("cb_filter.datetime_range.tblist applies date time range filter correctly", {
   # Test data
   data <- data.frame(
     date_var = as.POSIXct(c("2023-01-01 12:00:00", "2023-01-02 12:00:00", "2023-01-03 00:00:00", NA)),
@@ -42,7 +42,7 @@ test_that("cb_filter.date_time_range.tblist applies date time range filter corre
   
   # Helper function to create a filter and apply it to data
   apply_filter <- function(range, keep_na = TRUE) {
-    filter <- cb_filter.date_time_range.tblist(
+    filter <- cb_filter.datetime_range.tblist(
       source = data_object, variable = "date_var", range = range,
       dataset = "dataset_name", keep_na = keep_na
     )
@@ -74,7 +74,7 @@ test_that("cb_filter.date_time_range.tblist applies date time range filter corre
   expect_equal(nrow(result$dataset_name), 4)  # All data should remain
   
   # 7. Test `get_stats` function for data counts and missing values
-  stats <- cb_filter.date_time_range.tblist(
+  stats <- cb_filter.datetime_range.tblist(
     source = data_object, variable = "date_var", range = c(as.POSIXct("2023-01-01"), Inf),
     dataset = "dataset_name"
   )$get_stats(data_object)
@@ -82,7 +82,7 @@ test_that("cb_filter.date_time_range.tblist applies date time range filter corre
   expect_equal(stats$n_missing, 1)    # Count of NA entries
   
   # 8. Test `get_defaults` function for range limits
-  filter <- cb_filter.date_time_range.tblist(
+  filter <- cb_filter.datetime_range.tblist(
     source = data_object, variable = "date_var",
     dataset = "dataset_name"
   )
@@ -97,32 +97,36 @@ test_that("cb_filter.date_time_range.tblist applies date time range filter corre
   
 })
 
-test_that("date_time_range high level test", {
+test_that("datetime_range high level test", {
+  # Create test data with date and value columns
   data <- data.frame(
     date_var = as.POSIXct(c("2023-01-01 12:00:00", "2023-01-02 12:00:00", "2023-01-03 00:00:00", NA)),
     value = 1:4
   )
   
+  # Set up source and apply a datetime_range filter from 2023-01-01 12:00:00 to 2023-01-02 12:00:00
   source <- set_source(
     tblist(data = data)
   ) |>
     add_step(
       filter(
-        "date_time_range", id = "date_var", dataset = "data", 
+        "datetime_range", id = "date_var", dataset = "data", 
         variable = "date_var", range = c("2023-01-01 12:00:00", "2023-01-02 12:00:00"),
         active = TRUE
       )
     )
   
-  
+  # Initialize cohort and apply filter steps
   coh <- cohortBuilder::cohort(source)
-  
   coh$run_flow()
   
+  # Get filtered data
   filtered_data <- coh$get_data("1")$data
   
+  # Define expected data (rows in range or NA)
   expected_data <- data %>%
     dplyr::filter(date_var >= "2023-01-01 12:00:00" & date_var <= "2023-01-02 12:00:00" | is.na(date_var))
   
+  # Check if filtered data matches expected data, ignoring attributes
   expect_equal(filtered_data, expected_data, ignore_attr = TRUE)
 })

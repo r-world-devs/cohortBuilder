@@ -551,7 +551,7 @@ group_stats <- function(vec_stats, name) {
     stats::setNames(name)
 }
 
-calculate_date_time_step <- function(min_date, max_date) {
+calculate_datetime_step <- function(min_date, max_date) {
   # Define possible steps
   steps <- c(
     "mins" = 60,
@@ -572,8 +572,8 @@ calculate_date_time_step <- function(min_date, max_date) {
 
 #' @rdname filter-source-types
 #' @export
-cb_filter.date_time_range.tblist <- function(
-    source, type = "date_time_range", id = .gen_id(), name = id, variable, range = NA,
+cb_filter.datetime_range.tblist <- function(
+    source, type = "datetime_range", id = .gen_id(), name = id, variable, range = NA,
     dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
   
   args <- list(...)
@@ -637,7 +637,7 @@ cb_filter.date_time_range.tblist <- function(
         min <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
         max <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
         
-        extra_params$step <- calculate_date_time_step(min, max) |> unname()
+        extra_params$step <- calculate_datetime_step(min, max) |> unname()
       }
       
       stats <- list(
@@ -660,7 +660,7 @@ cb_filter.date_time_range.tblist <- function(
     },
     plot_data = function(data_object) {
       if (nrow(data_object[[dataset]])) {
-        breaks <- calculate_date_time_step(
+        breaks <- calculate_datetime_step(
           min(data_object[[dataset]][[variable]], na.rm = TRUE),
           max(data_object[[dataset]][[variable]], na.rm = TRUE)
         ) |> names()
