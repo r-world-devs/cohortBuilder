@@ -564,10 +564,11 @@ calculate_datetime_step <- function(min_date, max_date) {
   time_span <- as.numeric(max_date) - as.numeric(min_date)
   num_elements <- as.integer(time_span / steps)
   idx <- which(num_elements <= 200)[1]
-  if (!is.na(idx))
+  if (!is.na(idx)) {
     return(steps[idx])
-  else
-    return(steps[length(steps)])
+  }
+  
+  return(steps[length(steps)])
 }
 
 #' @rdname filter-source-types
@@ -584,8 +585,6 @@ cb_filter.datetime_range.tblist <- function(
     name = name,
     input_param = "range",
     filter_data = function(data_object) {
-      
-      # Convert the variable to POSIXct if it's not already
       if (!inherits(data_object[[dataset]][[variable]], "POSIXct")) {
         data_object[[dataset]][[variable]] <- as.POSIXct(data_object[[dataset]][[variable]], tz = "UTC", origin = "1970-01-01 UTC")
       }
@@ -595,33 +594,34 @@ cb_filter.datetime_range.tblist <- function(
       }
 
       if (keep_na && !identical(range, NA)) {
-        # Handle end range for single range value, NULL, NA or Inf(as character)
         end_range <- range[2]
         if (identical(end_range, NULL) || anyNA(end_range, NA) || identical(end_range, "Inf")) {
-          end_range <- Inf
+          range[2] <- Inf
         }
         
-        # Keep NAs and apply the range filter
+        # keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
           dplyr::filter(
-            (!!sym(variable) >= !!range[1] & !!sym(variable) <= !!end_range) |
+            (!!sym(variable) >= !!range[1] & !!sym(variable) <= !!range[2]) |
               is.na(!!sym(variable))
           )
+        # keep_na !value_na end
       }
       if (!keep_na && identical(range, NA)) {
-        # Exclude NAs without applying a range filter
+        # !keep_na value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
           dplyr::filter(!is.na(!!sym(variable)))
+        # !keep_na value_na end
       }
       if (!keep_na && !identical(range, NA)) {
-        # Exclude NAs and apply the range filter
+        # !keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
           dplyr::filter(
             !!sym(variable) >= !!range[1] & !!sym(variable) <= !!range[2]
           )
+        # !keep_na !value_na end
       }
       
-      # Indicate that the data has been filtered
       attr(data_object[[dataset]], "filtered") <- TRUE
       return(data_object)
     },
