@@ -95,7 +95,6 @@ test_that("cb_filter.date_time_range.tblist applies date time range filter corre
   result <- apply_filter(range = c(as.POSIXct("2023-01-02"), as.POSIXct("2023-01-03")), keep_na = TRUE)
   expect_true(attr(result$dataset_name, "filtered"))
   
-  # Add any additional checks for specific edge cases here
 })
 
 test_that("date_time_range high level test", {
