@@ -1,4 +1,4 @@
-# shinyCohortBuilder (development version)
+# cohortBuilder (development version)
 
 * Add new `data_time_filter` that handle POSIXct type.
 
