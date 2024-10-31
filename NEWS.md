@@ -1,3 +1,7 @@
+# shinyCohortBuilder (development version)
+
+* Add new `data_time_filter` that handle POSIXct type.
+
 # cohortBuilder 0.3.0
 
 * Add new filter of type `"query"` that allows to configure complex filtering rules with `queryBuilder` package.
