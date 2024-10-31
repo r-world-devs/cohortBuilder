@@ -587,11 +587,11 @@ cb_filter.date_time_range.tblist <- function(
       
       # Convert the variable to POSIXct if it's not already
       if (!inherits(data_object[[dataset]][[variable]], "POSIXct")) {
-        data_object[[dataset]][[variable]] <- as.POSIXct(data_object[[dataset]][[variable]], tz = "UTC")
+        data_object[[dataset]][[variable]] <- as.POSIXct(data_object[[dataset]][[variable]], tz = "UTC", origin = "1970-01-01 UTC")
       }
       
       if (identical(range, NULL) || length(range) == 0) {
-        range <- c(Inf, -Inf) %>% as.POSIXct()
+        range <- c(Inf, -Inf) %>% as.POSIXct(origin = "1970-01-01 UTC")
       }
 
       if (keep_na && !identical(range, NA)) {
