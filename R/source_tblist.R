@@ -585,20 +585,7 @@ cb_filter.datetime_range.tblist <- function(
     name = name,
     input_param = "range",
     filter_data = function(data_object) {
-      if (!inherits(data_object[[dataset]][[variable]], "POSIXct")) {
-        data_object[[dataset]][[variable]] <- as.POSIXct(data_object[[dataset]][[variable]], tz = "UTC", origin = "1970-01-01 UTC")
-      }
-      
-      if (identical(range, NULL) || length(range) == 0) {
-        range <- c(Inf, -Inf) %>% as.POSIXct(origin = "1970-01-01 UTC")
-      }
-
       if (keep_na && !identical(range, NA)) {
-        end_range <- range[2]
-        if (identical(end_range, NULL) || anyNA(end_range, NA) || identical(end_range, "Inf")) {
-          range[2] <- Inf
-        }
-        
         # keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
           dplyr::filter(
