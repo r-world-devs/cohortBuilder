@@ -1,6 +1,6 @@
 # cohortBuilder (development version)
 
-* Add new `data_time_filter` that handle POSIXct type.
+* Add new `datatime_filter` that handle POSIXct type.
 
 # cohortBuilder 0.3.0
 
