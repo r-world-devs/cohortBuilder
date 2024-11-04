@@ -551,6 +551,140 @@ group_stats <- function(vec_stats, name) {
     stats::setNames(name)
 }
 
+calculate_datetime_step <- function(min_date, max_date) {
+  # Define possible steps
+  steps <- c(
+    "mins" = 60,
+    "hours" = 3600,
+    "days" = 86400,
+    "weeks" = 604800,
+    "months" = 2592000,
+    "years" = 31104000
+  )
+  time_span <- as.numeric(max_date) - as.numeric(min_date)
+  num_elements <- as.integer(time_span / steps)
+  idx <- which(num_elements <= 200)[1]
+  if (!is.na(idx)) {
+    return(steps[idx])
+  }
+  
+  return(steps[length(steps)])
+}
+
+#' @rdname filter-source-types
+#' @export
+cb_filter.datetime_range.tblist <- function(
+    source, type = "datetime_range", id = .gen_id(), name = id, variable, range = NA,
+    dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
+  
+  args <- list(...)
+  
+  def_filter(
+    type = type,
+    id = id,
+    name = name,
+    input_param = "range",
+    filter_data = function(data_object) {
+      if (keep_na && !identical(range, NA)) {
+        # keep_na !value_na start
+        data_object[[dataset]] <- data_object[[dataset]] %>%
+          dplyr::filter(
+            (!!sym(variable) >= !!range[1] & !!sym(variable) <= !!range[2]) |
+              is.na(!!sym(variable))
+          )
+        # keep_na !value_na end
+      }
+      if (!keep_na && identical(range, NA)) {
+        # !keep_na value_na start
+        data_object[[dataset]] <- data_object[[dataset]] %>%
+          dplyr::filter(!is.na(!!sym(variable)))
+        # !keep_na value_na end
+      }
+      if (!keep_na && !identical(range, NA)) {
+        # !keep_na !value_na start
+        data_object[[dataset]] <- data_object[[dataset]] %>%
+          dplyr::filter(
+            !!sym(variable) >= !!range[1] & !!sym(variable) <= !!range[2]
+          )
+        # !keep_na !value_na end
+      }
+      
+      attr(data_object[[dataset]], "filtered") <- TRUE
+      return(data_object)
+    },
+    get_stats = function(data_object, name) {
+      if (missing(name)) {
+        name <- c("n_data", "frequencies", "n_missing")
+      }
+      extra_params <- list(...)
+      
+      data_object[[dataset]][[variable]] <- as.numeric(data_object[[dataset]][[variable]])
+
+      if (is.null(extra_params$step) && !identical(length(data_object[[dataset]][[variable]]), 0L)) {
+        min <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
+        max <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
+        
+        extra_params$step <- calculate_datetime_step(min, max) |> unname()
+      }
+      
+      stats <- list(
+        frequencies = if ("frequencies" %in% name) {
+          get_range_frequencies(data_object, dataset, variable, extra_params)
+        },
+        n_data = if ("n_data" %in% name) {
+          data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length()
+        },
+        n_missing = if ("n_missing" %in% name) {
+          data_object[[dataset]][[variable]] %>% is.na() %>% sum()
+        }
+      )
+      
+      if (length(name) == 1) {
+        return(stats[[name]])
+      } else {
+        return(stats[name])
+      }
+    },
+    plot_data = function(data_object) {
+      if (nrow(data_object[[dataset]])) {
+        breaks <- calculate_datetime_step(
+          min(data_object[[dataset]][[variable]], na.rm = TRUE),
+          max(data_object[[dataset]][[variable]], na.rm = TRUE)
+        ) |> names()
+        
+        data_object[[dataset]][[variable]] %>% 
+          graphics::hist(breaks = breaks)
+      } else {
+        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
+      }
+    },
+    get_params = function(name) {
+      params <- list(
+        dataset = dataset,
+        variable = variable,
+        range = range,
+        keep_na = keep_na,
+        description = description,
+        active = active,
+        ...
+      )
+      if (!missing(name)) return(params[[name]])
+      return(params)
+    },
+    get_data = function(data_object) {
+      data_object[[dataset]][[variable]]
+    },
+    get_defaults = function(data_object, cache_object) {
+      list(
+        range = c(
+          cache_object$frequencies$l_bound[1],
+          rev(cache_object$frequencies$u_bound)[1]
+        )
+      )
+    }
+  )
+}
+
 #' @rdname filter-source-types
 #' @param variables Vector of variable names to be used in filtering.
 #' @param values Named list of values to be applied in filtering.

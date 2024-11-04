@@ -6,12 +6,14 @@
 \alias{cb_filter.discrete_text}
 \alias{cb_filter.range}
 \alias{cb_filter.date_range}
+\alias{cb_filter.datetime_range}
 \alias{cb_filter.multi_discrete}
 \alias{cb_filter.query}
 \alias{cb_filter.discrete.tblist}
 \alias{cb_filter.discrete_text.tblist}
 \alias{cb_filter.range.tblist}
 \alias{cb_filter.date_range.tblist}
+\alias{cb_filter.datetime_range.tblist}
 \alias{cb_filter.multi_discrete.tblist}
 \alias{cb_filter.query.tblist}
 \title{Filter Source types methods}
@@ -23,6 +25,8 @@ cb_filter.discrete_text(source, ...)
 cb_filter.range(source, ...)
 
 cb_filter.date_range(source, ...)
+
+cb_filter.datetime_range(source, ...)
 
 cb_filter.multi_discrete(source, ...)
 
@@ -72,6 +76,20 @@ cb_filter.query(source, ...)
 \method{cb_filter.date_range}{tblist}(
   source,
   type = "date_range",
+  id = .gen_id(),
+  name = id,
+  variable,
+  range = NA,
+  dataset,
+  keep_na = TRUE,
+  ...,
+  description = NULL,
+  active = TRUE
+)
+
+\method{cb_filter.datetime_range}{tblist}(
+  source,
+  type = "datetime_range",
   id = .gen_id(),
   name = id,
   variable,

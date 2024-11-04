@@ -309,6 +309,31 @@ cb_filter.date_range <- function(source, ...) {
 
 #' @rdname filter-types
 #' @export
+filter.datetime_range <- function(type, id, name, ..., description = NULL,
+                                   active = getOption("cb_active_filter", default = TRUE)) {
+  args <- append(
+    environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
+    list(...)
+  )
+  
+  .as_constructor(
+    function(source) {
+      do.call(
+        cb_filter.datetime_range,
+        append(list(source = source), args)
+      )
+    }
+  )
+}
+
+#' @rdname filter-source-types
+#' @export
+cb_filter.datetime_range <- function(source, ...) {
+  UseMethod("cb_filter.datetime_range", source)
+}
+
+#' @rdname filter-types
+#' @export
 filter.multi_discrete <- function(type, id, name, ..., description = NULL,
                                   active = getOption("cb_active_filter", default = TRUE)) {
   args <- append(

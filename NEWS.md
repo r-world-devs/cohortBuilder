@@ -1,3 +1,7 @@
+# cohortBuilder (development version)
+
+* Add new `datatime_filter` that handle POSIXct type.
+
 # cohortBuilder 0.3.0
 
 * Add new filter of type `"query"` that allows to configure complex filtering rules with `queryBuilder` package.
