@@ -720,9 +720,11 @@ cb_filter.multi_discrete.tblist <- function(
 
       data_object[[dataset]] <- data_object[[dataset]] %>%
         dplyr::filter(
-          dplyr::across(
-            !!names(values),
-            ~col_in_val(.x, values[[dplyr::cur_column()]], !!keep_na)
+          dplyr::if_all(
+            dplyr::all_of(names(values)),
+            # Using deparse(substitute(.x)) over dplyr::cur_column
+            # dplyr::cur_column is accessible only in across
+            ~ col_in_val(.x, values[[deparse(substitute(.x))]], !!keep_na)
           )
         )
       attr(data_object[[dataset]], "filtered") <- TRUE
