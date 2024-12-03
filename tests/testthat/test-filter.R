@@ -8,8 +8,10 @@ variable_filter <- discrete_filter(patients_source)
 
 test_that("Calling filter with id returns function of source param, calling valid S3 method", {
   expect_equal(names(formals(discrete_filter)), "source")
-  expect_equal(as.character(body(discrete_filter)[[2]][[2]]), "cb_filter.discrete")
   expect_true(is.function(discrete_filter))
+  
+  skip_on_covr()
+  expect_equal(as.character(body(discrete_filter)[[2]][[2]]), "cb_filter.discrete")
 })
 
 test_that("Calling filter on source returns list with valid methods and parameters", {
