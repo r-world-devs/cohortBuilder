@@ -82,4 +82,26 @@ test_that("get_attrition_coords calculates percentages correctly when percent = 
   expect_equal(result$label_excl, expected_label_excl)
 })
 
+test_that("get_attrition_plot returns a ggplot object with expected structure", {
+  # Using the provided input data from get_attrition_coords
+  labels <- c("x", "Step: 1\nFilter: adsa (range = [1, 4])")
+  n_included <- c(`0` = 150L, `1` = 100L)
+  space <- 1
+  percent <- FALSE
+  input_data <- get_attrition_coords(labels = labels, n_included = n_included, space = space, percent = percent)
+  
+  plot <- get_attrition_plot(input_data)
+  
+  # Check that the result is a ggplot object
+  expect_s3_class(plot, "ggplot")
+  
+  # The logic of the function involves reversing the y-axis scale. 
+  # Check that a reversed y scale is applied.
+  y_scale <- plot$scales$get_scales("y")
+  expect_identical(y_scale$trans$name, "reverse", info = "Y scale should be reversed.")
+  
+  # Confirm that the labs are set to NULL for x and y, as per the logic
+  expect_null(plot$labels$x)
+  expect_null(plot$labels$y)
+})
 
