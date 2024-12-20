@@ -49,3 +49,30 @@ test_that("combine_expressions merges multiple expressions into a single one", {
     })
   )
 })
+
+test_that("pair_seq handles empty input gracefully", {
+  # Given an empty input, expect empty integer vector
+  result <- pair_seq(integer(0))
+  expect_true(is.integer(result))
+  expect_identical(result,integer(0))
+  expect_length(result, 0)
+})
+
+test_that("pair_seq requires an even number of indexes", {
+  # If odd length input is provided, function should fail due to indexing error
+  expect_error(pair_seq(c(1, 2, 3)))
+})
+
+test_that("pair_seq always returns a strictly increasing sequence of integers", {
+  # Check that output is sorted and has no duplicates for a known even-length input
+  input <- c(3, 1, 7, 5)   # Unsorted input
+  result <- pair_seq(input)
+  
+  # Expect numeric output
+  expect_true(is.numeric(result))
+  
+  # Expect output is in strictly ascending order
+  expect_true(all(diff(result) > 0))
+  
+})
+
