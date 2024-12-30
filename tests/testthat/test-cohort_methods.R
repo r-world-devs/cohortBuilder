@@ -831,11 +831,11 @@ test_that("Defining and accessing description works fine", {
   )
 })
 
-test_that("steps_range from Step.R returns empty character when from is greater than to", {
+test_that("steps_range returns empty character when from is greater than to", {
   expect_equal(steps_range(3,2),character(0))
 })
 
-test_that("eval_step_filters from Step.R returns empty character when step id is equal", {
+test_that("eval_step_filters returns empty character when step id is equal", {
   expect_equal(eval_step_filters(list(0, id = "2"),patients_source),list())
 })
 
