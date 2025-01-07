@@ -59,9 +59,9 @@ test_that("pair_seq handles empty input gracefully", {
 })
 
 test_that("pair_seq requires an even number of indexes", {
-  # If odd length input is provided, function should fail due to indexing error
-  expect_error(pair_seq(c(1, 2, 3)))
-})
+  # If odd length input is provided, function should fail
+  expect_error(pair_seq(c(1, 2, 3)), regexp ="The lenght of idxs is not even number")
+ })
 
 test_that("pair_seq always returns a strictly increasing sequence of integers", {
   # Check that output is sorted and has no duplicates for a known even-length input
