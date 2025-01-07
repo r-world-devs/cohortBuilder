@@ -839,7 +839,7 @@ test_that("eval_step_filters returns empty character when step id is equal", {
   expect_equal(eval_step_filters(list(0, id = "2"),patients_source),list())
 })
 
-test_that("next_step from Step.R returns the next index as a character string", {
+test_that("next_step returns the next index as a character string", {
   expect_equal(next_step("1"),"2")
   expect_type(next_step("1"),"character")
 })
