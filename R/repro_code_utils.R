@@ -8,6 +8,11 @@ pair_seq <- function(idxs) {
   if (length(idxs) == 0) {
     return(integer(0))
   }
+  
+  if (identical(length(idxs) %% 2L, 0L)) {
+    stop("The lenght of idxs is not even number")
+  }
+  
   idxs <- sort(idxs)
   sequence <- c()
   for (idx in seq(1, length(idxs), by = 2)) {
@@ -39,7 +44,7 @@ func_to_expr <- function(func, name) {
 
   func_expr <- c(paste(name, "<-"), utils::capture.output(func))
   # in case function comes from namespace
-  closing_idx <- rev(which("}" == func_expr))[1]
+  closing_idx <- rev(which(grepl("}$", func_expr, perl = TRUE)))[1]
   return(
     parse(text = func_expr[1:closing_idx])[[1]]
   )
