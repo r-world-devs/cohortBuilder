@@ -831,6 +831,19 @@ test_that("Defining and accessing description works fine", {
   )
 })
 
+test_that("steps_range returns empty character when from is greater than to", {
+  expect_equal(steps_range(3,2),character(0))
+})
+
+test_that("eval_step_filters returns empty character when step id is equal", {
+  expect_equal(eval_step_filters(list(0, id = "2"),patients_source),list())
+})
+
+test_that("next_step returns the next index as a character string", {
+  expect_equal(next_step("1"),"2")
+  expect_type(next_step("1"),"character")
+})
+
 # if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
 #   test_that("(experimental) Retrieving reproducible code works fine", {
 #     # Using direct Cohort methods
