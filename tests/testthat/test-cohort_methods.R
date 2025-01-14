@@ -844,6 +844,83 @@ test_that("next_step returns the next index as a character string", {
   expect_type(next_step("1"),"character")
 })
 
+test_that("copy_step with step_id works correctly", {
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  #set last id of step before using the function
+  pre_last_step_id<- as.integer(coh$last_step_id())
+  #get list of filters in first step
+  list_of_filters <- coh$get_state(1)[[1]]$filters
+
+  coh$copy_step(1)
+
+  expect_false(is.null(coh$get_step(pre_last_step_id+1)))
+  expect_identical(coh$get_state(coh$last_step_id())[[1]]$filters, list_of_filters)
+})
+
+test_that("copy_step without step_id duplicates filters from last step", {
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  #set last id of step before using the function
+  pre_last_step_id<- as.integer(coh$last_step_id())
+  #get list of filters in last step
+  list_of_filters <- coh$get_state(pre_last_step_id)[[1]]$filters
+
+  coh$copy_step()
+
+  expect_false(is.null(coh$get_step(pre_last_step_id+1)))
+  expect_identical(coh$get_state(coh$last_step_id())[[1]]$filters, list_of_filters)
+})
+
+test_that("copy_step duplicate selected filters without step_id", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  pre_last_step_id<- as.integer(coh$last_step_id())
+  list_of_filters <- coh$get_state(1)[[1]]$filters
+
+  coh$copy_step(filters=coh$get_filter(1))
+
+  expect_false(is.null(coh$get_step(pre_last_step_id+1)))
+  expect_identical(coh$get_state(coh$last_step_id())[[1]]$filters, list_of_filters)
+})
+
+test_that("copy_step with run_flow trigger data calculations", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  expect_null(coh$get_data())
+
+  coh$copy_step(run_flow = TRUE)
+
+  expect_false(is.null(coh$get_data()))
+  expect_identical(coh$get_state(coh$last_step_id())[[1]]$filters, list_of_filters)
+})
+
 # if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
 #   test_that("(experimental) Retrieving reproducible code works fine", {
 #     # Using direct Cohort methods
