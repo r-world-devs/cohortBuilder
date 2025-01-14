@@ -255,7 +255,7 @@ test_that("Removing step with ID '0' triggers warning", {
   expect_warning(iris_source$rm_step("0"), "No steps to remove or wrong ID passed")
 })
 
-test_that("Initialize cohort class with primary key set attribute primary_key", {
+test_that("Initialize Source with primary key set attribute primary_key", {
   key <- 1
   iris_source <- set_source(
     tblist(iris = iris),
