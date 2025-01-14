@@ -9,7 +9,7 @@ pair_seq <- function(idxs) {
     return(integer(0))
   }
   
-  if (identical(length(idxs) %% 2L, 0L)) {
+  if (!identical(length(idxs) %% 2L, 0L)) {
     stop("The lenght of idxs is not even number")
   }
   
