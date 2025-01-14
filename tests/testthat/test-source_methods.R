@@ -245,3 +245,33 @@ test_that("Updating filter on source works fine", {
   expect_setequal(coh$get_data(1, state = "post")$iris$Species, "setosa")
 })
 
+test_that("Removing step with ID '0' triggers warning", {
+  iris_source <- set_source(
+    tblist(iris = iris)
+    ) %>% add_filter(
+      discrete_filter_species
+    )
+
+  expect_warning(iris_source$rm_step("0"), "No steps to remove or wrong ID passed")
+})
+
+test_that("Initialize source with primary key set attribute primary_key", {
+  key <- 1
+  iris_source <- set_source(
+    tblist(iris = iris),
+    primary_keys = key)
+
+  type_of_primary_key <- typeof(key)
+  expect_equal(iris_source$primary_keys, key)
+  expect_type(iris_source$primary_keys, type_of_primary_key)
+  expect_false(is.null(iris_source$primary_keys))
+})
+
+test_that("get returns attributes of source", {
+  iris_source <- set_source(
+    tblist(iris = iris),
+    atribute1 = "test")
+
+  expect_type(iris_source$get("atribute1"), "character")
+  expect_type(iris_source$get("atribute2"), "NULL")
+})
