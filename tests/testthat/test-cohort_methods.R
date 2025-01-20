@@ -915,7 +915,7 @@ test_that("copy_step with run_flow trigger data calculations", {
 
   list_of_filters <- get_state(coh,coh$last_step_id())[[1]]$filters
 
-  expect_null(coh$get_data())
+  expect_null(get_data(coh))
 
   coh$copy_step(run_flow = TRUE)
 
