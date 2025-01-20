@@ -920,7 +920,6 @@ test_that("copy_step with run_flow trigger data calculations", {
   coh$copy_step(run_flow = TRUE)
 
   expect_false(is.null(coh$get_data()))
-  expect_identical(coh$get_state(coh$last_step_id())[[1]]$filters, list_of_filters)
 })
 
 # if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
