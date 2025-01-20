@@ -90,7 +90,7 @@ test_that("func_to_expr returns a language object that includes the specified fu
   test_fun_one <- function() {
     val <- a + 1
     val
-}
+  }
   name <- "simple_func_name"
   result <- func_to_expr(test_fun_one, name)
 
