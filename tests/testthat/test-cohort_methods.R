@@ -904,7 +904,7 @@ test_that("copy_step duplicate selected filters without step_id", {
   expect_identical(get_state(coh,coh$last_step_id())[[1]]$filters, list_of_filters)
 })
 
-test_that("copy_step with run_flow trigger data calculations", {
+test_that("copy_step trigger data calculations works fine", {
   coh <- Cohort$new(
     set_source(
       tblist(iris = iris)
@@ -919,10 +919,92 @@ test_that("copy_step with run_flow trigger data calculations", {
 
   coh$copy_step(run_flow = TRUE)
 
-  expect_false(is.null(coh$get_data()))
+  expect_false(is.null(get_data(coh)))
   expect_identical(get_state(coh, coh$last_step_id())[[1]]$filters, list_of_filters)
 })
 
+test_that("remove_step with missing step_id remove last step", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+
+  pre_last_step_id<- as.integer(coh$last_step_id())
+  #set list of filters to ensure that only the last step is removed
+  if(pre_last_step_id!=1){
+    pre_list_of_filters <- get_state(coh,c(1:pre_last_step_id-1))
+  }
+
+  coh$remove_step()
+
+  expect_equal(coh$last_step_id(),as.character(pre_last_step_id-1))
+  expect_null(coh$get_step(pre_last_step_id))
+
+  if(pre_last_step_id!=1) {
+    expect_identical(get_state(coh,c(1:pre_last_step_id-1)),pre_list_of_filters)
+  }
+})
+
+test_that("remove_step trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  expect_null(get_data(coh))
+
+  coh$remove_step(run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("add_filter trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_null(get_data(coh))
+
+  coh$add_filter(range_iris_one,1,run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("remove_filter trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_null(get_data(coh))
+
+  coh$remove_filter(1,1,run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("get_state returns state in JSON format correctly", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_true(jsonlite::validate(get_state(coh,1,json = TRUE)))
+})
 # if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
 #   test_that("(experimental) Retrieving reproducible code works fine", {
 #     # Using direct Cohort methods
