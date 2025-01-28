@@ -70,9 +70,31 @@ test_that("pair_seq always returns a strictly increasing sequence of integers", 
   
   # Expect numeric output
   expect_true(is.numeric(result))
-  
+  expect_type(result, "double")
   # Expect output is in strictly ascending order
   expect_true(all(diff(result) > 0))
   
+})
+
+test_that("parse_func_expr returns an empty expression when func is NULL", {
+  expect_equal(parse_func_expr(NULL),
+               quote({}))
+})
+
+test_that("func_to_expr returns an empty expression when func is NULL", {
+  expect_equal(func_to_expr(NULL,"test"),
+               quote({}))
+})
+
+test_that("func_to_expr returns a language object that includes the specified function name", {
+  test_fun_one <- function() {
+    val <- a + 1
+    val
+  }
+  name <- "simple_func_name"
+  result <- func_to_expr(test_fun_one, name)
+
+  expect_type(result,"language")
+  expect_equal(as.character(result[2]), name)
 })
 
