@@ -123,11 +123,11 @@ test_that("parse_filter_expr works fine", {
   expect_true(is.call(result))
 })
 
-test_that("method_to_expr returns NULL if does not find the method", {
+test_that("method_to_expr works fine", {
   expect_null(method_to_expr("not_existing_name","not_existing_namespace"))
 })
 
-test_that("method_to_expr works fine", {
+test_that("method_to_expr return function works fine", {
   name <- ".pre_filtering"
   namespace <- "tblist"
 
