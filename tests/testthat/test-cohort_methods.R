@@ -1005,6 +1005,105 @@ test_that("get_state returns state in JSON format correctly", {
 
   expect_true(jsonlite::validate(get_state(coh,1,json = TRUE)))
 })
+
+test_that("Restoring cohort configurations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+  # Character type
+  pre_state_character <- get_state(coh)
+  coh$add_filter(range_iris_one,2)
+  expect_false(identical(get_state(coh),pre_state_character))
+  restore(coh,pre_state_character)
+  expect_true(identical(get_state(coh),pre_state_character))
+
+  # JSON type
+  pre_state_json <- get_state(coh, json = TRUE)
+  coh$add_filter(range_iris_one,2)
+  expect_false(identical(get_state(coh),pre_state_character))
+  restore(coh,pre_state_json)
+  expect_true(identical(get_state(coh),pre_state_character))
+})
+
+test_that("Restoring cohort configurations without state returns invisible FALSE", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  pre_state <- get_state(coh)
+
+  coh$add_filter(range_iris_one,2)
+
+  expect_false(identical(get_state(coh),pre_state))
+  expect_invisible(coh$restore(state = NULL))
+  expect_false(coh$restore(state = NULL))
+  expect_false(identical(get_state(coh),pre_state))
+})
+
+test_that("Restoring cohort configurations trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+  coh_2 <- coh$clone()
+  run(coh_2)
+  pre_state <- get_state(coh)
+
+  coh$add_filter(range_iris_one,2)
+  expect_false(identical(get_state(coh_2),get_state(coh)))
+  expect_null(get_data(coh))
+
+  restore(coh, pre_state, run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+  expect_identical(get_state(coh),get_state(coh))
+  expect_identical(get_data(coh),get_data(coh))
+})
+
+test_that("restore correctly restore filters filter type date_range and datetime_range", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(issues = librarian$issues)
+    ),
+    step(
+      filter(
+        "date_range", id = "issues_date", dataset = "issues",
+        variable = "date", range = c(as.Date("2010-10-01"), as.Date("2015-10-01"))
+      ),
+      filter(
+        "date_range", id = "issues_date2", dataset = "issues",
+        variable = "date", range = as.Date(NULL)
+      ),
+      filter(
+        "datetime_range", id = "issues_datetime", dataset = "issues",
+        variable = "date", range = c(as.POSIXct("2010-10-01"), as.POSIXct("2015-10-01"))
+      ),
+      filter(
+        "datetime_range", id = "issues_datetime2", dataset = "issues",
+        variable = "date", range = as.POSIXct(NULL))
+    )
+  )
+
+  pre_state <- get_state(coh)
+
+  coh$add_filter(range_iris_one,2)
+  coh$remove_filter(1,"issues_datetime")
+
+  expect_false(identical(get_state(coh),pre_state))
+
+  restore(coh, pre_state)
+
+  expect_identical(get_state(coh),pre_state)
+})
+
 # if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
 #   test_that("(experimental) Retrieving reproducible code works fine", {
 #     # Using direct Cohort methods
