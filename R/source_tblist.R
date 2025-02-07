@@ -219,8 +219,8 @@ cb_filter.discrete_text.tblist <- function(
         name <- c("n_data", "choices", "n_missing")
       }
       stats <- list(
-        choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% unique() %>% paste(collapse = ","),
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% unique() %>% length(),
+        choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% collapse::funique() %>% paste(collapse = ","),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% collapse::funique() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
       if (length(name) == 1) {
@@ -879,7 +879,7 @@ cb_filter.query.tblist <- function(
   common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))
   for (dependent_dataset in dependent_datasets) {
     key_names <- binding_key$data_keys[[dependent_dataset]]$key
-    tmp_key_values <- dplyr::distinct(data_object_post[[dependent_dataset]][, key_names, drop = FALSE]) %>%
+    tmp_key_values <- collapse::funique(data_object_post[[dependent_dataset]][, key_names, drop = FALSE]) %>%
       stats::setNames(common_key_names)
     if (is.null(key_values)) {
       key_values <- tmp_key_values
@@ -936,7 +936,7 @@ cb_filter.query.tblist <- function(
     ) %>%
       purrr::map(~names(.[["data_keys"]])) %>%
       unlist() %>%
-      unique()
+      collapse::funique()
     if (length(dependent_datasets) > 0) {
       bind_keys_section <- glue::glue(
         "\nData linked with external datasets: {paste(dependent_datasets, collapse = ', ')}",

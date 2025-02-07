@@ -39,7 +39,7 @@ test_that("Discrete text filter works fine", {
   )
   expect_equal(coh$get_data(1, state = "pre")$iris, iris)
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
   expect_equal(
     coh$get_cache("1", "species", state = "post")$choices,
     "setosa,virginica"
@@ -63,8 +63,8 @@ test_that("Multi discrete filter works fine", {
   expect_equal(coh$get_data(1, state = "pre")$md_data, md_data)
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$md_data$col1), c("A"))
-  expect_setequal(unique(coh$get_data(1, state = "post")$md_data$col2), c("D"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$md_data$col1), c("A"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$md_data$col2), c("D"))
 
   expect_equal(
     coh$get_cache("1", "mcols", state = "pre")$choices$col1,
@@ -107,24 +107,24 @@ test_that("Query discrete filter works fine", {
   expect_equal(coh$get_data(1, state = "pre")$md_data, md_data)
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$md_data$col1), c("A"))
-  expect_setequal(unique(coh$get_data(1, state = "post")$md_data$col2), c("D"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$md_data$col1), c("A"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$md_data$col2), c("D"))
 
   expect_equal(
     coh$get_cache("1", "qcols", state = "pre")$specs$col1$values,
-    unique(md_data$col1)
+    collapse::funique(md_data$col1)
   )
   expect_equal(
     coh$get_cache("1", "qcols", state = "pre")$specs$col2$values,
-    unique(md_data$col2)
+    collapse::funique(md_data$col2)
   )
   expect_equal(
     coh$get_cache("1", "qcols", state = "post")$specs$col1$values,
-    unique(c("A"))
+    "A"
   )
   expect_equal(
     coh$get_cache("1", "qcols", state = "post")$specs$col2$values,
-    unique(c("D"))
+    "D"
   )
 
 })
