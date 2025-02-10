@@ -296,6 +296,6 @@ pipe_all_filters <- function(expr_df) {
   ) %>%
     dplyr::mutate(expr = purrr::map2(expr, new_expr, if_null_default_list)) %>%
     dplyr::select(type, expr) %>%
-    # collapse::funique can not be used here
+    # collapse::funique not support nested tables with custom values
     dplyr::distinct()
 }
