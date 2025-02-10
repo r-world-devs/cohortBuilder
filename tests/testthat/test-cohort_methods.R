@@ -32,8 +32,8 @@ test_that("Running steps filter raw data properly", {
   expect_equal(coh$get_data(1, state = "pre")$iris, iris)
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 
   # Using S3 Cohort method
   coh <- Cohort$new(
@@ -44,8 +44,8 @@ test_that("Running steps filter raw data properly", {
   expect_equal(coh$get_data(1, state = "pre")$iris, iris)
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 })
 
 test_that("Adding source on empty cohort works fine", {
@@ -94,7 +94,7 @@ test_that("Adding step on source-only cohort works fine", {
   expect_equal(state$steps_structure, list("1" = "species_filter"))
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
 
   coh <- Cohort$new()
   iris_source <- set_source(
@@ -113,7 +113,7 @@ test_that("Adding step on source-only cohort works fine", {
   expect_equal(state$steps_structure, list("1" = c("species_filter", "species_filter_two")))
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("virginica"))
 
   # Using S3 Cohort methods
   coh <- Cohort$new()
@@ -132,7 +132,7 @@ test_that("Adding step on source-only cohort works fine", {
   expect_equal(state$steps_structure, list("1" = "species_filter"))
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
 
   coh <- Cohort$new()
   iris_source <- set_source(
@@ -152,7 +152,7 @@ test_that("Adding step on source-only cohort works fine", {
   expect_equal(state$steps_structure, list("1" = c("species_filter", "species_filter_two")))
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("virginica"))
 })
 
 test_that("Adding step on existing cohort with step works fine", {
@@ -174,7 +174,7 @@ test_that("Adding step on existing cohort with step works fine", {
   expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 
   ## auto-run flow
   coh <- Cohort$new(
@@ -193,7 +193,7 @@ test_that("Adding step on existing cohort with step works fine", {
   expect_equal(state$n_steps, 2)
   expect_equal(state$n_filters, list("1" = 1, "2" = 1))
   expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 
   # Using S3 Cohort methods
   coh <- Cohort$new(
@@ -213,7 +213,7 @@ test_that("Adding step on existing cohort with step works fine", {
   expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 
   ## auto-run flow
   coh <- Cohort$new(
@@ -232,7 +232,7 @@ test_that("Adding step on existing cohort with step works fine", {
   expect_equal(state$n_steps, 2)
   expect_equal(state$n_filters, list("1" = 1, "2" = 1))
   expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 })
 
 test_that("Removing step works fine", {
@@ -480,7 +480,7 @@ test_that("Updating filter works fine", {
   )
   coh$update_filter(1, "species_filter_two", value = "setosa")
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), "setosa")
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), "setosa")
 
   coh$update_filter(1, "sepal_l", variable = "Petal.Length", range = c(1, 1.5))
   coh$run_flow()
@@ -504,7 +504,7 @@ test_that("Updating filter works fine", {
   )
   coh <- coh %>% update_filter(1, 'species_filter_two', value = "setosa")
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), "setosa")
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), "setosa")
 
   coh <- coh %>% update_filter(1, "sepal_l", variable = "Petal.Length", range = c(1, 1.5))
   coh <- coh %>% run()
