@@ -354,7 +354,7 @@ properly just run:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sum_up.html">sum_up</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &gt;&gt; Step ID: 1</span></span>
-<span><span class="co">#&gt; -&gt; Filter ID: EEXOM1738831588816</span></span>
+<span><span class="co">#&gt; -&gt; Filter ID: EEXOM1739188455110</span></span>
 <span><span class="co">#&gt;    Filter Type: discrete</span></span>
 <span><span class="co">#&gt;    Filter Parameters:</span></span>
 <span><span class="co">#&gt;      dataset: books</span></span>
@@ -770,7 +770,7 @@ source):</p>
 <span><span class="co">#&gt;     common_key_names &lt;- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))</span></span>
 <span><span class="co">#&gt;     for (dependent_dataset in dependent_datasets) {</span></span>
 <span><span class="co">#&gt;         key_names &lt;- binding_key$data_keys[[dependent_dataset]]$key</span></span>
-<span><span class="co">#&gt;         tmp_key_values &lt;- dplyr::distinct(data_object_post[[dependent_dataset]][,</span></span>
+<span><span class="co">#&gt;         tmp_key_values &lt;- collapse::funique(data_object_post[[dependent_dataset]][,</span></span>
 <span><span class="co">#&gt;             key_names, drop = FALSE]) %&gt;%</span></span>
 <span><span class="co">#&gt;             stats::setNames(common_key_names)</span></span>
 <span><span class="co">#&gt;         if (is.null(key_values)) {</span></span>
@@ -861,7 +861,7 @@ which creation code can be defined separately while creating it:</p>
 <span><span class="co">#&gt;     common_key_names &lt;- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))</span></span>
 <span><span class="co">#&gt;     for (dependent_dataset in dependent_datasets) {</span></span>
 <span><span class="co">#&gt;         key_names &lt;- binding_key$data_keys[[dependent_dataset]]$key</span></span>
-<span><span class="co">#&gt;         tmp_key_values &lt;- dplyr::distinct(data_object_post[[dependent_dataset]][,</span></span>
+<span><span class="co">#&gt;         tmp_key_values &lt;- collapse::funique(data_object_post[[dependent_dataset]][,</span></span>
 <span><span class="co">#&gt;             key_names, drop = FALSE]) %&gt;%</span></span>
 <span><span class="co">#&gt;             stats::setNames(common_key_names)</span></span>
 <span><span class="co">#&gt;         if (is.null(key_values)) {</span></span>
