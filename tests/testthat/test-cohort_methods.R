@@ -1165,7 +1165,8 @@ test_that("code returns expression to create filtered tblist", {
       tblist(iris = iris)
     ),
     step(discrete_iris_one, range_iris_one),
-    step(discrete_iris_two)
+    step(discrete_iris_two),
+    run_flow = TRUE
   )
 
   code_as_text <- code(coh, include_methods = NULL, include_action = NULL, mark_step = FALSE)
