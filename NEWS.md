@@ -1,6 +1,7 @@
 # cohortBuilder (development version)
 
 * Add new `datatime_filter` that handle POSIXct type.
+* Move unique/distinct to collapse::funique
 
 # cohortBuilder 0.3.0
 

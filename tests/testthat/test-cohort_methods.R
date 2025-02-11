@@ -32,8 +32,8 @@ test_that("Running steps filter raw data properly", {
   expect_equal(coh$get_data(1, state = "pre")$iris, iris)
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 
   # Using S3 Cohort method
   coh <- Cohort$new(
@@ -44,8 +44,8 @@ test_that("Running steps filter raw data properly", {
   expect_equal(coh$get_data(1, state = "pre")$iris, iris)
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 })
 
 test_that("Adding source on empty cohort works fine", {
@@ -94,7 +94,7 @@ test_that("Adding step on source-only cohort works fine", {
   expect_equal(state$steps_structure, list("1" = "species_filter"))
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
 
   coh <- Cohort$new()
   iris_source <- set_source(
@@ -113,7 +113,7 @@ test_that("Adding step on source-only cohort works fine", {
   expect_equal(state$steps_structure, list("1" = c("species_filter", "species_filter_two")))
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("virginica"))
 
   # Using S3 Cohort methods
   coh <- Cohort$new()
@@ -132,7 +132,7 @@ test_that("Adding step on source-only cohort works fine", {
   expect_equal(state$steps_structure, list("1" = "species_filter"))
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
 
   coh <- Cohort$new()
   iris_source <- set_source(
@@ -152,7 +152,7 @@ test_that("Adding step on source-only cohort works fine", {
   expect_equal(state$steps_structure, list("1" = c("species_filter", "species_filter_two")))
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("virginica"))
 })
 
 test_that("Adding step on existing cohort with step works fine", {
@@ -174,7 +174,7 @@ test_that("Adding step on existing cohort with step works fine", {
   expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 
   ## auto-run flow
   coh <- Cohort$new(
@@ -193,7 +193,7 @@ test_that("Adding step on existing cohort with step works fine", {
   expect_equal(state$n_steps, 2)
   expect_equal(state$n_filters, list("1" = 1, "2" = 1))
   expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 
   # Using S3 Cohort methods
   coh <- Cohort$new(
@@ -213,7 +213,7 @@ test_that("Adding step on existing cohort with step works fine", {
   expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 
   ## auto-run flow
   coh <- Cohort$new(
@@ -232,7 +232,7 @@ test_that("Adding step on existing cohort with step works fine", {
   expect_equal(state$n_steps, 2)
   expect_equal(state$n_filters, list("1" = 1, "2" = 1))
   expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
 })
 
 test_that("Removing step works fine", {
@@ -480,7 +480,7 @@ test_that("Updating filter works fine", {
   )
   coh$update_filter(1, "species_filter_two", value = "setosa")
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), "setosa")
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), "setosa")
 
   coh$update_filter(1, "sepal_l", variable = "Petal.Length", range = c(1, 1.5))
   coh$run_flow()
@@ -504,7 +504,7 @@ test_that("Updating filter works fine", {
   )
   coh <- coh %>% update_filter(1, 'species_filter_two', value = "setosa")
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), "setosa")
+  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), "setosa")
 
   coh <- coh %>% update_filter(1, "sepal_l", variable = "Petal.Length", range = c(1, 1.5))
   coh <- coh %>% run()
@@ -842,6 +842,266 @@ test_that("eval_step_filters returns empty character when step id is equal", {
 test_that("next_step returns the next index as a character string", {
   expect_equal(next_step("1"),"2")
   expect_type(next_step("1"),"character")
+})
+
+test_that("copy_step with step_id works correctly", {
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  #set last id of step before using the function
+  pre_last_step_id<- as.integer(coh$last_step_id())
+  #get list of filters in first step
+  list_of_filters <- get_state(coh, 1)[[1]]$filters
+
+  coh$copy_step(1)
+
+  expect_false(is.null(coh$get_step(pre_last_step_id+1)))
+  expect_identical(get_state(coh, coh$last_step_id())[[1]]$filters, list_of_filters)
+})
+
+test_that("copy_step without step_id duplicates filters from last step", {
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  #set last id of step before using the function
+  pre_last_step_id<- as.integer(coh$last_step_id())
+  #get list of filters in last step
+  list_of_filters <- get_state(coh, pre_last_step_id)[[1]]$filters
+
+  coh$copy_step()
+
+  expect_false(is.null(coh$get_step(pre_last_step_id+1)))
+  expect_identical(get_state(coh,coh$last_step_id())[[1]]$filters, list_of_filters)
+})
+
+test_that("copy_step duplicate selected filters without step_id", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  pre_last_step_id<- as.integer(coh$last_step_id())
+  list_of_filters <- get_state(coh,1)[[1]]$filters
+
+  coh$copy_step(filters=coh$get_filter(1))
+
+  expect_false(is.null(coh$get_step(pre_last_step_id+1)))
+  expect_identical(get_state(coh,coh$last_step_id())[[1]]$filters, list_of_filters)
+})
+
+test_that("copy_step trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  list_of_filters <- get_state(coh,coh$last_step_id())[[1]]$filters
+
+  expect_null(get_data(coh))
+
+  coh$copy_step(run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+  expect_identical(get_state(coh, coh$last_step_id())[[1]]$filters, list_of_filters)
+})
+
+test_that("remove_step with missing step_id remove last step", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+
+  pre_last_step_id<- as.integer(coh$last_step_id())
+  #set list of filters to ensure that only the last step is removed
+  if(pre_last_step_id!=1){
+    pre_list_of_filters <- get_state(coh,c(1:pre_last_step_id-1))
+  }
+
+  coh$remove_step()
+
+  expect_equal(coh$last_step_id(),as.character(pre_last_step_id-1))
+  expect_null(coh$get_step(pre_last_step_id))
+
+  if(pre_last_step_id!=1) {
+    expect_identical(get_state(coh,c(1:pre_last_step_id-1)),pre_list_of_filters)
+  }
+})
+
+test_that("remove_step trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  expect_null(get_data(coh))
+
+  coh$remove_step(run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("add_filter trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_null(get_data(coh))
+
+  coh$add_filter(range_iris_one,1,run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("remove_filter trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_null(get_data(coh))
+
+  coh$remove_filter(1,1,run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("get_state returns state in JSON format correctly", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_true(jsonlite::validate(get_state(coh,1,json = TRUE)))
+})
+
+test_that("Restoring cohort configurations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+  # Character type
+  pre_state_character <- get_state(coh)
+  coh$add_filter(range_iris_one,2)
+  expect_false(identical(get_state(coh),pre_state_character))
+  restore(coh,pre_state_character)
+  expect_true(identical(get_state(coh),pre_state_character))
+
+  # JSON type
+  pre_state_json <- get_state(coh, json = TRUE)
+  coh$add_filter(range_iris_one,2)
+  expect_false(identical(get_state(coh),pre_state_character))
+  restore(coh,pre_state_json)
+  expect_true(identical(get_state(coh),pre_state_character))
+})
+
+test_that("Restoring cohort configurations without state returns invisible FALSE", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  pre_state <- get_state(coh)
+
+  coh$add_filter(range_iris_one,2)
+
+  expect_false(identical(get_state(coh),pre_state))
+  expect_invisible(coh$restore(state = NULL))
+  expect_false(coh$restore(state = NULL))
+  expect_false(identical(get_state(coh),pre_state))
+})
+
+test_that("Restoring cohort configurations trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+  coh_2 <- coh$clone()
+  run(coh_2)
+  pre_state <- get_state(coh)
+
+  coh$add_filter(range_iris_one,2)
+  expect_false(identical(get_state(coh_2),get_state(coh)))
+  expect_null(get_data(coh))
+
+  restore(coh, pre_state, run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+  expect_identical(get_state(coh),get_state(coh))
+  expect_identical(get_data(coh),get_data(coh))
+})
+
+test_that("restore correctly restore filters filter type date_range and datetime_range", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(issues = librarian$issues)
+    ),
+    step(
+      filter(
+        "date_range", id = "issues_date", dataset = "issues",
+        variable = "date", range = c(as.Date("2010-10-01"), as.Date("2015-10-01"))
+      ),
+      filter(
+        "date_range", id = "issues_date2", dataset = "issues",
+        variable = "date", range = as.Date(NULL)
+      ),
+      filter(
+        "datetime_range", id = "issues_datetime", dataset = "issues",
+        variable = "date", range = c(as.POSIXct("2010-10-01"), as.POSIXct("2015-10-01"))
+      ),
+      filter(
+        "datetime_range", id = "issues_datetime2", dataset = "issues",
+        variable = "date", range = as.POSIXct(NULL))
+    )
+  )
+
+  pre_state <- get_state(coh)
+
+  coh$add_filter(range_iris_one,2)
+  coh$remove_filter(1,"issues_datetime")
+
+  expect_false(identical(get_state(coh),pre_state))
+
+  restore(coh, pre_state)
+
+  expect_identical(get_state(coh),pre_state)
 })
 
 # if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass

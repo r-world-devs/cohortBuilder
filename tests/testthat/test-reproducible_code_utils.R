@@ -26,6 +26,11 @@ test_that("parse_func_expr substitutes environment variables", {
   )
 })
 
+test_that("parse_func_expr returns an empty expression when func is NULL", {
+  expect_equal(parse_func_expr(NULL),
+               quote({}))
+})
+
 test_that("combine_expressions merges multiple expressions into a single one", {
   test_fun_one <- function(data_object, b = 1) {
     data_object <- a + b
@@ -61,7 +66,7 @@ test_that("pair_seq handles empty input gracefully", {
 test_that("pair_seq requires an even number of indexes", {
   # If odd length input is provided, function should fail
   expect_error(pair_seq(c(1, 2, 3)), regexp ="The lenght of idxs is not even number")
- })
+})
 
 test_that("pair_seq always returns a strictly increasing sequence of integers", {
   # Check that output is sorted and has no duplicates for a known even-length input
@@ -70,9 +75,77 @@ test_that("pair_seq always returns a strictly increasing sequence of integers", 
   
   # Expect numeric output
   expect_true(is.numeric(result))
-  
+  expect_type(result, "double")
+
   # Expect output is in strictly ascending order
   expect_true(all(diff(result) > 0))
   
 })
 
+test_that("parse_func_expr returns an empty expression when func is NULL", {
+  expect_equal(parse_func_expr(NULL),
+               quote({}))
+})
+
+test_that("func_to_expr returns an empty expression when func is NULL", {
+  expect_equal(func_to_expr(NULL,"test"),
+               quote({}))
+})
+
+test_that("func_to_expr returns a language object that includes the specified function name", {
+  test_fun_one <- function() {
+    val <- a + 1
+    val
+  }
+  name <- "simple_func_name"
+  result <- func_to_expr(test_fun_one, name)
+
+  expect_type(result,"language")
+  expect_equal(as.character(result[2]), name)
+})
+
+test_that("parse_filter_expr works fine", {
+  discrete_iris_one <- filter(
+    type = "discrete", id = "species_filter", name = "Species",
+    variable = "Species", dataset = "iris", value = c("setosa", "virginica")
+  )
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  result <- parse_filter_expr(coh$get_filter(1,1))
+
+  expect_type(result, "language")
+  expect_true(is.call(result))
+})
+
+test_that("method_to_expr works fine", {
+  expect_null(method_to_expr("not_existing_name","not_existing_namespace"))
+})
+
+test_that("method_to_expr return function works fine", {
+  name <- ".pre_filtering"
+  namespace <- "tblist"
+
+  result <- method_to_expr(name,namespace)
+
+  expect_type(result, "language")
+  expect_true(is.call(result))
+  expect_equal(formals(eval(result)), formals(paste0(name,".",namespace)))
+})
+
+test_that("assign_expr works fine", {
+  body_of_function <- quote(function(a=1,b=1) {a+b})
+  result <- assign_expr(quote(function_name), body_of_function)
+
+  eval_result <- eval(result)
+  eval_body <- eval(body_of_function)
+
+  expect_type(result,"language")
+  expect_equal(body(eval_result), body(eval_body))
+  expect_equal(formals(eval_result), formals(eval_body))
+})
