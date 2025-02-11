@@ -1104,6 +1104,80 @@ test_that("restore correctly restore filters filter type date_range and datetime
   expect_identical(get_state(coh),pre_state)
 })
 
+test_that("update_filter changed active status works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, discrete_iris_two)
+  )
+  #default TRUE
+  expect_true(get_state(coh)[[1]]$filters[[1]]$active)
+  expect_true(get_state(coh)[[1]]$filters[[2]]$active)
+
+  coh$update_filter(1, coh$get_filter(1,1)$id, active = FALSE)
+
+  expect_false(get_state(coh)[[1]]$filters[[1]]$active)
+  expect_true(get_state(coh)[[1]]$filters[[2]]$active)
+
+  coh$update_filter(1, coh$get_filter(1,1)$id, active = TRUE)
+
+  expect_true(get_state(coh)[[1]]$filters[[1]]$active)
+  expect_true(get_state(coh)[[1]]$filters[[2]]$active)
+})
+
+test_that("update_filter trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_null(get_data(coh))
+
+  #do not trigger data calculations without any changes
+  coh$update_filter(1,coh$get_filter(1,1)$id, run_flow = TRUE )
+
+  expect_null(get_data(coh))
+
+  #trigger data calculations
+  coh$update_filter(1,coh$get_filter(1,1)$id, active = FALSE, run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("Create cohort object with triggered data calculations", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one),
+    run_flow = TRUE
+  )
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("code returns expression to create filtered tblist", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  code_as_text <- code(coh, include_methods = NULL, include_action = NULL, mark_step = FALSE)
+
+  for(line in code_as_text$text.tidy){
+    rlang::eval_bare(rlang::parse_expr(line))
+  }
+
+  expect_identical(data_object$iris, get_data(coh)$iris)
+  expect_true(attr(data_object$iris, "filtered"))
+  expect_output(code(coh))
+})
 # if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
 #   test_that("(experimental) Retrieving reproducible code works fine", {
 #     # Using direct Cohort methods
