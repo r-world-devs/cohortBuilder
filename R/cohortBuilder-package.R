@@ -24,3 +24,11 @@ force_import <- function() {
   name <- as.character(substitute(name))
   get(name, envir = asNamespace(pkg), inherits = FALSE)
 }
+
+`%in%` <- function(x, table) {
+  out <- logical(length(x))
+  out[collapse::`%iin%`(x, table)] <- TRUE
+  out
+}
+
+

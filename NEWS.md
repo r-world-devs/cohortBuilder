@@ -1,7 +1,8 @@
 # cohortBuilder (development version)
 
 * Add new `datatime_filter` that handle POSIXct type.
-* Move unique/distinct to collapse::funique
+* Move unique/distinct to collapse::funique.
+* Replace `%in%` with custom operator that using `collapse::fmatch`.
 
 # cohortBuilder 0.3.0
 
