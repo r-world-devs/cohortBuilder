@@ -30,5 +30,3 @@ force_import <- function() {
   out[collapse::`%iin%`(x, table)] <- TRUE
   out
 }
-
-
