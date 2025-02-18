@@ -2,7 +2,7 @@
 
 * Add new `datatime_filter` that handle POSIXct type.
 * Move unique/distinct to collapse::funique.
-* Replace `%in%` with custom operator that using `collapse::fmatch`.
+* Replace (internally) `%in%` with custom operator using `collapse::fmatch`, that seems to be more efficient.
 
 # cohortBuilder 0.3.0
 
