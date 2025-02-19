@@ -1,0 +1,78 @@
+#' @param x Cohort
+#' @param tables Vector of tables to be combined.
+#'  The first is the main one on the basis of which the connection is created
+combine_tables <- function(x, tables, use_nest = TRUE) {
+  source_cohort <- x$get_source()
+  keys <- source_cohort$binding_keys
+  combined_tables <- c()
+  tables_keys <- list()
+
+  # Rename columns "first_name" -> "actor_first_name"
+  update_ds <- keys[[1]]$update$dataset
+  data_keys_ds <- keys[[1]]$data_keys[[1]]$dataset
+
+  if((update_ds %in% tables[-1]) && !(update_ds %in% tables_keys) && use_nest){
+    tables_keys <- append(tables_keys, list(c(dataset = update_ds, key = paste0(update_ds, "_", keys[[1]]$update$key), oryginal_key = keys[[1]]$update$key)))
+  }
+  else if((data_keys_ds %in% tables[-1]) && !(data_keys_ds %in% tables_keys) && use_nest){
+    tables_keys <- append(tables_keys, list(c(dataset = data_keys_ds, key = paste0(data_keys_ds, "_", keys[[1]]$data_keys[[1]]$key), oryginal_key = keys[[1]]$data_keys[[1]]$key)))
+  }
+
+  left_table <- get_data(x)[[update_ds]] %>%
+    dplyr::rename_with(~paste0(update_ds,"_", .), everything())
+
+  right_table <- get_data(x)[[data_keys_ds]] %>%
+    dplyr::rename_with(~paste0(data_keys_ds,"_", .), everything())
+
+  # Adding all tables to one big
+  result <- left_table %>%
+    dplyr::left_join(right_table, by = setNames(paste0(data_keys_ds, "_", keys[[1]]$data_keys[[1]]$key), paste0(update_ds, "_", keys[[1]]$update$key)), keep = TRUE)
+
+  combined_tables <- append(combined_tables, c(update_ds, data_keys_ds))
+
+  # Start on second bind key
+  for(i in keys[2:length(keys)]) {
+    update_ds <- i$update$dataset
+    data_keys_ds <- i$data_keys[[1]]$dataset
+
+    # Save name of key to create one table using a nested join
+    if((update_ds %in% tables[-1]) && !(update_ds %in% tables_keys) && use_nest){
+      tables_keys <- append(tables_keys, list(c(dataset = update_ds, key = paste0(update_ds, "_", i$update$key), oryginal_key = i$update$key)))
+    }
+    else if((data_keys_ds %in% tables[-1]) && !(data_keys_ds %in% tables_keys) && use_nest){
+      tables_keys <- append(tables_keys, list(c(dataset = data_keys_ds, key = paste0(data_keys_ds, "_", i$data_keys[[1]]$key), oryginal_key = i$data_keys[[1]]$key)))
+    }
+
+    if((update_ds %in% combined_tables) && !(data_keys_ds %in% combined_tables)){
+      right_table <- get_data(x)[[data_keys_ds]] %>%
+        dplyr::rename_with(~paste0(data_keys_ds, "_", .), everything())
+
+      result <- result %>%
+        dplyr::left_join(right_table, by = setNames(paste0(data_keys_ds, "_", i$data_keys[[1]]$key ), paste0(update_ds,"_",i$update$key)), keep = TRUE)
+
+      combined_tables <- append(combined_tables, data_keys_ds)
+    }
+    else if((data_keys_ds %in% combined_tables) && !(update_ds %in% combined_tables)) {
+      right_table <- get_data(x)[[update_ds]] %>%
+        dplyr::rename_with(~paste0(update_ds,"_", .), everything())
+
+      result <- result %>%
+        dplyr::left_join(right_table, by = setNames(paste0(update_ds,"_",i$update$key), paste0(data_keys_ds, "_", i$data_keys[[1]]$key )), keep = TRUE)
+
+      combined_tables <- append(combined_tables, update_ds)
+    }
+  }
+
+  if(use_nest){
+    for(i in tables_keys){
+      result <- result %>%
+        dplyr::nest_join(get_data(x)[[i[[1]]]], by = setNames(i[[3]], i[[2]]), name = paste0(tables[1], "_", i[[1]]))
+    }
+    final_table <- dplyr::select(result, starts_with(tables[1]))
+  }else{
+    regex_pattern <- paste0("^(", paste(tables, collapse = "|"), ")")
+    final_table <- dplyr::select(result,matches(regex_pattern))
+  }
+
+  return(final_table)
+}
