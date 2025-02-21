@@ -73,7 +73,7 @@ set_source.tblist <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
                               source_code = NULL, description = NULL, ...) {
   Source$new(
     dtconn, primary_keys = primary_keys, binding_keys = binding_keys,
-    source_code = source_code, description = description,
+    source_code = source_code, description = purrr::map(description, describe),
     ...
   )
 }
@@ -170,7 +170,7 @@ cb_filter.discrete.tblist <- function(
         variable = variable,
         value = value,
         keep_na = keep_na,
-        description = description,
+        description = describe(description),
         active = active,
         ...
       )
@@ -235,7 +235,7 @@ cb_filter.discrete_text.tblist <- function(
         dataset = dataset,
         variable = variable,
         value = value,
-        description = description,
+        description = describe(description),
         active = active,
         ...
       )
@@ -378,7 +378,7 @@ cb_filter.range.tblist <- function(
         variable = variable,
         range = range,
         keep_na = keep_na,
-        description = description,
+        description = describe(description),
         active = active,
         ...
       )
@@ -520,7 +520,7 @@ cb_filter.date_range.tblist <- function(
         variable = variable,
         range = range,
         keep_na = keep_na,
-        description = description,
+        description = describe(description),
         active = active,
         ...
       )
@@ -567,7 +567,7 @@ calculate_datetime_step <- function(min_date, max_date) {
   if (!is.na(idx)) {
     return(steps[idx])
   }
-  
+
   return(steps[length(steps)])
 }
 
@@ -576,9 +576,9 @@ calculate_datetime_step <- function(min_date, max_date) {
 cb_filter.datetime_range.tblist <- function(
     source, type = "datetime_range", id = .gen_id(), name = id, variable, range = NA,
     dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
-  
+
   args <- list(...)
-  
+
   def_filter(
     type = type,
     id = id,
@@ -588,7 +588,7 @@ cb_filter.datetime_range.tblist <- function(
       if (!inherits(data_object[[dataset]][[variable]], "POSIXct")) {
         data_object[[dataset]][[variable]] <- as.POSIXct(data_object[[dataset]][[variable]], tz = "UTC", origin = "1970-01-01 UTC")
       }
-      
+
       if (identical(range, NULL) || length(range) == 0) {
         range <- c(Inf, -Inf) %>% as.POSIXct(origin = "1970-01-01 UTC")
       }
@@ -598,7 +598,7 @@ cb_filter.datetime_range.tblist <- function(
         if (identical(end_range, NULL) || anyNA(end_range, NA) || identical(end_range, "Inf")) {
           range[2] <- Inf
         }
-        
+
         # keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
           dplyr::filter(
@@ -621,7 +621,7 @@ cb_filter.datetime_range.tblist <- function(
           )
         # !keep_na !value_na end
       }
-      
+
       attr(data_object[[dataset]], "filtered") <- TRUE
       return(data_object)
     },
@@ -630,16 +630,16 @@ cb_filter.datetime_range.tblist <- function(
         name <- c("n_data", "frequencies", "n_missing")
       }
       extra_params <- list(...)
-      
+
       data_object[[dataset]][[variable]] <- as.numeric(data_object[[dataset]][[variable]])
 
       if (is.null(extra_params$step) && !identical(length(data_object[[dataset]][[variable]]), 0L)) {
         min <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
         max <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
-        
+
         extra_params$step <- calculate_datetime_step(min, max) |> unname()
       }
-      
+
       stats <- list(
         frequencies = if ("frequencies" %in% name) {
           get_range_frequencies(data_object, dataset, variable, extra_params)
@@ -651,7 +651,7 @@ cb_filter.datetime_range.tblist <- function(
           data_object[[dataset]][[variable]] %>% is.na() %>% sum()
         }
       )
-      
+
       if (length(name) == 1) {
         return(stats[[name]])
       } else {
@@ -664,8 +664,8 @@ cb_filter.datetime_range.tblist <- function(
           min(data_object[[dataset]][[variable]], na.rm = TRUE),
           max(data_object[[dataset]][[variable]], na.rm = TRUE)
         ) |> names()
-        
-        data_object[[dataset]][[variable]] %>% 
+
+        data_object[[dataset]][[variable]] %>%
           graphics::hist(breaks = breaks)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
@@ -677,7 +677,7 @@ cb_filter.datetime_range.tblist <- function(
         variable = variable,
         range = range,
         keep_na = keep_na,
-        description = description,
+        description = describe(description),
         active = active,
         ...
       )
@@ -775,7 +775,7 @@ cb_filter.multi_discrete.tblist <- function(
         variables = variables,
         values = values,
         keep_na = keep_na,
-        description = description,
+        description = describe(description),
         active = active,
         ...
       )
@@ -858,7 +858,7 @@ cb_filter.query.tblist <- function(
         variables = variables,
         value = value,
         keep_na = keep_na,
-        description = description,
+        description = describe(description),
         active = active,
         ...
       )
@@ -899,15 +899,25 @@ cb_filter.query.tblist <- function(
     }
   }
 
-  data_object_post[[binding_dataset]] <- dplyr::inner_join(
+  data_object_post[[binding_dataset]] <- collapse::join(
     switch(
       as.character(binding_key$post),
       "FALSE" = data_object_pre[[binding_dataset]],
       "TRUE" = data_object_post[[binding_dataset]]
     ),
     key_values,
-    by = stats::setNames(common_key_names, binding_key$update$key)
+    on = stats::setNames(common_key_names, binding_key$update$key),
+    how = "inner"
   )
+  # data_object_post[[binding_dataset]] <- dplyr::inner_join(
+  #   switch(
+  #     as.character(binding_key$post),
+  #     "FALSE" = data_object_pre[[binding_dataset]],
+  #     "TRUE" = data_object_post[[binding_dataset]]
+  #   ),
+  #   key_values,
+  #   by = stats::setNames(common_key_names, binding_key$update$key)
+  # )
   if (binding_key$activate) {
     attr(data_object_post[[binding_dataset]], "filtered") <- TRUE
   }

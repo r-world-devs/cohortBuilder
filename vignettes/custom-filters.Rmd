@@ -227,7 +227,7 @@ cb_filter.logical.tblist <- function(
         dataset = dataset,
         variable = variable,
         value = value,
-        description = description,
+        description = describe(description),
         keep_na = keep_na,
         active = active,
         ...
