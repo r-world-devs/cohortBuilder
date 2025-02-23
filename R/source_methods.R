@@ -22,7 +22,7 @@ Source <- R6::R6Class(
     initialize = function(
       dtconn, ..., primary_keys = NULL, binding_keys = NULL, source_code = NULL,
       description = NULL,  options = list(display_binding = TRUE)
-      ) {
+    ) {
 
       self$dtconn <- dtconn
       self$attributes <- list(...)
@@ -56,7 +56,7 @@ Source <- R6::R6Class(
         private$steps,
         stats::setNames(
           list(step),
-          as.character(length(private$steps) + 1)
+          as.character(length(private$steps) + 1L)
         )
       )
     },
@@ -74,7 +74,7 @@ Source <- R6::R6Class(
       }
 
       private$steps[[step_id]] <- NULL
-      if (length(private$steps) >= 1) {
+      if (length(private$steps) >= 1L) {
         names(private$steps) <- as.character(seq_len(length(private$steps)))
       } else {
         private$steps <- NULL
@@ -88,7 +88,7 @@ Source <- R6::R6Class(
     add_filter = function(filter, step_id) {
 
       if (missing(step_id)) {
-        step_id <- 1
+        step_id <- 1L
         if (!is.null(private$steps)) {
           step_id <- length(private$steps)
         }
@@ -117,11 +117,11 @@ Source <- R6::R6Class(
 
       private$steps[[step_id]]$filters[[to_remove_idx]] <- NULL
 
-      if (length(private$steps[[step_id]]$filters) == 0) {
+      if (length(private$steps[[step_id]]$filters) == 0L) {
         private$steps[[step_id]] <- NULL # remove step when no more filters
       }
 
-      if (length(private$steps) == 0) {
+      if (length(private$steps) == 0L) {
         private$steps <- NULL
       }
     },

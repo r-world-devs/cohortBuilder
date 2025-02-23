@@ -89,7 +89,7 @@ Cohort <- R6::R6Class(
                           post = get_hook("post_add_step_hook")
                         )) {
 
-      new_step_id <- as.character(as.integer(self$last_step_id()) + 1)
+      new_step_id <- as.character(as.integer(self$last_step_id()) + 1L)
 
       run_hooks(hook$pre, self, private, new_step_id)
 
@@ -121,7 +121,7 @@ Cohort <- R6::R6Class(
           filters = purrr::map(filters, get_filter_state, extra_fields = NULL)
         )
       } else {
-        step_config <- self$get_state(step_id, json = FALSE)[[1]]
+        step_config <- self$get_state(step_id, json = FALSE)[[1L]]
         step_config$step <- next_step(step_id)
       }
 
@@ -150,7 +150,7 @@ Cohort <- R6::R6Class(
       run_hooks(hook$pre, self, private, step_id)
 
       step_id <- as.character(step_id)
-      clear_data_ids <- steps_range(step_id, rev(names(private$steps))[1])
+      clear_data_ids <- steps_range(step_id, rev(names(private$steps))[1L])
       private$steps[[step_id]] <- NULL
       private$cache[clear_data_ids] <- NULL
       private$data_objects[clear_data_ids] <- NULL
@@ -191,7 +191,7 @@ Cohort <- R6::R6Class(
       filter_id <- as.character(filter_id)
 
       private$steps[[step_id]]$filters[[filter_id]] <- NULL
-      if (length(private$steps[[step_id]]$filters) == 0) {
+      if (length(private$steps[[step_id]]$filters) == 0L) {
         self$remove_step(step_id, run_flow)
       } else {
         if (run_flow) {
@@ -341,10 +341,9 @@ Cohort <- R6::R6Class(
             filter_state$range <- na_fix(filter_state$range)
             filter_state$range <- as.Date(filter_state$range)
           }
-          
           if (filter_state$type == "datetime_range") {
             filter_state$range <- na_fix(filter_state$range)
-            if (length(filter_state$range) == 0) filter_state$range <- NULL
+            if (length(filter_state$range) == 0L) filter_state$range <- NULL
             filter_state$range <- as.POSIXct(filter_state$range, origin = "1970-01-01 UTC")
           }
           add_filter(
@@ -508,7 +507,7 @@ Cohort <- R6::R6Class(
       include_action = c("pre_filtering", "post_filtering", "run_binding"),
       modifier = .repro_code_tweak, mark_step = TRUE, ...) {
 
-      source_type <- class(private$source)[1]
+      source_type <- class(private$source)[1L]
       # todo improve
       fun_args <- environment()
       code_params <- c(
@@ -620,7 +619,7 @@ Cohort <- R6::R6Class(
       # todo code include once?
       res_quote <- combine_expressions(unlist(code_components_df$expr))
       formatR::tidy_source(
-        text = as.character(res_quote)[-1],
+        text = as.character(res_quote)[-1L],
         ...
       )
     },
@@ -631,7 +630,7 @@ Cohort <- R6::R6Class(
                         hook = list(pre = get_hook("pre_run_flow_hook"), post = get_hook("post_run_flow_hook"))) {
       run_hooks(hook$pre, self, private)
       if (missing(min_step)) {
-        min_step <- 1
+        min_step <- 1L
       }
       min_step <- min(length(private$data_objects), as.integer(min_step)) # make sure all steps data is evaluated
       steps_to_execute <- steps_range(min_step, length(private$steps))

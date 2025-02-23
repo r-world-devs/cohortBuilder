@@ -13,8 +13,8 @@ eval_filter <- function(filter_fun, step_id, source) {
 #' @export
 .gen_id <- function() {
   paste0(
-    paste0(sample(LETTERS, 5, TRUE), collapse = ""),
-    round(as.numeric(Sys.time()) * 1000)
+    paste0(sample(LETTERS, 5L, TRUE), collapse = ""),
+    round(as.numeric(Sys.time()) * 1000L)
   )
 }
 
@@ -315,7 +315,7 @@ filter.datetime_range <- function(type, id, name, ..., description = NULL,
     environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
     list(...)
   )
-  
+
   .as_constructor(
     function(source) {
       do.call(

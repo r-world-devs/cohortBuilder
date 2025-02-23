@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-options("tibble.print_min" = 5, "tibble.print_max" = 5)
+options("tibble.print_min" = 5L, "tibble.print_max" = 5L)
 library(magrittr)
 library(cohortBuilder)
 ```
