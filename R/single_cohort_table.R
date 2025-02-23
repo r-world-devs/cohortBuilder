@@ -87,3 +87,25 @@ combine_tables <- function(x, tables, main_key, use_nest = TRUE) {
 
   return(final_table)
 }
+
+#' @description
+#' Create plot to draw connection between binding keys
+#'
+#' @param x Cohort
+plot_binding_keys <- function(x) {
+  source_cohort <- x$get_source()
+
+  edges <- do.call(rbind, lapply(source_cohort$binding_keys, function(bind) {
+    source <- bind$update$dataset
+    targets <- sapply(bind$data_keys, function(dk) dk$dataset)
+    data.frame(source = source, target = targets, stringsAsFactors = FALSE)
+  }))
+
+  graph <- igraph::graph_from_data_frame(edges, directed = TRUE)
+
+  ggraph::ggraph(graph, layout = "fr") +
+    ggraph::geom_edge_link( linewidth = 0.8) +
+    ggraph::geom_node_point(size = 6, color = "blue") +
+    ggraph::geom_node_text(ggplot2::aes(label = name), vjust = 1.5, size = 5) +
+    ggplot2::theme_minimal()
+}
