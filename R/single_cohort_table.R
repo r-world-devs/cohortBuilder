@@ -18,7 +18,7 @@ combine_tables <- function(x, tables, main_key, use_nest = TRUE) {
 
   subset_tables <- create_subset_list(keys)
 
-  tables_in_subset <- check_tables_in_subsets(tables,subset_tables)
+  tables_in_subset <- get_tables_from_subsets(tables,subset_tables)
 
   if((update_ds %in% tables[-1]) && use_nest){
     tables_keys <- append(tables_keys, list(c(dataset = update_ds, key = paste0(update_ds, "_", keys[[1]]$update$key))))
@@ -138,9 +138,10 @@ create_subset_list <- function(keys) {
 
 }
 
-#' @param tables vector of tables to check
-#' @param subset_tables list of subset tables
-check_tables_in_subsets <- function(tables,subset_tables) {
+#' @param tables vector of tables to check in all subset and merged subsets
+#' @param subset_tables list of subsets
+#' @return vector of tables from subset where all tables from input are located
+get_tables_from_subsets <- function(tables,subset_tables) {
 
   for (subset in subset_tables) {
     if (all(tables %in% subset)) {
