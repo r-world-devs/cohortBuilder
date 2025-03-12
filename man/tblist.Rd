@@ -5,15 +5,18 @@
 \alias{as.tblist}
 \title{Create in memory tables connection}
 \usage{
-tblist(..., names)
+tblist(..., names, extra_class = NULL)
 
-as.tblist(x, ...)
+as.tblist(x, ..., extra_class = NULL)
 }
 \arguments{
 \item{...}{additional arguments to be passed to or from methods.}
 
 \item{names}{A character vector describing provided tables names.
 If missing names are constructed based on provided tables objects.}
+
+\item{extra_class}{The custom class that can be simply used to overwrite
+existing method without modifying package class.}
 
 \item{x}{an R object.}
 }

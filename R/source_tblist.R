@@ -12,11 +12,13 @@
 #' @param ... Optionally named data frames.
 #' @param names A character vector describing provided tables names.
 #'   If missing names are constructed based on provided tables objects.
+#' @param extra_class The custom class that can be simply used to overwrite
+#'   existing method without modifying package class.
 #' @return Object of class 'tblist' being a named list of data frames.
 #' @export
-tblist <- function(..., names) {
+tblist <- function(..., names, extra_class = NULL) {
   tables <- rlang::dots_list(..., .named = TRUE)
-  out_class <- "tblist"
+  out_class <- c(extra_class, "tblist")
 
   tb_call <- sys.call(1)
   if (inherits(tables, "data.frame")) {
@@ -53,18 +55,18 @@ tblist <- function(..., names) {
 #' @param x an R object.
 #' @param ... additional arguments to be passed to or from methods.
 #' @export
-as.tblist <- function(x, ...) {
+as.tblist <- function(x, ..., extra_class = NULL) {
   UseMethod("as.tblist", x)
 }
 
 #' @export
-as.tblist.data.frame <- function(x, names, ...) {
-  tblist(x, names = names)
+as.tblist.data.frame <- function(x, names, ..., extra_class = NULL) {
+  tblist(x, names = names, extra_class = extra_class)
 }
 
 #' @export
-as.tblist.list <- function(x, names, ...) {
-  tblist(!!!x, names = names)
+as.tblist.list <- function(x, names, ..., extra_class = NULL) {
+  tblist(!!!x, names = names, extra_class = extra_class)
 }
 
 #' @rdname set_source

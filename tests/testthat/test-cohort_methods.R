@@ -1105,6 +1105,43 @@ test_that("restore correctly restore filters filter type date_range and datetime
   expect_identical(get_state(coh), pre_state)
 })
 
+test_that("Verify that new custom class method works correctly", {
+  .collect_data.custom_tblist <- function(source, data_object) {
+    "custom_tblist_data_collect"
+  }
+  
+  registerS3method(".collect_data", "custom_tblist", .collect_data.custom_tblist)
+  
+  coh <- cohort(
+    set_source(
+      tblist(iris = iris, extra_class = "custom_tblist")
+    ),
+    step(discrete_iris_one)
+  )
+  
+  run(coh)
+  expect_identical(get_data(coh, 1, collect = TRUE), "custom_tblist_data_collect")
+})
+
+test_that("Verify that new verbose class method works correctly", {
+  .collect_data.verbose <- function(source, data_object) {
+    message(nrow(data_object[[1]]))
+    NextMethod()
+  }
+  
+  registerS3method(".collect_data", "verbose", .collect_data.verbose)
+  
+  coh <- cohort(
+    set_source(
+      tblist(iris = iris, extra_class = "verbose")
+    ),
+    step(discrete_iris_one)
+  )
+  
+  run(coh)
+  expect_message(get_data(coh, 1, collect = TRUE), regexp =  nrow(get_data(coh, 1, collect = TRUE[[1]])))
+})
+
 # if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
 #   test_that("(experimental) Retrieving reproducible code works fine", {
 #     # Using direct Cohort methods
