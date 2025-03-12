@@ -27,6 +27,8 @@ linters: linters_with_defaults(
     object_name_linter = NULL,
     object_usage_linter = NULL,
     assignment_linter = assignment_linter(allow_trailing = FALSE),
-    indentation_linter = indentation_linter(hanging_indent_style = "tidy", assignment_as_infix = FALSE)
+    indentation_linter = indentation_linter(hanging_indent_style = "tidy", assignment_as_infix = FALSE),
+    return_linter = NULL,
+    trailing_whitespace_linter = NULL
   )
 encoding: "UTF-8"

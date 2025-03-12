@@ -887,16 +887,28 @@ cb_filter.query.tblist <- function(
       key_values <- dplyr::inner_join(key_values, tmp_key_values, by = common_key_names)
     }
   }
-
-  data_object_post[[binding_dataset]] <- dplyr::inner_join(
-    switch(
-      as.character(binding_key$post),
-      "FALSE" = data_object_pre[[binding_dataset]],
-      "TRUE" = data_object_post[[binding_dataset]]
-    ),
-    key_values,
-    by = stats::setNames(common_key_names, binding_key$update$key)
+  
+  df <- switch(
+    as.character(binding_key$post),
+    "FALSE" = data_object_pre[[binding_dataset]],
+    "TRUE" = data_object_post[[binding_dataset]]
   )
+  
+  data_object_post[[binding_dataset]] <- tryCatch({
+    collapse::join(
+      df,
+      key_values,
+      on = stats::setNames(common_key_names, binding_key$update$key),
+      how = "inner"
+    )
+  }, error = function(e) {
+    dplyr::inner_join(
+      df,
+      key_values,
+      by = stats::setNames(common_key_names, binding_key$update$key)
+    )
+  })
+  
   if (binding_key$activate) {
     attr(data_object_post[[binding_dataset]], "filtered") <- TRUE
   }
