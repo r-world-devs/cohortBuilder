@@ -888,6 +888,12 @@ cb_filter.query.tblist <- function(
     }
   }
   
+  df <- switch(
+    as.character(binding_key$post),
+    "FALSE" = data_object_pre[[binding_dataset]],
+    "TRUE" = data_object_post[[binding_dataset]]
+  )
+  
   data_object_post[[binding_dataset]] <- tryCatch({
     collapse::join(
       df,
@@ -897,11 +903,7 @@ cb_filter.query.tblist <- function(
     )
   }, error = function(e) {
     dplyr::inner_join(
-      switch(
-        as.character(binding_key$post),
-        "FALSE" = data_object_pre[[binding_dataset]],
-        "TRUE" = data_object_post[[binding_dataset]]
-      ),
+      df,
       key_values,
       by = stats::setNames(common_key_names, binding_key$update$key)
     )
