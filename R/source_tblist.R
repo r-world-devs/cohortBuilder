@@ -899,7 +899,8 @@ cb_filter.query.tblist <- function(
       df,
       key_values,
       on = stats::setNames(common_key_names, binding_key$update$key),
-      how = "inner"
+      how = "inner",
+      verbose = getOption("cb_verbose", default = FALSE)
     )
   }, error = function(e) {
     dplyr::inner_join(
