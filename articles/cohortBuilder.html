@@ -354,7 +354,7 @@ properly just run:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sum_up.html">sum_up</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &gt;&gt; Step ID: 1</span></span>
-<span><span class="co">#&gt; -&gt; Filter ID: EEXOM1741782169491</span></span>
+<span><span class="co">#&gt; -&gt; Filter ID: EEXOM1742296244300</span></span>
 <span><span class="co">#&gt;    Filter Type: discrete</span></span>
 <span><span class="co">#&gt;    Filter Parameters:</span></span>
 <span><span class="co">#&gt;      dataset: books</span></span>
@@ -783,7 +783,7 @@ source):</p>
 <span><span class="co">#&gt;         `TRUE` = data_object_post[[binding_dataset]])</span></span>
 <span><span class="co">#&gt;     data_object_post[[binding_dataset]] &lt;- tryCatch({</span></span>
 <span><span class="co">#&gt;         collapse::join(df, key_values, on = stats::setNames(common_key_names, binding_key$update$key),</span></span>
-<span><span class="co">#&gt;             how = "inner")</span></span>
+<span><span class="co">#&gt;             how = "inner", verbose = getOption("cb_verbose", default = FALSE))</span></span>
 <span><span class="co">#&gt;     }, error = function(e) {</span></span>
 <span><span class="co">#&gt;         dplyr::inner_join(df, key_values, by = stats::setNames(common_key_names,</span></span>
 <span><span class="co">#&gt;             binding_key$update$key))</span></span>
@@ -880,7 +880,7 @@ which creation code can be defined separately while creating it:</p>
 <span><span class="co">#&gt;         `TRUE` = data_object_post[[binding_dataset]])</span></span>
 <span><span class="co">#&gt;     data_object_post[[binding_dataset]] &lt;- tryCatch({</span></span>
 <span><span class="co">#&gt;         collapse::join(df, key_values, on = stats::setNames(common_key_names, binding_key$update$key),</span></span>
-<span><span class="co">#&gt;             how = "inner")</span></span>
+<span><span class="co">#&gt;             how = "inner", verbose = getOption("cb_verbose", default = FALSE))</span></span>
 <span><span class="co">#&gt;     }, error = function(e) {</span></span>
 <span><span class="co">#&gt;         dplyr::inner_join(df, key_values, by = stats::setNames(common_key_names,</span></span>
 <span><span class="co">#&gt;             binding_key$update$key))</span></span>
