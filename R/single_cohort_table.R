@@ -1,8 +1,7 @@
 #' @param x Cohort
 #' @param tables Vector of tables to be combined.
 #'  The first is the main one on the basis of which the connection is created
-#' @param main_key Name of primary key of main table
-combine_tables <- function(x, tables, main_key, use_nest = TRUE) {
+combine_tables <- function(x, tables, use_nest = TRUE) {
 
   if(!all(tables %in% names(get_data(x)))) {
     stop("one or more tables do not appear in this cohort")
@@ -12,15 +11,117 @@ combine_tables <- function(x, tables, main_key, use_nest = TRUE) {
   prim_keys <- source_cohort$primary_keys
   keys <- source_cohort$binding_keys
   tables_keys <- list()
-
   update_ds <- keys[[1]]$update$dataset
-  primary_key <- prim_keys[[which(sapply(prim_keys, function(x) x$dataset) == update_ds)]]$key
 
   subset_tables <- create_subset_list(keys)
-
   tables_in_subset <- get_tables_from_subsets(tables,subset_tables)
 
-  if((update_ds %in% tables[-1]) && use_nest){
+  if(is.null(tables_in_subset)){
+    stop("At this moment we do not support joining 2 tables from different table subsets")
+  }
+
+  keys <- keys[sapply(keys, function(x) {
+           x$update$dataset %in% tables_in_subset & x$data_key[[1]]$dataset %in% tables_in_subset
+  })]
+
+  main_key <- prim_keys[[which(sapply(prim_keys, function(x) x$dataset== tables[1]))]]$key
+
+  keys <- reduce_number_of_keys(tables, keys)
+
+  final_table  <- join_tables(x, keys, use_nest, main_key, tables)
+
+  return(final_table)
+}
+
+#' @param keys List of binding keys
+create_subset_list <- function(keys) {
+  subset_list <- list(keys[[1]]$update$dataset)
+  id_subset_list <- 2
+
+  for(key in keys) {
+    found <- FALSE
+    up_table <- key$update$dataset
+    data_table <- key$data_keys[[1]]$dataset
+
+    for(id in which(sapply(subset_list, function(x) up_table %in% x))) {
+      if(!(data_table %in% subset_list[[id]])){
+        subset_list[[id]] <- append(subset_list[[id]], data_table)
+      }
+      found <- TRUE
+    }
+
+    for(id in which(sapply(subset_list, function(x) data_table %in% x))) {
+      if(!(up_table %in% subset_list[[id]])){
+        subset_list[[id]] <- append(subset_list[[id]], up_table)
+      }
+      found <- TRUE
+    }
+
+    if(!found){
+      subset_list[[paste0("subset_", id_subset_list)]] <- c(up_table, data_table)
+      id_subset_list <- id_subset_list + 1
+    }
+  }
+
+  return(subset_list)
+
+}
+
+#' @param tables vector of tables to check in all subset and merged subsets
+#' @param subset_tables list of subsets
+#' @return vector of tables from subset where all tables from input are located
+get_tables_from_subsets <- function(tables,subset_tables) {
+
+  for (subset in subset_tables) {
+    if (all(tables %in% subset)) {
+      return(subset)
+    }
+  }
+
+  if(length(subset_tables) == 1) {
+    return(NULL)
+  }
+
+  continue <- TRUE
+  change <- FALSE
+  start_id <- 1
+  while(continue) {
+
+    end_id <- length(subset_tables)
+
+    if(change){
+      if (all(tables %in% subset_tables[[start_id]])) {
+        return(subset_tables[[start_id]])
+      }
+      change <- FALSE
+    }
+
+
+    for(id in (start_id+1):end_id) {
+      common_tables <- intersect(subset_tables[[start_id]], subset_tables[[id]])
+      if(length(common_tables) > 0) {
+        subset_tables[[start_id]] <- union(subset_tables[[start_id]], subset_tables[[id]])
+        subset_tables[[id]] <- NULL
+        change <- TRUE
+        break
+      }
+    }
+    if(!change){
+      start_id <- start_id + 1
+    }
+    if(start_id >= end_id - 1){
+      return(NULL)
+    }
+  }
+}
+
+join_tables <- function(x, keys, use_nest, main_key, tables) {
+
+  tables_keys <- list()
+
+  update_ds <- keys[[1]]$update$dataset
+
+  if(update_ds %in% tables[-1]){
     tables_keys <- append(tables_keys, list(c(dataset = update_ds, key = paste0(update_ds, "_", keys[[1]]$update$key))))
   }
 
@@ -35,10 +136,10 @@ combine_tables <- function(x, tables, main_key, use_nest = TRUE) {
     data_keys_ds <- i$data_keys[[1]]$dataset
 
     # Save name of key to create one table using a nested join
-    if((update_ds %in% tables[-1]) && !(update_ds %in% unlist(tables_keys)) && use_nest){
+    if((update_ds %in% tables[-1]) && !(update_ds %in% unlist(tables_keys))){
       tables_keys <- append(tables_keys, list(c(dataset = update_ds, key = paste0(update_ds, "_", i$update$key))))
     }
-    else if((data_keys_ds %in% tables[-1]) && !(data_keys_ds %in% unlist(tables_keys)) && use_nest){
+    else if((data_keys_ds %in% tables[-1]) && !(data_keys_ds %in% unlist(tables_keys))){
       tables_keys <- append(tables_keys, list(c(dataset = data_keys_ds, key = paste0(data_keys_ds, "_", i$data_keys[[1]]$key))))
     }
 
@@ -61,7 +162,6 @@ combine_tables <- function(x, tables, main_key, use_nest = TRUE) {
       combined_tables <- append(combined_tables, update_ds)
     }
   }
-
   if(use_nest){
     name_of_new_col <- paste0(tables[1], "_", tables_keys[[1]][[1]])
     main_key_result <- paste0(tables[1],"_", main_key)
@@ -102,81 +202,9 @@ combine_tables <- function(x, tables, main_key, use_nest = TRUE) {
   return(final_table)
 }
 
-#' @param keys List of binding keys
-create_subset_list <- function(keys) {
-  subset_list <- list(subset_1 = keys[[1]]$update$dataset)
-  id_subset_list <- 2
 
-  for(key in keys) {
-    found <- FALSE
-    up_table <- key$update$dataset
-    data_table <- key$data_keys[[1]]$dataset
-
-
-
-    for(id in which(sapply(subset_list, function(x) up_table %in% x))) {
-      if(!(data_table %in% subset_list[[id]])){
-        subset_list[[id]] <- append(subset_list[[id]], data_table)
-      }
-      found <- TRUE
-    }
-
-    for(id in which(sapply(subset_list, function(x) data_table %in% x))) {
-      if(!(up_table %in% subset_list[[id]])){
-        subset_list[[id]] <- append(subset_list[[id]], up_table)
-      }
-      found <- TRUE
-    }
-
-    if(!found){
-      subset_list[[paste0("subset_", id_subset_list)]] <- c(up_table, data_table)
-      id_subset_list <- id_subset_list + 1
-    }
-  }
-
-  return(subset_list)
-
-}
-
-#' @param tables vector of tables to check in all subset and merged subsets
-#' @param subset_tables list of subsets
-#' @return vector of tables from subset where all tables from input are located
-get_tables_from_subsets <- function(tables,subset_tables) {
-
-  for (subset in subset_tables) {
-    if (all(tables %in% subset)) {
-      return(subset)
-    }
-  }
   continue <- TRUE
-  change <- FALSE
-  start_id <- 1
-  while(continue) {
-
-    end_id <- length(subset_tables)
-
-    if(change){
-      if (all(tables %in% subset_tables[[start_id]])) {
-        return(subset_tables[[start_id]])
-      }
-      change <- FALSE
     }
-
-    for(id in (start_id+1):end_id) {
-      common_tables <- intersect(subset_tables[[start_id]], subset_tables[[id]])
-      if(length(common_tables) > 0) {
-        subset_tables[[start_id]] <- union(subset_tables[[start_id]], subset_tables[[id]])
-        subset_tables[[id]] <- NULL
-        change <- TRUE
-        break
-      }
-    }
-    if(!change){
-      start_id <- start_id + 1
-
-      if(start_id >= end_id - 1){
-        stop("At this moment we do not support joining 2 tables from different table subsets")
-      }
     }
   }
 }
