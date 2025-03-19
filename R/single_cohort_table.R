@@ -26,7 +26,7 @@ combine_tables <- function(x, tables, use_nest = TRUE) {
 
   main_key <- prim_keys[[which(sapply(prim_keys, function(x) x$dataset== tables[1]))]]$key
 
-  keys <- reduce_number_of_keys(tables, keys)
+  keys <- select_keys(tables, keys)
 
   final_table  <- join_tables(x, keys, use_nest, main_key, tables)
 
@@ -202,11 +202,29 @@ join_tables <- function(x, keys, use_nest, main_key, tables) {
   return(final_table)
 }
 
+select_keys <- function(tables, keys) {
 
+  id <- 1
+  keys_test <- keys
   continue <- TRUE
+  while(continue){
+    keys_test <- keys[-id]
+    subset_tables <- create_subset_list(keys_test)
+    tables_in_subset <- get_tables_from_subsets(tables,subset_tables)
+
+    if(!is.null(tables_in_subset)){
+      keys <- keys_test[sapply(keys_test, function(x) {
+        x$update$dataset %in% tables_in_subset & x$data_key[[1]]$dataset %in% tables_in_subset
+      })]
+    }else{
+      id <- id + 1
     }
+    if(id > length(keys)){
+      continue <- FALSE
     }
   }
+
+  return(keys)
 }
 
 #' @description
@@ -230,3 +248,4 @@ plot_binding_keys <- function(x) {
     ggraph::geom_node_text(ggplot2::aes(label = name), vjust = 1.5, size = 5) +
     ggplot2::theme_minimal()
 }
+
