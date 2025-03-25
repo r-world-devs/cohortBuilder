@@ -19,13 +19,14 @@ combine_tables <- function(x, tables, use_nest = TRUE) {
     stop("At this moment we do not support joining 2 tables from different table subsets")
   }
 
-  keys <- keys[sapply(keys, function(x) {
-    x$update$dataset %in% tables_in_subset &
-      x$data_key[[1]]$dataset %in% tables_in_subset
-  })]
+  keys <- keys %>%
+    purrr::keep(~ .x$update$dataset %in% tables_in_subset &
+                  .x$data_key[[1]]$dataset %in% tables_in_subset)
 
-  main_key <- prim_keys[[which(sapply(prim_keys, function(x)
-    x$dataset == tables[1]))]]$key
+  main_key <- prim_keys %>%
+    purrr::keep(~.x$dataset == tables[1]) %>%
+    purrr::map_chr("key") %>%
+    dplyr::first()
 
   keys <- select_keys(tables, keys)
 
@@ -36,27 +37,31 @@ combine_tables <- function(x, tables, use_nest = TRUE) {
 
 #' @param keys List of binding keys
 create_subset_list <- function(keys) {
-  subset_list <- list(keys[[1]]$update$dataset)
+  subset_list <- list("subset_1" = keys[[1]]$update$dataset)
   id_subset_list <- 2
 
-  for (key in keys) {
+  purrr::walk(keys, \(key){
     found <- FALSE
     up_table <- key$update$dataset
     data_table <- key$data_keys[[1]]$dataset
 
-    for (id in which(sapply(subset_list, function(x)
-      up_table %in% x))) {
-      if (!(data_table %in% subset_list[[id]])) {
-        subset_list[[id]] <- append(subset_list[[id]], data_table)
-      }
+    matching_subsets <- subset_list %>%
+      purrr::keep(~ up_table %in% .x)
+    if (!(rlang::is_empty(matching_subsets))) {
+      subset_list[names(matching_subsets)] <- matching_subsets %>%
+        purrr::map(~ if (!(data_table %in% .x)){
+          append(.x, data_table)
+        }else .x)
       found <- TRUE
     }
 
-    for (id in which(sapply(subset_list, function(x)
-      data_table %in% x))) {
-      if (!(up_table %in% subset_list[[id]])) {
-        subset_list[[id]] <- append(subset_list[[id]], up_table)
-      }
+    matching_subsets <- subset_list %>%
+      purrr::keep(~ data_table %in% .x)
+    if (!(rlang::is_empty(matching_subsets))) {
+      subset_list[names(matching_subsets)] <- matching_subsets %>%
+        purrr::map(~ if (!(up_table %in% .x)){
+          append(.x, up_table)
+        }else .x)
       found <- TRUE
     }
 
@@ -64,7 +69,7 @@ create_subset_list <- function(keys) {
       subset_list[[paste0("subset_", id_subset_list)]] <- c(up_table, data_table)
       id_subset_list <- id_subset_list + 1
     }
-  }
+  })
 
   return(subset_list)
 }
@@ -73,20 +78,20 @@ create_subset_list <- function(keys) {
 #' @param subset_tables list of subsets
 #' @return vector of tables from subset where all tables from input are located
 get_tables_from_subsets <- function(tables, subset_tables) {
-  for (subset in subset_tables) {
-    if (all(tables %in% subset)) {
-      return(subset)
-    }
+  subset <- subset_tables %>%
+    purrr::keep(~all(tables %in% .x))
+
+  if(!rlang::is_empty(subset)){
+    return(subset)
   }
 
   if (length(subset_tables) == 1) {
     return(NULL)
   }
 
-  continue <- TRUE
   change <- FALSE
   start_id <- 1
-  while (continue) {
+  while (TRUE) {
     end_id <- length(subset_tables)
 
     if (change) {
@@ -96,16 +101,17 @@ get_tables_from_subsets <- function(tables, subset_tables) {
       change <- FALSE
     }
 
-
-    for (id in (start_id + 1):end_id) {
+    purrr::walk((start_id + 1):end_id, function(id) {
       common_tables <- intersect(subset_tables[[start_id]], subset_tables[[id]])
       if (length(common_tables) > 0) {
         subset_tables[[start_id]] <- union(subset_tables[[start_id]], subset_tables[[id]])
         subset_tables[[id]] <- NULL
-        change <- TRUE
-        break
+        change <<- TRUE
+        return(NULL)
       }
-    }
+    })
+
+
     if (!change) {
       start_id <- start_id + 1
     }
@@ -247,10 +253,9 @@ select_keys <- function(tables, keys) {
     tables_in_subset <- get_tables_from_subsets(tables, subset_tables)
 
     if (!is.null(tables_in_subset)) {
-      keys <- keys_test[sapply(keys_test, function(x) {
-        x$update$dataset %in% tables_in_subset &
-          x$data_key[[1]]$dataset %in% tables_in_subset
-      })]
+      keys <- keys %>%
+        purrr::keep(~ .x$update$dataset %in% tables_in_subset &
+                      .x$data_key[[1]]$dataset %in% tables_in_subset)
     } else {
       id <- id + 1
     }
@@ -271,7 +276,7 @@ plot_binding_keys <- function(x) {
 
   edges <- do.call(rbind, lapply(source_cohort$binding_keys, function(bind) {
     source <- bind$update$dataset
-    targets <- sapply(bind$data_keys, function(dk)
+    targets <- purrr::map_vec(bind$data_keys, function(dk)
       dk$dataset)
     data.frame(source = source,
                target = targets,
