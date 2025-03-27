@@ -368,7 +368,7 @@ code(coh)
 #>     common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))
 #>     for (dependent_dataset in dependent_datasets) {
 #>         key_names <- binding_key$data_keys[[dependent_dataset]]$key
-#>         tmp_key_values <- dplyr::distinct(data_object_post[[dependent_dataset]][,
+#>         tmp_key_values <- collapse::funique(data_object_post[[dependent_dataset]][,
 #>             key_names, drop = FALSE]) %>%
 #>             stats::setNames(common_key_names)
 #>         if (is.null(key_values)) {

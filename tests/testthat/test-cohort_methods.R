@@ -8,14 +8,14 @@ discrete_iris_two <- filter(
 )
 range_iris_one <- filter(
   type = "range", id = "sepal_l", name = "Sepal.Length",
-  variable = "Sepal.Length", dataset = "iris", range = c(5, 6)
+  variable = "Sepal.Length", dataset = "iris", range = c(5L, 6L)
 )
 range_iris_two <- filter(
   type = "range", id = "sepal_l_two", name = "Sepal.Length.Two",
-  variable = "Sepal.Length", dataset = "iris", range = c(9, 11)
+  variable = "Sepal.Length", dataset = "iris", range = c(9L, 11L)
 )
 patients_source <- set_source(
-  tblist(patients = data.frame(id = 1:2, age = 50:51))
+  tblist(patients = data.frame(id = 1L:2L, age = 50L:51L))
 )
 
 test_that("Running steps filter raw data properly", {
@@ -29,11 +29,11 @@ test_that("Running steps filter raw data properly", {
     step(discrete_iris_one),
     step(discrete_iris_two)
   )
-  expect_equal(coh$get_data(1, state = "pre")$iris, iris)
+  expect_identical(coh$get_data(1L, state = "pre")$iris, iris)
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2L, state = "post")$iris$Species), c("virginica"))
 
   # Using S3 Cohort method
   coh <- Cohort$new(
@@ -41,11 +41,11 @@ test_that("Running steps filter raw data properly", {
     step(discrete_iris_one),
     step(discrete_iris_two)
   )
-  expect_equal(coh$get_data(1, state = "pre")$iris, iris)
+  expect_identical(coh$get_data(1L, state = "pre")$iris, iris)
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2L, state = "post")$iris$Species), c("virginica"))
 })
 
 test_that("Adding source on empty cohort works fine", {
@@ -57,10 +57,10 @@ test_that("Adding source on empty cohort works fine", {
   coh$add_source(iris_source)
   state <- coh$sum_up_state()
   expect_true(state$source)
-  expect_equal(state$source_vars, NULL)
-  expect_equal(state$n_steps, 0)
-  expect_equal(state$n_filters, 0)
-  expect_equal(state$steps_structure, list())
+  expect_null(state$source_vars)
+  expect_identical(state$n_steps, 0L)
+  expect_identical(state$n_filters, 0L)
+  expect_identical(state$steps_structure, list())
 
   # Using S3 Cohort methods
   coh <- Cohort$new()
@@ -70,10 +70,10 @@ test_that("Adding source on empty cohort works fine", {
   coh <- coh %>% add_source(iris_source)
   state <- coh$sum_up_state()
   expect_true(state$source)
-  expect_equal(state$source_vars, NULL)
-  expect_equal(state$n_steps, 0)
-  expect_equal(state$n_filters, 0)
-  expect_equal(state$steps_structure, list())
+  expect_null(state$source_vars)
+  expect_identical(state$n_steps, 0L)
+  expect_identical(state$n_filters, 0L)
+  expect_identical(state$steps_structure, list())
 })
 
 test_that("Adding step on source-only cohort works fine", {
@@ -89,12 +89,12 @@ test_that("Adding step on source-only cohort works fine", {
     )
   )
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter"))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter"))
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("setosa", "virginica"))
 
   coh <- Cohort$new()
   iris_source <- set_source(
@@ -108,12 +108,12 @@ test_that("Adding step on source-only cohort works fine", {
     )
   )
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 2))
-  expect_equal(state$steps_structure, list("1" = c("species_filter", "species_filter_two")))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 2L))
+  expect_identical(state$steps_structure, list("1" = c("species_filter", "species_filter_two")))
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("virginica"))
 
   # Using S3 Cohort methods
   coh <- Cohort$new()
@@ -127,12 +127,12 @@ test_that("Adding step on source-only cohort works fine", {
     )
   )
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter"))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter"))
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("setosa", "virginica"))
 
   coh <- Cohort$new()
   iris_source <- set_source(
@@ -141,18 +141,18 @@ test_that("Adding step on source-only cohort works fine", {
   coh <- coh %>%
     add_source(iris_source) %>%
     add_step(
-    step(
-      discrete_iris_one,
-      discrete_iris_two
+      step(
+        discrete_iris_one,
+        discrete_iris_two
+      )
     )
-  )
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 2))
-  expect_equal(state$steps_structure, list("1" = c("species_filter", "species_filter_two")))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 2L))
+  expect_identical(state$steps_structure, list("1" = c("species_filter", "species_filter_two")))
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("virginica"))
 })
 
 test_that("Adding step on existing cohort with step works fine", {
@@ -169,12 +169,12 @@ test_that("Adding step on existing cohort with step works fine", {
     )
   )
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 2)
-  expect_equal(state$n_filters, list("1" = 1, "2" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
+  expect_identical(state$n_steps, 2L)
+  expect_identical(state$n_filters, list("1" = 1L, "2" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2L, state = "post")$iris$Species), c("virginica"))
 
   ## auto-run flow
   coh <- Cohort$new(
@@ -190,10 +190,10 @@ test_that("Adding step on existing cohort with step works fine", {
     run_flow = TRUE
   )
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 2)
-  expect_equal(state$n_filters, list("1" = 1, "2" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_identical(state$n_steps, 2L)
+  expect_identical(state$n_filters, list("1" = 1L, "2" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
+  expect_setequal(collapse::funique(coh$get_data(2L, state = "post")$iris$Species), c("virginica"))
 
   # Using S3 Cohort methods
   coh <- Cohort$new(
@@ -208,12 +208,12 @@ test_that("Adding step on existing cohort with step works fine", {
     )
   )
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 2)
-  expect_equal(state$n_filters, list("1" = 1, "2" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
+  expect_identical(state$n_steps, 2L)
+  expect_identical(state$n_filters, list("1" = 1L, "2" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
 
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_setequal(collapse::funique(coh$get_data(2L, state = "post")$iris$Species), c("virginica"))
 
   ## auto-run flow
   coh <- Cohort$new(
@@ -229,10 +229,10 @@ test_that("Adding step on existing cohort with step works fine", {
     run_flow = TRUE
   )
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 2)
-  expect_equal(state$n_filters, list("1" = 1, "2" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
-  expect_setequal(unique(coh$get_data(2, state = "post")$iris$Species), c("virginica"))
+  expect_identical(state$n_steps, 2L)
+  expect_identical(state$n_filters, list("1" = 1L, "2" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
+  expect_setequal(collapse::funique(coh$get_data(2L, state = "post")$iris$Species), c("virginica"))
 })
 
 test_that("Removing step works fine", {
@@ -249,11 +249,11 @@ test_that("Removing step works fine", {
       discrete_iris_two
     )
   )
-  coh$remove_step(2)
+  coh$remove_step(2L)
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter"))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter"))
 
   ## >1 steps and remove first step
   coh <- Cohort$new(
@@ -267,11 +267,11 @@ test_that("Removing step works fine", {
       discrete_iris_two
     )
   )
-  coh$remove_step(1)
+  coh$remove_step(1L)
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter_two"))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter_two"))
 
   ## 1 step and removing it
   coh <- Cohort$new(
@@ -282,11 +282,11 @@ test_that("Removing step works fine", {
       discrete_iris_one
     )
   )
-  coh$remove_step(1)
+  coh$remove_step(1L)
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 0)
-  expect_equal(state$n_filters, 0)
-  expect_equal(state$steps_structure, list())
+  expect_identical(state$n_steps, 0L)
+  expect_identical(state$n_filters, 0L)
+  expect_identical(state$steps_structure, list())
 
   # Using S3 methods on Cohort object
   ## >1 steps and remove last step
@@ -301,11 +301,11 @@ test_that("Removing step works fine", {
       discrete_iris_two
     )
   )
-  coh <- coh %>% rm_step(2)
+  coh <- coh %>% rm_step(2L)
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter"))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter"))
 
   ## >1 steps and remove first step
   coh <- Cohort$new(
@@ -319,11 +319,11 @@ test_that("Removing step works fine", {
       discrete_iris_two
     )
   )
-  coh <- coh %>% rm_step(1)
+  coh <- coh %>% rm_step(1L)
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter_two"))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter_two"))
 
   ## 1 step and removing it
   coh <- Cohort$new(
@@ -334,11 +334,11 @@ test_that("Removing step works fine", {
       discrete_iris_one
     )
   )
-  coh <- coh %>% rm_step(1)
+  coh <- coh %>% rm_step(1L)
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 0)
-  expect_equal(state$n_filters, 0)
-  expect_equal(state$steps_structure, list())
+  expect_identical(state$n_steps, 0L)
+  expect_identical(state$n_filters, 0L)
+  expect_identical(state$steps_structure, list())
 })
 
 test_that("Adding filter works fine", {
@@ -352,9 +352,9 @@ test_that("Adding filter works fine", {
     discrete_iris_one
   )
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter"))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter"))
 
   # Using S3 Cohort methods
   coh <- Cohort$new(
@@ -368,9 +368,9 @@ test_that("Adding filter works fine", {
     )
 
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter"))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter"))
 })
 
 test_that("Removing filter works fine", {
@@ -385,10 +385,10 @@ test_that("Removing filter works fine", {
       discrete_iris_two
     )
   )
-  coh$remove_filter(1, "species_filter_two")
+  coh$remove_filter(1L, "species_filter_two")
   state <- coh$sum_up_state()
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter"))
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter"))
 
   # >1 filters in the step and removing the first one
   coh <- Cohort$new(
@@ -400,10 +400,10 @@ test_that("Removing filter works fine", {
       discrete_iris_two
     )
   )
-  coh$remove_filter(1, "species_filter")
+  coh$remove_filter(1L, "species_filter")
   state <- coh$sum_up_state()
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter_two"))
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter_two"))
 
   # 1 filter and removing it
   coh <- cohort(
@@ -414,11 +414,11 @@ test_that("Removing filter works fine", {
       discrete_iris_one
     )
   )
-  coh <- coh %>% rm_filter(1, "species_filter")
+  coh <- coh %>% rm_filter(1L, "species_filter")
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 0)
-  expect_equal(state$n_filters, 0)
-  expect_equal(state$steps_structure, list())
+  expect_identical(state$n_steps, 0L)
+  expect_identical(state$n_filters, 0L)
+  expect_identical(state$steps_structure, list())
 
   # Using S3 Cohort methods
   ## >1 filters in the step and removing the last one
@@ -431,10 +431,10 @@ test_that("Removing filter works fine", {
       discrete_iris_two
     )
   )
-  coh <- coh %>% rm_filter(1, "species_filter_two")
+  coh <- coh %>% rm_filter(1L, "species_filter_two")
   state <- coh$sum_up_state()
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter"))
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter"))
 
   # >1 filters in the step and removing the first one
   coh <- cohort(
@@ -446,10 +446,10 @@ test_that("Removing filter works fine", {
       discrete_iris_two
     )
   )
-  coh <- coh %>% rm_filter(1, "species_filter")
+  coh <- coh %>% rm_filter(1L, "species_filter")
   state <- coh$sum_up_state()
-  expect_equal(state$n_filters, list("1" = 1))
-  expect_equal(state$steps_structure, list("1" = "species_filter_two"))
+  expect_identical(state$n_filters, list("1" = 1L))
+  expect_identical(state$steps_structure, list("1" = "species_filter_two"))
 
   # 1 filter and removing it
   coh <- cohort(
@@ -460,11 +460,11 @@ test_that("Removing filter works fine", {
       discrete_iris_one
     )
   )
-  coh <- coh %>% rm_filter(1, "species_filter")
+  coh <- coh %>% rm_filter(1L, "species_filter")
   state <- coh$sum_up_state()
-  expect_equal(state$n_steps, 0)
-  expect_equal(state$n_filters, 0)
-  expect_equal(state$steps_structure, list())
+  expect_identical(state$n_steps, 0L)
+  expect_identical(state$n_filters, 0L)
+  expect_identical(state$steps_structure, list())
 })
 
 test_that("Updating filter works fine", {
@@ -478,17 +478,17 @@ test_that("Updating filter works fine", {
       discrete_iris_two
     )
   )
-  coh$update_filter(1, "species_filter_two", value = "setosa")
+  coh$update_filter(1L, "species_filter_two", value = "setosa")
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), "setosa")
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), "setosa")
 
-  coh$update_filter(1, "sepal_l", variable = "Petal.Length", range = c(1, 1.5))
+  coh$update_filter(1L, "sepal_l", variable = "Petal.Length", range = c(1.0, 1.5))
   coh$run_flow()
-  var_range <- range(coh$get_data(1, state = "post")$iris$Petal.Length)
-  expect_true(var_range[1] >= 1 && var_range[2] <= 1.5)
+  var_range <- range(coh$get_data(1L, state = "post")$iris$Petal.Length)
+  expect_true(var_range[1L] >= 1L && var_range[2L] <= 1.5)
 
   expect_warning(
-    coh$update_filter(1, "sepal_l", type = "discrete"),
+    coh$update_filter(1L, "sepal_l", type = "discrete"),
     label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
   )
 
@@ -502,24 +502,24 @@ test_that("Updating filter works fine", {
       discrete_iris_two
     )
   )
-  coh <- coh %>% update_filter(1, 'species_filter_two', value = "setosa")
+  coh <- coh %>% update_filter(1L, "species_filter_two", value = "setosa")
   coh <- coh %>% run()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), "setosa")
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), "setosa")
 
-  coh <- coh %>% update_filter(1, "sepal_l", variable = "Petal.Length", range = c(1, 1.5))
+  coh <- coh %>% update_filter(1L, "sepal_l", variable = "Petal.Length", range = c(1.0, 1.5))
   coh <- coh %>% run()
-  var_range <- range(coh$get_data(1, state = "post")$iris$Petal.Length)
-  expect_true(var_range[1] >= 1 && var_range[2] <= 1.5)
+  var_range <- range(coh$get_data(1L, state = "post")$iris$Petal.Length)
+  expect_true(var_range[1L] >= 1L && var_range[2L] <= 1.5)
 
   expect_warning(
-    coh$update_filter(1, "sepal_l", type = "discrete"),
+    coh$update_filter(1L, "sepal_l", type = "discrete"),
     label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
   )
 })
 
 test_that("Updating source works fine", {
   iris2 <- iris
-  iris2[150, 1] <- 10
+  iris2[150L, 1L] <- 10L
   new_source <- set_source(
     tblist(iris = iris2)
   )
@@ -539,11 +539,11 @@ test_that("Updating source works fine", {
   coh$update_source(new_source, keep_steps = FALSE)
 
   state <- coh$sum_up_state()
-  expect_equal(coh$get_data(1, state = "pre")$iris, iris2)
+  expect_identical(coh$get_data(1L, state = "pre")$iris, iris2)
   expect_true(state$source, TRUE)
-  expect_equal(state$n_steps, 0)
-  expect_equal(state$n_filters, 0)
-  expect_equal(state$steps_structure, list())
+  expect_identical(state$n_steps, 0L)
+  expect_identical(state$n_filters, 0L)
+  expect_identical(state$steps_structure, list())
 
   ## setting up new source with keeping steps unchanged
   coh <- Cohort$new(
@@ -558,17 +558,17 @@ test_that("Updating source works fine", {
   coh$update_source(new_source, keep_steps =  TRUE)
 
   state <- coh$sum_up_state()
-  expect_identical(coh$get_data(1, state = "pre")$iris, iris2)
+  expect_identical(coh$get_data(1L, state = "pre")$iris, iris2)
   expect_true(state$source, TRUE)
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 2))
-  expect_equal(state$steps_structure, list("1" = c("species_filter", "sepal_l_two")))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 2L))
+  expect_identical(state$steps_structure, list("1" = c("species_filter", "sepal_l_two")))
 
   coh$run_flow()
-  expect_equal(coh$get_data(1, state = "post")$iris$Sepal.Length, 10)
+  expect_identical(coh$get_data(1L, state = "post")$iris$Sepal.Length, 10.0)
 
   iris2 <- iris
-  iris2[150, 1] <- 10
+  iris2[150L, 1L] <- 10L
   new_source <- set_source(
     tblist(iris = iris2)
   )
@@ -588,11 +588,11 @@ test_that("Updating source works fine", {
   coh <- coh %>% update_source(new_source, keep_steps = FALSE)
 
   state <- coh$sum_up_state()
-  expect_identical(coh$get_data(1, state = "pre")$iris, iris2)
+  expect_identical(coh$get_data(1L, state = "pre")$iris, iris2)
   expect_true(state$source, TRUE)
-  expect_equal(state$n_steps, 0)
-  expect_equal(state$n_filters, 0)
-  expect_equal(state$steps_structure, list())
+  expect_identical(state$n_steps, 0L)
+  expect_identical(state$n_filters, 0L)
+  expect_identical(state$steps_structure, list())
 
   ## setting up new source with keeping steps unchanged
   coh <- cohort(
@@ -607,14 +607,14 @@ test_that("Updating source works fine", {
   coh <- coh %>% update_source(new_source, keep_steps =  TRUE)
 
   state <- coh$sum_up_state()
-  expect_identical(coh$get_data(1, state = "pre")$iris, iris2)
+  expect_identical(coh$get_data(1L, state = "pre")$iris, iris2)
   expect_true(state$source, TRUE)
-  expect_equal(state$n_steps, 1)
-  expect_equal(state$n_filters, list("1" = 2))
-  expect_equal(state$steps_structure, list("1" = c("species_filter", "sepal_l_two")))
+  expect_identical(state$n_steps, 1L)
+  expect_identical(state$n_filters, list("1" = 2L))
+  expect_identical(state$steps_structure, list("1" = c("species_filter", "sepal_l_two")))
 
   coh <- coh %>% run()
-  expect_equal(coh$get_data(1, state = "post")$iris$Sepal.Length, 10)
+  expect_identical(coh$get_data(1L, state = "post")$iris$Sepal.Length, 10.0)
 })
 
 test_that("Getting filter stats works fine", {
@@ -625,10 +625,10 @@ test_that("Getting filter stats works fine", {
     ),
     discrete_iris_one
   )
-  expect_equal(coh$get_stats(1, "species_filter", state = "pre")$choices, as.list(table(iris$Species)))
+  expect_identical(coh$get_stats(1L, "species_filter", state = "pre")$choices, as.list(table(iris$Species)))
   coh$run_flow()
-  expect_equal(
-    coh$get_stats(1, "species_filter", state = "post")$choices,
+  expect_identical(
+    coh$get_stats(1L, "species_filter", state = "post")$choices,
     as.list(table(iris$Species[iris$Species %in% c("setosa", "virginica")]))
   )
 
@@ -640,10 +640,10 @@ test_that("Getting filter stats works fine", {
     discrete_iris_one
   )
 
-  expect_equal(stat(coh, 1, "species_filter", state = "pre")$choices, as.list(table(iris$Species)))
+  expect_identical(stat(coh, 1L, "species_filter", state = "pre")$choices, as.list(table(iris$Species)))
   coh <- coh %>% run()
-  expect_equal(
-    stat(coh, 1, "species_filter", state = "post")$choices,
+  expect_identical(
+    stat(coh, 1L, "species_filter", state = "post")$choices,
     as.list(table(iris$Species[iris$Species %in% c("setosa", "virginica")]))
   )
 })
@@ -658,23 +658,25 @@ test_that("Caching works fine", {
   )
 
   coh$run_flow()
-  expect_equal(coh$get_cache("1", "species_filter", state = "pre")$choices, list(setosa = 50, versicolor = 50, virginica = 50))
-  expect_equal(coh$get_cache("1", "species_filter", state = "pre")$n_data, 150)
-  expect_equal(coh$get_cache("1", "species_filter", state = "pre")$n_missing, 0)
+  expect_identical(coh$get_cache("1", "species_filter", state = "pre")$choices,
+                   list(setosa = 50L, versicolor = 50L, virginica = 50L))
+  expect_identical(coh$get_cache("1", "species_filter", state = "pre")$n_data, 150L)
+  expect_identical(coh$get_cache("1", "species_filter", state = "pre")$n_missing, 0L)
 
-  expect_equal(coh$get_cache("1", "species_filter", state = "post")$choices, list(setosa = 50, versicolor = 0, virginica = 50))
-  expect_equal(coh$get_cache("1", "species_filter", state = "post")$n_data, 100)
-  expect_equal(coh$get_cache("1", "species_filter", state = "post")$n_missing, 0)
+  expect_identical(coh$get_cache("1", "species_filter", state = "post")$choices,
+                   list(setosa = 50L, versicolor = 0L, virginica = 50L))
+  expect_identical(coh$get_cache("1", "species_filter", state = "post")$n_data, 100L)
+  expect_identical(coh$get_cache("1", "species_filter", state = "post")$n_missing, 0L)
 })
 
 test_that("Bind keys work fine", {
   patients <- data.frame(
-    id = letters[1:3], name = c("a", "b", "b"),
-    surname = c("A", "A", "B"), surname2 = c("A", "A", "B"), age = 1:3
+    id = letters[1L:3L], name = c("a", "b", "b"),
+    surname = c("A", "A", "B"), surname2 = c("A", "A", "B"), age = 1L:3L
   )
   treatment <- data.frame(
-    id = letters[1:3], name = c("a", "b", "b"),
-    surname = c("A", "A", "B"), treatment = LETTERS[1:3]
+    id = letters[1L:3L], name = c("a", "b", "b"),
+    surname = c("A", "A", "B"), treatment = LETTERS[1L:3L]
   )
 
 
@@ -686,7 +688,7 @@ test_that("Bind keys work fine", {
         bind_key(update = data_key("treatment", "id"), data_key("patients", "id"))
       )
     ),
-    filter("range", id = "patients", name = "Patients", variable = "age", range = c(1, 2), dataset = "patients"),
+    filter("range", id = "patients", name = "Patients", variable = "age", range = c(1L, 2L), dataset = "patients"),
     filter("discrete", id = "treatment", name = "Treatment", variable = "treatment", value = NA, dataset = "treatment")
   )
 
@@ -694,16 +696,16 @@ test_that("Bind keys work fine", {
 
   expect_equal(
     coh$get_data("1", state = "post")$treatment,
-    treatment[1:2, ],
+    treatment[1L:2L, ],
     ignore_attr = TRUE
   )
   expect_true(
     attr(coh$get_data("1", state = "post")$treatment, "filtered")
   )
 
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1, "B" = 1))
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$n_data, 2)
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$n_missing, 0)
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_data, 2L)
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_missing, 0L)
 
   # directed relation graph (update != "all"), multi key with same names
   coh <- Cohort$new(
@@ -716,20 +718,20 @@ test_that("Bind keys work fine", {
         )
       )
     ),
-    filter("range", id = "patients", name = "Patients", variable = "age", range = c(1, 2), dataset = "patients"),
+    filter("range", id = "patients", name = "Patients", variable = "age", range = c(1L, 2L), dataset = "patients"),
     filter("discrete", id = "treatment", name = "Treatment", variable = "treatment", value = NA, dataset = "treatment")
   )
 
   coh$run_flow()
 
-  expect_equal(coh$get_data("1", state = "post")$treatment, treatment[1:2, ], ignore_attr = TRUE)
+  expect_equal(coh$get_data("1", state = "post")$treatment, treatment[1L:2L, ], ignore_attr = TRUE)
   expect_true(
     attr(coh$get_data("1", state = "post")$treatment, "filtered")
   )
 
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1, "B" = 1))
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$n_data, 2)
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$n_missing, 0)
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_data, 2L)
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_missing, 0L)
 
   # directed relation graph (update != "all"), multi key with different names
   coh <- Cohort$new(
@@ -742,20 +744,20 @@ test_that("Bind keys work fine", {
         )
       )
     ),
-    filter("range", id = "patients", name = "Patients", variable = "age", range = c(1, 2), dataset = "patients"),
+    filter("range", id = "patients", name = "Patients", variable = "age", range = c(1L, 2L), dataset = "patients"),
     filter("discrete", id = "treatment", name = "Treatment", variable = "treatment", value = NA, dataset = "treatment")
   )
 
   coh$run_flow()
 
-  expect_equal(coh$get_data("1", state = "post")$treatment, treatment[1:2, ], ignore_attr = TRUE)
+  expect_equal(coh$get_data("1", state = "post")$treatment, treatment[1L:2L, ], ignore_attr = TRUE)
   expect_true(
     attr(coh$get_data("1", state = "post")$treatment, "filtered")
   )
 
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1, "B" = 1))
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$n_data, 2)
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$n_missing, 0)
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_data, 2L)
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_missing, 0L)
 
   # cyclic relation graph, single key
   coh <- Cohort$new(
@@ -772,13 +774,13 @@ test_that("Bind keys work fine", {
         )
       )
     ),
-    filter("range", id = "patients", name = "Patients", variable = "age", range = c(1, 2), dataset = "patients"),
+    filter("range", id = "patients", name = "Patients", variable = "age", range = c(1L, 2L), dataset = "patients"),
     filter("discrete", id = "treatment", name = "Treatment", variable = "treatment", value = NA, dataset = "treatment")
   )
 
   coh$run_flow()
 
-  expect_equal(coh$get_data("1", state = "post")$treatment, treatment[1:2, ], ignore_attr = TRUE)
+  expect_equal(coh$get_data("1", state = "post")$treatment, treatment[1L:2L, ], ignore_attr = TRUE)
   expect_true(
     attr(coh$get_data("1", state = "post")$treatment, "filtered")
   )
@@ -786,15 +788,16 @@ test_that("Bind keys work fine", {
     attr(coh$get_data("1", state = "post")$patients, "filtered")
   )
 
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1, "B" = 1))
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$n_data, 2)
-  expect_equal(coh$get_cache("1", "treatment", state = "post")$n_missing, 0)
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_data, 2L)
+  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_missing, 0L)
 })
 
 test_that("Defining and accessing description works fine", {
   # Using direct Cohort methods
   species_filter_no_desc <- filter("discrete", id = "species", dataset = "iris", variable = "Species")
-  species_filter_desc <- filter("discrete", id = "species", dataset = "iris", variable = "Species", description = "Species Filter")
+  species_filter_desc <- filter("discrete", id = "species", dataset = "iris",
+                                variable = "Species", description = "Species Filter")
   coh <- Cohort$new(
     set_source(
       tblist(iris = iris),
@@ -803,45 +806,303 @@ test_that("Defining and accessing description works fine", {
     step(species_filter_no_desc),
     step(species_filter_desc)
   )
-  expect_equal(
+  expect_identical(
     coh$show_help("iris"),
     "Iris dataset."
   )
-  expect_equal(
+  expect_identical(
     description(coh, "iris"),
     "Iris dataset."
   )
 
-  expect_equal(
-    coh$show_help(filter_id = "species", step_id = "1"),
-    NULL
+  expect_null(
+    coh$show_help(filter_id = "species", step_id = "1")
   )
-  expect_equal(
-    description(coh, filter_id = "species", step_id = "1"),
-    NULL
+  expect_null(
+    description(coh, filter_id = "species", step_id = "1")
   )
 
-  expect_equal(
+  expect_identical(
     coh$show_help(filter_id = "species", step_id = "2"),
     "Species Filter"
   )
-  expect_equal(
+  expect_identical(
     description(coh, filter_id = "species", step_id = "2"),
     "Species Filter"
   )
 })
 
 test_that("steps_range returns empty character when from is greater than to", {
-  expect_equal(steps_range(3,2),character(0))
+  expect_identical(steps_range(3L, 2L), character(0L))
 })
 
 test_that("eval_step_filters returns empty character when step id is equal", {
-  expect_equal(eval_step_filters(list(0, id = "2"),patients_source),list())
+  expect_identical(eval_step_filters(list(0L, id = "2"), patients_source), list())
 })
 
 test_that("next_step returns the next index as a character string", {
-  expect_equal(next_step("1"),"2")
-  expect_type(next_step("1"),"character")
+  expect_identical(next_step("1"), "2")
+  expect_type(next_step("1"), "character")
+})
+
+test_that("copy_step with step_id works correctly", {
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  #set last id of step before using the function
+  pre_last_step_id <- as.integer(coh$last_step_id())
+  #get list of filters in first step
+  list_of_filters <- get_state(coh, 1L)[[1L]]$filters
+
+  coh$copy_step(1L)
+
+  expect_false(is.null(coh$get_step(pre_last_step_id + 1L)))
+  expect_identical(get_state(coh, coh$last_step_id())[[1L]]$filters, list_of_filters)
+})
+
+test_that("copy_step without step_id duplicates filters from last step", {
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  #set last id of step before using the function
+  pre_last_step_id <- as.integer(coh$last_step_id())
+  #get list of filters in last step
+  list_of_filters <- get_state(coh, pre_last_step_id)[[1L]]$filters
+
+  coh$copy_step()
+
+  expect_false(is.null(coh$get_step(pre_last_step_id + 1L)))
+  expect_identical(get_state(coh, coh$last_step_id())[[1L]]$filters, list_of_filters)
+})
+
+test_that("copy_step duplicate selected filters without step_id", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  pre_last_step_id <- as.integer(coh$last_step_id())
+  list_of_filters <- get_state(coh, 1L)[[1L]]$filters
+
+  coh$copy_step(filters = coh$get_filter(1L))
+
+  expect_false(is.null(coh$get_step(pre_last_step_id + 1L)))
+  expect_identical(get_state(coh, coh$last_step_id())[[1L]]$filters, list_of_filters)
+})
+
+test_that("copy_step trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  list_of_filters <- get_state(coh, coh$last_step_id())[[1L]]$filters
+
+  expect_null(get_data(coh))
+
+  coh$copy_step(run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+  expect_identical(get_state(coh, coh$last_step_id())[[1L]]$filters, list_of_filters)
+})
+
+test_that("remove_step with missing step_id remove last step", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+
+  pre_last_step_id <- as.integer(coh$last_step_id())
+  #set list of filters to ensure that only the last step is removed
+  if (pre_last_step_id != 1L) {
+    pre_list_of_filters <- get_state(coh, c(1L:pre_last_step_id - 1L))
+  }
+
+  coh$remove_step()
+
+  expect_identical(coh$last_step_id(), as.character(pre_last_step_id - 1L))
+  expect_null(coh$get_step(pre_last_step_id))
+
+  if (pre_last_step_id != 1L) {
+    expect_identical(get_state(coh, c(1L:pre_last_step_id - 1L)), pre_list_of_filters)
+  }
+})
+
+test_that("remove_step trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two)
+  )
+
+  expect_null(get_data(coh))
+
+  coh$remove_step(run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("add_filter trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_null(get_data(coh))
+
+  coh$add_filter(range_iris_one, 1L, run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("remove_filter trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_null(get_data(coh))
+
+  coh$remove_filter(1L, 1L, run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("get_state returns state in JSON format correctly", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_true(jsonlite::validate(get_state(coh, 1L, json = TRUE)))
+})
+
+test_that("Restoring cohort configurations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+  # Character type
+  pre_state_character <- get_state(coh)
+  coh$add_filter(range_iris_one, 2L)
+  expect_false(identical(get_state(coh), pre_state_character))
+  restore(coh, pre_state_character)
+  expect_identical(get_state(coh), pre_state_character)
+
+  # JSON type
+  pre_state_json <- get_state(coh, json = TRUE)
+  coh$add_filter(range_iris_one, 2L)
+  expect_false(identical(get_state(coh), pre_state_character))
+  restore(coh, pre_state_json)
+  expect_identical(get_state(coh), pre_state_character)
+})
+
+test_that("Restoring cohort configurations without state returns invisible FALSE", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  pre_state <- get_state(coh)
+
+  coh$add_filter(range_iris_one, 2L)
+
+  expect_false(identical(get_state(coh), pre_state))
+  expect_invisible(coh$restore(state = NULL))
+  expect_false(coh$restore(state = NULL))
+  expect_false(identical(get_state(coh), pre_state))
+})
+
+test_that("Restoring cohort configurations trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+  coh_2 <- coh$clone()
+  run(coh_2)
+  pre_state <- get_state(coh)
+
+  coh$add_filter(range_iris_one, 2L)
+  expect_false(identical(get_state(coh_2), get_state(coh)))
+  expect_null(get_data(coh))
+
+  restore(coh, pre_state, run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+  expect_identical(get_state(coh), get_state(coh))
+  expect_identical(get_data(coh), get_data(coh))
+})
+
+test_that("restore correctly restore filters filter type date_range and datetime_range", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(issues = librarian$issues)
+    ),
+    step(
+      filter(
+             "date_range", id = "issues_date", dataset = "issues",
+             variable = "date", range = c(as.Date("2010-10-01"), as.Date("2015-10-01"))
+      ),
+      filter(
+             "date_range", id = "issues_date2", dataset = "issues",
+             variable = "date", range = as.Date(NULL)
+      ),
+      filter(
+             "datetime_range", id = "issues_datetime", dataset = "issues",
+             variable = "date", range = c(as.POSIXct("2010-10-01"), as.POSIXct("2015-10-01"))
+      ),
+      filter(
+             "datetime_range", id = "issues_datetime2", dataset = "issues",
+             variable = "date", range = as.POSIXct(NULL))
+    )
+  )
+
+  pre_state <- get_state(coh)
+
+  coh$add_filter(range_iris_one, 2L)
+  coh$remove_filter(1L, "issues_datetime")
+
+  expect_false(identical(get_state(coh), pre_state))
+
+  restore(coh, pre_state)
+
+  expect_identical(get_state(coh), pre_state)
 })
 
 # if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
