@@ -105,7 +105,7 @@ get_attrition_filter_label <- function(name, value_name, value) {
     dependent_datasets <- binding_keys %>%
       purrr::map(~names(.[["data_keys"]])) %>%
       unlist() %>%
-      unique()
+      collapse::funique()
     if (length(dependent_datasets) > 0) {
       bind_keys_section <- glue::glue(
         "\nData linked with external datasets: {paste(dependent_datasets, collapse = ', ')}",

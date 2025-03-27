@@ -34,6 +34,7 @@ pkg_version <- read.dcf("DESCRIPTION", fields = "Version")[1, 1]
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/r-world-devs/cohortBuilder/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-world-devs/cohortBuilder/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/r-world-devs/cohortBuilder/graph/badge.svg)](https://app.codecov.io/gh/r-world-devs/cohortBuilder)
 <!-- badges: end -->
 
 ## Overview
