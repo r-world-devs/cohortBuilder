@@ -140,7 +140,7 @@ test_that("Adding filter on source works fine and attaches it to correct step", 
     tblist(iris = iris)
   ) %>% add_filter(
     discrete_filter_species,
-    step_id = 1
+    step_id = 1L
   )
   coh <- Cohort$new(iris_source)
   state <- coh$sum_up_state()
@@ -172,10 +172,10 @@ test_that("Adding filter on source works fine and attaches it to correct step", 
     tblist(iris = iris)
   ) %>% add_filter(
     discrete_filter_species,
-    step_id = 1
+    step_id = 1L
   ) %>% add_filter(
     discrete_filter_species,
-    step_id = 2
+    step_id = 2L
   )
 
   coh <- Cohort$new(iris_source)
@@ -212,7 +212,7 @@ test_that("Removing filter on source works fine", {
     discrete_filter_species_two
   )
   removed_filter_but_not_last_one <- iris_source$clone() %>%
-    rm_filter(1, "species_filter_two")
+    rm_filter(1L, "species_filter_two")
   coh <- Cohort$new(removed_filter_but_not_last_one)
   state <- coh$sum_up_state()
   expect_true(state$source)

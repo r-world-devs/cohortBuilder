@@ -1,17 +1,17 @@
 discrete_filter <- filter(
-  type = "discrete", id = "age_filter", name = "Age", variable = "age", dataset = "patients", value = 50
+  type = "discrete", id = "age_filter", name = "Age", variable = "age", dataset = "patients", value = 50L
 )
 patients_source <- set_source(
-  tblist(patients = data.frame(id = 1:2, age = 50:51))
+  tblist(patients = data.frame(id = 1L:2L, age = 50L:51L))
 )
 variable_filter <- discrete_filter(patients_source)
 
 test_that("Calling filter with id returns function of source param, calling valid S3 method", {
-  expect_equal(names(formals(discrete_filter)), "source")
+  expect_named(formals(discrete_filter), "source")
   expect_true(is.function(discrete_filter))
-  
+
   skip_on_covr()
-  expect_equal(as.character(body(discrete_filter)[[2]][[2]]), "cb_filter.discrete")
+  expect_identical(as.character(body(discrete_filter)[[2L]][[2L]]), "cb_filter.discrete")
 })
 
 test_that("Calling filter on source returns list with valid methods and parameters", {
@@ -23,9 +23,9 @@ test_that("Calling filter on source returns list with valid methods and paramete
 })
 
 test_that("Filter methods operate correctly based on its definition", {
-  expect_equal(variable_filter$filter_data(patients_source$dtconn)$patients$age, 50)
-  expect_equal(variable_filter$get_stats(patients_source$dtconn)$choices, as.list(table(50:51)))
-  expect_equal(class(variable_filter$plot_data(patients_source$dtconn)), c("matrix", "array"))
+  expect_identical(variable_filter$filter_data(patients_source$dtconn)$patients$age, 50L)
+  expect_identical(variable_filter$get_stats(patients_source$dtconn)$choices, as.list(table(50L:51L)))
+  expect_identical(class(variable_filter$plot_data(patients_source$dtconn)), c("matrix", "array"))
 })
 
 test_that("Discrete text filter works fine", {
@@ -37,10 +37,10 @@ test_that("Discrete text filter works fine", {
     iris_source,
     spec_filter
   )
-  expect_equal(coh$get_data(1, state = "pre")$iris, iris)
+  expect_identical(coh$get_data(1L, state = "pre")$iris, iris)
   coh$run_flow()
-  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
-  expect_equal(
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_identical(
     coh$get_cache("1", "species", state = "post")$choices,
     "setosa,virginica"
   )
@@ -60,25 +60,25 @@ test_that("Multi discrete filter works fine", {
     md_source,
     md_filter
   )
-  expect_equal(coh$get_data(1, state = "pre")$md_data, md_data)
+  expect_identical(coh$get_data(1L, state = "pre")$md_data, md_data)
 
   coh$run_flow()
-  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$md_data$col1), c("A"))
-  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$md_data$col2), c("D"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$md_data$col1), c("A"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$md_data$col2), c("D"))
 
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "mcols", state = "pre")$choices$col1,
     as.list(table(md_data$col1))
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "mcols", state = "pre")$choices$col2,
     as.list(table(md_data$col2))
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "mcols", state = "post")$choices$col1,
     as.list(table(c("A")))
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "mcols", state = "post")$choices$col2,
     as.list(table(c("D")))
   )
@@ -104,25 +104,25 @@ test_that("Query discrete filter works fine", {
     md_source,
     md_filter
   )
-  expect_equal(coh$get_data(1, state = "pre")$md_data, md_data)
+  expect_identical(coh$get_data(1L, state = "pre")$md_data, md_data)
 
   coh$run_flow()
-  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$md_data$col1), c("A"))
-  expect_setequal(collapse::funique(coh$get_data(1, state = "post")$md_data$col2), c("D"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$md_data$col1), c("A"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$md_data$col2), c("D"))
 
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "qcols", state = "pre")$specs$col1$values,
     collapse::funique(md_data$col1)
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "qcols", state = "pre")$specs$col2$values,
     collapse::funique(md_data$col2)
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "qcols", state = "post")$specs$col1$values,
     "A"
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "qcols", state = "post")$specs$col2$values,
     "D"
   )
