@@ -17,7 +17,8 @@ test_that("Calling filter with id returns function of source param, calling vali
 test_that("Calling filter on source returns list with valid methods and parameters", {
   expect_true(is.list(variable_filter))
   expect_identical(
-    c("id", "type", "name", "input_param", "filter_data", "get_stats", "plot_data", "get_params", "get_data", "get_defaults"),
+    c("id", "type", "name", "input_param", "filter_data",
+      "get_stats", "plot_data", "get_params", "get_data", "get_defaults"),
     names(variable_filter)
   )
 })
@@ -32,7 +33,8 @@ test_that("Discrete text filter works fine", {
   iris_source <- set_source(
     tblist(iris = iris)
   )
-  spec_filter <- filter("discrete_text", id = "species", dataset = "iris", variable = "Species", value = "setosa,virginica")
+  spec_filter <- filter("discrete_text", id = "species", dataset = "iris",
+                        variable = "Species", value = "setosa,virginica")
   coh <- Cohort$new(
     iris_source,
     spec_filter
@@ -47,7 +49,7 @@ test_that("Discrete text filter works fine", {
 })
 
 test_that("Multi discrete filter works fine", {
-  md_data <- data.frame(col1 = c("A", "B", "A", "B", "A"), col2 = c("C", "C", "C", "D", "D"))
+  md_data <- data.frame(col1 = c("A", "B", "A", "B", "A"), col2 = c("C", "C", "C", "D", "D"), stringsAsFactors = FALSE)
   md_source <- set_source(
     tblist(md_data = md_data)
   )
@@ -86,7 +88,7 @@ test_that("Multi discrete filter works fine", {
 })
 
 test_that("Query discrete filter works fine", {
-  md_data <- data.frame(col1 = c("A", "B", "A", "B", "A"), col2 = c("C", "C", "C", "D", "D"))
+  md_data <- data.frame(col1 = c("A", "B", "A", "B", "A"), col2 = c("C", "C", "C", "D", "D"), stringsAsFactors = FALSE)
   md_source <- set_source(
     tblist(md_data = md_data)
   )

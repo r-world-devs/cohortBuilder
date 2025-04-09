@@ -49,7 +49,7 @@ eval_step_filters <- function(step, source) {
     purrr::map(eval_filter, step_id = step$id, source = source)
 
   filters_names <- step$filters %>% purrr::map_chr(~.x$id)
-  if (any(duplicated(filters_names))) {
+  if (anyDuplicated(filters_names) > 0L) {
     stop("Cannot create filters with the same id in a single step.")
   }
   step$filters <- step$filters %>%

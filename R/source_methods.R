@@ -26,7 +26,7 @@ Source <- R6::R6Class(
 
       self$dtconn <- dtconn
       self$attributes <- list(...)
-      self$source_code = source_code
+      self$source_code <- source_code
       self$description <- description
       if (!is.null(binding_keys)) {
         self$binding_keys <- binding_keys

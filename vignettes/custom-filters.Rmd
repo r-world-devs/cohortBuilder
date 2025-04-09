@@ -203,11 +203,15 @@ cb_filter.logical.tblist <- function(
       }
       stats <- list(
         choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% 
-          stats::na.omit() %>% table() %>% as.list(),
+          stats::na.omit() %>% 
+          table() %>% 
+          as.list(),
         n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% 
           stats::na.omit() %>% 
           length(),
-        n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
+        n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% 
+          is.na() %>% 
+          sum()
       )
       if (length(name) == 1L) {
         return(stats[[name]])

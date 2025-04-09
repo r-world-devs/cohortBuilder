@@ -307,11 +307,11 @@ Cohort <- R6::R6Class(
     #' @param state List or JSON string containing steps and filters configuration.
     #' @param modifier Function two parameters combining the previous and provided state.
     #'   The returned state is then restored.
-    restore = function(state, modifier = function(prev_state, state) {state},
+    restore = function(state, modifier = function(prev_state, state) state,
                        run_flow = FALSE, hook = list(
-      pre = get_hook("pre_restore_hook"),
-      post = get_hook("post_restore_hook")
-    )) {
+                         pre = get_hook("pre_restore_hook"),
+                         post = get_hook("post_restore_hook")
+                       )) {
 
       self$attributes$pre_restore_state <- self$get_state(json = FALSE)
 
@@ -322,7 +322,8 @@ Cohort <- R6::R6Class(
       }
 
       if (is.character(state)) {
-        state <- jsonlite::fromJSON(txt = state, simplifyVector = TRUE, simplifyMatrix = FALSE, simplifyDataFrame = FALSE)
+        state <- jsonlite::fromJSON(txt = state, simplifyVector = TRUE,
+                                    simplifyMatrix = FALSE, simplifyDataFrame = FALSE)
       }
 
       state <- modifier(self$attributes$pre_restore_state, state)
@@ -420,7 +421,7 @@ Cohort <- R6::R6Class(
         ...
       )
       for (active_state in active_states) {
-        attrition_labels[length(attrition_labels) + 1] <- .get_attrition_label(
+        attrition_labels[length(attrition_labels) + 1L] <- .get_attrition_label(
           source = self$get_source(),
           step_id = active_state$step,
           step_filters = purrr::map(active_state$filters, get_filter_meta),
@@ -503,9 +504,9 @@ Cohort <- R6::R6Class(
     #' @param mark_step Include information which filtering step is performed.
     #' @param ... Other parameters passed to \link[formatR]{tidy_source}.
     get_code = function(
-      include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
-      include_action = c("pre_filtering", "post_filtering", "run_binding"),
-      modifier = .repro_code_tweak, mark_step = TRUE, ...) {
+        include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
+        include_action = c("pre_filtering", "post_filtering", "run_binding"),
+        modifier = .repro_code_tweak, mark_step = TRUE, ...) {
 
       source_type <- class(private$source)[1L]
       # todo improve
@@ -719,7 +720,7 @@ Cohort <- R6::R6Class(
     #' @description
     #' Print defined steps configuration.
     describe_state = function() {
-      if (length(private$steps) == 0) {
+      if (length(private$steps) == 0L) {
         cat("No steps configuration found.")
       } else {
         private$steps %>% purrr::walk(print_step)
@@ -1233,6 +1234,6 @@ attrition <- function(x, ..., percent = FALSE) {
 #' @seealso \link{cohort-methods}
 #' @export
 description <- function(x, field, step_id, filter_id,
-                      modifier = getOption("cb_help_modifier", default = function(x) x)) {
+                        modifier = getOption("cb_help_modifier", default = function(x) x)) {
   x$show_help(field = field, step_id = step_id, filter_id = filter_id, modifier = modifier)
 }

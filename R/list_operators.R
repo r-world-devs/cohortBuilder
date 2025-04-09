@@ -3,7 +3,7 @@ adjust_names <- function(list_obj) {
     # removed the last existing object
     return(list())
   }
-  names(list_obj) <- as.character(1L:length(list_obj))
+  names(list_obj) <- as.character(seq_along(list_obj))
   return(list_obj)
 }
 

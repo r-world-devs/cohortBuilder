@@ -146,9 +146,10 @@ cb_filter.discrete.tblist <- function(
       }
       stats <- list(
         choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>%
-          stats::na.omit() %>% table() %>% as.list(),
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>%
-          stats::na.omit() %>% length(),
+          stats::na.omit() %>%
+          table() %>%
+          as.list(),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
       if (length(name) == 1L) {
@@ -220,9 +221,12 @@ cb_filter.discrete_text.tblist <- function(
       }
       stats <- list(
         choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>%
-          collapse::funique() %>% paste(collapse = ","),
+          collapse::funique() %>%
+          paste(collapse = ","),
         n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>%
-          stats::na.omit() %>% collapse::funique() %>% length(),
+          stats::na.omit() %>%
+          collapse::funique() %>%
+          length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
       if (length(name) == 1L) {
@@ -261,7 +265,8 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
         level = character(0L),
         count = numeric(0L),
         l_bound = numeric(0L),
-        u_bound = numeric(0L)
+        u_bound = numeric(0L),
+        stringsAsFactors = FALSE
       )
     )
   }
@@ -273,7 +278,8 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
         level = "1",
         count = length(data_object[[dataset]][[variable]]),
         l_bound = min_val,
-        u_bound = max_val
+        u_bound = max_val,
+        stringsAsFactors = FALSE
       )
     )
   }
@@ -296,8 +302,8 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
     dplyr::mutate(
       level = factor(
         findInterval(!!sym(variable), breaks, rightmost.closed = FALSE),
-        levels = 1L:(length(breaks)),
-        labels = as.character(1L:(length(breaks)))
+        levels = seq_len(length(breaks)),
+        labels = as.character(seq_len(length(breaks)))
       )
     ) %>%
     dplyr::group_by(level) %>%
@@ -409,7 +415,8 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
         level = character(0L),
         count = numeric(0L),
         l_bound = numeric(0L),
-        u_bound = numeric(0L)
+        u_bound = numeric(0L),
+        stringsAsFactors = FALSE
       )
     )
   }
@@ -421,7 +428,8 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
         level = "1",
         count = length(data_object[[dataset]][[variable]]),
         l_bound = min_val,
-        u_bound = max_val
+        u_bound = max_val,
+        stringsAsFactors = FALSE
       )
     )
   }
@@ -439,8 +447,8 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
     dplyr::mutate(
       level = factor(
         findInterval(!!sym(variable), breaks, rightmost.closed = FALSE),
-        levels = 1L:(length(breaks)),
-        labels = as.character(1L:(length(breaks)))
+        levels = seq_len(length(breaks)),
+        labels = as.character(seq_len(length(breaks)))
       )
     ) %>%
     dplyr::group_by(level) %>%

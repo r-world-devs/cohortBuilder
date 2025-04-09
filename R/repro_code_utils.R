@@ -155,15 +155,13 @@ exclude_first_pipe <- function(expr, after) {
   if (expr[[1L]] == as.symbol("{")) {
     if (identical(expr[[2L]][[2L]], after) && expr[[2L]][[1L]] == as.symbol("%>%")) {
       expr[[2L]] <- expr[[2L]][[3L]]
-    }
-    else {
+    } else {
       expr[[2L]][[2L]] <- exclude_first_pipe(expr[[2L]][[2L]], after)
     }
   } else {
     if (identical(expr[[2L]], after) && expr[[1L]] == as.symbol("%>%")) {
       expr <- expr[[3L]]
-    }
-    else {
+    } else {
       expr[[2L]] <- exclude_first_pipe(expr[[2L]], after)
     }
   }

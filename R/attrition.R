@@ -15,7 +15,7 @@ get_attrition_coords <- function(labels, n_included, space = 1L, percent = FALSE
     label_excl = label_excl
   ) %>%
     dplyr::mutate(
-      label_heights = nchar(label) - nchar(gsub("\n", "", label)),
+      label_heights = nchar(label) - nchar(gsub("\n", "", label, fixed = TRUE)),
       label_position_y = dplyr::lag(cumsum(label_heights + space), default = 0L),
       label_position_x = 0L,
       arrow_end_position_y = dplyr::lead(label_position_y),
@@ -47,7 +47,8 @@ get_attrition_plot <- function(attrition_coords) {
       label.r = ggplot2::unit(0L, "lines"), vjust = "top", size = 12L / ggplot2::.pt, na.rm = TRUE
     ) +
     ggplot2::geom_label(
-      ggplot2::aes(label = label_excl, x = excl_end_position_x, y = excl_position_y), label.r = ggplot2::unit(0L, "lines"),
+      ggplot2::aes(label = label_excl, x = excl_end_position_x, y = excl_position_y),
+      label.r = ggplot2::unit(0L, "lines"),
       hjust = "left", size = 12L / ggplot2::.pt, na.rm = TRUE
     ) +
     ggplot2::scale_y_continuous(limits = c(max_y_lim + space, -space), trans = "reverse") +
@@ -69,7 +70,7 @@ get_attrition_filter_label <- function(name, value_name, value) {
       purrr::imap(~paste(.y, " = ", .x)) %>%
       paste(collapse = ", ")
   } else if (is.vector(value)) {
-    value <- paste(value, collapse = ", ")
+    value <- toString(value)
   }
   glue::glue("Filter: {name} ({value_name} = [{value}])")
 }

@@ -13,7 +13,7 @@ eval_filter <- function(filter_fun, step_id, source) {
 #' @export
 .gen_id <- function() {
   paste0(
-    paste0(sample(LETTERS, 5L, TRUE), collapse = ""),
+    paste(sample(LETTERS, 5L, TRUE), collapse = ""),
     round(as.numeric(Sys.time()) * 1000L)
   )
 }
@@ -62,7 +62,7 @@ get_filter_state <- function(filter, extra_fields) {
 #'
 #' @export
 def_filter <- function(type, id = .gen_id(), name = id, input_param = NULL,
-  filter_data, get_stats, plot_data, get_params, get_data, get_defaults) {
+                       filter_data, get_stats, plot_data, get_params, get_data, get_defaults) {
 
   structure(
     list(
@@ -95,13 +95,12 @@ new_filter <- function(filter_type, source_type, input_param = "value", extra_pa
   ))
   extra_params_assign <- ""
   if (!identical(extra_params, "")) {
-    extra_params_assign <- paste0(paste(
-      glue::glue("{extra_params} = {extra_params}"),
-      collapse = ", "
+    extra_params_assign <- paste0(toString(
+      glue::glue("{extra_params} = {extra_params}")
     ), ",")
-    extra_params <- paste0(paste(extra_params, collapse = ", "), ",")
+    extra_params <- paste0(toString(extra_params), ",")
   }
-  file = file.path(getwd(), glue::glue("filter_{filter_type}_{source_type}.R"))
+  file <- file.path(getwd(), glue::glue("filter_{filter_type}_{source_type}.R"))
   writeLines(
     do.call(glue::glue, as.list(template_content)),
     con = file
@@ -310,7 +309,7 @@ cb_filter.date_range <- function(source, ...) {
 #' @rdname filter-types
 #' @export
 filter.datetime_range <- function(type, id, name, ..., description = NULL,
-                                   active = getOption("cb_active_filter", default = TRUE)) {
+                                  active = getOption("cb_active_filter", default = TRUE)) {
   args <- append(
     environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
     list(...)
@@ -396,4 +395,3 @@ cb_filter.query <- function(source, ...) {
     }
   }
 }
-
