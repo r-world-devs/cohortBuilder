@@ -66,3 +66,51 @@ test_that("Add new step works fine",{
   expect_error(add_step(coh))
 })
 
+test_that("Get state works fine",{
+  test_type <- "range"
+  test_id <- "actor_filter"
+  test_name <- "Actor"
+  test_variable <- "actor_id"
+  test_dataset <- "actor"
+  test_range <- c(1L, 10L)
+  test_description <- "Description for filter"
+
+  test_filter <- filter(
+    type = test_type, id = test_id, name = test_name,
+    variable = test_variable, dataset = test_dataset, range = test_range,
+    description = test_description
+  )
+
+  coh <- Cohort$new(
+    sakila_source,
+    step(test_filter),
+    step_2,
+    run_flow = TRUE
+  )
+  number_of_steps <- 2L
+  state_cohort <- get_state(coh)
+  state_filters_step_1 <- state_cohort[[1L]]$filters[[1L]]
+
+  expect_length(state_cohort, number_of_steps)
+  expect_identical(state_filters_step_1$type, test_type)
+  expect_identical(state_filters_step_1$id, test_id)
+  expect_identical(state_filters_step_1$name, test_name)
+  expect_identical(state_filters_step_1$variable, test_variable)
+  expect_identical(state_filters_step_1$dataset, test_dataset)
+  expect_identical(state_filters_step_1$range, test_range)
+  expect_identical(state_filters_step_1$description, test_description)
+
+  json_state <- get_state(coh, 1L, json = TRUE)
+  expect_silent(jsonlite::fromJSON(json_state))
+
+  state_from_json <- jsonlite::fromJSON(json_state)
+  expect_identical(state_from_json$step, "1")
+
+  expect_identical(state_from_json$filters[[1L]]$type, test_type)
+  expect_identical(state_from_json$filters[[1L]]$id, test_id)
+  expect_identical(state_from_json$filters[[1L]]$name, test_name)
+  expect_identical(state_from_json$filters[[1L]]$variable, test_variable)
+  expect_identical(state_from_json$filters[[1L]]$dataset, test_dataset)
+  expect_identical(state_from_json$filters[[1L]]$range[[1L]], test_range)
+  expect_identical(state_from_json$filters[[1L]]$description, test_description)
+})
