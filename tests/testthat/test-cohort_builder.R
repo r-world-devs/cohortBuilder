@@ -1,3 +1,4 @@
+load(testthat::test_path("../data/sakila/sakila.rda"))
 sakila_source <- set_source(as.tblist(sakila))
 sakila_source$binding_keys <- bind_keys(
   bind_key(update = data_key('actor', 'actor_id'),
@@ -9,22 +10,22 @@ sakila_source$binding_keys <- bind_keys(
 
 range_filter_actor <- filter(
   type = "range", id = "actor_filter", name = "Actor",
-  variable = "actor_id", dataset = "actor", range = c(1, 10)
+  variable = "actor_id", dataset = "actor", range = c(1L, 10L)
 )
 range_filter_actor_two <- filter(
   type = "range", id = "actor_filter_two", name = "Actor",
-  variable = "actor_id", dataset = "actor", range = c(3, 6)
+  variable = "actor_id", dataset = "actor", range = c(3L, 6L)
 )
 range_filter_actor_three <- filter(
   type = "range", id = "actor_filter_three", name = "Actor",
-  variable = "actor_id", dataset = "actor", range = c(6, 8)
+  variable = "actor_id", dataset = "actor", range = c(6L, 8L)
 )
 discrete_filter_film <- filter(
   type = "discrete", id = "film_filter", name = "Film",
   variable = "rating", dataset = "film", value = c("G","R")
 )
 discrete_filter_film_two <- filter(
-  type = "discrete", id = "film_filter", name = "Film",
+  type = "discrete", id = "film_filter_two", name = "Film",
   variable = "rating", dataset = "film", value = c("G")
 )
 
@@ -49,7 +50,7 @@ test_that("Add new step works fine",{
   expect_length(get_state(coh), number_of_steps + 1L)
   expect_identical(nrow(get_data(coh)$actor), 4L)
   expect_identical(get_state(coh, 2L)[[1L]]$filters[[1L]]$id, "actor_filter_two")
-  expect_identical(get_state(coh, 2L)[[1L]]$filters[[2L]]$id, "film_filter")
+  expect_identical(get_state(coh, 2L)[[1L]]$filters[[2L]]$id, "film_filter_two")
 
   # Add step without data calculations
   add_step(coh, step_3)
