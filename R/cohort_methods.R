@@ -225,9 +225,12 @@ Cohort <- R6::R6Class(
           filter_env[[param_name]] <- new_val
         }
       }
-
       if (!missing(active)) {
-        filter_env[["active"]] <- active
+        if(!is.logical(active)) {
+          warning("Active accepts only logical values")
+        } else {
+          filter_env[["active"]] <- active
+        }
       }
 
       if (run_flow && (!missing(active) || any_changed)) {
