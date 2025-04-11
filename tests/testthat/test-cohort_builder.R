@@ -114,3 +114,50 @@ test_that("Get state works fine", {
   expect_identical(state_from_json$filters[[1L]]$range[[1L]], test_range)
   expect_identical(state_from_json$filters[[1L]]$description, test_description)
 })
+
+test_that("Update filter works fine", {
+  coh <- Cohort$new(
+    sakila_source,
+    step_1,
+    run_flow = TRUE
+  )
+  # Save all unique rating without filtering
+  unique_rating <- unique(get_data(coh, 0L)$film$rating)
+
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$film$rating), c("R", "G"))
+  expect_setequal(get_state(coh, 1L)[[1L]]$filters[[2L]]$value, c("R", "G"))
+  expect_true(get_state(coh, 1L)[[1L]]$filters[[2L]]$active)
+
+  # Update film filter to one value with run_flow
+  coh$update_filter(1L, "film_filter", value = "R", run_flow = TRUE)
+
+  expect_identical(get_state(coh, 1L)[[1L]]$filters[[2L]]$value, "R")
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$film$rating), "R")
+
+  # Update film filter to non-existent value without run_flow
+  coh$update_filter(1L, "film_filter", value = "non_existent_vaule")
+
+  expect_identical(get_state(coh, 1L)[[1L]]$filters[[2L]]$value, "non_existent_vaule")
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$film$rating), "R")
+  coh %>% run()
+  expect_identical(coh$get_data(1L, state = "post")$film$rating, character(0L))
+
+  # Change active status
+  coh$update_filter(1L, "film_filter", value = "G", active = FALSE, run_flow = TRUE)
+
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$film$rating), unique_rating)
+  expect_false(get_state(coh, 1L)[[1L]]$filters[[2L]]$active)
+
+  expect_warning(
+    coh$update_filter(1L, "film_filter", type = "range"),
+    label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
+  )
+  expect_warning(
+    coh$update_filter(1L, "film_filter", id = "film_filter_two"),
+    label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
+  )
+  expect_warning(
+    coh$update_filter(1L, "film_filter", name = "test"),
+    label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
+  )
+})
