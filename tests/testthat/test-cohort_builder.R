@@ -1,12 +1,12 @@
 load(testthat::test_path("../data/sakila/sakila.rda"))
 sakila_source <- set_source(as.tblist(sakila))
 sakila_source$binding_keys <- bind_keys(
-  bind_key(update = data_key('actor', 'actor_id'),
-           data_key('film_actor', 'actor_id')
-  ),
-  bind_key(update = data_key('film_actor','film_id'),
-           data_key('film','film_id')
-  ))
+                                        bind_key(update = data_key("actor", "actor_id"),
+                                          data_key("film_actor", "actor_id")
+                                        ),
+                                        bind_key(update = data_key("film_actor", "film_id"),
+                                          data_key("film", "film_id")
+                                        ))
 
 range_filter_actor <- filter(
   type = "range", id = "actor_filter", name = "Actor",
@@ -22,19 +22,19 @@ range_filter_actor_three <- filter(
 )
 discrete_filter_film <- filter(
   type = "discrete", id = "film_filter", name = "Film",
-  variable = "rating", dataset = "film", value = c("G","R")
+  variable = "rating", dataset = "film", value = c("G", "R")
 )
 discrete_filter_film_two <- filter(
   type = "discrete", id = "film_filter_two", name = "Film",
   variable = "rating", dataset = "film", value = c("G")
 )
 
-step_1 <- step(range_filter_actor,discrete_filter_film)
-step_2 <- step(range_filter_actor_two,discrete_filter_film_two)
+step_1 <- step(range_filter_actor, discrete_filter_film)
+step_2 <- step(range_filter_actor_two, discrete_filter_film_two)
 step_3 <- step(range_filter_actor_three)
 
 
-test_that("Add new step works fine",{
+test_that("Add new step works fine", {
   coh <- Cohort$new(
     sakila_source,
     step_1,
@@ -66,7 +66,7 @@ test_that("Add new step works fine",{
   expect_error(add_step(coh))
 })
 
-test_that("Get state works fine",{
+test_that("Get state works fine", {
   test_type <- "range"
   test_id <- "actor_filter"
   test_name <- "Actor"
