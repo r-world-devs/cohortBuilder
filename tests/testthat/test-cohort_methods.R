@@ -492,6 +492,11 @@ test_that("Updating filter works fine", {
     label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
   )
 
+  expect_warning(
+    coh$update_filter(1L, "sepal_l", active = "FALSE"),
+    regexp = "Active accepts only logical values."
+  )
+
   # Using S3 Cohort methods
   coh <- cohort(
     set_source(
@@ -514,6 +519,11 @@ test_that("Updating filter works fine", {
   expect_warning(
     coh$update_filter(1L, "sepal_l", type = "discrete"),
     label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
+  )
+
+  expect_warning(
+    coh$update_filter(1L, "sepal_l", active = "FALSE"),
+    regexp = "Active accepts only logical values."
   )
 })
 
