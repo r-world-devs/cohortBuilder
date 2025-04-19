@@ -642,6 +642,11 @@ test_that("Getting filter stats works fine", {
     as.list(table(iris$Species[iris$Species %in% c("setosa", "virginica")]))
   )
 
+  expect_error(
+    stat(coh,10),
+    regexp = "Step is not exist in this cohort object."
+  )
+
   # Using S3 Cohort methods
   coh <- cohort(
     set_source(

@@ -459,6 +459,11 @@ Cohort <- R6::R6Class(
       if (state == "pre") {
         data_id <- prev_step(step_id)
       }
+
+      if(is.null(self$get_step(step_id)) && step_id != 0){
+        stop("Step is not exist in this cohort object.")
+      }
+
       if (missing(filter_id)) {
         return(
           .get_stats(private$source, private$data_objects[[data_id]])
