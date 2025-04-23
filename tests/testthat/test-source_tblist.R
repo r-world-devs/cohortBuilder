@@ -103,6 +103,7 @@ test_that("get_stats in discrete filter works fine", {
 
   result <- filter$get_stats(test_data, "n_data")
   expect_identical(result, length(test_var %>% na.omit()))
+  expect_type(result, "integer")
 })
 
 test_that("plot_data in discrete filter works fine", {
@@ -122,3 +123,150 @@ test_that("plot_data in discrete filter works fine", {
   expect_silent(recordPlot())
 })
 
+test_that("get_params in discrete filter works fine", {
+  filter <- cb_filter.discrete.tblist(
+    variable = "var1", value = "A",
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  expect_type(filter$get_params("value"), "character")
+  expect_type(filter$get_params(), "list")
+})
+
+test_that("get_data in discrete filter works fine", {
+  test_var <- c("A", "B", NA, "C", "A", NA, "B")
+
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = test_var
+    )
+  )
+
+  test_data_null <- list(
+    test_dataset = data.frame(
+      var1 = NULL
+    )
+  )
+
+  filter <- cb_filter.discrete.tblist(
+    variable = "var1", value = "A",
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  # Filter with non-existing variable
+  wrong_filter <- cb_filter.discrete.tblist(
+    variable = "non-existing", value = "A",
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  expect_type(filter$get_data(test_data), "character")
+  expect_length(filter$get_data(test_data), length(test_var))
+  expect_null(wrong_filter$get_data(test_data))
+  expect_null(filter$get_data(test_data_null))
+})
+
+test_that("get_defaults in discrete filter works fine", {
+  test_var <- c("A", "B", NA, "C", "A", NA, "B")
+
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = test_var
+    )
+  )
+
+  filter <- cb_filter.discrete.tblist(
+    variable = "var1", value = "A",
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  result <- filter$get_defaults(test_data, filter$get_stats(test_data))
+
+  expect_type(result, "list")
+  expect_length(result, 1L)
+  expect_type(result$value, "character")
+  expect_length(result$value, length(test_var %>% na.omit() %>% collapse::funique()))
+  expect_identical(result$value, test_var %>% na.omit() %>% collapse::funique())
+})
+
+test_that("get_stats in discrete text filter works fine", {
+  test_var <- c("A", "B", NA, "C", "A", NA, "B")
+
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = test_var
+    )
+  )
+
+  filter <- cb_filter.discrete_text.tblist(
+    variable = "var1", value = "A",
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  result <- filter$get_stats(test_data, "n_missing")
+  expect_identical(result, length(test_var[is.na(test_var)]))
+  expect_type(result, "integer")
+})
+
+test_that("get_params in discrete text filter works fine", {
+  filter <- cb_filter.discrete_text.tblist(
+    variable = "var1", value = "A",
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  expect_type(filter$get_params("value"), "character")
+  expect_type(filter$get_params(), "list")
+})
+
+test_that("get_data in discrete text filter works fine", {
+  test_var <- c("A", "B", NA, "C", "A", NA, "B")
+
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = test_var
+    )
+  )
+
+  test_data_null <- list(
+    test_dataset = data.frame(
+      var1 = NULL
+    )
+  )
+
+  filter <- cb_filter.discrete_text.tblist(
+    variable = "var1", value = "A",
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  # Filter with non-existing variable
+  wrong_filter <- cb_filter.discrete_text.tblist(
+    variable = "non-existing", value = "A",
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  expect_type(filter$get_data(test_data), "character")
+  expect_length(filter$get_data(test_data), length(test_var))
+  expect_null(wrong_filter$get_data(test_data))
+  expect_null(filter$get_data(test_data_null))
+})
+
+test_that("get_defaults in discrete text filter works fine", {
+  test_var <- c("A", "B", NA, "C", "A", NA, "B")
+
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = test_var
+    )
+  )
+
+  filter <- cb_filter.discrete_text.tblist(
+    variable = "var1", value = "A",
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  result <- filter$get_defaults(test_data, filter$get_stats(test_data))
+
+  expect_type(result, "list")
+  expect_length(result, 1L)
+  expect_type(result$value, "character")
+  expect_length(result$value, 1L)
+})
