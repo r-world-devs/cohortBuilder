@@ -185,7 +185,7 @@ test_that("get_defaults in discrete filter works fine", {
   expect_length(result, 1L)
   expect_type(result$value, "character")
   expect_length(result$value, length(test_var %>% na.omit() %>% collapse::funique()))
-  expect_identical(result$value, test_var %>% na.omit() %>% collapse::funique())
+  expect_identical(result$value, as.vector(test_var %>% na.omit() %>% collapse::funique()))
 })
 
 test_that("get_stats in discrete text filter works fine", {
