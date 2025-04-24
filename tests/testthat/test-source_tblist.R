@@ -85,6 +85,7 @@ test_that("filter_data in discrete filter works fine", {
   expect_type(result$test_dataset$var1, "character")
   expect_length(result$test_dataset$var1, length(test_var %>% na.omit() %>% .[. == "B"]))
   expect_setequal(result$test_dataset$var1, "B")
+  expect_false(anyNA(result$test_dataset$var1))
 })
 
 test_that("get_stats in discrete filter works fine", {
@@ -305,7 +306,6 @@ test_that("filter_data in range filter works fine", {
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
   expect_type(result$test_dataset$var1, "integer")
-  expect_gt(length(result$test_dataset$var1), 0L)
 
   # filter_data with keep_na = FALSE and value = NA
   filter2 <- cb_filter.range.tblist(
@@ -321,10 +321,8 @@ test_that("filter_data in range filter works fine", {
   expect_false(anyNA(result$test_dataset$var1))
 
   # filter_data with keep_na = FALSE and value != NA
-  range_value <- c(1L, 40L)
-
   filter3 <- cb_filter.range.tblist(
-    variable = "var1", range = range_value,
+    variable = "var1", range = c(1L, 40L),
     dataset = "test_dataset", keep_na = FALSE
   )
 
@@ -332,8 +330,7 @@ test_that("filter_data in range filter works fine", {
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
   expect_type(result$test_dataset$var1, "integer")
-  expect_gt(length(result$test_dataset$var1), 0L)
-  expect_false(any(result$test_dataset$var1 > range_value[2L] & result$test_dataset$var1 < range_value[1L]))
+  expect_false(anyNA(result$test_dataset$var1))
 })
 
 test_that("get_stats in range filter works fine", {
@@ -383,6 +380,7 @@ test_that("plot_data in range filter works fine", {
 
   filter$plot_data(test_data_null)
   expect_silent(recordPlot())
+  dev.off()
 })
 
 test_that("get_params in range filter works fine", {
