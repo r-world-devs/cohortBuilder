@@ -73,7 +73,7 @@ set_source.tblist <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
                               source_code = NULL, description = NULL, ...) {
   Source$new(
     dtconn, primary_keys = primary_keys, binding_keys = binding_keys,
-    source_code = source_code, description = purrr::map(description, describe),
+    source_code = source_code, description = description,
     ...
   )
 }
@@ -994,4 +994,29 @@ cb_filter.query.tblist <- function(
 #' @export
 .repro_code_tweak.tblist <- function(source, code_data) {
   pipe_all_filters(code_data)
+}
+
+#' @export
+shape.tblist <- function(source, field, subfield, ...) {
+  description_obj <- source$description
+  if (missing(subfield)) {
+    subfield <- "dataset_"
+  }
+  if (!missing(field)) {
+    return(description_obj[[field]][[subfield]]$text)
+  }
+  purrr::imap_dfr(
+    description_obj,
+    function(fields, dataset_name) {
+      purrr::imap_dfr(
+        fields,
+        function(field, field_name) {
+          if (field_name == "dataset_") {
+            field_name <- NA
+          }
+          tibble::tibble(dataset = dataset_name, filter = field_name, description = field)
+        }
+      )
+    }
+  )
 }

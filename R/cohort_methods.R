@@ -341,7 +341,7 @@ Cohort <- R6::R6Class(
             filter_state$range <- na_fix(filter_state$range)
             filter_state$range <- as.Date(filter_state$range)
           }
-          
+
           if (filter_state$type == "datetime_range") {
             filter_state$range <- na_fix(filter_state$range)
             if (length(filter_state$range) == 0) filter_state$range <- NULL
@@ -482,12 +482,17 @@ Cohort <- R6::R6Class(
       description <- NULL
       if (!missing(field)) {
         if (is.null(self$get_source()$description)) return(NULL)
-        description <- self$get_source()$description[[field]]
+        description <- shape(self$get_source(), field)
       }
       if (!missing(step_id) && !missing(filter_id)) {
         filter <- self$get_filter(step_id, filter_id)
         description <- filter$get_params("description")
+        if (is.null(description)) {
+          description <- shape(self$get_source(), field, filter_id)
+        }
       }
+
+
       return(modifier(description))
     },
     #' @description

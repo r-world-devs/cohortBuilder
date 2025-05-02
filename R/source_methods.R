@@ -27,6 +27,7 @@ Source <- R6::R6Class(
       self$dtconn <- dtconn
       self$attributes <- list(...)
       self$source_code = source_code
+      browser()
       self$description <- description
       if (!is.null(binding_keys)) {
         self$binding_keys <- binding_keys
@@ -398,4 +399,17 @@ rm_filter.Source <- function(x, step_id, filter_id, ...) {
 update_filter.Source <- function(x, step_id, filter_id, ...) {
   x$update_filter(step_id, filter_id, ...)
   return(x)
+}
+
+#' @export
+shape <- function(source, ...) {
+  UseMethod("shape", source)
+}
+
+#' @export
+shape.default <- function(source, field, subfield, ...) {
+  if (missing(subfield)) {
+    return(source$description[[field]])
+  }
+  return(NULL)
 }

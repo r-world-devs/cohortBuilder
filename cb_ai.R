@@ -1,27 +1,65 @@
-data_source <- set_source(
-  tblist(),
-  available_filters = filters_config(
-    filter("deiscrete", "age", description = describe("Age filter", meta = "", embeeddings = function(name), take_from_db(name) ...))
-  ),
-  description = list(patients = describe("patietns data", meta = "", embeeddings = function(name), take_from_db(name) ...), ...)
-)
-
+pkgload::load_all()
 describe <- function(description, ...) {
-  already_description <- is.list(description) && !is.null(description$text)
-  if (is.list(description) && !is.null(description$text)) {
-    return(already_description)
-  }
+  # already_described <- is.list(description) && !is.null(description$text)
+  # if (already_described) {
+  #   return(already_description)
+  # }
   list(
-    text = description,
+    oko = description,
     ...
   )
 }
 
-
-
-data_cohort <- cohort(
-  data_source
+dt_source <- set_source(
+  tblist(
+    iris = iris,
+    mtcars = mtcars
+  ),
+  description = list(
+    iris = list(
+      dataset_ = describe("Iris"),
+      Petal.Length = describe("Petal.Length"),
+      Species = describe("Species")
+    ),
+    mtcars = list(
+      dataset_ = describe("MTcars"),
+      qsec = describe("Qsec")
+    )
+  )
 )
+
+coh <- cohort(
+  source = dt_source
+) %>%
+  add_filter(
+    filter("discrete", id = "species", dataset = "iris", variable = "Species", value = c("setosa", "versicolor"))
+  ) %>%
+  add_filter(
+    filter("range", dataset = "iris", variable = "Petal.Length", range = c(5, 6))
+  ) %>%
+  add_filter(
+    filter("range", dataset = "mtcars", variable = "qsec", range = NA)
+  )
+
+shape(dt_source)
+
+
+# data_source <- set_source(
+#   tblist(),
+#   available_filters = filters_config(
+#     filter("deiscrete", "age", description = "Age filter")
+#   ),
+#   description = list(
+#     datasets = list(
+#       patients = list(
+#         dataset_ = describe("patietns data", meta = "", embeeddings = function(name) take_from_db(name), "..."),
+#         age = describe("Age filter", meta = "", embeeddings = function(name) take_from_db(name), "...")
+#       )
+#     )
+#   )
+# )
+
+
 
 # Tool description:
 # ellmer's tools (is it possible to keep cohort as argument)
