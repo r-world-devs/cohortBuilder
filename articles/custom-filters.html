@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Implementing custom filters • cohortBuilder</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -102,7 +101,7 @@ filter is.</p>
 <span><span class="co">#&gt; function(type, ...) {</span></span>
 <span><span class="co">#&gt;   UseMethod("filter", type)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55892a2ec680&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5557162f5ee8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
 <p>So in case of <code>discrete</code> filter, the proper used method
 is:</p>
@@ -123,7 +122,7 @@ is:</p>
 <span><span class="co">#&gt;     }</span></span>
 <span><span class="co">#&gt;   )</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55892a7a8640&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5557167ea4b8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
 <p>that gathers provided parameters and returns function of
 <code>source</code> argument:</p>
@@ -136,8 +135,8 @@ is:</p>
 <span><span class="co">#&gt;         append(list(source = source), args)</span></span>
 <span><span class="co">#&gt;       )</span></span>
 <span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55892a7b32b8&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55892a99dd30&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5557167ef3e0&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5557169f5af8&gt;</span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "function"              "cb_filter_constructor"</span></span></code></pre></div>
 <p>So whenever we define filter of specific type it returns unevaluated
@@ -150,7 +149,7 @@ provided source.</p>
 <span><span class="co">#&gt; function(source, ...) {</span></span>
 <span><span class="co">#&gt;   UseMethod("cb_filter.discrete", source)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55892a2d2450&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5557162e1938&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
 <p>With such approach for having two layers of S3 methods, we are
 allowed to to build various filter types, for various source types. For
@@ -166,9 +165,9 @@ source, range filter for raw source etc.</p>
 <span>  give.attr <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 10</span></span>
-<span><span class="co">#&gt;  $ id          : chr "MWLEF1742296252697"</span></span>
+<span><span class="co">#&gt;  $ id          : chr "MWLEF1746182984860"</span></span>
 <span><span class="co">#&gt;  $ type        : 'discrete' chr "discrete"</span></span>
-<span><span class="co">#&gt;  $ name        : chr "MWLEF1742296252697"</span></span>
+<span><span class="co">#&gt;  $ name        : chr "MWLEF1746182984860"</span></span>
 <span><span class="co">#&gt;  $ input_param : chr "value"</span></span>
 <span><span class="co">#&gt;  $ filter_data :function (data_object)  </span></span>
 <span><span class="co">#&gt;  $ get_stats   :function (data_object, name)  </span></span>
@@ -428,7 +427,7 @@ bindings. If no bindings are used, this step can be skipped.</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>
