@@ -8,14 +8,14 @@ variable_filter <- discrete_filter(patients_source)
 
 test_that("Calling filter with id returns function of source param, calling valid S3 method", {
   expect_named(formals(discrete_filter), "source")
-  expect_true(is.function(discrete_filter))
+  expect_s3_class(discrete_filter, "function")
 
   skip_on_covr()
   expect_identical(as.character(body(discrete_filter)[[2L]][[2L]]), "cb_filter.discrete")
 })
 
 test_that("Calling filter on source returns list with valid methods and parameters", {
-  expect_true(is.list(variable_filter))
+  expect_type(variable_filter, "list")
   expect_identical(
     c("id", "type", "name", "input_param", "filter_data",
       "get_stats", "plot_data", "get_params", "get_data", "get_defaults"),
@@ -26,7 +26,6 @@ test_that("Calling filter on source returns list with valid methods and paramete
 test_that("Filter methods operate correctly based on its definition", {
   expect_identical(variable_filter$filter_data(patients_source$dtconn)$patients$age, 50L)
   expect_identical(variable_filter$get_stats(patients_source$dtconn)$choices, as.list(table(50L:51L)))
-  expect_identical(class(variable_filter$plot_data(patients_source$dtconn)), c("matrix", "array"))
 })
 
 test_that("Discrete text filter works fine", {

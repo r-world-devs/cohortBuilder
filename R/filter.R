@@ -53,11 +53,14 @@ get_filter_state <- function(filter, extra_fields) {
 #' @param name Filter name.
 #' @param input_param Name of parameter responsible for providing filtering value.
 #' @param filter_data Function of `data_object` parameter defining filtering logic on Source data object.
-#' @param get_stats Function of `data_object` and `name` parameters defining what and how data statistics should be calculated.
+#' @param get_stats Function of `data_object` and `name` parameters
+#' defining what and how data statistics should be calculated.
 #' @param plot_data Function of `data_object` parameter defining how filter data should be plotted.
-#' @param get_params Function of `name` parameter returning filter parameters (if names is skipped all the parameters are returned).
+#' @param get_params Function of `name` parameter returning
+#' filter parameters (if names is skipped all the parameters are returned).
 #' @param get_data Function of `data_object` returning filter related data.
-#' @param get_defaults Function of `data_object` and `cache_object` parameters returning default `input_param` parameter value.
+#' @param get_defaults Function of `data_object` and `cache_object` parameters
+#' returning default `input_param` parameter value.
 #' @return A list of filter specific values and methods (`def_filter`) or no value (`new_filter`).
 #'
 #' @export

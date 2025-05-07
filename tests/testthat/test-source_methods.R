@@ -221,9 +221,9 @@ test_that("Removing filter on source works fine", {
     add_filter(
       discrete_filter_species_two
     )
-  removed_filter_but_not_last_one <- iris_source$clone() %>%
+  removed_filter_not_last_one <- iris_source$clone() %>%
     rm_filter(1L, "species_filter_two")
-  coh <- Cohort$new(removed_filter_but_not_last_one)
+  coh <- Cohort$new(removed_filter_not_last_one)
   state <- coh$sum_up_state()
   expect_true(state$source)
   expect_null(state$source_vars)

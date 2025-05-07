@@ -1107,26 +1107,3 @@ test_that("restore correctly restore filters filter type date_range and datetime
 
   expect_identical(get_state(coh), pre_state)
 })
-
-# if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
-#   test_that("(experimental) Retrieving reproducible code works fine", {
-#     # Using direct Cohort methods
-#     coh <- Cohort$new(
-#       set_source(
-#         tblist(iris = iris)
-#       ),
-#       discrete_iris_one
-#     )
-#     repro_code <- coh$get_code(1, "species_filter")
-#     target_code <- quote({
-#       data_object <- source$datasets
-#       if (!identical(c("setosa", "virginica"), NA)) {
-#         data_object[["iris"]] <- data_object[["iris"]] %>% dplyr::filter(!!sym("Species") %in% !!c("setosa", "virginica"))
-#       }
-#     })
-#     expect_equal(
-#       as.character(repro_code),
-#       as.character(target_code)
-#     )
-#   })
-# }
