@@ -306,6 +306,7 @@ test_that("filter_data in range filter works fine", {
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
   expect_type(result$test_dataset$var1, "integer")
+  expect_gt(length(result$test_dataset$var1), 0L)
 
   # filter_data with keep_na = FALSE and value = NA
   filter2 <- cb_filter.range.tblist(
@@ -565,4 +566,3 @@ test_that("get_stats in date range filter works fine", {
   expect_type(filter$get_stats(test_data, "n_data"), "integer")
   expect_identical(filter$get_stats(test_data, "n_data"), result$n_data)
 })
-
