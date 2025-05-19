@@ -18,25 +18,31 @@ tblist <- function(..., names) {
   tables <- rlang::dots_list(..., .named = TRUE)
   out_class <- "tblist"
 
-  tb_call <- sys.call(1)
-  if (inherits(tables, "data.frame")) {
-    if (!missing(names)) {
-      names(tables) <- names
-    }
-    return(
-      structure(tables, class = out_class)
-    )
-  }
-  if (inherits(tables, "list")) {
+  tb_call <- sys.call(1L)
+  if (purrr::every(tables, is.data.frame)) {
     if (!missing(names)) {
       if (length(tables) != length(names)) {
         stop(glue::glue(
           "{sQuote('tables')} should be of same length as {sQuote('names')}"
         ))
       }
+      names(tables) <- names
+    }
+    return(
+      structure(tables, class = out_class)
+    )
+  }
+
+  if (inherits(tables[[1L]], "list") && length(tables) == 1L) {
+    if (!missing(names)) {
+      if (length(tables[[1L]]) != length(names)) {
+        stop(glue::glue(
+          "{sQuote('tables')} should be of same length as {sQuote('names')}"
+        ))
+      }
       return(
         structure(
-          stats::setNames(tables, names),
+          stats::setNames(tables[[1L]], names),
           class = out_class
         )
       )

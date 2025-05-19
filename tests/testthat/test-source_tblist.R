@@ -1,3 +1,23 @@
+test_that("tblist throws error when input is not data frames or list of data frames", {
+  expect_error(tblist(NULL), "Please provide a data.frame or list of data.frames")
+  expect_error(tblist(123L), "Please provide a data.frame or list of data.frames")
+  expect_error(tblist("123"), "Please provide a data.frame or list of data.frames")
+  expect_error(tblist(1.5), "Please provide a data.frame or list of data.frames")
+  expect_error(tblist(TRUE), "Please provide a data.frame or list of data.frames")
+})
+
+test_that("tblist applies names correctly to list of data frames", {
+  df_list <- list(mtcars, iris)
+  result <- tblist(df_list, names = c("Cars", "Flowers"))
+
+  result_without_names <- tblist(df_list)
+
+  expect_s3_class(result, "tblist")
+  expect_named(result, c("Cars", "Flowers"))
+  expect_identical(result$Cars, mtcars)
+  expect_identical(result$Flowers, iris)
+})
+
 test_that("tblist returns named list of data frames when provided unnamed data frames", {
   result <- tblist(mtcars, iris)
 
