@@ -507,9 +507,9 @@ cb_filter.date_range.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, breaks) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% graphics::hist()
+        data_object[[dataset]][[variable]] %>% graphics::hist(breaks)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }

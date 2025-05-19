@@ -441,3 +441,34 @@ test_that("get_defaults in range filter works fine", {
   expect_length(result$range, 2L)
 })
 
+test_that("plot_data in date range filter works fine", {
+  test_var <- c(
+    "2026-01-01", "2022-01-02", "2021-01-02",
+    "2024-01-03", "2024-01-05", NA
+  )
+
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = as.Date(test_var)
+    )
+  )
+
+  test_data_null <- list(
+    test_dataset = data.frame(
+      var1 = NULL
+    )
+  )
+
+  filter <- cb_filter.date_range.tblist(
+    variable = "var1", range = as.Date(c("2021-01-02", "2024-01-03")),
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  filter$plot_data(test_data, "year")
+  expect_silent(recordPlot())
+  dev.off()
+
+  filter$plot_data(test_data_null, "year")
+  expect_silent(recordPlot())
+  dev.off()
+})
