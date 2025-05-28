@@ -28,6 +28,14 @@ discrete_filter_film_two <- filter(
   type = "discrete", id = "film_filter_two", name = "Film",
   variable = "rating", dataset = "film", value = c("G")
 )
+datetamie_rage_filter <- filter(
+  type = "datetime_range", id = "rental_filter_datetime_range", name = "Rental",
+  variable = "return_date", dataset = "rental", range = as.POSIXct(c("2005-05-25 11:30:37", "2005-05-27 20:35:37"))
+)
+date_rage_filter <- filter(
+  type = "date_range", id = "payment_filter_datetime_range", name = "Payment",
+  variable = "payment_date", dataset = "payment", range = as.Date(c("2005-05-25", "2005-08-25"))
+)
 
 step_1 <- step(range_filter_actor, discrete_filter_film)
 step_2 <- step(range_filter_actor_two, discrete_filter_film_two)
@@ -122,7 +130,7 @@ test_that("Update filter works fine", {
     run_flow = TRUE
   )
   # Save all unique rating without filtering
-  unique_rating <- unique(get_data(coh, 0L)$film$rating)
+  unique_rating <- collapse::funique(get_data(coh, 0L)$film$rating)
 
   expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$film$rating), c("R", "G"))
   expect_setequal(get_state(coh, 1L)[[1L]]$filters[[2L]]$value, c("R", "G"))
@@ -160,4 +168,59 @@ test_that("Update filter works fine", {
     coh$update_filter(1L, "film_filter", name = "test"),
     label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
   )
+})
+
+test_that("Restore state works fine", {
+  step_datatime_range <- step(datetamie_rage_filter)
+  step_date_range <- step(date_rage_filter)
+
+  # Datetime
+  sakila_source$dtconn$rental$return_date <- as.POSIXct(sakila_source$dtconn$rental$return_date)
+  # Date
+  sakila_source$dtconn$payment$payment_date <- as.Date(sakila_source$dtconn$payment$payment_date)
+
+  coh <- Cohort$new(
+    sakila_source,
+    step_1,
+    step_2,
+    step_datatime_range,
+    step_date_range,
+    run_flow = TRUE
+  )
+  state_cohort <- get_state(coh)
+  state_cohort_json <- get_state(coh, json = TRUE)
+  expect_silent(jsonlite::fromJSON(state_cohort_json))
+  data_cohort <- get_data(coh)
+
+  coh$remove_step(2L)
+  coh$remove_filter(1L, 1L, run_flow = TRUE)
+
+  expect_false(identical(data_cohort, get_data(coh)))
+  expect_false(identical(state_cohort, get_state(coh)))
+
+  # Restore state with json = FALSE
+  restore(coh, state_cohort, run_flow = TRUE)
+
+  expect_identical(state_cohort, get_state(coh))
+  expect_identical(data_cohort, get_data(coh))
+
+  coh$remove_step()
+  coh$remove_step()
+  add_step(coh, step_3)
+  state_cohort_2 <- get_state(coh)
+
+  # Restore state with changed modifier
+  restore(coh, state_cohort, modifier = function(prev_state, state) append(prev_state, state))
+
+  identical(get_state(coh), append(state_cohort, state_cohort_2))
+  expect_error(restore(coh, list("non_state")), regexp = ".*\\$ operator is invalid for atomic vectors.*")
+
+  expect_false(identical(data_cohort, get_data(coh)))
+  expect_false(identical(state_cohort_json, get_state(coh, json = TRUE)))
+
+  # Restore state with json = TRUE
+  restore(coh, state_cohort_json, run_flow = TRUE)
+
+  expect_identical(state_cohort, get_state(coh))
+  expect_identical(data_cohort, get_data(coh))
 })
