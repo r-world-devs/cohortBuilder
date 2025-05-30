@@ -10,6 +10,10 @@ describe <- function(description, ...) {
   )
 }
 
+extract_choices <- function(x, filter_type) {
+
+}
+
 dt_source <- set_source(
   tblist(
     iris = iris,
@@ -18,7 +22,7 @@ dt_source <- set_source(
   description = list(
     iris = list(
       dataset_ = describe("dataset related to iris plants"),
-      Sepal.Length = describe("filter for the sepal length measurement"),
+      Sepal.Length = describe("filter for the sepal length measurement", stats = c("never", "auto")),
       Petal.Length = describe("filter for the petal length measurement"),
       Sepal.Width = describe("filter for the sepal width measurement"),
       Petal.Width = describe("filter for the petal width measurement"),
@@ -47,7 +51,7 @@ coh <- cohort(
   source = dt_source
 ) %>%
   add_filter(
-    filter("discrete", id = "species", dataset = "iris", variable = "Species", value = c("setosa", "versicolor"))
+    filter("discrete", id = "species", dataset = "iris", variable = "Species", value = c("setosa", "versicolor"), active = FALSE)
   ) %>%
   add_filter(
     filter("range", dataset = "iris", variable = "Petal.Length", range = c(5, 6))
@@ -55,6 +59,26 @@ coh <- cohort(
   add_filter(
     filter("range", dataset = "mtcars", variable = "qsec", range = NA)
   )
+
+run(coh)
+
+str(coh[[".__enclos_env__"]]$private$cache)
+
+sum_up(coh)
+
+coh$get_cache("1", "species", state = "pre")
+coh$get_cache("0")
+coh$update_cache("1", "GKVPF1747395050341", state = "pre")
+coh$update_cache("1", "species", state = "pre")
+
+coh$update_cache("0", filters = TRUE)
+
+# 1. autofilter to cb
+# 2. update_cache is run on meta filters and saves stats to "step" 0
+# 3. make update cache working on step_id = 0 to run all the filters
+# 4. extend range filter's stats to min and max
+# 5. keep state 0 cache within source (then cohort during initialization just copies it)
+# 6. write method to refactor chache stats to readable llm format
 
 shape(dt_source)
 
@@ -114,10 +138,9 @@ sum_up(coh)
 
 # Tool description:
 # ellmer's tools (is it possible to keep cohort as argument)
-set_step_filters_tool <- function(cohort, action = c("edit_last", "new_step"), ...) {
+add_filters_tool <- function(cohort, action = c("edit_last", "new_step"), ...) {
   action <- match.arg(action, several.ok = TRUE)
   fun <- function(filter_ids, action = action) {
-    browser()
     filter_ids <- strsplit(filter_ids, ",")[[1]]
     action <- match.arg(action, several.ok = FALSE)
     available_filters <- cohort$attributes$available_filters
@@ -138,11 +161,12 @@ set_step_filters_tool <- function(cohort, action = c("edit_last", "new_step"), .
   attr(fun, "description") <- r"(
     The tool used to set specific set of filters to a new filtering step.
     Available filters can be extracted using 'get_filters_meta' tool.
+    The tool should be called once for all the filter ids of user interest.
   )"
   attr(fun, "params") <- list(
-    .name = "set_step_filters",
+    .name = "add_filters_tool",
     filter_ids = ellmer::type_string(
-      "JSON array storing filter ids that should be set to the cohort."
+      "Comma separated filter ids that should be set to the cohort."
     ),
     action = ellmer::type_string(
       "Always equal to 'new_step' string."
@@ -173,10 +197,6 @@ sum_up(coh)
 #     )
 #   )
 # )
-
-
-
-
 
 # Tool description: when filter description is missing, use this tool to get filter description:
 get_description_tool <- function(cohort, calculate_embeddings, top_k) {
