@@ -224,3 +224,33 @@ test_that("Restore state works fine", {
   expect_identical(state_cohort, get_state(coh))
   expect_identical(data_cohort, get_data(coh))
 })
+
+test_that("Plot data works fine", {
+  coh <- Cohort$new(
+    sakila_source,
+    step_1,
+    run_flow = TRUE
+  )
+
+  expect_error(recordPlot())
+  plot_data(coh, 1L, 2L)
+  expect_silent(recordPlot())
+  dev.off()
+})
+
+test_that("Stats works fine", {
+  coh <- Cohort$new(
+    sakila_source,
+    step_1,
+    run_flow = TRUE
+  )
+
+  result_post <- coh$get_stats(1L, 2L)
+  result_pre <- coh$get_stats(1L, 2L, state = "pre")
+
+  expect_identical(result_post$n_data, nrow(coh$get_data(1L)$film))
+  expect_identical(result_post$choices$G, sum(coh$get_data(1L)$film$rating == "G"))
+
+  expect_identical(result_pre$n_data, nrow(coh$get_data(0L)$film))
+  expect_identical(result_pre$choices$G, sum(coh$get_data(0L)$film$rating == "G"))
+})
