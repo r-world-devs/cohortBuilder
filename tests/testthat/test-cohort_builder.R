@@ -254,3 +254,33 @@ test_that("Stats works fine", {
   expect_identical(result_pre$n_data, nrow(coh$get_data(0L)$film))
   expect_identical(result_pre$choices$G, sum(coh$get_data(0L)$film$rating == "G"))
 })
+
+test_that("Remove_step works fine", {
+  coh <- Cohort$new(
+    sakila_source,
+    step_1,
+    step_2,
+    run_flow = TRUE
+  )
+  id_first_filter <- coh$get_state()[[1L]]$filters[[1L]]$id
+  number_of_steps_pre <- length(coh$get_state())
+  # Remove step without step id remove last step
+  coh$remove_step()
+
+  expect_gt(number_of_steps_pre, length(coh$get_state()))
+  expect_null(coh$get_step(2L))
+  expect_identical(id_first_filter, coh$get_state()[[1L]]$filters[[1L]]$id)
+
+  coh$add_step(step_2)
+
+  # Remove first step
+  coh$remove_step(1L)
+  expect_false(identical(id_first_filter, coh$get_state()[[1L]]$filters[[1L]]$id))
+  expect_null(coh$get_step(2L))
+  expect_gt(number_of_steps_pre, length(coh$get_state()))
+
+  coh$add_step(step_1)
+  # Remove step with non-existed step id
+  coh$remove_step(100L)
+  expect_identical(number_of_steps_pre, length(coh$get_state()))
+})
