@@ -747,10 +747,12 @@ Cohort <- R6::R6Class(
     #' @param filter_id If of the filter to be returned.
     #' @param method Custom function taking filters list as argument.
     get_filter = function(step_id, filter_id, method = function(x) x) {
+      step_id <- as.character(step_id)
+      filters_container <- private$steps[[as.character(step_id)]]
       if (!missing(filter_id)) {
-        method(private$steps[[as.character(step_id)]]$filters[[filter_id]])
+        method(filters_container$filters[[filter_id]])
       } else {
-        method(private$steps[[as.character(step_id)]]$filters)
+        method(filters_container$filters)
       }
     },
     #' @description
@@ -778,7 +780,7 @@ Cohort <- R6::R6Class(
       } else {
         filter <- self$get_filter(step_id, filter_id)
         prev_cache <- private$cache[[cache_id]]$filters[[filter_id]]
-        cache_changes <- FALSE
+        cache_changed <- FALSE
         private$cache[[cache_id]]$filters[[filter_id]] <- filter$get_stats(self$get_data(step_id, state, FALSE))
         if (!identical(prev_cache, private$cache[[cache_id]]$filters[[filter_id]])) {
           cache_changed <- TRUE
@@ -843,14 +845,25 @@ Cohort <- R6::R6Class(
     steps = list(),
     cache = list(),
     data_objects = list(),
-    init_source = function(source, ...) {
+    init_source = function(source, ...,
+                           hook = list(
+                             pre = get_hook("pre_init_source_hook"),
+                             post = get_hook("post_init_source_hook")
+                           )) {
+      run_hooks(hook$pre, self, private)
+
       private$source <- source
       private$steps <- register_steps_and_filters(source, ...)
       initial_data <- .init_step(source)
       if (!is.null(initial_data)) {
-        # important note: data objects are indexed from 0, whereas steps and filters from 1
+        # important note: data objects and cache are indexed from 0, whereas steps and filters from 1
         private$data_objects[["0"]] <- initial_data
       }
+      if (!is.null(source$available_filters)) {
+        self$attributes$available_filters <- purrr::map(source$available_filters, ~ .x(source))
+      }
+      private$cache[["0"]] <- private$source$meta_stats
+      run_hooks(hook$post, self, private)
     }
   )
 )

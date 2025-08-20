@@ -19,6 +19,10 @@ last_item <- function(list_obj) {
   list_obj[[list_length]]
 }
 
+drop_nulls <- function(x) {
+  purrr::keep(x, ~!is.null(.))
+}
+
 step_filter_state <- function(steps, method = length, raw = FALSE) {
   if (length(steps) == 0) {
     if (raw) return(steps)

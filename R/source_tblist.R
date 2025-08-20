@@ -348,7 +348,7 @@ cb_filter.range.tblist <- function(
     },
     get_stats = function(data_object, name) {
       if (missing(name)) {
-        name <- c("n_data", "frequencies", "n_missing")
+        name <- c("n_data", "frequencies", "min", "max", "n_missing")
       }
       extra_params <- list(...)
 
@@ -356,7 +356,9 @@ cb_filter.range.tblist <- function(
         frequencies = if ("frequencies" %in% name) {
           get_range_frequencies(data_object, dataset, variable, extra_params)
         },
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length(),
+        min = if ("min" %in% name) data_object[[dataset]][[variable]] %>% min(na.rm = TRUE),
+        max = if ("max" %in% name) data_object[[dataset]][[variable]] %>% max(na.rm = TRUE),
+        n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
       if (length(name) == 1) {
@@ -490,7 +492,7 @@ cb_filter.date_range.tblist <- function(
     },
     get_stats = function(data_object, name) {
       if (missing(name)) {
-        name <- c("n_data", "frequencies", "n_missing")
+        name <- c("n_data", "frequencies", "min", "max", "n_missing")
       }
       extra_params <- list(...)
 
@@ -498,6 +500,8 @@ cb_filter.date_range.tblist <- function(
         frequencies = if ("frequencies" %in% name) {
           get_date_range_frequencies(data_object, dataset, variable, extra_params)
         },
+        min = if ("min" %in% name) data_object[[dataset]][[variable]] %>% min(na.rm = TRUE),
+        max = if ("max" %in% name) data_object[[dataset]][[variable]] %>% max(na.rm = TRUE),
         n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
@@ -627,7 +631,7 @@ cb_filter.datetime_range.tblist <- function(
     },
     get_stats = function(data_object, name) {
       if (missing(name)) {
-        name <- c("n_data", "frequencies", "n_missing")
+        name <- c("n_data", "frequencies", "min", "max", "n_missing")
       }
       extra_params <- list(...)
 
@@ -644,6 +648,8 @@ cb_filter.datetime_range.tblist <- function(
         frequencies = if ("frequencies" %in% name) {
           get_range_frequencies(data_object, dataset, variable, extra_params)
         },
+        min = if ("min" %in% name) data_object[[dataset]][[variable]] %>% min(na.rm = TRUE),
+        max = if ("max" %in% name) data_object[[dataset]][[variable]] %>% max(na.rm = TRUE),
         n_data = if ("n_data" %in% name) {
           data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length()
         },
@@ -1011,12 +1017,146 @@ shape.tblist <- function(source, field, subfield, ...) {
       purrr::imap_dfr(
         fields,
         function(field, field_name) {
+          stats_container <- source$meta_stats$filters
           if (field_name == "dataset_") {
             field_name <- NA
           }
-          tibble::tibble(dataset = dataset_name, filter = field_name, description = field)
+#browser()
+          stats <- source$meta_stats$filters[[field_name]]
+          stats <- stats[names(stats) %in% c("min", "max", "choices")]
+          stats$type <- "range"
+          if ("choices" %in% names(stats)) {
+            stats$choices <- names(stats$choices)
+            stats$type <- "discrete"
+          }
+          tibble::tibble(
+            dataset = dataset_name, filter = field_name, description = field,
+            stats = list(stats)
+          )
         }
       )
     }
   )
+}
+
+
+rule_character <- function(column, name, dataset_name) {
+  type <- "discrete"
+  gui_input <- NULL
+  n_unique <- length(unique(column))
+  if (n_unique == length(column)) {
+    type <- "discrete_text"
+  } else if (length(unique(column)) > 3) {
+    gui_input <- "vs"
+  }
+  drop_nulls(
+    list(
+      type = type,
+      id = name,
+      name = name,
+      variable = name,
+      dataset = dataset_name,
+      value = NA,
+      keep_na = TRUE,
+      gui_input = gui_input
+    )
+  )
+}
+
+rule_factor <- function(column, name, dataset_name) {
+  type <- "discrete"
+  gui_input <- NULL
+  n_levels <- length(levels(column))
+  if (n_levels == length(column)) {
+    type <- "discrete_text"
+  } else if (length(unique(column)) > 3) {
+    gui_input <- "vs"
+  }
+  drop_nulls(
+    list(
+      type = type,
+      id = name,
+      name = name,
+      variable = name,
+      dataset = dataset_name,
+      value = NA,
+      keep_na = TRUE,
+      gui_input = gui_input
+    )
+  )
+}
+
+rule_numeric <- function(column, name, dataset_name) {
+  list(
+    type = "range",
+    id = name,
+    name = name,
+    variable = name,
+    dataset = dataset_name,
+    range = NA,
+    keep_na = TRUE
+  )
+}
+rule_integer <- rule_numeric
+
+rule_Date <- function(column, name, dataset_name) {
+  list(
+    type = "date_range",
+    id = name,
+    name = name,
+    variable = name,
+    dataset = dataset_name,
+    range = NA,
+    keep_na = TRUE
+  )
+}
+
+rule_POSIXct <- function(column, name, dataset_name) {
+  list(
+    type = "datetime_range",
+    id = name,
+    name = name,
+    variable = name,
+    dataset = dataset_name,
+    range = NA,
+    keep_na = TRUE
+  )
+}
+
+filter_rule <- function(column, name, dataset_name) {
+  rule_method <- paste0("rule_", class(column)[[1]])
+  do.call(
+    rule_method,
+    list(
+      column = column,
+      name = name,
+      dataset_name = dataset_name
+    )
+  )
+}
+
+filter_rules <- function(dataset, dataset_name) {
+  dataset %>%
+    purrr::imap(~filter_rule(.x, .y, dataset_name = dataset_name))
+}
+
+#' @rdname autofilter
+#' @export
+autofilter.tblist <- function(source, attach_as = c("step", "meta"), ...) {
+  attach_as <- rlang::arg_match(attach_as)
+  step_rule <- source$dtconn %>%
+    purrr::imap(~filter_rules(.x, .y)) %>%
+    unlist(recursive = FALSE) %>%
+    purrr::discard(~is.null(.x)) %>%
+    purrr::map(~do.call(cohortBuilder::filter, .)) %>%
+    unname()
+
+  if (identical(attach_as, "meta")) {
+    source$available_filters <- step_rule
+  } else {
+    source %>%
+      cohortBuilder::add_step(do.call(cohortBuilder::step, step_rule))
+  }
+
+  return(source)
 }

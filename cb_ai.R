@@ -10,9 +10,9 @@ describe <- function(description, ...) {
   )
 }
 
-extract_choices <- function(x, filter_type) {
-
-}
+# extract_choices <- function(x, filter_type) {
+#
+# }
 
 dt_source <- set_source(
   tblist(
@@ -43,44 +43,46 @@ dt_source <- set_source(
       carb =	describe("Number of carburetors")
     )
   )
-) |> shinyCohortBuilder::autofilter(attach_as = "meta")
+) |> cohortBuilder::autofilter(attach_as = "meta")
 
-dt_source
+shape(dt_source)
 
 coh <- cohort(
   source = dt_source
-) %>%
-  add_filter(
-    filter("discrete", id = "species", dataset = "iris", variable = "Species", value = c("setosa", "versicolor"), active = FALSE)
-  ) %>%
-  add_filter(
-    filter("range", dataset = "iris", variable = "Petal.Length", range = c(5, 6))
-  ) %>%
-  add_filter(
-    filter("range", dataset = "mtcars", variable = "qsec", range = NA)
-  )
+)# %>%
+  # add_filter(
+  #   filter("discrete", id = "Species", dataset = "iris", variable = "Species", value = c("setosa", "versicolor"), active = FALSE)
+  # ) %>%
+  # add_filter(
+  #   filter("range", id = "Petal.Length", dataset = "iris", variable = "Petal.Length", range = c(5, 6))
+  # ) %>%
+  # add_filter(
+  #   filter("range", id = "qsec", dataset = "mtcars", variable = "qsec", range = NA)
+  # )
 
-run(coh)
+# run(coh)
+#
+# str(coh[[".__enclos_env__"]]$private$cache)
+#
+# sum_up(coh)
+#
+# coh$get_cache("1", "Species", state = "pre")
+# coh$get_cache("1", "Species", state = "post")
+# coh$get_cache("0")
+# coh$update_cache("1", "GKVPF1747395050341", state = "pre")
+# coh$update_cache("1", "species", state = "pre")
+#
+# coh$update_cache("0", filters = TRUE)
 
-str(coh[[".__enclos_env__"]]$private$cache)
+# 1. [done] autofilter to cb
+# 2. [done] update_cache is run on meta filters and saves stats to "step" 0
+# 3. [done] make update cache working on step_id = 0 to run all the filters
+# 4. [done] extend range filter's stats to min and max
+# 5. [done] keep state 0 cache within source (then cohort during initialization just copies it)
+# 6. [done] write method to refactor chache stats to readable llm format
+# 7. nth Write get_filter that will take one of available_filters by id
 
-sum_up(coh)
-
-coh$get_cache("1", "species", state = "pre")
-coh$get_cache("0")
-coh$update_cache("1", "GKVPF1747395050341", state = "pre")
-coh$update_cache("1", "species", state = "pre")
-
-coh$update_cache("0", filters = TRUE)
-
-# 1. autofilter to cb
-# 2. update_cache is run on meta filters and saves stats to "step" 0
-# 3. make update cache working on step_id = 0 to run all the filters
-# 4. extend range filter's stats to min and max
-# 5. keep state 0 cache within source (then cohort during initialization just copies it)
-# 6. write method to refactor chache stats to readable llm format
-
-shape(dt_source)
+#shape(dt_source)
 
 chat <- ellmer::chat_azure(
   endpoint = Sys.getenv("CHAT_ENDPOINT"),
@@ -122,6 +124,9 @@ get_filters_meta_tool <- function(cohort) {
     Fields named 'filter' are storing the filter id.
     Fields named 'dataset' are storing the dataset name that filter is attached to.
     Fields named 'desciption' are storing the description of filter purpose.
+    Fields named 'stats' are storing related filter limits:
+      - 'choices' lists available options,
+      - 'range' provides numerical values the filter should operate within.
   )"
   attr(fun, "params") <- list(
     .name = "get_filters_meta"
@@ -134,7 +139,7 @@ set_chat_tool(chat, get_filters_meta_tool(coh))
 #chat$chat("Get information about available filters.")
 #chat$chat("What are the filters in mtcars dataset?")
 
-sum_up(coh)
+#sum_up(coh)
 
 # Tool description:
 # ellmer's tools (is it possible to keep cohort as argument)
@@ -143,8 +148,10 @@ add_filters_tool <- function(cohort, action = c("edit_last", "new_step"), ...) {
   fun <- function(filter_ids, action = action) {
     filter_ids <- strsplit(filter_ids, ",")[[1]]
     action <- match.arg(action, several.ok = FALSE)
-    available_filters <- cohort$attributes$available_filters
+    data_source <- cohort$get_source()
+    available_filters <- data_source$available_filters
     filters_to_set <- available_filters %>%
+      purrr::map(~.x(data_source)) |>
       purrr::keep(function(x) {x$name %in% filter_ids})
     # if (action == "edit_last") {
     #   cohort$edit_step(filters, step_id = last_step())
@@ -152,7 +159,7 @@ add_filters_tool <- function(cohort, action = c("edit_last", "new_step"), ...) {
     if (action == "new_step") {
       cohort$copy_step(
         filters = filters_to_set,
-        run_flow = TRUE
+        run_flow = FALSE
       )
     }
     msg <- glue::glue("The following filters have been set: {paste(filter_ids, collapse = ', ')}")
@@ -161,10 +168,10 @@ add_filters_tool <- function(cohort, action = c("edit_last", "new_step"), ...) {
   attr(fun, "description") <- r"(
     The tool used to set specific set of filters to a new filtering step.
     Available filters can be extracted using 'get_filters_meta' tool.
-    The tool should be called once for all the filter ids of user interest.
+    Very important: The tool should be called once for all the filter ids of user interest.
   )"
   attr(fun, "params") <- list(
-    .name = "add_filters_tool",
+    .name = "add_filters",
     filter_ids = ellmer::type_string(
       "Comma separated filter ids that should be set to the cohort."
     ),
@@ -175,13 +182,46 @@ add_filters_tool <- function(cohort, action = c("edit_last", "new_step"), ...) {
   return(fun)
 }
 
-set_chat_tool(chat, set_step_filters_tool(coh))
+set_chat_tool(chat, add_filters_tool(coh))
 
-sum_up(coh)
+# sum_up(coh)
+#
+# chat$chat("Set filters that will allow me to specify iris species and a car speed.")
+#
+# sum_up(coh)
 
-chat$chat("Set filters that will allow me to specify iris species and a car speed.")
+set_filter_values_tool <- function(cohort, ...) {
+  fun <- function(filter_values) {
+    filter_vals <- jsonlite::fromJSON(filter_values)
+    for (filter_id in names(filter_vals)) {
+      do.call(cohort$update_filter, c(step_id = cohort$last_step_id(), filter_id = filter_id, filter_vals[[filter_id]]))
+    }
+    run(cohort)
+    msg <- glue::glue("The following filter values have been updated: {paste(capture.output(str(filter_vals)), collapse = ', ')}")
+    return(msg)
+  }
+  attr(fun, "description") <- r"(
+    The tool used to set filter values.
+    Available filters domain can be extracted using 'get_filters_meta' tool and are stored within stats field.
+  )"
+  attr(fun, "params") <- list(
+    .name = "set_filter_values",
+    filter_values = ellmer::type_string(
+      "JSON object storing filter values to be set.
+      Takes into account only filters returned by 'get_filters_meta' tool.
+      Each element should be named as filter id and store the following elements:
+      - 'value' - array of desired values for discrete-type filter.
+      - 'range' - array of two values - minimal and maximal value to be set for range-type filter."
+    )
+  )
+  return(fun)
+}
 
-sum_up(coh)
+set_chat_tool(chat, set_filter_values_tool(coh))
+
+chat$chat("Filter iris species that start with 'v' letter and cars having horse power above 100.")
+
+#### only ideas below
 
 # data_source <- set_source(
 #   tblist(),
@@ -222,6 +262,8 @@ get_vocab_tool <- function(cohort, top_k) {
     return("restricted")
   }
 }
+
+
 
 set_filter_tool <- function(cohort) {
   fun <- function(filter_id, values) {
@@ -270,8 +312,3 @@ chat |>
   set_tool(get_description_tool(cohort))
 
 chat$chat()
-
-
-
-
-

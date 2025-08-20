@@ -42,6 +42,7 @@ primary keys and relations between stored data.
 \item \href{#method-Source-add_filter}{\code{Source$add_filter()}}
 \item \href{#method-Source-rm_filter}{\code{Source$rm_filter()}}
 \item \href{#method-Source-update_filter}{\code{Source$update_filter()}}
+\item \href{#method-Source-calc_meta_stats}{\code{Source$calc_meta_stats()}}
 \item \href{#method-Source-clone}{\code{Source$clone()}}
 }
 }
@@ -58,6 +59,7 @@ Create a new `Source` object.
   binding_keys = NULL,
   source_code = NULL,
   description = NULL,
+  available_filters = NULL,
   options = list(display_binding = TRUE)
 )}\if{html}{\out{</div>}}
 }
@@ -208,6 +210,15 @@ Update filter definition.
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Source-calc_meta_stats"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-calc_meta_stats}{}}}
+\subsection{Method \code{calc_meta_stats()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$calc_meta_stats()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-clone"></a>}}

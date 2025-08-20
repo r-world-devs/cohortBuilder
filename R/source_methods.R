@@ -21,10 +21,13 @@ Source <- R6::R6Class(
     #' @return A new `Source` object of class `Source` (and `dtconn` object class appended).
     initialize = function(
       dtconn, ..., primary_keys = NULL, binding_keys = NULL, source_code = NULL,
-      description = NULL,  options = list(display_binding = TRUE)
+      description = NULL, available_filters = NULL, options = list(display_binding = TRUE)
       ) {
 
       self$dtconn <- dtconn
+      class(self) <- c(class(dtconn), class(self))
+      self$dtvalue <- .init_step(self)
+      self$available_filters <- available_filters
       self$attributes <- list(...)
       self$source_code = source_code
       self$description <- description
@@ -35,7 +38,6 @@ Source <- R6::R6Class(
         self$primary_keys <- primary_keys
       }
       self$options <- options
-      class(self) <- c(class(dtconn), class(self))
     },
     #' @description
     #' Get selected `Source` object `attribute`.
@@ -144,6 +146,8 @@ Source <- R6::R6Class(
     },
     #' @field dtconn Data connection object the Source if based on.
     dtconn = NULL,
+    dtvalue = NULL,
+    meta_stats = NULL,
     #' @field description Source object description list.
     description = NULL,
     #' @field attributes Extra source parameters passed when source is defined.
@@ -155,10 +159,33 @@ Source <- R6::R6Class(
     #' @field primary_keys Source data primary keys expressed as \link{primary_keys}.
     primary_keys = NULL,
     #' @field source_code An expression which allows to recreate basic source structure.
-    source_code = NULL
+    source_code = NULL,
+    calc_meta_stats = function() {
+      keep_meta_stats <- getOption("cb.source_filters_meta_stats", TRUE)
+      if (!is.null(private$meta_filters) && keep_meta_stats) {
+        self$meta_stats <- .get_stats(self, self$dtvalue)
+        self$meta_stats$changed <- FALSE
+        for (filter_fun in self$available_filters) {
+          evaled_filter <- eval_filter(filter_fun, step_id = NULL, source = self)
+          self$meta_stats$filters[[evaled_filter$id]] <- evaled_filter$get_stats(self$dtvalue)
+          self$meta_stats$filters[[evaled_filter$id]]$changed <- FALSE
+        }
+      }
+      return(self$meta_stats)
+    }
+  ),
+  active = list(
+    available_filters = function(value) {
+      if (missing(value)) {
+        return(private$meta_filters)
+      }
+      private$meta_filters <- value
+      self$calc_meta_stats()
+    }
   ),
   private = list(
-    steps = NULL
+    steps = NULL,
+    meta_filters = NULL
   )
 )
 
@@ -412,3 +439,52 @@ shape.default <- function(source, field, subfield, ...) {
   }
   return(NULL)
 }
+
+#' Generate filters definition based on the Source data
+#'
+#' The method should analyze source data structure, generate proper filters based on
+#' the data (e.g. column types) and attach them to source.
+#'
+#' @param source Source object.
+#' @param attach_as Choose whether the filters should be attached as a new step,
+#'    or list of available filters (used in filtering panel when `new_step = "configure"`).
+#'    By default in \code{step}.
+#' @param ... Extra arguments passed to a specific method.
+#' @return Source object having step configuration attached.
+#' @seealso \link{source-gui-layer}
+#'
+#' @examples
+#' library(magrittr)
+#' library(cohortBuilder)
+#' library(shinyCohortBuilder)
+#'
+#' iris_source <- set_source(tblist(iris = iris)) %>%
+#'   autofilter()
+#' iris_cohort <- cohort(iris_source)
+#' sum_up(iris_cohort)
+#'
+#' if (interactive()) {
+#'   library(shiny)
+#'
+#'   ui <- fluidPage(
+#'     cb_ui("mycoh")
+#'   )
+#'
+#'   server <- function(input, output, session) {
+#'     cb_server("mycoh", cohort = iris_cohort)
+#'   }
+#'
+#'   shinyApp(ui, server)
+#' }
+#' @export
+autofilter <- function(source, attach_as = c("step", "meta"), ...) {
+  UseMethod("autofilter", source)
+}
+
+#' @rdname autofilter
+#' @export
+autofilter.default <- function(source, ...) {
+  return(source)
+}
+
+
