@@ -205,12 +205,25 @@ Cohort <- R6::R6Class(
     #' @param filter_id Id of the filter to be updated.
     #' @param ... Filter parameters that should be updated.
     #' @param active Mark filter as active (`TRUE`) or inactive (`FALSE`).
-    update_filter = function(step_id, filter_id, ..., active, run_flow = FALSE) {
+    update_filter = function(step_id, filter_id, ..., active, run_flow = FALSE,
+                             hook = list(
+                               pre = get_hook("pre_update_filter_hook"),
+                               post = get_hook("post_update_filter_hook")
+                             ),
+                             hook_args = list(
+                               pre = list(),
+                               post = list()
+                             )) {
       step_id <- as.character(step_id)
       filter_id <- as.character(filter_id)
+      new_args <- list(...)
+
+      run_hooks(
+        hook$pre, self, private, step_id = step_id, filter_id = filter_id,
+        ..., active = active, hook_args = hook_args$pre
+      )
 
       filter_env <- environment(private$steps[[step_id]]$filters[[filter_id]]$filter_data)
-      new_args <- list(...)
       if (any(static_params %in% names(new_args))) {
         warning(glue::glue("Cannot modify filter {paste(sQuote(static_params), collapse = ', ')} parameters."))
       }
@@ -229,6 +242,11 @@ Cohort <- R6::R6Class(
       if (!missing(active)) {
         filter_env[["active"]] <- active
       }
+
+      run_hooks(
+        hook$post, self, private, step_id = step_id, filter_id = filter_id,
+        ..., active = active, hook_args = hook_args$post
+      )
 
       if (run_flow && (!missing(active) || any_changed)) {
         self$run_flow(step_id)
@@ -309,9 +327,9 @@ Cohort <- R6::R6Class(
     #'   The returned state is then restored.
     restore = function(state, modifier = function(prev_state, state) {state},
                        run_flow = FALSE, hook = list(
-      pre = get_hook("pre_restore_hook"),
-      post = get_hook("post_restore_hook")
-    )) {
+                         pre = get_hook("pre_restore_hook"),
+                         post = get_hook("post_restore_hook")
+                       )) {
 
       self$attributes$pre_restore_state <- self$get_state(json = FALSE)
 
@@ -476,8 +494,8 @@ Cohort <- R6::R6Class(
     #' @param modifier A function taking the description as argument.
     #'     The function can be used to modify its argument (convert to html, display in browser etc.).
     show_help = function(
-      field, step_id, filter_id,
-      modifier = getOption("cb_help_modifier", default = function(x) x)
+    field, step_id, filter_id,
+    modifier = getOption("cb_help_modifier", default = function(x) x)
     ) {
       description <- NULL
       if (!missing(field)) {
@@ -509,9 +527,9 @@ Cohort <- R6::R6Class(
     #' @param mark_step Include information which filtering step is performed.
     #' @param ... Other parameters passed to \link[formatR]{tidy_source}.
     get_code = function(
-      include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
-      include_action = c("pre_filtering", "post_filtering", "run_binding"),
-      modifier = .repro_code_tweak, mark_step = TRUE, ...) {
+    include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
+    include_action = c("pre_filtering", "post_filtering", "run_binding"),
+    modifier = .repro_code_tweak, mark_step = TRUE, ...) {
 
       source_type <- class(private$source)[1]
       # todo improve
@@ -1252,6 +1270,6 @@ attrition <- function(x, ..., percent = FALSE) {
 #' @seealso \link{cohort-methods}
 #' @export
 description <- function(x, field, step_id, filter_id,
-                      modifier = getOption("cb_help_modifier", default = function(x) x)) {
+                        modifier = getOption("cb_help_modifier", default = function(x) x)) {
   x$show_help(field = field, step_id = step_id, filter_id = filter_id, modifier = modifier)
 }

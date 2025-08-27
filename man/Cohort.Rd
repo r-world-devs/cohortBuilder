@@ -271,7 +271,16 @@ Remove filter definition
 \subsection{Method \code{update_filter()}}{
 Update filter definition
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_filter(step_id, filter_id, ..., active, run_flow = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_filter(
+  step_id,
+  filter_id,
+  ...,
+  active,
+  run_flow = FALSE,
+  hook = list(pre = get_hook("pre_update_filter_hook"), post =
+    get_hook("post_update_filter_hook")),
+  hook_args = list(pre = list(), post = list())
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -286,6 +295,9 @@ Update filter definition
 \item{\code{active}}{Mark filter as active (`TRUE`) or inactive (`FALSE`).}
 
 \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+
+\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+See \link{hooks} for more details.}
 }
 \if{html}{\out{</div>}}
 }

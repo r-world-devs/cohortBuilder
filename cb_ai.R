@@ -81,6 +81,7 @@ coh <- cohort(
 # 5. [done] keep state 0 cache within source (then cohort during initialization just copies it)
 # 6. [done] write method to refactor chache stats to readable llm format
 # 7. nth Write get_filter that will take one of available_filters by id
+# 8. Allow to modify the current step with llm.
 
 #shape(dt_source)
 
@@ -104,8 +105,8 @@ set_chat_tool <- function(chat, cb_tool, description, ...) {
   chat$register_tool(
     rlang::inject(
       ellmer::tool(
-        .fun = cb_tool,
-        .description = description,
+        fun = cb_tool,
+        description = description,
         !!!args
       )
     )
@@ -129,7 +130,7 @@ get_filters_meta_tool <- function(cohort) {
       - 'range' provides numerical values the filter should operate within.
   )"
   attr(fun, "params") <- list(
-    .name = "get_filters_meta"
+    name = "get_filters_meta"
   )
   return(fun)
 }
@@ -171,7 +172,7 @@ add_filters_tool <- function(cohort, action = c("edit_last", "new_step"), ...) {
     Very important: The tool should be called once for all the filter ids of user interest.
   )"
   attr(fun, "params") <- list(
-    .name = "add_filters",
+    name = "add_filters",
     filter_ids = ellmer::type_string(
       "Comma separated filter ids that should be set to the cohort."
     ),
@@ -205,7 +206,7 @@ set_filter_values_tool <- function(cohort, ...) {
     Available filters domain can be extracted using 'get_filters_meta' tool and are stored within stats field.
   )"
   attr(fun, "params") <- list(
-    .name = "set_filter_values",
+    name = "set_filter_values",
     filter_values = ellmer::type_string(
       "JSON object storing filter values to be set.
       Takes into account only filters returned by 'get_filters_meta' tool.

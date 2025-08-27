@@ -34,7 +34,8 @@ Suggests:
     testthat (>= 3.0.0),
     shiny,
     knitr,
-    rmarkdown
+    rmarkdown,
+    ellmer (>= 0.3.0)
 Config/testthat/edition: 3
 Collate:
     'cohortBuilder-package.R'
