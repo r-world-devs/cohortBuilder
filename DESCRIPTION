@@ -26,7 +26,8 @@ Imports:
     glue,
     ggplot2,
     rlang (>= 1.0),
-    formatR
+    formatR,
+    collapse
 KeepSource: true
 RoxygenNote: 7.3.2
 Suggests: 

@@ -65,8 +65,8 @@ test_that("cb_filter.datetime_range.tblist applies date time range filter correc
   result <- apply_filter(range = NA, keep_na = FALSE)
   expect_equal(nrow(result$dataset_name), 3)  # All rows excluding NA
   
-  # 5. Test filtering with NULL range to keep only NA values
-  result <- apply_filter(range = NULL, keep_na = TRUE)
+  # 5. Test filtering with c(Inf, -Inf) range to keep only NA values
+  result <- apply_filter(range = c(Inf, -Inf), keep_na = TRUE)
   expect_equal(nrow(result$dataset_name), 1)  # All rows including NA
   
   # 6. Test end boundary only (Inf) to include all data with NA
