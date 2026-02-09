@@ -248,7 +248,7 @@ Cohort <- R6::R6Class(
           list(step_id = step_id, filter_id = filter_id, run_flow = run_flow),
           self$get_filter(step_id, filter_id)$get_defaults(
             self$get_data(step_id, collect = FALSE, state = "pre"),
-            self$get_cache(step_id, filter_id, state = "pre")
+            self$get_cache(step_id, filter_id, state = "pre", .recalc_when_missing = TRUE)
           )
         )
       )
@@ -341,7 +341,7 @@ Cohort <- R6::R6Class(
             filter_state$range <- na_fix(filter_state$range)
             filter_state$range <- as.Date(filter_state$range)
           }
-          
+
           if (filter_state$type == "datetime_range") {
             filter_state$range <- na_fix(filter_state$range)
             if (length(filter_state$range) == 0) filter_state$range <- NULL
@@ -677,20 +677,15 @@ Cohort <- R6::R6Class(
       )
 
       filter_ids <- names(self$get_step(step_id)$filters)
-      is_cached <- !is.null(self$get_cache(step_id, state = "pre"))
+      is_cached <- !is.null(self$get_cache(step_id, state = "pre", .recalc_when_missing = FALSE))
 
       # todo make sure is_cached logic is correct
       if (!is_cached) {
         self$update_cache(step_id, state = "pre")
       }
       self$update_cache(step_id, state = "post")
-      for (filter_id in filter_ids) {
-        is_cached <- !is.null(self$get_cache(step_id, filter_id, state = "pre"))
-        if (!is_cached) {
-          self$update_cache(step_id, filter_id, state = "pre")
-        }
-      }
       for (filter_id in active_filters) {
+        self$update_cache(step_id, filter_id, state = "pre")
         self$update_cache(step_id, filter_id, state = "post")
       }
 
@@ -788,16 +783,21 @@ Cohort <- R6::R6Class(
     #' @param filter_id Id of the filter for which cache data should be returned.
     #' @param state Should cache be returned on data before ("pre") or after ("post")
     #'    filtering in specified step.
-    get_cache = function(step_id, filter_id, state = "post") {
-      step_id <- as.character(step_id)
+    get_cache = function(step_id, filter_id, state = "post", .recalc_when_missing = TRUE) {
+      cache_id <- as.character(step_id)
       if (state == "pre") {
-        step_id <- prev_step(step_id)
+        cache_id <- prev_step(step_id)
       }
       if (missing(filter_id)) {
-        private$cache[[step_id]]
+        res <- private$cache[[cache_id]]
       } else {
-        private$cache[[step_id]]$filters[[filter_id]]
+        res <- private$cache[[cache_id]]$filters[[filter_id]]
       }
+      if (is.null(res) && .recalc_when_missing) {
+        self$update_cache(step_id, filter_id, state)
+        res <- self$get_cache(step_id, filter_id, state, FALSE)
+      }
+      return(res)
     },
     #' @description
     #' List active filters included in selected step.
