@@ -225,9 +225,12 @@ Cohort <- R6::R6Class(
           filter_env[[param_name]] <- new_val
         }
       }
-
       if (!missing(active)) {
-        filter_env[["active"]] <- active
+        if(!is.logical(active)) {
+          warning("Active accepts only logical values.")
+        } else {
+          filter_env[["active"]] <- active
+        }
       }
 
       if (run_flow && (!missing(active) || any_changed)) {
@@ -456,6 +459,11 @@ Cohort <- R6::R6Class(
       if (state == "pre") {
         data_id <- prev_step(step_id)
       }
+
+      if(is.null(self$get_step(step_id)) && step_id != 0){
+        stop("Step is not exist in this cohort object.")
+      }
+
       if (missing(filter_id)) {
         return(
           .get_stats(private$source, private$data_objects[[data_id]])

@@ -492,6 +492,11 @@ test_that("Updating filter works fine", {
     label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
   )
 
+  expect_warning(
+    coh$update_filter(1L, "sepal_l", active = "FALSE"),
+    regexp = "Active accepts only logical values."
+  )
+
   # Using S3 Cohort methods
   coh <- cohort(
     set_source(
@@ -514,6 +519,11 @@ test_that("Updating filter works fine", {
   expect_warning(
     coh$update_filter(1L, "sepal_l", type = "discrete"),
     label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
+  )
+
+  expect_warning(
+    coh$update_filter(1L, "sepal_l", active = "FALSE"),
+    regexp = "Active accepts only logical values."
   )
 })
 
@@ -630,6 +640,11 @@ test_that("Getting filter stats works fine", {
   expect_identical(
     coh$get_stats(1L, "species_filter", state = "post")$choices,
     as.list(table(iris$Species[iris$Species %in% c("setosa", "virginica")]))
+  )
+
+  expect_error(
+    stat(coh,10),
+    regexp = "Step is not exist in this cohort object."
   )
 
   # Using S3 Cohort methods
