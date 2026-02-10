@@ -101,7 +101,7 @@ filter is.</p>
 <span><span class="co">#&gt; function(type, ...) {</span></span>
 <span><span class="co">#&gt;   UseMethod("filter", type)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5557162f5ee8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x561f767f9560&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
 <p>So in case of <code>discrete</code> filter, the proper used method
 is:</p>
@@ -122,7 +122,7 @@ is:</p>
 <span><span class="co">#&gt;     }</span></span>
 <span><span class="co">#&gt;   )</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5557167ea4b8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x561f76cfe7e8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
 <p>that gathers provided parameters and returns function of
 <code>source</code> argument:</p>
@@ -135,8 +135,8 @@ is:</p>
 <span><span class="co">#&gt;         append(list(source = source), args)</span></span>
 <span><span class="co">#&gt;       )</span></span>
 <span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5557167ef3e0&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5557169f5af8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x561f76d03710&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x561f76f0f1c8&gt;</span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "function"              "cb_filter_constructor"</span></span></code></pre></div>
 <p>So whenever we define filter of specific type it returns unevaluated
@@ -149,7 +149,7 @@ provided source.</p>
 <span><span class="co">#&gt; function(source, ...) {</span></span>
 <span><span class="co">#&gt;   UseMethod("cb_filter.discrete", source)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5557162e1938&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x561f767df330&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
 <p>With such approach for having two layers of S3 methods, we are
 allowed to to build various filter types, for various source types. For
@@ -165,9 +165,9 @@ source, range filter for raw source etc.</p>
 <span>  give.attr <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 10</span></span>
-<span><span class="co">#&gt;  $ id          : chr "MWLEF1746182984860"</span></span>
+<span><span class="co">#&gt;  $ id          : chr "MWLEF1770731071944"</span></span>
 <span><span class="co">#&gt;  $ type        : 'discrete' chr "discrete"</span></span>
-<span><span class="co">#&gt;  $ name        : chr "MWLEF1746182984860"</span></span>
+<span><span class="co">#&gt;  $ name        : chr "MWLEF1770731071944"</span></span>
 <span><span class="co">#&gt;  $ input_param : chr "value"</span></span>
 <span><span class="co">#&gt;  $ filter_data :function (data_object)  </span></span>
 <span><span class="co">#&gt;  $ get_stats   :function (data_object, name)  </span></span>
@@ -427,7 +427,7 @@ bindings. If no bindings are used, this step can be skipped.</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
