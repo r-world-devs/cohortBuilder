@@ -27,7 +27,7 @@ filter
 #> function(type, ...) {
 #>   UseMethod("filter", type)
 #> }
-#> <bytecode: 0x561f767f9560>
+#> <bytecode: 0x564fb98e3560>
 #> <environment: namespace:cohortBuilder>
 ```
 
@@ -50,7 +50,7 @@ cohortBuilder:::filter.discrete
 #>     }
 #>   )
 #> }
-#> <bytecode: 0x561f76cfe7e8>
+#> <bytecode: 0x564fb9de87e8>
 #> <environment: namespace:cohortBuilder>
 ```
 
@@ -66,8 +66,8 @@ spec_filter
 #>         append(list(source = source), args)
 #>       )
 #>     }
-#> <bytecode: 0x561f76d03710>
-#> <environment: 0x561f76f0f1c8>
+#> <bytecode: 0x564fb9ded710>
+#> <environment: 0x564fb9ff91c8>
 #> attr(,"class")
 #> [1] "function"              "cb_filter_constructor"
 ```
@@ -84,7 +84,7 @@ cb_filter.discrete
 #> function(source, ...) {
 #>   UseMethod("cb_filter.discrete", source)
 #> }
-#> <bytecode: 0x561f767df330>
+#> <bytecode: 0x564fb98c9330>
 #> <environment: namespace:cohortBuilder>
 ```
 
@@ -104,9 +104,9 @@ str(
   give.attr = FALSE
 )
 #> List of 10
-#>  $ id          : chr "MWLEF1770731071944"
+#>  $ id          : chr "MWLEF1770731319353"
 #>  $ type        : 'discrete' chr "discrete"
-#>  $ name        : chr "MWLEF1770731071944"
+#>  $ name        : chr "MWLEF1770731319353"
 #>  $ input_param : chr "value"
 #>  $ filter_data :function (data_object)  
 #>  $ get_stats   :function (data_object, name)  
