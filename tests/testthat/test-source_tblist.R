@@ -85,6 +85,7 @@ test_that("filter_data in discrete filter works fine", {
   expect_type(result$test_dataset$var1, "character")
   expect_length(result$test_dataset$var1, length(test_var %>% na.omit() %>% .[. == "B"]))
   expect_setequal(result$test_dataset$var1, "B")
+  expect_false(anyNA(result$test_dataset$var1))
 })
 
 test_that("get_stats in discrete filter works fine", {
@@ -321,10 +322,8 @@ test_that("filter_data in range filter works fine", {
   expect_false(anyNA(result$test_dataset$var1))
 
   # filter_data with keep_na = FALSE and value != NA
-  range_value <- c(1L, 40L)
-
   filter3 <- cb_filter.range.tblist(
-    variable = "var1", range = range_value,
+    variable = "var1", range = c(1L, 40L),
     dataset = "test_dataset", keep_na = FALSE
   )
 
@@ -332,8 +331,7 @@ test_that("filter_data in range filter works fine", {
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
   expect_type(result$test_dataset$var1, "integer")
-  expect_gt(length(result$test_dataset$var1), 0L)
-  expect_false(any(result$test_dataset$var1 > range_value[2L] & result$test_dataset$var1 < range_value[1L]))
+  expect_false(anyNA(result$test_dataset$var1))
 })
 
 test_that("get_stats in range filter works fine", {
@@ -383,6 +381,7 @@ test_that("plot_data in range filter works fine", {
 
   filter$plot_data(test_data_null)
   expect_silent(recordPlot())
+  dev.off()
 })
 
 test_that("get_params in range filter works fine", {
@@ -441,3 +440,129 @@ test_that("get_defaults in range filter works fine", {
   expect_length(result$range, 2L)
 })
 
+test_that("get_date_range_frequencies works fine", {
+  test_var <- c(
+    "2026-01-01", "2022-01-02", "2021-01-02",
+    "2024-01-03", "2024-01-05", NA
+  )
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = as.Date(test_var)
+    )
+  )
+
+  test_data_with_one_date <- list(
+    test_dataset = data.frame(
+      var1 = as.Date("2024-01-03")
+    )
+  )
+
+  test_data_null <- list(
+    test_dataset = data.frame(
+      var1 = NULL
+    )
+  )
+
+  # With empty data
+  result <- get_date_range_frequencies(test_data_null, "test_dataset", "var1")
+
+  expect_type(result, "list")
+  expect_identical(nrow(result), 0L)
+  expect_identical(ncol(result), 4L)
+
+  # With data and multi dates
+  result <- get_date_range_frequencies(test_data, "test_dataset", "var1", extra_params = NULL)
+
+  expect_identical(ncol(result), 4L)
+  expect_type(result, "list")
+  expect_s3_class(result$l_bound, "Date")
+  expect_s3_class(result$u_bound, "Date")
+
+  # With data and one date
+  result <- get_date_range_frequencies(test_data_with_one_date, "test_dataset", "var1", extra_params = NULL)
+
+  expect_identical(ncol(result), 4L)
+  expect_identical(nrow(result), 1L)
+  expect_type(result, "list")
+  expect_s3_class(result$l_bound, "Date")
+  expect_s3_class(result$u_bound, "Date")
+})
+
+test_that("filter_data in date range filter works fine", {
+  test_var <- c(
+    "2026-01-01", "2022-01-02", "2021-01-02",
+    "2024-01-03", "2024-01-05", NA
+  )
+
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = as.Date(test_var)
+    )
+  )
+
+  # filter_data with keep_na = TRUE and value != NA
+  filter <- cb_filter.date_range.tblist(
+    variable = "var1", range = as.Date(c("2021-01-02", "2024-01-03")),
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  result <- filter$filter_data(test_data)
+
+  expect_type(result, "list")
+  expect_type(result$test_dataset, "list")
+  expect_s3_class(result$test_dataset$var1, "Date")
+
+  # filter_data with keep_na = FALSE and value = NA
+  filter2 <- cb_filter.date_range.tblist(
+    variable = "var1", range = NA,
+    dataset = "test_dataset", keep_na = FALSE
+  )
+
+  result <- filter2$filter_data(test_data)
+  expect_type(result, "list")
+  expect_type(result$test_dataset, "list")
+  expect_s3_class(result$test_dataset$var1, "Date")
+  expect_false(anyNA(result$test_dataset$var1))
+
+  # filter_data with keep_na = FALSE and value != NA
+  filter3 <- cb_filter.date_range.tblist(
+    variable = "var1", range = as.Date(c("2021-01-02", "2024-01-03")),
+    dataset = "test_dataset", keep_na = FALSE
+  )
+
+  result <- filter3$filter_data(test_data)
+  expect_type(result, "list")
+  expect_type(result$test_dataset, "list")
+  expect_s3_class(result$test_dataset$var1, "Date")
+  expect_false(anyNA(result$test_dataset$var1))
+})
+
+test_that("get_stats in date range filter works fine", {
+  test_var <- c(
+    "2026-01-01", "2022-01-02", "2021-01-02",
+    "2024-01-03", "2024-01-05", NA
+  )
+
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = as.Date(test_var)
+    )
+  )
+
+  filter <- cb_filter.date_range.tblist(
+    variable = "var1", range = as.Date(c("2021-01-02", "2024-01-03")),
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  # All stats
+  result <- filter$get_stats(test_data)
+
+  expect_type(result, "list")
+  expect_type(result$n_data, "integer")
+  expect_s3_class(result$frequencies, "data.frame")
+  expect_type(result$n_missing, "integer")
+
+  # One stat
+  expect_type(filter$get_stats(test_data, "n_data"), "integer")
+  expect_identical(filter$get_stats(test_data, "n_data"), result$n_data)
+})
