@@ -5,19 +5,19 @@ test_that("force_import loads necessary functions", {
 
 # Test for %:::% operator
 test_that("%:::% operator retrieves internal function", {
-  expect_equal("jsonlite" %:::% "toJSON", jsonlite::toJSON)
+  expect_identical("jsonlite" %:::% "toJSON", jsonlite::toJSON)
 })
 
 # Test for %in% operator
 test_that("%in% operator behaves as expected", {
-  x <- c(1, 2, 3, 4, 5)
-  table <- c(3, 4, 5, 6, 7)
-  
-  expect_equal(`%in%`(x, table), base::`%in%`(x, table))
-  
+  x <- c(1L, 2L, 3L, 4L, 5L)
+  table <- c(3L, 4L, 5L, 6L, 7L)
+
+  expect_identical(`%in%`(x, table), base::`%in%`(x, table))
+
   x <- c("apple", "banana", "cherry")
   table <- c("banana", "cherry", "date")
-  
-  expect_equal(`%in%`(x, table), base::`%in%`(x, table))
-  expect_equal(x %in% table, base::`%in%`(x, table))
+
+  expect_identical(`%in%`(x, table), base::`%in%`(x, table))
+  expect_identical(x %in% table, base::`%in%`(x, table))
 })

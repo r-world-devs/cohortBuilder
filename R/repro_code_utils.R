@@ -5,18 +5,18 @@ substitute_q <- function(x, env) {
 
 pair_seq <- function(idxs) {
 
-  if (length(idxs) == 0) {
-    return(integer(0))
+  if (length(idxs) == 0L) {
+    return(integer(0L))
   }
-  
+
   if (!identical(length(idxs) %% 2L, 0L)) {
     stop("The lenght of idxs is not even number")
   }
-  
+
   idxs <- sort(idxs)
   sequence <- c()
-  for (idx in seq(1, length(idxs), by = 2)) {
-    sequence <- c(sequence, seq(idxs[idx], idxs[idx + 1], by = 1))
+  for (idx in seq(1L, length(idxs), by = 2L)) {
+    sequence <- c(sequence, seq(idxs[idx], idxs[idx + 1L], by = 1L))
   }
   return(sequence)
 }
@@ -28,8 +28,8 @@ parse_func_expr <- function(func) {
   }
   func_body <- utils::capture.output(body(func))
   n_lines <- length(func_body)
-  func_body[n_lines - 1] <- glue::glue("data_object <- {func_body[n_lines - 1]}")
-  func_expr <- parse(text = func_body)[[1]]
+  func_body[n_lines - 1L] <- glue::glue("data_object <- {func_body[n_lines - 1]}")
+  func_expr <- parse(text = func_body)[[1L]]
 
   substitute_q(
     func_expr,
@@ -44,9 +44,9 @@ func_to_expr <- function(func, name) {
 
   func_expr <- c(paste(name, "<-"), utils::capture.output(func))
   # in case function comes from namespace
-  closing_idx <- rev(which(grepl("}$", func_expr, perl = TRUE)))[1]
+  closing_idx <- rev(which(grepl("}$", func_expr, perl = TRUE)))[1L]
   return(
-    parse(text = func_expr[1:closing_idx])[[1]]
+    parse(text = func_expr[1L:closing_idx])[[1L]]
   )
 }
 
@@ -87,7 +87,7 @@ parse_filter_expr <- function(filter) {
     pair_seq(grep("# code eval ", filter_expr, fixed = TRUE)),
     grep("# code eval$", filter_expr)
   ))
-  code_eval_expr <- parse(text = c("{", filter_expr[code_eval_idx], "}"))[[1]]
+  code_eval_expr <- parse(text = c("{", filter_expr[code_eval_idx], "}"))[[1L]]
   rlang::eval_bare(code_eval_expr, filter_env)
 
   keep_na_ind <- if (keep_na) "keep_na" else "!keep_na"
@@ -103,11 +103,11 @@ parse_filter_expr <- function(filter) {
     grep("# code include$", filter_expr)
   ))
 
-  if (length(sub_expr_idx) == 0) {
+  if (length(sub_expr_idx) == 0L) {
     return(str2lang("{}"))
   }
 
-  filter_expr <- parse(text = c("{", filter_expr[sub_expr_idx], "}"))[[1]]
+  filter_expr <- parse(text = c("{", filter_expr[sub_expr_idx], "}"))[[1L]]
   sub_vars <- substitute_q(filter_expr, vars_env)
   sub_syms <-   rlang::inject((!!rlang::expr)(!!sub_vars), filter_env)
   return(sub_syms)
@@ -115,8 +115,8 @@ parse_filter_expr <- function(filter) {
 
 combine_expressions <- function(expressions_list) {
   expressions_list <- lapply(expressions_list, function(x) {
-    if (x[[1]] == as.symbol("{")) {
-      return(as.list(x)[-1])
+    if (x[[1L]] == as.symbol("{")) {
+      return(as.list(x)[-1L])
     } else {
       return(x)
     }
@@ -152,19 +152,17 @@ type_expr <- function(type, expr, step = NA, ...) {
 }
 
 exclude_first_pipe <- function(expr, after) {
-  if (expr[[1]] == as.symbol("{")) {
-    if (identical(expr[[2]][[2]], after) && expr[[2]][[1]] == as.symbol("%>%")) {
-      expr[[2]] <- expr[[2]][[3]]
-    }
-    else {
-      expr[[2]][[2]] <- exclude_first_pipe(expr[[2]][[2]], after)
+  if (expr[[1L]] == as.symbol("{")) {
+    if (identical(expr[[2L]][[2L]], after) && expr[[2L]][[1L]] == as.symbol("%>%")) {
+      expr[[2L]] <- expr[[2L]][[3L]]
+    } else {
+      expr[[2L]][[2L]] <- exclude_first_pipe(expr[[2L]][[2L]], after)
     }
   } else {
-    if (identical(expr[[2]], after) && expr[[1]] == as.symbol("%>%")) {
-      expr <- expr[[3]]
-    }
-    else {
-      expr[[2]] <- exclude_first_pipe(expr[[2]], after)
+    if (identical(expr[[2L]], after) && expr[[1L]] == as.symbol("%>%")) {
+      expr <- expr[[3L]]
+    } else {
+      expr[[2L]] <- exclude_first_pipe(expr[[2L]], after)
     }
   }
   return(expr)
@@ -172,20 +170,20 @@ exclude_first_pipe <- function(expr, after) {
 
 exclude_reassignment <- function(expr, along_with = c("left", "both")) {
   along_with <- match.arg(along_with)
-  if (expr[[1]] == as.symbol("{")) {
-    to_exclude <- expr[[2]][[2]]
-    if (expr[[2]][[1]] == as.symbol("<-")) {
-      expr[[2]] <- expr[[2]][[3]]
+  if (expr[[1L]] == as.symbol("{")) {
+    to_exclude <- expr[[2L]][[2L]]
+    if (expr[[2L]][[1L]] == as.symbol("<-")) {
+      expr[[2L]] <- expr[[2L]][[3L]]
       if (along_with == "both") {
-        expr[[2]] <- exclude_first_pipe(expr[[2]], to_exclude)
+        expr[[2L]] <- exclude_first_pipe(expr[[2L]], to_exclude)
       }
     } else {
       warning("First line of expression is not a reassignment.")
     }
   } else {
-    to_exclude <- expr[[2]]
-    if (expr[[1]] == as.symbol("<-")) {
-      expr <- expr[[3]]
+    to_exclude <- expr[[2L]]
+    if (expr[[1L]] == as.symbol("<-")) {
+      expr <- expr[[3L]]
       if (along_with == "both") {
         expr <- exclude_first_pipe(expr, to_exclude)
       }
@@ -197,8 +195,8 @@ exclude_reassignment <- function(expr, along_with = c("left", "both")) {
 }
 
 take_first_line <- function(expr) {
-  if (expr[[1]] == as.symbol("{")) {
-     return(expr[[2]])
+  if (expr[[1L]] == as.symbol("{")) {
+    return(expr[[2L]])
   }
   return(expr)
 }
@@ -209,17 +207,17 @@ pipe_reassignment <- function(expr_l, expr_r) {
 
 nos <- rlang::expr({
   a %>% sum()
-  b <- 1
+  b <- 1L
 })
 
 pipe_filtering <- function(filtering_exprs) {
   n_exprs <- length(filtering_exprs)
-  if (n_exprs <= 1) {
+  if (n_exprs <= 1L) {
     return(filtering_exprs)
   }
-  if (n_exprs > 1) {
+  if (n_exprs > 1L) {
     for (expr_id in seq_along(filtering_exprs)) {
-      if (expr_id > 1) {
+      if (expr_id > 1L) {
         filtering_exprs[[expr_id]] <- filtering_exprs[[expr_id]] %>%
           exclude_reassignment(along_with = "both")
       }
@@ -227,15 +225,15 @@ pipe_filtering <- function(filtering_exprs) {
         filtering_exprs[[expr_id]] <- filtering_exprs[[expr_id]] %>%
           take_first_line()
       }
-      if (expr_id == 1) {
+      if (expr_id == 1L) {
         res_expr <- exclude_reassignment(filtering_exprs[[expr_id]], along_with = "left")
       } else {
-        if (filtering_exprs[[expr_id]][[1]] == as.symbol("{")) {
+        if (filtering_exprs[[expr_id]][[1L]] == as.symbol("{")) {
           res_expr <- rlang::expr(
             !!res_expr %>%
-              !!filtering_exprs[[expr_id]][[2]]
+              !!filtering_exprs[[expr_id]][[2L]]
           )
-          for (i in setdiff(seq_along(filtering_exprs[[expr_id]]), 1:2)) {
+          for (i in setdiff(seq_along(filtering_exprs[[expr_id]]), 1L:2L)) {
             res_expr <- rlang::expr({
               !!res_expr
               !!filtering_exprs[[expr_id]][[i]]
@@ -250,9 +248,9 @@ pipe_filtering <- function(filtering_exprs) {
       }
     }
   }
-  assignment <- rlang::expr(!!filtering_exprs[[1]][[2]] <- x)
-  if (res_expr[[1]] == as.symbol("{")) {
-    res_expr[[2]] <- substitute_q(assignment, list(x = res_expr[[2]]))
+  assignment <- rlang::expr(!!filtering_exprs[[1L]][[2L]] <- x)
+  if (res_expr[[1L]] == as.symbol("{")) {
+    res_expr[[2L]] <- substitute_q(assignment, list(x = res_expr[[2L]]))
   } else {
     res_expr <- substitute_q(assignment, list(x = res_expr))
   }
@@ -261,17 +259,17 @@ pipe_filtering <- function(filtering_exprs) {
 }
 
 if_null_default_list <- function(x, y) {
-  if (is.null(y[[1]])) {
+  if (is.null(y[[1L]])) {
     return(x)
   }
   return(y)
 }
 
 flatten_listcol <- function(x) {
-  if (is.null(x[[1]])) {
+  if (is.null(x[[1L]])) {
     return(NA)
   }
-  return(x[[1]])
+  return(x[[1L]])
 }
 
 pipe_all_filters <- function(expr_df) {
@@ -283,7 +281,7 @@ pipe_all_filters <- function(expr_df) {
   expr_df <- expr_df %>% dplyr::mutate(dataset = purrr::map_chr(dataset, flatten_listcol))
   filtering_expr_df <- expr_df %>% dplyr::filter(type == "filtering")
 
-  if (nrow(filtering_expr_df) == 0) {
+  if (nrow(filtering_expr_df) == 0L) {
     return(dplyr::select(expr_df, type, expr))
   }
 

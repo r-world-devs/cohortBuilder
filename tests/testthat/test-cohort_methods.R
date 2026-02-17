@@ -687,11 +687,13 @@ test_that("Caching works fine", {
 test_that("Bind keys work fine", {
   patients <- data.frame(
     id = letters[1L:3L], name = c("a", "b", "b"),
-    surname = c("A", "A", "B"), surname2 = c("A", "A", "B"), age = 1L:3L
+    surname = c("A", "A", "B"), surname2 = c("A", "A", "B"),
+    age = 1L:3L, stringsAsFactors = FALSE
   )
   treatment <- data.frame(
     id = letters[1L:3L], name = c("a", "b", "b"),
-    surname = c("A", "A", "B"), treatment = LETTERS[1L:3L]
+    surname = c("A", "A", "B"), treatment = LETTERS[1L:3L],
+    stringsAsFactors = FALSE
   )
 
 
@@ -1091,20 +1093,21 @@ test_that("restore correctly restore filters filter type date_range and datetime
     ),
     step(
       filter(
-             "date_range", id = "issues_date", dataset = "issues",
-             variable = "date", range = c(as.Date("2010-10-01"), as.Date("2015-10-01"))
+        "date_range", id = "issues_date", dataset = "issues",
+        variable = "date", range = c(as.Date("2010-10-01"), as.Date("2015-10-01"))
       ),
       filter(
-             "date_range", id = "issues_date2", dataset = "issues",
-             variable = "date", range = as.Date(NULL)
+        "date_range", id = "issues_date2", dataset = "issues",
+        variable = "date", range = as.Date(NULL)
       ),
       filter(
-             "datetime_range", id = "issues_datetime", dataset = "issues",
-             variable = "date", range = c(as.POSIXct("2010-10-01"), as.POSIXct("2015-10-01"))
+        "datetime_range", id = "issues_datetime", dataset = "issues",
+        variable = "date", range = c(as.POSIXct("2010-10-01"), as.POSIXct("2015-10-01"))
       ),
       filter(
-             "datetime_range", id = "issues_datetime2", dataset = "issues",
-             variable = "date", range = as.POSIXct(NULL))
+        "datetime_range", id = "issues_datetime2", dataset = "issues",
+        variable = "date", range = as.POSIXct(NULL)
+      )
     )
   )
 
@@ -1119,26 +1122,3 @@ test_that("restore correctly restore filters filter type date_range and datetime
 
   expect_identical(get_state(coh), pre_state)
 })
-
-# if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
-#   test_that("(experimental) Retrieving reproducible code works fine", {
-#     # Using direct Cohort methods
-#     coh <- Cohort$new(
-#       set_source(
-#         tblist(iris = iris)
-#       ),
-#       discrete_iris_one
-#     )
-#     repro_code <- coh$get_code(1, "species_filter")
-#     target_code <- quote({
-#       data_object <- source$datasets
-#       if (!identical(c("setosa", "virginica"), NA)) {
-#         data_object[["iris"]] <- data_object[["iris"]] %>% dplyr::filter(!!sym("Species") %in% !!c("setosa", "virginica"))
-#       }
-#     })
-#     expect_equal(
-#       as.character(repro_code),
-#       as.character(target_code)
-#     )
-#   })
-# }
