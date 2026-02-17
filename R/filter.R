@@ -13,8 +13,8 @@ eval_filter <- function(filter_fun, step_id, source) {
 #' @export
 .gen_id <- function() {
   paste0(
-    paste0(sample(LETTERS, 5, TRUE), collapse = ""),
-    round(as.numeric(Sys.time()) * 1000)
+    paste(sample(LETTERS, 5L, TRUE), collapse = ""),
+    round(as.numeric(Sys.time()) * 1000L)
   )
 }
 
@@ -53,16 +53,19 @@ get_filter_state <- function(filter, extra_fields) {
 #' @param name Filter name.
 #' @param input_param Name of parameter responsible for providing filtering value.
 #' @param filter_data Function of `data_object` parameter defining filtering logic on Source data object.
-#' @param get_stats Function of `data_object` and `name` parameters defining what and how data statistics should be calculated.
+#' @param get_stats Function of `data_object` and `name` parameters
+#' defining what and how data statistics should be calculated.
 #' @param plot_data Function of `data_object` parameter defining how filter data should be plotted.
-#' @param get_params Function of `name` parameter returning filter parameters (if names is skipped all the parameters are returned).
+#' @param get_params Function of `name` parameter returning
+#' filter parameters (if names is skipped all the parameters are returned).
 #' @param get_data Function of `data_object` returning filter related data.
-#' @param get_defaults Function of `data_object` and `cache_object` parameters returning default `input_param` parameter value.
+#' @param get_defaults Function of `data_object` and `cache_object` parameters
+#' returning default `input_param` parameter value.
 #' @return A list of filter specific values and methods (`def_filter`) or no value (`new_filter`).
 #'
 #' @export
 def_filter <- function(type, id = .gen_id(), name = id, input_param = NULL,
-  filter_data, get_stats, plot_data, get_params, get_data, get_defaults) {
+                       filter_data, get_stats, plot_data, get_params, get_data, get_defaults) {
 
   structure(
     list(
@@ -95,13 +98,12 @@ new_filter <- function(filter_type, source_type, input_param = "value", extra_pa
   ))
   extra_params_assign <- ""
   if (!identical(extra_params, "")) {
-    extra_params_assign <- paste0(paste(
-      glue::glue("{extra_params} = {extra_params}"),
-      collapse = ", "
+    extra_params_assign <- paste0(toString(
+      glue::glue("{extra_params} = {extra_params}")
     ), ",")
-    extra_params <- paste0(paste(extra_params, collapse = ", "), ",")
+    extra_params <- paste0(toString(extra_params), ",")
   }
-  file = file.path(getwd(), glue::glue("filter_{filter_type}_{source_type}.R"))
+  file <- file.path(getwd(), glue::glue("filter_{filter_type}_{source_type}.R"))
   writeLines(
     do.call(glue::glue, as.list(template_content)),
     con = file
@@ -310,12 +312,12 @@ cb_filter.date_range <- function(source, ...) {
 #' @rdname filter-types
 #' @export
 filter.datetime_range <- function(type, id, name, ..., description = NULL,
-                                   active = getOption("cb_active_filter", default = TRUE)) {
+                                  active = getOption("cb_active_filter", default = TRUE)) {
   args <- append(
     environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
     list(...)
   )
-  
+
   .as_constructor(
     function(source) {
       do.call(
@@ -396,4 +398,3 @@ cb_filter.query <- function(source, ...) {
     }
   }
 }
-

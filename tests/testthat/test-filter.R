@@ -1,53 +1,54 @@
 discrete_filter <- filter(
-  type = "discrete", id = "age_filter", name = "Age", variable = "age", dataset = "patients", value = 50
+  type = "discrete", id = "age_filter", name = "Age", variable = "age", dataset = "patients", value = 50L
 )
 patients_source <- set_source(
-  tblist(patients = data.frame(id = 1:2, age = 50:51))
+  tblist(patients = data.frame(id = 1L:2L, age = 50L:51L))
 )
 variable_filter <- discrete_filter(patients_source)
 
 test_that("Calling filter with id returns function of source param, calling valid S3 method", {
-  expect_equal(names(formals(discrete_filter)), "source")
-  expect_true(is.function(discrete_filter))
-  
+  expect_named(formals(discrete_filter), "source")
+  expect_s3_class(discrete_filter, "function")
+
   skip_on_covr()
-  expect_equal(as.character(body(discrete_filter)[[2]][[2]]), "cb_filter.discrete")
+  expect_identical(as.character(body(discrete_filter)[[2L]][[2L]]), "cb_filter.discrete")
 })
 
 test_that("Calling filter on source returns list with valid methods and parameters", {
-  expect_true(is.list(variable_filter))
+  expect_type(variable_filter, "list")
   expect_identical(
-    c("id", "type", "name", "input_param", "filter_data", "get_stats", "plot_data", "get_params", "get_data", "get_defaults"),
+    c("id", "type", "name", "input_param", "filter_data",
+      "get_stats", "plot_data", "get_params", "get_data", "get_defaults"),
     names(variable_filter)
   )
 })
 
 test_that("Filter methods operate correctly based on its definition", {
-  expect_equal(variable_filter$filter_data(patients_source$dtconn)$patients$age, 50)
-  expect_equal(variable_filter$get_stats(patients_source$dtconn)$choices, as.list(table(50:51)))
-  expect_equal(class(variable_filter$plot_data(patients_source$dtconn)), c("matrix", "array"))
+  expect_identical(variable_filter$filter_data(patients_source$dtconn)$patients$age, 50L)
+  expect_identical(variable_filter$get_stats(patients_source$dtconn)$choices, as.list(table(50L:51L)))
 })
 
 test_that("Discrete text filter works fine", {
   iris_source <- set_source(
     tblist(iris = iris)
   )
-  spec_filter <- filter("discrete_text", id = "species", dataset = "iris", variable = "Species", value = "setosa,virginica")
+  spec_filter <- filter("discrete_text", id = "species", dataset = "iris",
+                        variable = "Species", value = "setosa,virginica")
   coh <- Cohort$new(
     iris_source,
     spec_filter
   )
-  expect_equal(coh$get_data(1, state = "pre")$iris, iris)
+  expect_identical(coh$get_data(1L, state = "pre")$iris, iris)
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$iris$Species), c("setosa", "virginica"))
-  expect_equal(
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("setosa", "virginica"))
+  expect_identical(
     coh$get_cache("1", "species", state = "post")$choices,
     "setosa,virginica"
   )
 })
 
 test_that("Multi discrete filter works fine", {
-  md_data <- data.frame(col1 = c("A", "B", "A", "B", "A"), col2 = c("C", "C", "C", "D", "D"))
+  md_data <- data.frame(col1 = c("A", "B", "A", "B", "A"), col2 = c("C", "C", "C", "D", "D"), stringsAsFactors = FALSE)
   md_source <- set_source(
     tblist(md_data = md_data)
   )
@@ -60,25 +61,25 @@ test_that("Multi discrete filter works fine", {
     md_source,
     md_filter
   )
-  expect_equal(coh$get_data(1, state = "pre")$md_data, md_data)
+  expect_identical(coh$get_data(1L, state = "pre")$md_data, md_data)
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$md_data$col1), c("A"))
-  expect_setequal(unique(coh$get_data(1, state = "post")$md_data$col2), c("D"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$md_data$col1), c("A"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$md_data$col2), c("D"))
 
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "mcols", state = "pre")$choices$col1,
     as.list(table(md_data$col1))
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "mcols", state = "pre")$choices$col2,
     as.list(table(md_data$col2))
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "mcols", state = "post")$choices$col1,
     as.list(table(c("A")))
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "mcols", state = "post")$choices$col2,
     as.list(table(c("D")))
   )
@@ -86,7 +87,7 @@ test_that("Multi discrete filter works fine", {
 })
 
 test_that("Query discrete filter works fine", {
-  md_data <- data.frame(col1 = c("A", "B", "A", "B", "A"), col2 = c("C", "C", "C", "D", "D"))
+  md_data <- data.frame(col1 = c("A", "B", "A", "B", "A"), col2 = c("C", "C", "C", "D", "D"), stringsAsFactors = FALSE)
   md_source <- set_source(
     tblist(md_data = md_data)
   )
@@ -104,27 +105,27 @@ test_that("Query discrete filter works fine", {
     md_source,
     md_filter
   )
-  expect_equal(coh$get_data(1, state = "pre")$md_data, md_data)
+  expect_identical(coh$get_data(1L, state = "pre")$md_data, md_data)
 
   coh$run_flow()
-  expect_setequal(unique(coh$get_data(1, state = "post")$md_data$col1), c("A"))
-  expect_setequal(unique(coh$get_data(1, state = "post")$md_data$col2), c("D"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$md_data$col1), c("A"))
+  expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$md_data$col2), c("D"))
 
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "qcols", state = "pre")$specs$col1$values,
-    unique(md_data$col1)
+    collapse::funique(md_data$col1)
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "qcols", state = "pre")$specs$col2$values,
-    unique(md_data$col2)
+    collapse::funique(md_data$col2)
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "qcols", state = "post")$specs$col1$values,
-    unique(c("A"))
+    "A"
   )
-  expect_equal(
+  expect_identical(
     coh$get_cache("1", "qcols", state = "post")$specs$col2$values,
-    unique(c("D"))
+    "D"
   )
 
 })

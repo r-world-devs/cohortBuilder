@@ -1,5 +1,5 @@
-get_attrition_coords <- function(labels, n_included, space = 1, percent = FALSE) {
-  n_total <- n_included[1]
+get_attrition_coords <- function(labels, n_included, space = 1L, percent = FALSE) {
+  n_total <- n_included[1L]
   n_excluded <- stats::na.omit(n_included - dplyr::lead(n_included))
 
   label <- glue::glue("{labels}\nN = {n_included}")
@@ -15,13 +15,13 @@ get_attrition_coords <- function(labels, n_included, space = 1, percent = FALSE)
     label_excl = label_excl
   ) %>%
     dplyr::mutate(
-      label_heights = nchar(label) - nchar(gsub("\n", "", label)),
-      label_position_y = dplyr::lag(cumsum(label_heights + space), default = 0),
-      label_position_x = 0,
+      label_heights = nchar(label) - nchar(gsub("\n", "", label, fixed = TRUE)),
+      label_position_y = dplyr::lag(cumsum(label_heights + space), default = 0L),
+      label_position_x = 0L,
       arrow_end_position_y = dplyr::lead(label_position_y),
-      excl_position_x = 0,
-      excl_end_position_x = 40,
-      excl_position_y = dplyr::lag(arrow_end_position_y) - (space / 2)
+      excl_position_x = 0L,
+      excl_end_position_x = 40L,
+      excl_position_y = dplyr::lag(arrow_end_position_y) - (space / 2L)
     )
   attr(dt, "space") <- space
   dt
@@ -31,7 +31,7 @@ get_attrition_plot <- function(attrition_coords) {
   max_y_lim <- max(attrition_coords$label_position_y) + max(attrition_coords$label_heights)
   space <- attr(attrition_coords, "space")
   if (is.null(space)) {
-    space <- 1
+    space <- 1L
   }
   ggplot2::ggplot(attrition_coords) +
     ggplot2::geom_segment(
@@ -44,14 +44,15 @@ get_attrition_plot <- function(attrition_coords) {
     ) +
     ggplot2::geom_label(
       ggplot2::aes(label = label, x = label_position_x, y = label_position_y),
-      label.r = ggplot2::unit(0, "lines"), vjust = "top", size = 12/ggplot2::.pt, na.rm = TRUE
+      label.r = ggplot2::unit(0L, "lines"), vjust = "top", size = 12L / ggplot2::.pt, na.rm = TRUE
     ) +
     ggplot2::geom_label(
-      ggplot2::aes(label = label_excl, x = excl_end_position_x, y = excl_position_y), label.r = ggplot2::unit(0, "lines"),
-      hjust = "left", size = 12/ggplot2::.pt, na.rm = TRUE
+      ggplot2::aes(label = label_excl, x = excl_end_position_x, y = excl_position_y),
+      label.r = ggplot2::unit(0L, "lines"),
+      hjust = "left", size = 12L / ggplot2::.pt, na.rm = TRUE
     ) +
     ggplot2::scale_y_continuous(limits = c(max_y_lim + space, -space), trans = "reverse") +
-    ggplot2::scale_x_continuous(limits = c(-35, 60)) +
+    ggplot2::scale_x_continuous(limits = c(-35L, 60L)) +
     ggplot2::theme(
       panel.grid.major = ggplot2::element_blank(),
       panel.grid.minor = ggplot2::element_blank(),
@@ -69,7 +70,7 @@ get_attrition_filter_label <- function(name, value_name, value) {
       purrr::imap(~paste(.y, " = ", .x)) %>%
       paste(collapse = ", ")
   } else if (is.vector(value)) {
-    value <- paste(value, collapse = ", ")
+    value <- toString(value)
   }
   glue::glue("Filter: {name} ({value_name} = [{value}])")
 }
@@ -92,8 +93,8 @@ get_attrition_filter_label <- function(name, value_name, value) {
     if (is.null(pkey)) {
       return("Initial dataset")
     } else {
-      dataset <- pkey[[1]]$dataset
-      dataset_pkey <- pkey[[1]]$key
+      dataset <- pkey[[1L]]$dataset
+      dataset_pkey <- pkey[[1L]]$key
       return(glue::glue("{dataset}\n primary key: {paste(dataset_pkey, collapse = ', ')}"))
     }
   }
@@ -105,8 +106,8 @@ get_attrition_filter_label <- function(name, value_name, value) {
     dependent_datasets <- binding_keys %>%
       purrr::map(~names(.[["data_keys"]])) %>%
       unlist() %>%
-      unique()
-    if (length(dependent_datasets) > 0) {
+      collapse::funique()
+    if (length(dependent_datasets) > 0L) {
       bind_keys_section <- glue::glue(
         "\nData linked with external datasets: {paste(dependent_datasets, collapse = ', ')}",
         .trim = FALSE
@@ -134,4 +135,3 @@ get_attrition_filter_label <- function(name, value_name, value) {
   data_stats %>%
     purrr::map_int("n_rows")
 }
-

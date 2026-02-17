@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-options("tibble.print_min" = 5, "tibble.print_max" = 5)
+options("tibble.print_min" = 5L, "tibble.print_max" = 5L)
 library(magrittr)
 library(cohortBuilder)
 ```
@@ -56,7 +56,7 @@ Example:
 
 ```{r, eval = FALSE}
 set_source.tblist <- function(dtconn, primary_keys = NULL, binding_keys = NULL, 
-                           source_code = NULL, description = NULL, ...) {
+                              source_code = NULL, description = NULL, ...) {
   Source$new(
     dtconn, primary_keys = primary_keys, binding_keys = binding_keys,
     source_code = source_code, description = description,
@@ -276,10 +276,10 @@ Examples:
   }
 
   key_values <- NULL
-  common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))
+  common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1L]]$key))
   for (dependent_dataset in dependent_datasets) {
     key_names <- binding_key$data_keys[[dependent_dataset]]$key
-    tmp_key_values <- dplyr::distinct(data_object_post[[dependent_dataset]][, key_names, drop = FALSE]) %>%
+    tmp_key_values <- collapse::funique(data_object_post[[dependent_dataset]][, key_names, drop = FALSE]) %>%
       stats::setNames(common_key_names)
     if (is.null(key_values)) {
       key_values <- tmp_key_values
@@ -357,7 +357,7 @@ get_attrition_label.tblist <- function(source, step_id, step_filters, dataset, .
     if (is.null(pkey)) {
       return(dataset)
     } else {
-      dataset_pkey <- .get_item(pkey, "dataset", dataset)[1][[1]]$key
+      dataset_pkey <- .get_item(pkey, "dataset", dataset)[1L][[1L]]$key
       if (is.null(dataset_pkey)) return(dataset)
       return(glue::glue("{dataset}\n primary key: {paste(dataset_pkey, collapse = ', ')}"))
     }
@@ -376,8 +376,8 @@ get_attrition_label.tblist <- function(source, step_id, step_filters, dataset, .
     ) %>%
       purrr::map(~names(.[["data_keys"]])) %>%
       unlist() %>%
-      unique()
-    if (length(dependent_datasets) > 0) {
+      collapse::funique()
+    if (length(dependent_datasets) > 0L) {
       bind_keys_section <- glue::glue(
         "\nData linked with external datasets: {paste(dependent_datasets, collapse = ', ')}",
         .trim = FALSE
