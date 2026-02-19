@@ -52,6 +52,7 @@ Cohort object is designed to make operations on source data possible.
 \item \href{#method-Cohort-get_cache}{\code{Cohort$get_cache()}}
 \item \href{#method-Cohort-list_active_filters}{\code{Cohort$list_active_filters()}}
 \item \href{#method-Cohort-last_step_id}{\code{Cohort$last_step_id()}}
+\item \href{#method-Cohort-is_pending}{\code{Cohort$is_pending()}}
 \item \href{#method-Cohort-modify}{\code{Cohort$modify()}}
 \item \href{#method-Cohort-clone}{\code{Cohort$clone()}}
 }
@@ -693,7 +694,12 @@ filtering in specified step.}
 \subsection{Method \code{get_cache()}}{
 Return step of filter specific cache.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_cache(step_id, filter_id, state = "post")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_cache(
+  step_id,
+  filter_id,
+  state = "post",
+  .recalc_when_missing = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -706,6 +712,8 @@ If `filter_id` is not missing, the parameter describes id of the step where filt
 
 \item{\code{state}}{Should cache be returned on data before ("pre") or after ("post")
 filtering in specified step.}
+
+\item{\code{.recalc_when_missing}}{Should the function compute cache automatically when the one is not computed yet?}
 }
 \if{html}{\out{</div>}}
 }
@@ -736,6 +744,23 @@ Return id of the last existing step in Cohort.
 \if{html}{\out{<div class="r">}}\preformatted{Cohort$last_step_id()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-is_pending"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-is_pending}{}}}
+\subsection{Method \code{is_pending()}}{
+Check if step is pending.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$is_pending(step_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step_id}}{Id of the step to be checked.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-modify"></a>}}

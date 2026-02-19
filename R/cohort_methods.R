@@ -178,6 +178,7 @@ Cohort <- R6::R6Class(
       evaled_filter <- eval_filter(filter, step_id, private$source)
       private$steps[[step_id]]$filters[[evaled_filter$id]] <- evaled_filter
       private$steps[[step_id]]$id <- step_id
+      private$steps[[step_id]]$pending <- TRUE
       if (run_flow) {
         self$run_flow(min_step = step_id)
       }
@@ -191,6 +192,8 @@ Cohort <- R6::R6Class(
       filter_id <- as.character(filter_id)
 
       private$steps[[step_id]]$filters[[filter_id]] <- NULL
+      private$steps[[step_id]]$pending <- TRUE
+
       if (length(private$steps[[step_id]]$filters) == 0) {
         self$remove_step(step_id, run_flow)
       } else {
@@ -229,6 +232,8 @@ Cohort <- R6::R6Class(
       if (!missing(active)) {
         filter_env[["active"]] <- active
       }
+
+      private$steps[[step_id]]$pending <- TRUE
 
       if (run_flow && (!missing(active) || any_changed)) {
         self$run_flow(step_id)
@@ -689,6 +694,8 @@ Cohort <- R6::R6Class(
         self$update_cache(step_id, filter_id, state = "post")
       }
 
+      private$steps[[step_id]]$pending <- FALSE
+
       run_hooks(hook$post, self, private, step_id)
     },
     #' @description
@@ -783,6 +790,7 @@ Cohort <- R6::R6Class(
     #' @param filter_id Id of the filter for which cache data should be returned.
     #' @param state Should cache be returned on data before ("pre") or after ("post")
     #'    filtering in specified step.
+    #' @param .recalc_when_missing Should the function compute cache automatically when the one is not computed yet?
     get_cache = function(step_id, filter_id, state = "post", .recalc_when_missing = TRUE) {
       cache_id <- as.character(step_id)
       if (state == "pre") {
@@ -825,6 +833,15 @@ Cohort <- R6::R6Class(
       as.character(length(private$steps))
     },
     #' @description
+    #' Check if step is pending.
+    #' @param step_id Id of the step to be checked.
+    is_pending = function(step_id) {
+      if (missing(step_id)) {
+        return(private$steps %>% purrr::map_lgl("pending"))
+      }
+      private$steps[[step_id]]$pending
+    },
+    #' @description
     #' Helper method enabling to run non-standard operation on Cohort object.
     #' @param modifier Function of two arguments `self` and `private`.
     modify = function(modifier) {
@@ -838,7 +855,14 @@ Cohort <- R6::R6Class(
     steps = list(),
     cache = list(),
     data_objects = list(),
-    init_source = function(source, ...) {
+    init_source = function(source, ...,
+                           hook = list(
+                             pre = get_hook("pre_init_source_hook"),
+                             post = get_hook("post_init_source_hook")
+                           )) {
+
+      run_hooks(hook$pre, self, private, ...)
+
       private$source <- source
       private$steps <- register_steps_and_filters(source, ...)
       initial_data <- .init_step(source)
@@ -846,6 +870,8 @@ Cohort <- R6::R6Class(
         # important note: data objects are indexed from 0, whereas steps and filters from 1
         private$data_objects[["0"]] <- initial_data
       }
+
+      run_hooks(hook$post, self, private, ...)
     }
   )
 )

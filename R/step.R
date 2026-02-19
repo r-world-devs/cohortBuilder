@@ -54,6 +54,9 @@ eval_step_filters <- function(step, source) {
   }
   step$filters <- step$filters %>%
     stats::setNames(filters_names)
+
+  step$pending <- TRUE
+
   return(step)
 }
 
@@ -91,6 +94,7 @@ steps_range <- function(from, to) {
 readjust_step <- function(step, new_id) {
   step$id <- new_id
   step$filters <- purrr::modify(step$filters, modify_item, new_val = new_id, what = "step_id")
+  step$pending <- TRUE
 
   return(step)
 }
