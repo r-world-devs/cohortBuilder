@@ -39,11 +39,13 @@ bind_keys - If needed, allows to define more than one relation.
 
 - `data_key` - requires to provide two parameters:
 dataset - Name of the dataset existing in Source.
-key - Single character string or vector storing column names that are keys, which should be used to describe relation.
+key - Single character string or vector storing column names that are keys,
+    which should be used to describe relation.
 For example `data_key('books', 'author_id')`.
 - `bind_key` - requires to provide two obligatory parameters
 update - Data key describing which table should be updated.
-... - Triggering data keys. One or more data keys describing on which dataset(s) the one in `update` is dependent.
+... - Triggering data keys. One or more data keys describing on which dataset(s)
+    the one in `update` is dependent.
 The output of `bind_key` function is named binding key.
 `bind_key` offers two extra parameters `post` and `activate`.
 See below to learn how these parameters affect the final result.
@@ -183,11 +185,13 @@ bind_keys - If needed, allows to define more than one relation.
 
 - `data_key` - requires to provide two parameters:
 dataset - Name of the dataset existing in Source.
-key - Single character string or vector storing column names that are keys, which should be used to describe relation.
+key - Single character string or vector storing column names that are keys,
+    which should be used to describe relation.
 For example `data_key('books', 'author_id')`.
 - `bind_key` - requires to provide two obligatory parameters
 update - Data key describing which table should be updated.
-... - Triggering data keys. One or more data keys describing on which dataset(s) the one in `update` is dependent.
+... - Triggering data keys. One or more data keys describing on which dataset(s)
+    the one in `update` is dependent.
 The output of `bind_key` function is named binding key.
 `bind_key` offers two extra parameters `post` and `activate`.
 See below to learn how these parameters affect the final result.
@@ -365,10 +369,12 @@ as below:</p><div class="sourceCode"><pre><code><span></span>
 <li><p><code>bind_key</code> - Defines what relation occur between datasets.</p></li>
 <li><p><code>bind_keys</code> - If needed, allows to define more than one relation.</p></li>
 </ul><p>- `data_key` - requires to provide two parameters:</p><ul><li><p><code>dataset</code> - Name of the dataset existing in Source.</p></li>
-<li><p><code>key</code> - Single character string or vector storing column names that are keys, which should be used to describe relation.</p></li>
+<li><p><code>key</code> - Single character string or vector storing column names that are keys,
+    which should be used to describe relation.</p></li>
 </ul><p>For example `data_key('books', 'author_id')`.</p>
 <p>- `bind_key` - requires to provide two obligatory parameters</p><ul><li><p><code>update</code> - Data key describing which table should be updated.</p></li>
-<li><p><code>...</code> - <strong>Triggering data keys</strong>. One or more data keys describing on which dataset(s) the one in `update` is dependent.</p></li>
+<li><p><code>...</code> - <strong>Triggering data keys</strong>. One or more data keys describing on which dataset(s)
+    the one in `update` is dependent.</p></li>
 </ul><p>The output of `bind_key` function is named <strong>binding key</strong>.
 `bind_key` offers two extra parameters `post` and `activate`.
 See below to learn how these parameters affect the final result.</p>

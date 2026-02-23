@@ -14,15 +14,17 @@ method:
 ``` r
 librarian_source <- set_source(
   as.tblist(librarian)
-) %>% 
+) %>%
   add_step(
     step(
       filter(
-        "discrete", id = "author", dataset = "books", 
+        "discrete",
+        id = "author", dataset = "books",
         variable = "author", value = "Dan Brown"
       ),
       filter(
-        "discrete", id = "program", dataset = "borrowers", 
+        "discrete",
+        id = "program", dataset = "borrowers",
         variable = "program", value = "premium", keep_na = FALSE
       )
     )
@@ -34,14 +36,16 @@ or with `%->%` pipe operator:
 ``` r
 librarian_source <- set_source(
   as.tblist(librarian)
-) %->% 
+) %->%
   step(
     filter(
-      "discrete", id = "author", dataset = "books", 
+      "discrete",
+      id = "author", dataset = "books",
       variable = "author", value = "Dan Brown"
     ),
     filter(
-      "discrete", id = "program", dataset = "borrowers", 
+      "discrete",
+      id = "program", dataset = "borrowers",
       variable = "program", value = "premium", keep_na = FALSE
     )
   )
@@ -53,20 +57,22 @@ passing `step_id` inside:
 ``` r
 librarian_source <- set_source(
   as.tblist(librarian)
-) %>% 
+) %>%
   add_filter(
     filter(
-      "discrete", id = "author", dataset = "books", 
+      "discrete",
+      id = "author", dataset = "books",
       variable = "author", value = "Dan Brown"
     ),
-    step_id = 1
-  ) %>% 
+    step_id = 1L
+  ) %>%
   add_filter(
     filter(
-      "discrete", id = "program", dataset = "borrowers", 
+      "discrete",
+      id = "program", dataset = "borrowers",
       variable = "program", value = "premium", keep_na = FALSE
     ),
-    step_id = 1
+    step_id = 1L
   )
 ```
 
@@ -78,13 +84,15 @@ Or even simpler using `%->%` (to put filters in the last existing step):
 ``` r
 librarian_source <- set_source(
   as.tblist(librarian)
-) %->% 
+) %->%
   filter(
-    "discrete", id = "author", dataset = "books", 
+    "discrete",
+    id = "author", dataset = "books",
     variable = "author", value = "Dan Brown"
-  ) %->% 
+  ) %->%
   filter(
-    "discrete", id = "program", dataset = "borrowers", 
+    "discrete",
+    id = "program", dataset = "borrowers",
     variable = "program", value = "premium", keep_na = FALSE
   )
 ```
@@ -127,15 +135,17 @@ librarian_source <- set_source(
   as.tblist(librarian)
 )
 
-librarian_cohort <- librarian_source %>% 
+librarian_cohort <- librarian_source %>%
   cohort(
     step(
       filter(
-        "discrete", id = "author", dataset = "books", 
+        "discrete",
+        id = "author", dataset = "books",
         variable = "author", value = "Dan Brown"
       ),
       filter(
-        "discrete", id = "program", dataset = "borrowers", 
+        "discrete",
+        id = "program", dataset = "borrowers",
         variable = "program", value = "premium", keep_na = FALSE
       )
     )
@@ -145,14 +155,16 @@ librarian_cohort <- librarian_source %>%
 Or if you want to define only one step, place filters directly:
 
 ``` r
-librarian_cohort <- librarian_source %>% 
+librarian_cohort <- librarian_source %>%
   cohort(
     filter(
-      "discrete", id = "author", dataset = "books", 
+      "discrete",
+      id = "author", dataset = "books",
       variable = "author", value = "Dan Brown"
     ),
     filter(
-      "discrete", id = "program", dataset = "borrowers", 
+      "discrete",
+      id = "program", dataset = "borrowers",
       variable = "program", value = "premium", keep_na = FALSE
     )
   )
@@ -166,20 +178,21 @@ Using `add_step`:
 ``` r
 librarian_cohort <- librarian_source %>% cohort()
 
-librarian_cohort %>% 
+librarian_cohort %>%
   add_step(
     step(
       filter(
-        "discrete", id = "author", dataset = "books", 
+        "discrete",
+        id = "author", dataset = "books",
         variable = "author", value = "Dan Brown"
       ),
       filter(
-        "discrete", id = "program", dataset = "borrowers", 
+        "discrete",
+        id = "program", dataset = "borrowers",
         variable = "program", value = "premium", keep_na = FALSE
       )
     )
   )
-  
 ```
 
 Using `%->%` pipe operator:
@@ -187,14 +200,16 @@ Using `%->%` pipe operator:
 ``` r
 librarian_cohort <- librarian_source %>% cohort()
 
-librarian_cohort %->% 
+librarian_cohort %->%
   step(
     filter(
-      "discrete", id = "author", dataset = "books", 
+      "discrete",
+      id = "author", dataset = "books",
       variable = "author", value = "Dan Brown"
     ),
     filter(
-      "discrete", id = "program", dataset = "borrowers", 
+      "discrete",
+      id = "program", dataset = "borrowers",
       variable = "program", value = "premium", keep_na = FALSE
     )
   )
@@ -206,16 +221,18 @@ passing `step_id` inside:
 ``` r
 librarian_cohort <- librarian_source %>% cohort()
 
-librarian_cohort %>% 
+librarian_cohort %>%
   add_filter(
     filter(
-      "discrete", id = "author", dataset = "books", 
+      "discrete",
+      id = "author", dataset = "books",
       variable = "author", value = "Dan Brown"
     )
-  ) %>% 
+  ) %>%
   add_filter(
     filter(
-      "discrete", id = "program", dataset = "borrowers", 
+      "discrete",
+      id = "program", dataset = "borrowers",
       variable = "program", value = "premium", keep_na = FALSE
     )
   )
@@ -229,13 +246,15 @@ Or even simpler using `%->%` (to put filters in the last existing step):
 ``` r
 librarian_cohort <- librarian_source %>% cohort()
 
-librarian_cohort %->% 
+librarian_cohort %->%
   filter(
-    "discrete", id = "author", dataset = "books", 
+    "discrete",
+    id = "author", dataset = "books",
     variable = "author", value = "Dan Brown"
-  ) %->% 
+  ) %->%
   filter(
-    "discrete", id = "program", dataset = "borrowers", 
+    "discrete",
+    id = "program", dataset = "borrowers",
     variable = "program", value = "premium", keep_na = FALSE
   )
 ```

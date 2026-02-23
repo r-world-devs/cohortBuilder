@@ -449,9 +449,7 @@ Restore Cohort configuration.</p></dd>
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Cohort</span><span class="op">$</span><span class="fu">restore</span><span class="op">(</span></span>
 <span>  <span class="va">state</span>,</span>
-<span>  modifier <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">prev_state</span>, <span class="va">state</span><span class="op">)</span> <span class="op">{</span></span>
-<span>     <span class="va">state</span></span>
-<span> <span class="op">}</span>,</span>
+<span>  modifier <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">prev_state</span>, <span class="va">state</span><span class="op">)</span> <span class="va">state</span>,</span>
 <span>  run_flow <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  hook <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pre <span class="op">=</span> <span class="fu"><a href="../reference/hooks.html">get_hook</a></span><span class="op">(</span><span class="st">"pre_restore_hook"</span><span class="op">)</span>, post <span class="op">=</span> <span class="fu"><a href="../reference/hooks.html">get_hook</a></span><span class="op">(</span><span class="st">"post_restore_hook"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>

@@ -66,7 +66,9 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
 
-<p><a href="https://r-world-devs.github.io/cohortBuilder/"><img src="https://img.shields.io/static/v1.svg?label=github.com&amp;message=v.0.3.0&amp;color=ff69b4" alt="version"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="lifecycle"></a></p>
+<p><a href="https://r-world-devs.github.io/cohortBuilder/"><img src="https://img.shields.io/static/v1.svg?label=github.com&amp;message=v.0.3.0.9000&amp;color=ff69b4" alt="version"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="lifecycle"></a></p>
+<!-- badges: start -->
+
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
@@ -393,69 +395,9 @@
 <span><span class="co">#&gt; attr(,"call")</span></span>
 <span><span class="co">#&gt; as.tblist(librarian)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/code.html">code</a></span><span class="op">(</span><span class="va">coh</span><span class="op">)</span></span>
-<span><span class="co">#&gt; .pre_filtering &lt;- function(source, data_object, step_id) {</span></span>
-<span><span class="co">#&gt;     for (dataset in names(data_object)) {</span></span>
-<span><span class="co">#&gt;         attr(data_object[[dataset]], "filtered") &lt;- FALSE</span></span>
-<span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt;     return(data_object)</span></span>
-<span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; .run_binding &lt;- function(source, binding_key, data_object_pre, data_object_post,</span></span>
-<span><span class="co">#&gt;     ...) {</span></span>
-<span><span class="co">#&gt;     binding_dataset &lt;- binding_key$update$dataset</span></span>
-<span><span class="co">#&gt;     dependent_datasets &lt;- names(binding_key$data_keys)</span></span>
-<span><span class="co">#&gt;     active_datasets &lt;- data_object_post %&gt;%</span></span>
-<span><span class="co">#&gt;         purrr::keep(~attr(., "filtered")) %&gt;%</span></span>
-<span><span class="co">#&gt;         names()</span></span>
-<span><span class="co">#&gt;     if (!any(dependent_datasets %in% active_datasets)) {</span></span>
-<span><span class="co">#&gt;         return(data_object_post)</span></span>
-<span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt;     key_values &lt;- NULL</span></span>
-<span><span class="co">#&gt;     common_key_names &lt;- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))</span></span>
-<span><span class="co">#&gt;     for (dependent_dataset in dependent_datasets) {</span></span>
-<span><span class="co">#&gt;         key_names &lt;- binding_key$data_keys[[dependent_dataset]]$key</span></span>
-<span><span class="co">#&gt;         tmp_key_values &lt;- collapse::funique(data_object_post[[dependent_dataset]][,</span></span>
-<span><span class="co">#&gt;             key_names, drop = FALSE]) %&gt;%</span></span>
-<span><span class="co">#&gt;             stats::setNames(common_key_names)</span></span>
-<span><span class="co">#&gt;         if (is.null(key_values)) {</span></span>
-<span><span class="co">#&gt;             key_values &lt;- tmp_key_values</span></span>
-<span><span class="co">#&gt;         } else {</span></span>
-<span><span class="co">#&gt;             key_values &lt;- dplyr::inner_join(key_values, tmp_key_values, by = common_key_names)</span></span>
-<span><span class="co">#&gt;         }</span></span>
-<span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt;     data_object_post[[binding_dataset]] &lt;- dplyr::inner_join(switch(as.character(binding_key$post),</span></span>
-<span><span class="co">#&gt;         `FALSE` = data_object_pre[[binding_dataset]], `TRUE` = data_object_post[[binding_dataset]]),</span></span>
-<span><span class="co">#&gt;         key_values, by = stats::setNames(common_key_names, binding_key$update$key))</span></span>
-<span><span class="co">#&gt;     if (binding_key$activate) {</span></span>
-<span><span class="co">#&gt;         attr(data_object_post[[binding_dataset]], "filtered") &lt;- TRUE</span></span>
-<span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt;     return(data_object_post)</span></span>
-<span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; source &lt;- list(dtconn = as.tblist(librarian))</span></span>
-<span><span class="co">#&gt; data_object &lt;- source$dtconn</span></span>
-<span><span class="co">#&gt; step_id &lt;- "1"</span></span>
-<span><span class="co">#&gt; pre_data_object &lt;- data_object</span></span>
-<span><span class="co">#&gt; data_object &lt;- .pre_filtering(source, data_object, "1")</span></span>
-<span><span class="co">#&gt; data_object[["books"]] &lt;- data_object[["books"]] %&gt;%</span></span>
-<span><span class="co">#&gt;     dplyr::filter(author %in% c("Dan Brown", NA))</span></span>
-<span><span class="co">#&gt; attr(data_object[["books"]], "filtered") &lt;- TRUE</span></span>
-<span><span class="co">#&gt; data_object[["borrowers"]] &lt;- data_object[["borrowers"]] %&gt;%</span></span>
-<span><span class="co">#&gt;     dplyr::filter((registered &lt;= Inf &amp; registered &gt;= 14610) | is.na(registered))</span></span>
-<span><span class="co">#&gt; attr(data_object[["borrowers"]], "filtered") &lt;- TRUE</span></span>
-<span><span class="co">#&gt; data_object &lt;- .post_filtering(source, data_object, "1")</span></span>
-<span><span class="co">#&gt; for (binding_key in binding_keys) {</span></span>
-<span><span class="co">#&gt;     data_object &lt;- .run_binding(source, binding_key, pre_data_object, data_object)</span></span>
-<span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; step_id &lt;- "2"</span></span>
-<span><span class="co">#&gt; data_object &lt;- .pre_filtering(source, data_object, "2")</span></span>
-<span><span class="co">#&gt; data_object[["books"]] &lt;- data_object[["books"]] %&gt;%</span></span>
-<span><span class="co">#&gt;     dplyr::filter((copies &lt;= 10 &amp; copies &gt;= 5) | is.na(copies))</span></span>
-<span><span class="co">#&gt; attr(data_object[["books"]], "filtered") &lt;- TRUE</span></span>
-<span><span class="co">#&gt; data_object &lt;- .post_filtering(source, data_object, "2")</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/attrition.html">attrition</a></span><span class="op">(</span><span class="va">coh</span>, dataset <span class="op">=</span> <span class="st">"books"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-8-1.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<p><img src="reference/figures/README-attrition-1.png" alt="" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/get_state.html">get_state</a></span><span class="op">(</span><span class="va">coh</span>, json <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [{"step":"1","filters":[{"range":[5,6],"type":"discrete","id":"author","name":"author","variable":"author","value":"Dan Brown","dataset":"books","keep_na":true,"description":null,"active":true},{"type":"date_range","id":"registered","name":"registered","variable":"registered","range":["2010-01-01","Inf"],"dataset":"borrowers","keep_na":true,"description":null,"active":true}]},{"step":"2","filters":[{"type":"range","id":"copies","name":"copies","variable":"copies","range":[5,10],"dataset":"books","keep_na":true,"description":null,"active":true}]}]</span></span></code></pre></div>
 </div>
@@ -511,7 +453,13 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/r-world-devs/cohortBuilder/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/r-world-devs/cohortBuilder/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://app.codecov.io/gh/r-world-devs/cohortBuilder" class="external-link"><img src="https://codecov.io/gh/r-world-devs/cohortBuilder/graph/badge.svg" alt="Codecov test coverage"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>

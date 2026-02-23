@@ -51,9 +51,9 @@ The object should be used as `dtconn` argument of <a href="set_source.html">set_
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tblist</span><span class="op">(</span><span class="va">...</span>, <span class="va">names</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tblist</span><span class="op">(</span><span class="va">...</span>, <span class="va">names</span>, .class <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">as.tblist</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">as.tblist</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, .class <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -67,6 +67,13 @@ The object should be used as `dtconn` argument of <a href="set_source.html">set_
 <dt id="arg-names">names<a class="anchor" aria-label="anchor" href="#arg-names"></a></dt>
 <dd><p>A character vector describing provided tables names.
 If missing names are constructed based on provided tables objects.</p></dd>
+
+
+<dt id="arg--class">.class<a class="anchor" aria-label="anchor" href="#arg--class"></a></dt>
+<dd><p>The extra (highest priority) class added to the resulting object.
+Having the extra class defined, enables to implement custom S3 methods for the object
+having higher priority over the existing methods.
+Especially useful if you want to change the built-in method behavior.</p></dd>
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>

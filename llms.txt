@@ -1,4 +1,4 @@
-[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.3.0&color=ff69b4)](https://r-world-devs.github.io/cohortBuilder/)
+[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.3.0.9000&color=ff69b4)](https://r-world-devs.github.io/cohortBuilder/)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
 ## Overview
@@ -344,72 +344,10 @@ get_data(coh, step_id = 2)
 ```
 
 ``` r
-code(coh)
-#> .pre_filtering <- function(source, data_object, step_id) {
-#>     for (dataset in names(data_object)) {
-#>         attr(data_object[[dataset]], "filtered") <- FALSE
-#>     }
-#>     return(data_object)
-#> }
-#> .run_binding <- function(source, binding_key, data_object_pre, data_object_post,
-#>     ...) {
-#>     binding_dataset <- binding_key$update$dataset
-#>     dependent_datasets <- names(binding_key$data_keys)
-#>     active_datasets <- data_object_post %>%
-#>         purrr::keep(~attr(., "filtered")) %>%
-#>         names()
-#>     if (!any(dependent_datasets %in% active_datasets)) {
-#>         return(data_object_post)
-#>     }
-#>     key_values <- NULL
-#>     common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))
-#>     for (dependent_dataset in dependent_datasets) {
-#>         key_names <- binding_key$data_keys[[dependent_dataset]]$key
-#>         tmp_key_values <- collapse::funique(data_object_post[[dependent_dataset]][,
-#>             key_names, drop = FALSE]) %>%
-#>             stats::setNames(common_key_names)
-#>         if (is.null(key_values)) {
-#>             key_values <- tmp_key_values
-#>         } else {
-#>             key_values <- dplyr::inner_join(key_values, tmp_key_values, by = common_key_names)
-#>         }
-#>     }
-#>     data_object_post[[binding_dataset]] <- dplyr::inner_join(switch(as.character(binding_key$post),
-#>         `FALSE` = data_object_pre[[binding_dataset]], `TRUE` = data_object_post[[binding_dataset]]),
-#>         key_values, by = stats::setNames(common_key_names, binding_key$update$key))
-#>     if (binding_key$activate) {
-#>         attr(data_object_post[[binding_dataset]], "filtered") <- TRUE
-#>     }
-#>     return(data_object_post)
-#> }
-#> source <- list(dtconn = as.tblist(librarian))
-#> data_object <- source$dtconn
-#> step_id <- "1"
-#> pre_data_object <- data_object
-#> data_object <- .pre_filtering(source, data_object, "1")
-#> data_object[["books"]] <- data_object[["books"]] %>%
-#>     dplyr::filter(author %in% c("Dan Brown", NA))
-#> attr(data_object[["books"]], "filtered") <- TRUE
-#> data_object[["borrowers"]] <- data_object[["borrowers"]] %>%
-#>     dplyr::filter((registered <= Inf & registered >= 14610) | is.na(registered))
-#> attr(data_object[["borrowers"]], "filtered") <- TRUE
-#> data_object <- .post_filtering(source, data_object, "1")
-#> for (binding_key in binding_keys) {
-#>     data_object <- .run_binding(source, binding_key, pre_data_object, data_object)
-#> }
-#> step_id <- "2"
-#> data_object <- .pre_filtering(source, data_object, "2")
-#> data_object[["books"]] <- data_object[["books"]] %>%
-#>     dplyr::filter((copies <= 10 & copies >= 5) | is.na(copies))
-#> attr(data_object[["books"]], "filtered") <- TRUE
-#> data_object <- .post_filtering(source, data_object, "2")
-```
-
-``` r
 attrition(coh, dataset = "books")
 ```
 
-![](reference/figures/README-unnamed-chunk-8-1.png)
+![](reference/figures/README-attrition-1.png)
 
 ``` r
 get_state(coh, json = TRUE)

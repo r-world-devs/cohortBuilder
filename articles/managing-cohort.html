@@ -87,22 +87,25 @@ Cohort management operations.</p>
 <span>  <span class="fu"><a href="../reference/tblist.html">as.tblist</a></span><span class="op">(</span><span class="va">librarian</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/create-cohort.html">cohort</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"discrete"</span>, id <span class="op">=</span> <span class="st">"author"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>, </span>
+<span>        <span class="st">"discrete"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"author"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>,</span>
 <span>        variable <span class="op">=</span> <span class="st">"author"</span>, value <span class="op">=</span> <span class="st">"Dan Brown"</span></span>
 <span>      <span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"discrete"</span>, id <span class="op">=</span> <span class="st">"program"</span>, dataset <span class="op">=</span> <span class="st">"borrowers"</span>, </span>
+<span>        <span class="st">"discrete"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"program"</span>, dataset <span class="op">=</span> <span class="st">"borrowers"</span>,</span>
 <span>        variable <span class="op">=</span> <span class="st">"program"</span>, value <span class="op">=</span> <span class="st">"premium"</span>, keep_na <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"range"</span>, id <span class="op">=</span> <span class="st">"copies"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>, </span>
-<span>        variable <span class="op">=</span> <span class="st">"copies"</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>        <span class="st">"range"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"copies"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>,</span>
+<span>        variable <span class="op">=</span> <span class="st">"copies"</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">5L</span><span class="op">)</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    run_flow <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -123,9 +126,9 @@ step,</li>
 </ul>
 <p>Updating filter:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/update_filter.html">update_filter</a></span><span class="op">(</span></span>
-<span>    step_id <span class="op">=</span> <span class="fl">1</span>, filter_id <span class="op">=</span> <span class="st">"author"</span>, value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Dan Brown"</span>, <span class="st">"Khaled Hosseini"</span><span class="op">)</span></span>
+<span>    step_id <span class="op">=</span> <span class="fl">1L</span>, filter_id <span class="op">=</span> <span class="st">"author"</span>, value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Dan Brown"</span>, <span class="st">"Khaled Hosseini"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/sum_up.html">sum_up</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
@@ -160,13 +163,14 @@ step,</li>
 <span><span class="co">#&gt;      active: TRUE</span></span></code></pre></div>
 <p>Adding new filter:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_filter.html">add_filter</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>      <span class="st">"date_range"</span>, id <span class="op">=</span> <span class="st">"issue_date"</span>, dataset <span class="op">=</span> <span class="st">"issues"</span>, </span>
+<span>      <span class="st">"date_range"</span>,</span>
+<span>      id <span class="op">=</span> <span class="st">"issue_date"</span>, dataset <span class="op">=</span> <span class="st">"issues"</span>,</span>
 <span>      variable <span class="op">=</span> <span class="st">"date"</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2010-01-01"</span><span class="op">)</span>, <span class="cn">Inf</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    step_id <span class="op">=</span> <span class="fl">2</span></span>
+<span>    step_id <span class="op">=</span> <span class="fl">2L</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/sum_up.html">sum_up</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
@@ -210,8 +214,8 @@ step,</li>
 <span><span class="co">#&gt;      active: TRUE</span></span></code></pre></div>
 <p>Removing filter:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/rm_filter.html">rm_filter</a></span><span class="op">(</span>step_id <span class="op">=</span> <span class="fl">2</span>, filter_id <span class="op">=</span> <span class="st">"copies"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/rm_filter.html">rm_filter</a></span><span class="op">(</span>step_id <span class="op">=</span> <span class="fl">2L</span>, filter_id <span class="op">=</span> <span class="st">"copies"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/sum_up.html">sum_up</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &gt;&gt; Step ID: 1</span></span>
@@ -250,7 +254,7 @@ case we’ve updated only the second step so we can optimize workflow
 skipping the previous steps calculation by specifying
 <code>min_step_id</code> parameter:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/run.html">run</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, min_step_id <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/run.html">run</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, min_step_id <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $books</span></span>
@@ -309,8 +313,8 @@ after calling one of the above methods just set
 <code>rm_step</code> methods to add new, or remove existing step
 respectively.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/rm_step.html">rm_step</a></span><span class="op">(</span>step_id <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/rm_step.html">rm_step</a></span><span class="op">(</span>step_id <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/sum_up.html">sum_up</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &gt;&gt; Step ID: 1</span></span>
@@ -327,15 +331,17 @@ respectively.</p>
 renaming all step ids (so that we always have steps numbering starting
 with 1).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_step.html">add_step</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"discrete"</span>, id <span class="op">=</span> <span class="st">"author"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>, </span>
+<span>        <span class="st">"discrete"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"author"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>,</span>
 <span>        variable <span class="op">=</span> <span class="st">"author"</span>, value <span class="op">=</span> <span class="st">"Dan Brown"</span></span>
 <span>      <span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"discrete"</span>, id <span class="op">=</span> <span class="st">"program"</span>, dataset <span class="op">=</span> <span class="st">"borrowers"</span>, </span>
+<span>        <span class="st">"discrete"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"program"</span>, dataset <span class="op">=</span> <span class="st">"borrowers"</span>,</span>
 <span>        variable <span class="op">=</span> <span class="st">"program"</span>, value <span class="op">=</span> <span class="st">"premium"</span>, keep_na <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
@@ -497,15 +503,17 @@ in Source:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">source_one</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_source.html">set_source</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/tblist.html">as.tblist</a></span><span class="op">(</span><span class="va">librarian</span><span class="op">)</span></span>
-<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_step.html">add_step</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"discrete"</span>, id <span class="op">=</span> <span class="st">"author"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>, </span>
+<span>        <span class="st">"discrete"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"author"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>,</span>
 <span>        variable <span class="op">=</span> <span class="st">"author"</span>, value <span class="op">=</span> <span class="st">"Dan Brown"</span></span>
 <span>      <span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"discrete"</span>, id <span class="op">=</span> <span class="st">"program"</span>, dataset <span class="op">=</span> <span class="st">"borrowers"</span>, </span>
+<span>        <span class="st">"discrete"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"program"</span>, dataset <span class="op">=</span> <span class="st">"borrowers"</span>,</span>
 <span>        variable <span class="op">=</span> <span class="st">"program"</span>, value <span class="op">=</span> <span class="st">"premium"</span>, keep_na <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
@@ -513,12 +521,13 @@ in Source:</p>
 <span></span>
 <span><span class="va">source_two</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_source.html">set_source</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/tblist.html">as.tblist</a></span><span class="op">(</span><span class="va">librarian</span><span class="op">)</span></span>
-<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_step.html">add_step</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"range"</span>, id <span class="op">=</span> <span class="st">"copies"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>, </span>
-<span>        variable <span class="op">=</span> <span class="st">"copies"</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>        <span class="st">"range"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"copies"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>,</span>
+<span>        variable <span class="op">=</span> <span class="st">"copies"</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">5L</span><span class="op">)</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>

@@ -27,7 +27,7 @@ filter
 #> function(type, ...) {
 #>   UseMethod("filter", type)
 #> }
-#> <bytecode: 0x564fb98e3560>
+#> <bytecode: 0x55d8b57ecf80>
 #> <environment: namespace:cohortBuilder>
 ```
 
@@ -50,7 +50,7 @@ cohortBuilder:::filter.discrete
 #>     }
 #>   )
 #> }
-#> <bytecode: 0x564fb9de87e8>
+#> <bytecode: 0x55d8b5cf2208>
 #> <environment: namespace:cohortBuilder>
 ```
 
@@ -66,8 +66,8 @@ spec_filter
 #>         append(list(source = source), args)
 #>       )
 #>     }
-#> <bytecode: 0x564fb9ded710>
-#> <environment: 0x564fb9ff91c8>
+#> <bytecode: 0x55d8b5cf9050>
+#> <environment: 0x55d8b5f00cc8>
 #> attr(,"class")
 #> [1] "function"              "cb_filter_constructor"
 ```
@@ -84,7 +84,7 @@ cb_filter.discrete
 #> function(source, ...) {
 #>   UseMethod("cb_filter.discrete", source)
 #> }
-#> <bytecode: 0x564fb98c9330>
+#> <bytecode: 0x55d8b57d2d50>
 #> <environment: namespace:cohortBuilder>
 ```
 
@@ -104,9 +104,9 @@ str(
   give.attr = FALSE
 )
 #> List of 10
-#>  $ id          : chr "MWLEF1770731319353"
+#>  $ id          : chr "MWLEF1771890420545"
 #>  $ type        : 'discrete' chr "discrete"
-#>  $ name        : chr "MWLEF1770731319353"
+#>  $ name        : chr "MWLEF1771890420545"
 #>  $ input_param : chr "value"
 #>  $ filter_data :function (data_object)  
 #>  $ get_stats   :function (data_object, name)  
@@ -222,8 +222,8 @@ based on filter configuration.
 
 ``` r
 cb_filter.logical.tblist <- function(
-  source, type = "logical", id = .gen_id(), name = id, dataset, variable, 
-  value = NA, keep_na = TRUE, description = NULL, ..., active = TRUE) {
+    source, type = "logical", id = .gen_id(), name = id, dataset, variable, 
+    value = NA, keep_na = TRUE, description = NULL, ..., active = TRUE) {
   args <- list(...)
 
   def_filter(
@@ -261,13 +261,17 @@ cb_filter.logical.tblist <- function(
       }
       stats <- list(
         choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% 
-          stats::na.omit() %>% table() %>% as.list(),
+          stats::na.omit() %>% 
+          table() %>% 
+          as.list(),
         n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% 
           stats::na.omit() %>% 
           length(),
-        n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
+        n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% 
+          is.na() %>% 
+          sum()
       )
-      if (length(name) == 1) {
+      if (length(name) == 1L) {
         return(stats[[name]])
       } else {
         return(stats[name])
@@ -277,7 +281,7 @@ cb_filter.logical.tblist <- function(
       if (nrow(data_object[[dataset]])) {
         data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
       } else {
-        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {

@@ -7,9 +7,9 @@ should be used as \`dtconn\` argument of
 ## Usage
 
 ``` r
-tblist(..., names)
+tblist(..., names, .class = NULL)
 
-as.tblist(x, ...)
+as.tblist(x, ..., .class = NULL)
 ```
 
 ## Arguments
@@ -22,6 +22,13 @@ as.tblist(x, ...)
 
   A character vector describing provided tables names. If missing names
   are constructed based on provided tables objects.
+
+- .class:
+
+  The extra (highest priority) class added to the resulting object.
+  Having the extra class defined, enables to implement custom S3 methods
+  for the object having higher priority over the existing methods.
+  Especially useful if you want to change the built-in method behavior.
 
 - x:
 

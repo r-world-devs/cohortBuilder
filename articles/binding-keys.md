@@ -48,15 +48,17 @@ librarian_source <- set_source(
   as.tblist(librarian)
 )
 
-librarian_cohort <- librarian_source %>% 
+librarian_cohort <- librarian_source %>%
   cohort(
     step(
       filter(
-        "discrete", id = "title", dataset = "books", 
+        "discrete",
+        id = "title", dataset = "books",
         variable = "title", value = "Birdsong"
       ),
       filter(
-        "date_range", id = "issue_date", dataset = "issues", 
+        "date_range",
+        id = "issue_date", dataset = "issues",
         variable = "date", range = c(as.Date("2016-01-01"), as.Date("2016-12-31"))
       )
     )
@@ -75,18 +77,18 @@ How can we overcome the issue?
 
 ## Classic approach
 
-With the classic approach, we may iteratively extract each information
+With the classic approach, we may iteractively extract each information
 and extend cohort filters, for example we can define a new condition in
 the next filtering step:
 
 ``` r
 run(librarian_cohort)
 selected_isbn <- get_data(librarian_cohort)$books$isbn
-librarian_cohort %->% 
+librarian_cohort %->%
   step(
-    filter("discrete", id = "isbn", dataset = "issues", variable = "isbn", value = selected_isbn)  
-  ) %>% 
-  run(step_id = 2)
+    filter("discrete", id = "isbn", dataset = "issues", variable = "isbn", value = selected_isbn)
+  ) %>%
+  run(step_id = 2L)
 ```
 
 Now `librarian_cohort` should store all the issues related to selected
@@ -95,11 +97,11 @@ issues. We’ll do this filtering in the third step:
 
 ``` r
 selected_borrower_id <- get_data(librarian_cohort)$issues$borrower_id
-librarian_cohort %->% 
+librarian_cohort %->%
   step(
-    filter("discrete", id = "borr_id", dataset = "borrowers", variable = "id", value = selected_borrower_id)  
-  ) %>% 
-  run(step_id = 3)
+    filter("discrete", id = "borr_id", dataset = "borrowers", variable = "id", value = selected_borrower_id)
+  ) %>%
+  run(step_id = 3L)
 ```
 
 Resulting third-step data should contain desired information:
@@ -186,15 +188,17 @@ librarian_source <- set_source(
   binding_keys = case_bks
 )
 
-librarian_cohort <- librarian_source %>% 
+librarian_cohort <- librarian_source %>%
   cohort(
     step(
       filter(
-        "discrete", id = "title", dataset = "books", 
+        "discrete",
+        id = "title", dataset = "books",
         variable = "title", value = "Birdsong"
       ),
       filter(
-        "date_range", id = "issue_date", dataset = "issues", 
+        "date_range",
+        id = "issue_date", dataset = "issues",
         variable = "date", range = c(as.Date("2016-01-01"), as.Date("2016-12-31"))
       )
     )

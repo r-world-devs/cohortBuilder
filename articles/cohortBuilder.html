@@ -180,7 +180,7 @@ list of data frames having <code>tblist</code> class.</p>
 <strong>Note.</strong> In order to convert list of data frames to
 ‘tblist’ just use <code>as.tblist</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/tblist.html">as.tblist</a></span><span class="op">(</span><span class="va">librarian</span><span class="op">)</span>, max.level <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/tblist.html">as.tblist</a></span><span class="op">(</span><span class="va">librarian</span><span class="op">)</span>, max.level <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 4</span></span>
 <span><span class="co">#&gt;  $ books    : tibble [17 × 6] (S3: tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;  $ borrowers: tibble [20 × 6] (S3: tbl_df/tbl/data.frame)</span></span>
@@ -215,7 +215,7 @@ providing methods for operating on data included in
 <code>Source</code>. We achieve it with <code>cohort</code>
 function:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/create-cohort.html">cohort</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Cohort" "R6"</span></span></code></pre></div>
@@ -335,7 +335,7 @@ to apply the filter to,</li>
 <span>  <span class="va">author_filter</span></span></code></pre></div>
 <p>Or define the filter while creating Cohort:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/create-cohort.html">cohort</a></span><span class="op">(</span></span>
 <span>    <span class="va">author_filter</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
@@ -353,7 +353,7 @@ properly just run:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sum_up.html">sum_up</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &gt;&gt; Step ID: 1</span></span>
-<span><span class="co">#&gt; -&gt; Filter ID: EEXOM1770731310449</span></span>
+<span><span class="co">#&gt; -&gt; Filter ID: EEXOM1771890411921</span></span>
 <span><span class="co">#&gt;    Filter Type: discrete</span></span>
 <span><span class="co">#&gt;    Filter Parameters:</span></span>
 <span><span class="co">#&gt;      dataset: books</span></span>
@@ -427,12 +427,12 @@ data:</p>
 <p>If you want to run data filtering automatically when the filter is
 defined you can set <code>run_flow = TRUE</code>:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/create-cohort.html">cohort</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/create-cohort.html">cohort</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_filter.html">add_filter</a></span><span class="op">(</span><span class="va">author_filter</span>, run_flow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>when using <code>add_filter</code> or:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/create-cohort.html">cohort</a></span><span class="op">(</span></span>
 <span>    <span class="va">author_filter</span>,</span>
 <span>    run_flow <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -510,22 +510,25 @@ operations. In order to define step, just wrap set of filters in
 second one.</p>
 <p>The below code does the job:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/create-cohort.html">cohort</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"discrete"</span>, id <span class="op">=</span> <span class="st">"author"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>, </span>
+<span>        <span class="st">"discrete"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"author"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>,</span>
 <span>        variable <span class="op">=</span> <span class="st">"author"</span>, value <span class="op">=</span> <span class="st">"Dan Brown"</span></span>
 <span>      <span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"discrete"</span>, id <span class="op">=</span> <span class="st">"program"</span>, dataset <span class="op">=</span> <span class="st">"borrowers"</span>, </span>
+<span>        <span class="st">"discrete"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"program"</span>, dataset <span class="op">=</span> <span class="st">"borrowers"</span>,</span>
 <span>        variable <span class="op">=</span> <span class="st">"program"</span>, value <span class="op">=</span> <span class="st">"premium"</span>, keep_na <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"range"</span>, id <span class="op">=</span> <span class="st">"copies"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>, </span>
-<span>        variable <span class="op">=</span> <span class="st">"copies"</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>        <span class="st">"range"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"copies"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>,</span>
+<span>        variable <span class="op">=</span> <span class="st">"copies"</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">5L</span><span class="op">)</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
@@ -580,7 +583,7 @@ want to get data from, just pass its id as <code>step_id</code>
 parameter:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/run.html">run</a></span><span class="op">(</span><span class="va">librarian_cohort</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $books</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
 <span><span class="co">#&gt;   isbn          title             genre                  publisher author copies</span></span>
@@ -625,7 +628,7 @@ parameter:</p>
 <span><span class="co">#&gt; [1] "tblist"</span></span>
 <span><span class="co">#&gt; attr(,"call")</span></span>
 <span><span class="co">#&gt; as.tblist(librarian)</span></span>
-<span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $books</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
 <span><span class="co">#&gt;   isbn          title             genre                  publisher author copies</span></span>
@@ -676,8 +679,8 @@ before or after filtering using <code>state</code> parameter. Because
 the proceeding step uses result from the previous one, we have:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">1</span>, state <span class="op">=</span> <span class="st">"post"</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">2</span>, state <span class="op">=</span> <span class="st">"pre"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">1L</span>, state <span class="op">=</span> <span class="st">"post"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">2L</span>, state <span class="op">=</span> <span class="st">"pre"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
@@ -704,7 +707,7 @@ exploring underlying data.</p>
 <li>display data changes across filtering steps.</li>
 </ul>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/stat.html">stat</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">1</span>, filter_id <span class="op">=</span> <span class="st">"program"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/stat.html">stat</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">1L</span>, filter_id <span class="op">=</span> <span class="st">"program"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $n_data</span></span>
 <span><span class="co">#&gt; [1] 6</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -715,7 +718,7 @@ exploring underlying data.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $n_missing</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="fu"><a href="../reference/stat.html">stat</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">2</span>, filter_id <span class="op">=</span> <span class="st">"copies"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/stat.html">stat</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">2L</span>, filter_id <span class="op">=</span> <span class="st">"copies"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $n_data</span></span>
 <span><span class="co">#&gt; [1] 1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -726,10 +729,10 @@ exploring underlying data.</p>
 <span><span class="co">#&gt; $n_missing</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_data.html">plot_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">1</span>, filter_id <span class="op">=</span> <span class="st">"program"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_data.html">plot_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">1L</span>, filter_id <span class="op">=</span> <span class="st">"program"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="cohortBuilder_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_data.html">plot_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">2</span>, filter_id <span class="op">=</span> <span class="st">"copies"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_data.html">plot_data</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, step_id <span class="op">=</span> <span class="fl">2L</span>, filter_id <span class="op">=</span> <span class="st">"copies"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="cohortBuilder_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/attrition.html">attrition</a></span><span class="op">(</span><span class="va">librarian_cohort</span>, dataset <span class="op">=</span> <span class="st">"books"</span><span class="op">)</span></span></code></pre></div>
@@ -824,22 +827,25 @@ which creation code can be defined separately while creating it:</p>
 <span>  <span class="op">}</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span><span class="va">librarian_cohort</span> <span class="op">&lt;-</span> <span class="va">librarian_source</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/create-cohort.html">cohort</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"discrete"</span>, id <span class="op">=</span> <span class="st">"author"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>, </span>
+<span>        <span class="st">"discrete"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"author"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>,</span>
 <span>        variable <span class="op">=</span> <span class="st">"author"</span>, value <span class="op">=</span> <span class="st">"Dan Brown"</span></span>
 <span>      <span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"discrete"</span>, id <span class="op">=</span> <span class="st">"program"</span>, dataset <span class="op">=</span> <span class="st">"borrowers"</span>, </span>
+<span>        <span class="st">"discrete"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"program"</span>, dataset <span class="op">=</span> <span class="st">"borrowers"</span>,</span>
 <span>        variable <span class="op">=</span> <span class="st">"program"</span>, value <span class="op">=</span> <span class="st">"premium"</span>, keep_na <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="../reference/filter.html">filter</a></span><span class="op">(</span></span>
-<span>        <span class="st">"range"</span>, id <span class="op">=</span> <span class="st">"copies"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>, </span>
-<span>        variable <span class="op">=</span> <span class="st">"copies"</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>        <span class="st">"range"</span>,</span>
+<span>        id <span class="op">=</span> <span class="st">"copies"</span>, dataset <span class="op">=</span> <span class="st">"books"</span>,</span>
+<span>        variable <span class="op">=</span> <span class="st">"copies"</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">5L</span><span class="op">)</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    run_flow <span class="op">=</span> <span class="cn">TRUE</span></span>
