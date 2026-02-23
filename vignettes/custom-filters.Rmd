@@ -215,9 +215,9 @@ cb_filter.logical.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
+        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot(...)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }

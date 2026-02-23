@@ -159,7 +159,7 @@ cb_filter.discrete.tblist <- function(
     },
     plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
+        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot(...)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
@@ -367,7 +367,7 @@ cb_filter.range.tblist <- function(
     },
     plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% graphics::hist()
+        data_object[[dataset]][[variable]] %>% graphics::hist(...)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
@@ -645,15 +645,16 @@ cb_filter.datetime_range.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object, ...) {
-      if (nrow(data_object[[dataset]])) {
+    plot_data = function(data_object, ..., breaks = NULL) {
+      args <- rlang::dots_list(...)
+      if (is.null(breaks) && nrow(data_object[[dataset]])) {
         breaks <- calculate_datetime_step(
           min(data_object[[dataset]][[variable]], na.rm = TRUE),
           max(data_object[[dataset]][[variable]], na.rm = TRUE)
         ) |> names()
 
         data_object[[dataset]][[variable]] %>%
-          graphics::hist(breaks = breaks)
+          graphics::hist(..., breaks = breaks)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
@@ -753,7 +754,7 @@ cb_filter.multi_discrete.tblist <- function(
           purrr::map(table) %>%
           purrr::imap_dfc(group_stats) %>%
           as.matrix() %>%
-          graphics::barplot()
+          graphics::barplot(...)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
@@ -836,7 +837,7 @@ cb_filter.query.tblist <- function(
           purrr::map(table) %>%
           purrr::imap_dfc(group_stats) %>%
           as.matrix() %>%
-          graphics::barplot()
+          graphics::barplot(...)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
