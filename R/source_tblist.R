@@ -640,7 +640,7 @@ cb_filter.datetime_range.tblist <- function(
         min <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
         max <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
 
-        extra_params$step <- calculate_datetime_step(min, max) |> unname()
+        extra_params$step <- calculate_datetime_step(min, max) %>% unname()
       }
 
       stats <- list(
@@ -666,7 +666,7 @@ cb_filter.datetime_range.tblist <- function(
         breaks <- calculate_datetime_step(
           min(data_object[[dataset]][[variable]], na.rm = TRUE),
           max(data_object[[dataset]][[variable]], na.rm = TRUE)
-        ) |> names()
+        ) %>% names()
 
         data_object[[dataset]][[variable]] %>%
           graphics::hist(breaks = breaks)

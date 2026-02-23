@@ -1179,6 +1179,9 @@ test_that("Create cohort object with triggered data calculations", {
 })
 
 test_that("code returns expression to create filtered tblist", {
+
+  skip_on_covr()
+
   coh <- Cohort$new(
     set_source(
       tblist(iris = iris)
