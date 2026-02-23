@@ -1132,18 +1132,18 @@ test_that("Verify that new custom class method works correctly", {
 
   coh <- cohort(
     set_source(
-      tblist(iris = iris, extra_class = "custom_tblist")
+      tblist(iris = iris, .class = "custom_tblist")
     ),
     step(discrete_iris_one)
   )
 
   run(coh)
-  expect_identical(get_data(coh, 1, collect = TRUE), "custom_tblist_data_collect")
+  expect_identical(get_data(coh, 1L, collect = TRUE), "custom_tblist_data_collect")
 })
 
 test_that("Verify that new verbose class method works correctly", {
   .collect_data.verbose <- function(source, data_object) {
-    message(nrow(data_object[[1]]))
+    message(nrow(data_object[[1L]]))
     NextMethod()
   }
 
@@ -1151,13 +1151,13 @@ test_that("Verify that new verbose class method works correctly", {
 
   coh <- cohort(
     set_source(
-      tblist(iris = iris, extra_class = "verbose")
+      tblist(iris = iris, .class = "verbose")
     ),
     step(discrete_iris_one)
   )
 
   run(coh)
-  expect_message(get_data(coh, 1, collect = TRUE), regexp =  nrow(get_data(coh, 1, collect = TRUE[[1]])))
+  expect_message(get_data(coh, 1L, collect = TRUE), regexp =  nrow(get_data(coh, 1L, collect = TRUE[[1L]])))
 })
 
 test_that("update_filter changed active status works fine", {
@@ -1218,28 +1218,37 @@ test_that("Create cohort object with triggered data calculations", {
   expect_false(is.null(get_data(coh)))
 })
 
-# if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
-#   test_that("(experimental) Retrieving reproducible code works fine", {
-#     # Using direct Cohort methods
-#     coh <- Cohort$new(
-#       set_source(
-#         tblist(iris = iris)
-#       ),
-#       discrete_iris_one
-#     )
-#     repro_code <- coh$get_code(1, "species_filter")
-#     target_code <- quote({
-#       data_object <- source$datasets
-#       if (!identical(c("setosa", "virginica"), NA)) {
-#         data_object[["iris"]] <- data_object[["iris"]] %>% dplyr::filter(!!sym("Species") %in% !!c("setosa", "virginica"))
-#       }
-#     })
-#     expect_equal(
-#       as.character(repro_code),
-#       as.character(target_code)
-#     )
-#   })
-# }
+
+test_that("Retrieving reproducible code works fine", {
+  # Using direct Cohort methods
+
+  # covr modifies function body so the test doesn't pass
+  skip_on_covr()
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    discrete_iris_one
+  )
+  repro_code <- coh$get_code(
+    1L, "species_filter", mark_step = FALSE,
+    include_methods = character(0L), include_ations = character(0L),
+    output = FALSE, width.cutoff = 120L
+  )
+  target_code <- quote({
+    source <- list(dtconn = tblist(iris = iris))
+    data_object <- source$dtconn
+    data_object[["iris"]] <- data_object[["iris"]] %>%
+      dplyr::filter(Species %in% c("setosa", "virginica", NA))
+    attr(data_object[["iris"]], "filtered") <- TRUE
+  })
+  expect_identical(
+    gsub("\n|\\s+", " ", repro_code$text.tidy),
+    as.character(target_code)[-1L]
+  )
+})
+
 
 test_that("code returns expression to create filtered tblist", {
 
@@ -1254,7 +1263,7 @@ test_that("code returns expression to create filtered tblist", {
     run_flow = TRUE
   )
 
-  code_as_text <- code(coh, include_methods = NULL, include_action = NULL, mark_step = FALSE)
+  code_as_text <- code(coh, include_methods = NULL, include_action = NULL, mark_step = FALSE, output = FALSE)
 
   for (line in code_as_text$text.tidy) {
     rlang::eval_bare(rlang::parse_expr(line))

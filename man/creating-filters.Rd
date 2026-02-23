@@ -38,15 +38,18 @@ new_filter(
 
 \item{filter_data}{Function of `data_object` parameter defining filtering logic on Source data object.}
 
-\item{get_stats}{Function of `data_object` and `name` parameters defining what and how data statistics should be calculated.}
+\item{get_stats}{Function of `data_object` and `name` parameters
+defining what and how data statistics should be calculated.}
 
 \item{plot_data}{Function of `data_object` parameter defining how filter data should be plotted.}
 
-\item{get_params}{Function of `name` parameter returning filter parameters (if names is skipped all the parameters are returned).}
+\item{get_params}{Function of `name` parameter returning
+filter parameters (if names is skipped all the parameters are returned).}
 
 \item{get_data}{Function of `data_object` returning filter related data.}
 
-\item{get_defaults}{Function of `data_object` and `cache_object` parameters returning default `input_param` parameter value.}
+\item{get_defaults}{Function of `data_object` and `cache_object` parameters
+returning default `input_param` parameter value.}
 
 \item{filter_type}{Type of new filter.}
 
