@@ -1130,19 +1130,22 @@ test_that("update_filter changed active status works fine", {
     ),
     step(discrete_iris_one, discrete_iris_two)
   )
+  first_filter_id <- "species_filter"
+  second_filter_id <- "species_filter_two"
+
   #default TRUE
-  expect_true(get_state(coh)[[1L]]$filters[[1L]]$active)
-  expect_true(get_state(coh)[[1L]]$filters[[2L]]$active)
+  expect_true(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
 
-  coh$update_filter(1L, coh$get_filter(1L, 1L)$id, active = FALSE)
+  coh$update_filter(1L, "species_filter", active = FALSE)
 
-  expect_false(get_state(coh)[[1L]]$filters[[1L]]$active)
-  expect_true(get_state(coh)[[1L]]$filters[[2L]]$active)
+  expect_false(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
 
-  coh$update_filter(1L, coh$get_filter(1L, 1L)$id, active = TRUE)
+  coh$update_filter(1L, "species_filter", active = TRUE)
 
-  expect_true(get_state(coh)[[1L]]$filters[[1L]]$active)
-  expect_true(get_state(coh)[[1L]]$filters[[2L]]$active)
+  expect_true(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
 })
 
 test_that("update_filter trigger data calculations works fine", {
@@ -1156,12 +1159,12 @@ test_that("update_filter trigger data calculations works fine", {
   expect_null(get_data(coh))
 
   #do not trigger data calculations without any changes
-  coh$update_filter(1L, coh$get_filter(1L, 1L)$id, run_flow = TRUE)
+  coh$update_filter(1L, "species_filter", run_flow = TRUE)
 
   expect_null(get_data(coh))
 
   #trigger data calculations
-  coh$update_filter(1L, coh$get_filter(1L, 1L)$id, active = FALSE, run_flow = TRUE)
+  coh$update_filter(1L, "species_filter", active = FALSE, run_flow = TRUE)
 
   expect_false(is.null(get_data(coh)))
 })
