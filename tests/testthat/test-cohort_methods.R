@@ -643,7 +643,7 @@ test_that("Getting filter stats works fine", {
   )
 
   expect_error(
-    stat(coh,10),
+    stat(coh, 10L),
     regexp = "Step is not exist in this cohort object."
   )
 
@@ -1131,18 +1131,18 @@ test_that("update_filter changed active status works fine", {
     step(discrete_iris_one, discrete_iris_two)
   )
   #default TRUE
-  expect_true(get_state(coh)[[1]]$filters[[1]]$active)
-  expect_true(get_state(coh)[[1]]$filters[[2]]$active)
+  expect_true(get_state(coh)[[1L]]$filters[[1L]]$active)
+  expect_true(get_state(coh)[[1L]]$filters[[2L]]$active)
 
-  coh$update_filter(1, coh$get_filter(1,1)$id, active = FALSE)
+  coh$update_filter(1L, coh$get_filter(1L, 1L)$id, active = FALSE)
 
-  expect_false(get_state(coh)[[1]]$filters[[1]]$active)
-  expect_true(get_state(coh)[[1]]$filters[[2]]$active)
+  expect_false(get_state(coh)[[1L]]$filters[[1L]]$active)
+  expect_true(get_state(coh)[[1L]]$filters[[2L]]$active)
 
-  coh$update_filter(1, coh$get_filter(1,1)$id, active = TRUE)
+  coh$update_filter(1L, coh$get_filter(1L, 1L)$id, active = TRUE)
 
-  expect_true(get_state(coh)[[1]]$filters[[1]]$active)
-  expect_true(get_state(coh)[[1]]$filters[[2]]$active)
+  expect_true(get_state(coh)[[1L]]$filters[[1L]]$active)
+  expect_true(get_state(coh)[[1L]]$filters[[2L]]$active)
 })
 
 test_that("update_filter trigger data calculations works fine", {
@@ -1156,12 +1156,12 @@ test_that("update_filter trigger data calculations works fine", {
   expect_null(get_data(coh))
 
   #do not trigger data calculations without any changes
-  coh$update_filter(1,coh$get_filter(1,1)$id, run_flow = TRUE )
+  coh$update_filter(1L, coh$get_filter(1L, 1L)$id, run_flow = TRUE)
 
   expect_null(get_data(coh))
 
   #trigger data calculations
-  coh$update_filter(1,coh$get_filter(1,1)$id, active = FALSE, run_flow = TRUE)
+  coh$update_filter(1L, coh$get_filter(1L, 1L)$id, active = FALSE, run_flow = TRUE)
 
   expect_false(is.null(get_data(coh)))
 })
@@ -1193,7 +1193,7 @@ test_that("code returns expression to create filtered tblist", {
 
   code_as_text <- code(coh, include_methods = NULL, include_action = NULL, mark_step = FALSE)
 
-  for(line in code_as_text$text.tidy){
+  for (line in code_as_text$text.tidy) {
     rlang::eval_bare(rlang::parse_expr(line))
   }
 

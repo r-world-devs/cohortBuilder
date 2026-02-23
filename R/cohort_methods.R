@@ -226,7 +226,7 @@ Cohort <- R6::R6Class(
         }
       }
       if (!missing(active)) {
-        if(!is.logical(active)) {
+        if (!is.logical(active)) {
           warning("Active accepts only logical values.")
         } else {
           filter_env[["active"]] <- active
@@ -460,7 +460,7 @@ Cohort <- R6::R6Class(
         data_id <- prev_step(step_id)
       }
 
-      if(is.null(self$get_step(step_id)) && step_id != 0){
+      if (is.null(self$get_step(step_id)) && step_id != 0L) {
         stop("Step is not exist in this cohort object.")
       }
 

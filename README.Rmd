@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 )
 knitr::opts_chunk$set()
 library(magrittr)
-#library(cohortBuilder)
+library(cohortBuilder)
 set.seed(123)
 options(tibble.width = Inf)
 iris <- tibble::as.tibble(iris)
@@ -88,6 +88,80 @@ install.packages("cohortBuilder")
 remotes::install_github("https://github.com/r-world-devs/cohortBuilder")
 ```
 
+## Usage
+
+```{r}
+librarian_source <- set_source(
+  as.tblist(librarian)
+)
+
+coh <- librarian_source %>% 
+  cohort(
+    filter(
+      "discrete", id = "author", dataset = "books", 
+      variable = "author", value = "Dan Brown"
+    ),
+    filter(
+      "range", id = "copies", dataset = "books", 
+      variable = "copies", range = c(5, 10)
+    ),
+    filter(
+      "date_range", id = "registered", dataset = "borrowers", 
+      variable = "registered", range = c(as.Date("2010-01-01"), Inf)
+    ) 
+  ) %>% 
+  run()
+
+get_data(coh)
+```
+
+```{r}
+coh <- librarian_source %>% 
+  cohort() %->% 
+  step(
+    filter(
+      "discrete", id = "author", dataset = "books", 
+      variable = "author", value = "Dan Brown"
+    ),
+    filter(
+      "date_range", id = "registered", dataset = "borrowers", 
+      variable = "registered", range = c(as.Date("2010-01-01"), Inf)
+    )
+  ) %->% 
+  step(
+    filter(
+      "range", id = "copies", dataset = "books", 
+      variable = "copies", range = c(5, 10)
+    )
+  ) %>% 
+  run()
+```
+
+```{r}
+get_data(coh, step_id = 1)
+```
+
+```{r}
+get_data(coh, step_id = 2)
+```
+
+```{r}
+update_filter(
+  coh, step_id = 1, filter_id = "author",
+  range = c(5, 6)
+)
+run(coh)
+
+get_data(coh, step_id = 2)
+```
+
+```{r attrition}
+attrition(coh, dataset = "books")
+```
+
+```{r}
+get_state(coh, json = TRUE)
+```
 
 ## Acknowledgement
 

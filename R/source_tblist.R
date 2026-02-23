@@ -308,8 +308,8 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
     dplyr::mutate(
       level = factor(
         findInterval(!!sym(variable), breaks, rightmost.closed = FALSE),
-        levels = seq_len(length(breaks)),
-        labels = as.character(seq_len(length(breaks)))
+        levels = seq_along(breaks),
+        labels = as.character(seq_along(breaks))
       )
     ) %>%
     dplyr::group_by(level) %>%
@@ -453,8 +453,8 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
     dplyr::mutate(
       level = factor(
         findInterval(!!sym(variable), breaks, rightmost.closed = FALSE),
-        levels = seq_len(length(breaks)),
-        labels = as.character(seq_len(length(breaks)))
+        levels = seq_along(breaks),
+        labels = as.character(seq_along(breaks))
       )
     ) %>%
     dplyr::group_by(level) %>%
