@@ -155,11 +155,7 @@ run(coh)
 get_data(coh, step_id = 2)
 ```
 
-```{r}
-code(coh)
-```
-
-```{r}
+```{r attrition}
 attrition(coh, dataset = "books")
 ```
 

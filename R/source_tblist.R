@@ -308,8 +308,8 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
     dplyr::mutate(
       level = factor(
         findInterval(!!sym(variable), breaks, rightmost.closed = FALSE),
-        levels = seq_len(length(breaks)),
-        labels = as.character(seq_len(length(breaks)))
+        levels = seq_along(breaks),
+        labels = as.character(seq_along(breaks))
       )
     ) %>%
     dplyr::group_by(level) %>%
@@ -453,8 +453,8 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
     dplyr::mutate(
       level = factor(
         findInterval(!!sym(variable), breaks, rightmost.closed = FALSE),
-        levels = seq_len(length(breaks)),
-        labels = as.character(seq_len(length(breaks)))
+        levels = seq_along(breaks),
+        labels = as.character(seq_along(breaks))
       )
     ) %>%
     dplyr::group_by(level) %>%
@@ -640,7 +640,7 @@ cb_filter.datetime_range.tblist <- function(
         min <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
         max <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
 
-        extra_params$step <- calculate_datetime_step(min, max) |> unname()
+        extra_params$step <- calculate_datetime_step(min, max) %>% unname()
       }
 
       stats <- list(
@@ -666,7 +666,7 @@ cb_filter.datetime_range.tblist <- function(
         breaks <- calculate_datetime_step(
           min(data_object[[dataset]][[variable]], na.rm = TRUE),
           max(data_object[[dataset]][[variable]], na.rm = TRUE)
-        ) |> names()
+        ) %>% names()
 
         data_object[[dataset]][[variable]] %>%
           graphics::hist(breaks = breaks)

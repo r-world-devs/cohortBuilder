@@ -643,7 +643,7 @@ test_that("Getting filter stats works fine", {
   )
 
   expect_error(
-    stat(coh,10),
+    stat(coh, 10L),
     regexp = "Step is not exist in this cohort object."
   )
 
@@ -1121,4 +1121,86 @@ test_that("restore correctly restore filters filter type date_range and datetime
   restore(coh, pre_state)
 
   expect_identical(get_state(coh), pre_state)
+})
+
+test_that("update_filter changed active status works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, discrete_iris_two)
+  )
+  first_filter_id <- "species_filter"
+  second_filter_id <- "species_filter_two"
+
+  #default TRUE
+  expect_true(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
+
+  coh$update_filter(1L, "species_filter", active = FALSE)
+
+  expect_false(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
+
+  coh$update_filter(1L, "species_filter", active = TRUE)
+
+  expect_true(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
+})
+
+test_that("update_filter trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_null(get_data(coh))
+
+  #do not trigger data calculations without any changes
+  coh$update_filter(1L, "species_filter", run_flow = TRUE)
+
+  expect_null(get_data(coh))
+
+  #trigger data calculations
+  coh$update_filter(1L, "species_filter", active = FALSE, run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("Create cohort object with triggered data calculations", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one),
+    run_flow = TRUE
+  )
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("code returns expression to create filtered tblist", {
+
+  skip_on_covr()
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two),
+    run_flow = TRUE
+  )
+
+  code_as_text <- code(coh, include_methods = NULL, include_action = NULL, mark_step = FALSE)
+
+  for (line in code_as_text$text.tidy) {
+    rlang::eval_bare(rlang::parse_expr(line))
+  }
+
+  expect_identical(data_object$iris, get_data(coh)$iris)
+  expect_true(attr(data_object$iris, "filtered"))
+  expect_output(code(coh))
 })

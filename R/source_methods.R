@@ -75,7 +75,7 @@ Source <- R6::R6Class(
 
       private$steps[[step_id]] <- NULL
       if (length(private$steps) >= 1L) {
-        names(private$steps) <- as.character(seq_len(length(private$steps)))
+        names(private$steps) <- as.character(seq_along(private$steps))
       } else {
         private$steps <- NULL
       }

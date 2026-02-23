@@ -131,6 +131,7 @@ get_source_expr <- function(source_type, public, private) {
   } else {
     substitute(source <- list(dtconn = x), list(x = attr(private$source$dtconn, "call")))
   }
+
   init_step_expr <- parse_func_expr(
     .get_method(paste0(".init_step", ".", source_type))
   )

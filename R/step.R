@@ -71,7 +71,7 @@ attach_step_id <- function(step, id) {
 }
 
 attach_step_ids <- function(steps) {
-  step_ids <- as.character(seq_len(length(steps)))
+  step_ids <- as.character(seq_along(steps))
   steps %>%
     purrr::imodify(~ attach_step_id(.x, as.character(.y))) %>%
     stats::setNames(step_ids)
