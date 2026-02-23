@@ -464,11 +464,11 @@ test_that("plot_data in date range filter works fine", {
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  filter$plot_data(test_data, "year")
+  filter$plot_data(test_data, breaks = "year")
   expect_silent(recordPlot())
   dev.off()
 
-  filter$plot_data(test_data_null, "year")
+  filter$plot_data(test_data_null, breaks = "year")
   expect_silent(recordPlot())
   dev.off()
 })

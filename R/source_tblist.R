@@ -157,7 +157,7 @@ cb_filter.discrete.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
         data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
       } else {
@@ -229,7 +229,7 @@ cb_filter.discrete_text.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {},
+    plot_data = function(data_object, ...) {},
     get_params = function(name) {
       params <- list(
         dataset = dataset,
@@ -365,7 +365,7 @@ cb_filter.range.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
         data_object[[dataset]][[variable]] %>% graphics::hist()
       } else {
@@ -507,9 +507,9 @@ cb_filter.date_range.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object, breaks) {
+    plot_data = function(data_object, ..., breaks) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% graphics::hist(breaks)
+        data_object[[dataset]][[variable]] %>% graphics::hist(..., breaks = breaks)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
       }
@@ -567,7 +567,7 @@ calculate_datetime_step <- function(min_date, max_date) {
   if (!is.na(idx)) {
     return(steps[idx])
   }
-  
+
   return(steps[length(steps)])
 }
 
@@ -576,9 +576,9 @@ calculate_datetime_step <- function(min_date, max_date) {
 cb_filter.datetime_range.tblist <- function(
     source, type = "datetime_range", id = .gen_id(), name = id, variable, range = NA,
     dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
-  
+
   args <- list(...)
-  
+
   def_filter(
     type = type,
     id = id,
@@ -608,7 +608,7 @@ cb_filter.datetime_range.tblist <- function(
           )
         # !keep_na !value_na end
       }
-      
+
       attr(data_object[[dataset]], "filtered") <- TRUE
       return(data_object)
     },
@@ -617,16 +617,16 @@ cb_filter.datetime_range.tblist <- function(
         name <- c("n_data", "frequencies", "n_missing")
       }
       extra_params <- list(...)
-      
+
       data_object[[dataset]][[variable]] <- as.numeric(data_object[[dataset]][[variable]])
 
       if (is.null(extra_params$step) && !identical(length(data_object[[dataset]][[variable]]), 0L)) {
         min <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
         max <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
-        
+
         extra_params$step <- calculate_datetime_step(min, max) |> unname()
       }
-      
+
       stats <- list(
         frequencies = if ("frequencies" %in% name) {
           get_range_frequencies(data_object, dataset, variable, extra_params)
@@ -638,21 +638,21 @@ cb_filter.datetime_range.tblist <- function(
           data_object[[dataset]][[variable]] %>% is.na() %>% sum()
         }
       )
-      
+
       if (length(name) == 1) {
         return(stats[[name]])
       } else {
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
         breaks <- calculate_datetime_step(
           min(data_object[[dataset]][[variable]], na.rm = TRUE),
           max(data_object[[dataset]][[variable]], na.rm = TRUE)
         ) |> names()
-        
-        data_object[[dataset]][[variable]] %>% 
+
+        data_object[[dataset]][[variable]] %>%
           graphics::hist(breaks = breaks)
       } else {
         graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
@@ -747,7 +747,7 @@ cb_filter.multi_discrete.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
         data_object[[dataset]][names(variables)] %>%
           purrr::map(table) %>%
@@ -830,7 +830,7 @@ cb_filter.query.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
         data_object[[dataset]][variables] %>%
           purrr::map(table) %>%
@@ -887,13 +887,13 @@ cb_filter.query.tblist <- function(
       key_values <- dplyr::inner_join(key_values, tmp_key_values, by = common_key_names)
     }
   }
-  
+
   df <- switch(
     as.character(binding_key$post),
     "FALSE" = data_object_pre[[binding_dataset]],
     "TRUE" = data_object_post[[binding_dataset]]
   )
-  
+
   data_object_post[[binding_dataset]] <- tryCatch({
     collapse::join(
       df,
@@ -909,7 +909,7 @@ cb_filter.query.tblist <- function(
       by = stats::setNames(common_key_names, binding_key$update$key)
     )
   })
-  
+
   if (binding_key$activate) {
     attr(data_object_post[[binding_dataset]], "filtered") <- TRUE
   }
