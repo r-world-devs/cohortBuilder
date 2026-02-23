@@ -1,9 +1,9 @@
 adjust_names <- function(list_obj) {
-  if (length(list_obj) == 0) {
+  if (length(list_obj) == 0L) {
     # removed the last existing object
     return(list())
   }
-  names(list_obj) <- as.character(1:length(list_obj))
+  names(list_obj) <- as.character(seq_along(list_obj))
   return(list_obj)
 }
 
@@ -13,14 +13,14 @@ list_names <- function(list_obj) {
 
 last_item <- function(list_obj) {
   list_length <- length(list_obj)
-  if (list_length == 0) {
+  if (list_length == 0L) {
     return(NULL)
   }
   list_obj[[list_length]]
 }
 
 step_filter_state <- function(steps, method = length, raw = FALSE) {
-  if (length(steps) == 0) {
+  if (length(steps) == 0L) {
     if (raw) return(steps)
     return(method(steps))
   }
@@ -52,12 +52,12 @@ modify_item <- function(list_obj, new_val, what) {
 #' @export
 .get_method <- function(name) {
   found_methods <- utils::getAnywhere(name)
-  if (length(found_methods$objs) == 0) {
+  if (length(found_methods$objs) == 0L) {
     return(NULL)
   }
   namespace <- gsub(
     "namespace:", "", fixed = TRUE,
-    grep("namespace:", found_methods$where, value = TRUE, fixed = TRUE)[1]
+    grep("namespace:", found_methods$where, value = TRUE, fixed = TRUE)[1L]
   )
   utils::getFromNamespace(name, namespace)
 }

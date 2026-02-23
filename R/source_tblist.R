@@ -20,25 +20,31 @@ tblist <- function(..., names, extra_class = NULL) {
   tables <- rlang::dots_list(..., .named = TRUE)
   out_class <- c(extra_class, "tblist")
 
-  tb_call <- sys.call(1)
-  if (inherits(tables, "data.frame")) {
-    if (!missing(names)) {
-      names(tables) <- names
-    }
-    return(
-      structure(tables, class = out_class)
-    )
-  }
-  if (inherits(tables, "list")) {
+  tb_call <- sys.call(1L)
+  if (purrr::every(tables, is.data.frame)) {
     if (!missing(names)) {
       if (length(tables) != length(names)) {
         stop(glue::glue(
           "{sQuote('tables')} should be of same length as {sQuote('names')}"
         ))
       }
+      names(tables) <- names
+    }
+    return(
+      structure(tables, class = out_class)
+    )
+  }
+
+  if (inherits(tables[[1L]], "list") && length(tables) == 1L) {
+    if (!missing(names)) {
+      if (length(tables[[1L]]) != length(names)) {
+        stop(glue::glue(
+          "{sQuote('tables')} should be of same length as {sQuote('names')}"
+        ))
+      }
       return(
         structure(
-          stats::setNames(tables, names),
+          stats::setNames(tables[[1L]], names),
           class = out_class
         )
       )
@@ -111,8 +117,8 @@ set_source.tblist <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
 #' @param keep_na If `TRUE`, NA values are included.
 #' @export
 cb_filter.discrete.tblist <- function(
-  source, type = "discrete", id = .gen_id(), name = id, variable, value = NA,
-  dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
+    source, type = "discrete", id = .gen_id(), name = id, variable, value = NA,
+    dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
   args <- list(...)
 
   def_filter(
@@ -148,12 +154,13 @@ cb_filter.discrete.tblist <- function(
       }
       stats <- list(
         choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>%
-          stats::na.omit() %>% table() %>% as.list(),
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>%
-          stats::na.omit() %>% length(),
+          stats::na.omit() %>%
+          table() %>%
+          as.list(),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
-      if (length(name) == 1) {
+      if (length(name) == 1L) {
         return(stats[[name]])
       } else {
         return(stats[name])
@@ -163,7 +170,7 @@ cb_filter.discrete.tblist <- function(
       if (nrow(data_object[[dataset]])) {
         data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
       } else {
-        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
@@ -191,8 +198,8 @@ cb_filter.discrete.tblist <- function(
 #' @rdname filter-source-types
 #' @export
 cb_filter.discrete_text.tblist <- function(
-  source, type = "discrete_text", id = .gen_id(), name = id, variable, value = NA,
-  dataset, ..., description = NULL, active = TRUE) {
+    source, type = "discrete_text", id = .gen_id(), name = id, variable, value = NA,
+    dataset, ..., description = NULL, active = TRUE) {
   args <- list(...)
 
   def_filter(
@@ -209,7 +216,7 @@ cb_filter.discrete_text.tblist <- function(
             !!sym(variable) %in% !!strsplit(
               sub(" ", "", value, fixed = TRUE),
               split = ",", fixed = TRUE
-            )[[1]]
+            )[[1L]]
           )
         # keep_na !value_na end, # !keep_na !value_na end
       }
@@ -221,11 +228,16 @@ cb_filter.discrete_text.tblist <- function(
         name <- c("n_data", "choices", "n_missing")
       }
       stats <- list(
-        choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% collapse::funique() %>% paste(collapse = ","),
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% collapse::funique() %>% length(),
+        choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>%
+          collapse::funique() %>%
+          paste(collapse = ","),
+        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>%
+          stats::na.omit() %>%
+          collapse::funique() %>%
+          length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
-      if (length(name) == 1) {
+      if (length(name) == 1L) {
         return(stats[[name]])
       } else {
         return(stats[name])
@@ -254,14 +266,15 @@ cb_filter.discrete_text.tblist <- function(
 }
 
 get_range_frequencies <- function(data_object, dataset, variable, extra_params) {
-  step <- 1
-  if (length(stats::na.omit(data_object[[dataset]][[variable]])) == 0) {
+  step <- 1L
+  if (length(stats::na.omit(data_object[[dataset]][[variable]])) == 0L) {
     return(
       data.frame(
-        level = character(0),
-        count = numeric(0),
-        l_bound = numeric(0),
-        u_bound = numeric(0)
+        level = character(0L),
+        count = numeric(0L),
+        l_bound = numeric(0L),
+        u_bound = numeric(0L),
+        stringsAsFactors = FALSE
       )
     )
   }
@@ -273,7 +286,8 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
         level = "1",
         count = length(data_object[[dataset]][[variable]]),
         l_bound = min_val,
-        u_bound = max_val
+        u_bound = max_val,
+        stringsAsFactors = FALSE
       )
     )
   }
@@ -282,13 +296,13 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
     step <- extra_params$step
   }
   breaks <- seq(min_val, max_val, by = step)
-  if (rev(breaks)[1] != max_val) {
-    breaks[length(breaks) + 1]  <- max_val
+  if (rev(breaks)[1L] != max_val) {
+    breaks[length(breaks) + 1L]  <- max_val
   }
-  breaks <- round(breaks, 2)
+  breaks <- round(breaks, 2L)
   bounds <- breaks
 
-  breaks[1] <- breaks[1] - 0.01
+  breaks[1L] <- breaks[1L] - 0.01
   breaks[length(breaks)] <- breaks[length(breaks)] + 0.01
 
   data_object[[dataset]][, variable, drop = FALSE] %>%
@@ -296,19 +310,19 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
     dplyr::mutate(
       level = factor(
         findInterval(!!sym(variable), breaks, rightmost.closed = FALSE),
-        levels = 1:(length(breaks)),
-        labels = as.character(1:(length(breaks)))
+        levels = seq_along(breaks),
+        labels = as.character(seq_along(breaks))
       )
     ) %>%
     dplyr::group_by(level) %>%
     dplyr::summarise(
       count = dplyr::n()
     ) %>%
-    tidyr::complete(level, fill = list(count = 0)) %>%
+    tidyr::complete(level, fill = list(count = 0L)) %>%
     dplyr::arrange(level) %>%
     dplyr::mutate(
       l_bound = bounds,
-      u_bound = c(bounds[-1], bounds[length(bounds)])
+      u_bound = c(bounds[-1L], bounds[length(bounds)])
     )
 }
 
@@ -316,8 +330,8 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
 #' @param range Variable range to be applied in filtering.
 #' @export
 cb_filter.range.tblist <- function(
-  source, type = "range", id = .gen_id(), name = id, variable, range = NA, dataset,
-  keep_na = TRUE, ..., description = NULL, active = TRUE) {
+    source, type = "range", id = .gen_id(), name = id, variable, range = NA, dataset,
+    keep_na = TRUE, ..., description = NULL, active = TRUE) {
   args <- list(...)
 
   def_filter(
@@ -330,7 +344,7 @@ cb_filter.range.tblist <- function(
       if (keep_na && !identical(range, NA)) {
         # keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter((!!sym(variable) <= !!range[2] & !!sym(variable) >= !!range[1]) | is.na(!!sym(variable)))
+          dplyr::filter((!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L]) | is.na(!!sym(variable)))
         # keep_na !value_na end
       }
       if (!keep_na && identical(range, NA)) {
@@ -342,7 +356,7 @@ cb_filter.range.tblist <- function(
       if (!keep_na && !identical(range, NA)) {
         # !keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(!!sym(variable) <= !!range[2] & !!sym(variable) >= !!range[1])
+          dplyr::filter(!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L])
         # !keep_na !value_na end
       }
       attr(data_object[[dataset]], "filtered") <- TRUE # code include
@@ -361,7 +375,7 @@ cb_filter.range.tblist <- function(
         n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
-      if (length(name) == 1) {
+      if (length(name) == 1L) {
         return(stats[[name]])
       } else {
         return(stats[name])
@@ -371,7 +385,7 @@ cb_filter.range.tblist <- function(
       if (nrow(data_object[[dataset]])) {
         data_object[[dataset]][[variable]] %>% graphics::hist()
       } else {
-        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
@@ -393,8 +407,8 @@ cb_filter.range.tblist <- function(
     get_defaults = function(data_object, cache_object) {
       list(
         range = c(
-          cache_object$frequencies$l_bound[1],
-          rev(cache_object$frequencies$u_bound)[1]
+          cache_object$frequencies$l_bound[1L],
+          rev(cache_object$frequencies$u_bound)[1L]
         )
       )
     }
@@ -403,13 +417,14 @@ cb_filter.range.tblist <- function(
 
 get_date_range_frequencies <- function(data_object, dataset, variable, extra_params) {
   step <- "day"
-  if (length(stats::na.omit(data_object[[dataset]][[variable]])) == 0) {
+  if (length(stats::na.omit(data_object[[dataset]][[variable]])) == 0L) {
     return(
       data.frame(
-        level = character(0),
-        count = numeric(0),
-        l_bound = numeric(0),
-        u_bound = numeric(0)
+        level = character(0L),
+        count = numeric(0L),
+        l_bound = numeric(0L),
+        u_bound = numeric(0L),
+        stringsAsFactors = FALSE
       )
     )
   }
@@ -421,7 +436,8 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
         level = "1",
         count = length(data_object[[dataset]][[variable]]),
         l_bound = min_val,
-        u_bound = max_val
+        u_bound = max_val,
+        stringsAsFactors = FALSE
       )
     )
   }
@@ -430,8 +446,8 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
     step <- extra_params$step
   }
   breaks <- seq.Date(min_val, max_val, by = step)
-  if (rev(breaks)[1] != max_val) {
-    breaks[length(breaks) + 1]  <- max_val
+  if (rev(breaks)[1L] != max_val) {
+    breaks[length(breaks) + 1L]  <- max_val
   }
 
   data_object[[dataset]][, variable, drop = FALSE] %>%
@@ -439,27 +455,27 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
     dplyr::mutate(
       level = factor(
         findInterval(!!sym(variable), breaks, rightmost.closed = FALSE),
-        levels = 1:(length(breaks)),
-        labels = as.character(1:(length(breaks)))
+        levels = seq_along(breaks),
+        labels = as.character(seq_along(breaks))
       )
     ) %>%
     dplyr::group_by(level) %>%
     dplyr::summarise(
       count = dplyr::n()
     ) %>%
-    tidyr::complete(level, fill = list(count = 0)) %>%
+    tidyr::complete(level, fill = list(count = 0L)) %>%
     dplyr::arrange(level) %>%
     dplyr::mutate(
       l_bound = breaks,
-      u_bound = c(breaks[-1], breaks[length(breaks)])
+      u_bound = c(breaks[-1L], breaks[length(breaks)])
     )
 }
 
 #' @rdname filter-source-types
 #' @export
 cb_filter.date_range.tblist <- function(
-  source, type = "date_range", id = .gen_id(), name = id, variable, range = NA,
-  dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
+    source, type = "date_range", id = .gen_id(), name = id, variable, range = NA,
+    dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
   args <- list(...)
 
   def_filter(
@@ -472,7 +488,7 @@ cb_filter.date_range.tblist <- function(
       if (keep_na && !identical(range, NA)) {
         # keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter((!!sym(variable) <= !!range[2] & !!sym(variable) >= !!range[1]) | is.na(!!sym(variable)))
+          dplyr::filter((!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L]) | is.na(!!sym(variable)))
         # keep_na !value_na end
       }
       if (!keep_na && identical(range, NA)) {
@@ -484,7 +500,7 @@ cb_filter.date_range.tblist <- function(
       if (!keep_na && !identical(range, NA)) {
         # !keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(!!sym(variable) <= !!range[2] & !!sym(variable) >= !!range[1])
+          dplyr::filter(!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L])
         # !keep_na !value_na end
       }
       attr(data_object[[dataset]], "filtered") <- TRUE # code include
@@ -503,7 +519,7 @@ cb_filter.date_range.tblist <- function(
         n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% stats::na.omit() %>% length(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
       )
-      if (length(name) == 1) {
+      if (length(name) == 1L) {
         return(stats[[name]])
       } else {
         return(stats[name])
@@ -513,7 +529,7 @@ cb_filter.date_range.tblist <- function(
       if (nrow(data_object[[dataset]])) {
         data_object[[dataset]][[variable]] %>% graphics::hist()
       } else {
-        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
@@ -535,8 +551,8 @@ cb_filter.date_range.tblist <- function(
     get_defaults = function(data_object, cache_object) {
       list(
         range = c(
-          cache_object$frequencies$l_bound[1],
-          rev(cache_object$frequencies$u_bound)[1]
+          cache_object$frequencies$l_bound[1L],
+          rev(cache_object$frequencies$u_bound)[1L]
         )
       )
     }
@@ -556,20 +572,20 @@ group_stats <- function(vec_stats, name) {
 calculate_datetime_step <- function(min_date, max_date) {
   # Define possible steps
   steps <- c(
-    "mins" = 60,
-    "hours" = 3600,
-    "days" = 86400,
-    "weeks" = 604800,
-    "months" = 2592000,
-    "years" = 31104000
+    "mins" = 60L,
+    "hours" = 3600L,
+    "days" = 86400L,
+    "weeks" = 604800L,
+    "months" = 2592000L,
+    "years" = 31104000L
   )
   time_span <- as.numeric(max_date) - as.numeric(min_date)
   num_elements <- as.integer(time_span / steps)
-  idx <- which(num_elements <= 200)[1]
+  idx <- which(num_elements <= 200L)[1L]
   if (!is.na(idx)) {
     return(steps[idx])
   }
-  
+
   return(steps[length(steps)])
 }
 
@@ -578,9 +594,9 @@ calculate_datetime_step <- function(min_date, max_date) {
 cb_filter.datetime_range.tblist <- function(
     source, type = "datetime_range", id = .gen_id(), name = id, variable, range = NA,
     dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
-  
+
   args <- list(...)
-  
+
   def_filter(
     type = type,
     id = id,
@@ -591,7 +607,7 @@ cb_filter.datetime_range.tblist <- function(
         # keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
           dplyr::filter(
-            (!!sym(variable) >= !!range[1] & !!sym(variable) <= !!range[2]) |
+            (!!sym(variable) >= !!range[1L] & !!sym(variable) <= !!range[2L]) |
               is.na(!!sym(variable))
           )
         # keep_na !value_na end
@@ -606,11 +622,11 @@ cb_filter.datetime_range.tblist <- function(
         # !keep_na !value_na start
         data_object[[dataset]] <- data_object[[dataset]] %>%
           dplyr::filter(
-            !!sym(variable) >= !!range[1] & !!sym(variable) <= !!range[2]
+            !!sym(variable) >= !!range[1L] & !!sym(variable) <= !!range[2L]
           )
         # !keep_na !value_na end
       }
-      
+
       attr(data_object[[dataset]], "filtered") <- TRUE
       return(data_object)
     },
@@ -619,16 +635,16 @@ cb_filter.datetime_range.tblist <- function(
         name <- c("n_data", "frequencies", "n_missing")
       }
       extra_params <- list(...)
-      
+
       data_object[[dataset]][[variable]] <- as.numeric(data_object[[dataset]][[variable]])
 
       if (is.null(extra_params$step) && !identical(length(data_object[[dataset]][[variable]]), 0L)) {
         min <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
         max <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
-        
-        extra_params$step <- calculate_datetime_step(min, max) |> unname()
+
+        extra_params$step <- calculate_datetime_step(min, max) %>% unname()
       }
-      
+
       stats <- list(
         frequencies = if ("frequencies" %in% name) {
           get_range_frequencies(data_object, dataset, variable, extra_params)
@@ -640,8 +656,8 @@ cb_filter.datetime_range.tblist <- function(
           data_object[[dataset]][[variable]] %>% is.na() %>% sum()
         }
       )
-      
-      if (length(name) == 1) {
+
+      if (length(name) == 1L) {
         return(stats[[name]])
       } else {
         return(stats[name])
@@ -652,12 +668,12 @@ cb_filter.datetime_range.tblist <- function(
         breaks <- calculate_datetime_step(
           min(data_object[[dataset]][[variable]], na.rm = TRUE),
           max(data_object[[dataset]][[variable]], na.rm = TRUE)
-        ) |> names()
-        
-        data_object[[dataset]][[variable]] %>% 
+        ) %>% names()
+
+        data_object[[dataset]][[variable]] %>%
           graphics::hist(breaks = breaks)
       } else {
-        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
@@ -679,8 +695,8 @@ cb_filter.datetime_range.tblist <- function(
     get_defaults = function(data_object, cache_object) {
       list(
         range = c(
-          cache_object$frequencies$l_bound[1],
-          rev(cache_object$frequencies$u_bound)[1]
+          cache_object$frequencies$l_bound[1L],
+          rev(cache_object$frequencies$u_bound)[1L]
         )
       )
     }
@@ -693,8 +709,8 @@ cb_filter.datetime_range.tblist <- function(
 #'   The names should relate to the ones included in `variables` parameter.
 #' @export
 cb_filter.multi_discrete.tblist <- function(
-  source, type = "multi_discrete", id = .gen_id(), name = id, values,
-  variables, dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
+    source, type = "multi_discrete", id = .gen_id(), name = id, values,
+    variables, dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
   args <- list(...)
 
   def_filter(
@@ -708,7 +724,7 @@ cb_filter.multi_discrete.tblist <- function(
       col_in_val <- function(vec, value, keep_na) {
         if (identical(value, NA)) {
           val_mask <- rep(TRUE, length(vec))
-        } else if (is.null(value)){
+        } else if (is.null(value)) {
           val_mask <- rep(FALSE, length(vec))
         } else {
           val_mask <- vec %in% value
@@ -743,7 +759,7 @@ cb_filter.multi_discrete.tblist <- function(
         n_data = if ("n_data" %in% name)  data_object[[dataset]][variables] %>% nrow(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][variables] %>% is.na() %>% colSums() %>% as.list()
       )
-      if (length(name) == 1) {
+      if (length(name) == 1L) {
         return(stats[[name]])
       } else {
         return(stats[name])
@@ -757,7 +773,7 @@ cb_filter.multi_discrete.tblist <- function(
           as.matrix() %>%
           graphics::barplot()
       } else {
-        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
@@ -790,8 +806,8 @@ cb_filter.multi_discrete.tblist <- function(
 #' @param keep_na If `TRUE`, NA values are included.
 #' @export
 cb_filter.query.tblist <- function(
-  source, type = "query", id = .gen_id(), name = id, variables, value = NA,
-  dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
+    source, type = "query", id = .gen_id(), name = id, variables, value = NA,
+    dataset, keep_na = TRUE, ..., description = NULL, active = TRUE) {
   args <- list(...)
 
   def_filter(
@@ -826,7 +842,7 @@ cb_filter.query.tblist <- function(
         n_data = if ("n_data" %in% name)  data_object[[dataset]][variables] %>% nrow(),
         n_missing = if ("n_missing" %in% name) data_object[[dataset]][variables] %>% is.na() %>% colSums() %>% as.list()
       )
-      if (length(name) == 1) {
+      if (length(name) == 1L) {
         return(stats[[name]])
       } else {
         return(stats[name])
@@ -840,7 +856,7 @@ cb_filter.query.tblist <- function(
           as.matrix() %>%
           graphics::barplot()
       } else {
-        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {
@@ -878,7 +894,7 @@ cb_filter.query.tblist <- function(
   }
 
   key_values <- NULL
-  common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))
+  common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1L]]$key))
   for (dependent_dataset in dependent_datasets) {
     key_names <- binding_key$data_keys[[dependent_dataset]]$key
     tmp_key_values <- collapse::funique(data_object_post[[dependent_dataset]][, key_names, drop = FALSE]) %>%
@@ -890,15 +906,28 @@ cb_filter.query.tblist <- function(
     }
   }
 
-  data_object_post[[binding_dataset]] <- dplyr::inner_join(
-    switch(
-      as.character(binding_key$post),
-      "FALSE" = data_object_pre[[binding_dataset]],
-      "TRUE" = data_object_post[[binding_dataset]]
-    ),
-    key_values,
-    by = stats::setNames(common_key_names, binding_key$update$key)
+  df <- switch(
+    as.character(binding_key$post),
+    "FALSE" = data_object_pre[[binding_dataset]],
+    "TRUE" = data_object_post[[binding_dataset]]
   )
+
+  data_object_post[[binding_dataset]] <- tryCatch({
+    collapse::join(
+      df,
+      key_values,
+      on = stats::setNames(common_key_names, binding_key$update$key),
+      how = "inner",
+      verbose = getOption("cb_verbose", default = FALSE)
+    )
+  }, error = function(e) {
+    dplyr::inner_join(
+      df,
+      key_values,
+      by = stats::setNames(common_key_names, binding_key$update$key)
+    )
+  })
+
   if (binding_key$activate) {
     attr(data_object_post[[binding_dataset]], "filtered") <- TRUE
   }
@@ -919,7 +948,7 @@ cb_filter.query.tblist <- function(
     if (is.null(pkey)) {
       return(dataset)
     } else {
-      dataset_pkey <- .get_item(pkey, "dataset", dataset)[1][[1]]$key
+      dataset_pkey <- .get_item(pkey, "dataset", dataset)[1L][[1L]]$key
       if (is.null(dataset_pkey)) return(dataset)
       return(glue::glue("{dataset}\n primary key: {paste(dataset_pkey, collapse = ', ')}"))
     }
@@ -939,7 +968,7 @@ cb_filter.query.tblist <- function(
       purrr::map(~names(.[["data_keys"]])) %>%
       unlist() %>%
       collapse::funique()
-    if (length(dependent_datasets) > 0) {
+    if (length(dependent_datasets) > 0L) {
       bind_keys_section <- glue::glue(
         "\nData linked with external datasets: {paste(dependent_datasets, collapse = ', ')}",
         .trim = FALSE

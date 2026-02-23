@@ -492,6 +492,11 @@ test_that("Updating filter works fine", {
     label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
   )
 
+  expect_warning(
+    coh$update_filter(1L, "sepal_l", active = "FALSE"),
+    regexp = "Active accepts only logical values."
+  )
+
   # Using S3 Cohort methods
   coh <- cohort(
     set_source(
@@ -514,6 +519,11 @@ test_that("Updating filter works fine", {
   expect_warning(
     coh$update_filter(1L, "sepal_l", type = "discrete"),
     label = "Cannot modify filter ‘type’, ‘id’, ‘name’ parameters."
+  )
+
+  expect_warning(
+    coh$update_filter(1L, "sepal_l", active = "FALSE"),
+    regexp = "Active accepts only logical values."
   )
 })
 
@@ -632,6 +642,11 @@ test_that("Getting filter stats works fine", {
     as.list(table(iris$Species[iris$Species %in% c("setosa", "virginica")]))
   )
 
+  expect_error(
+    stat(coh, 10L),
+    regexp = "Step is not exist in this cohort object."
+  )
+
   # Using S3 Cohort methods
   coh <- cohort(
     set_source(
@@ -672,11 +687,13 @@ test_that("Caching works fine", {
 test_that("Bind keys work fine", {
   patients <- data.frame(
     id = letters[1L:3L], name = c("a", "b", "b"),
-    surname = c("A", "A", "B"), surname2 = c("A", "A", "B"), age = 1L:3L
+    surname = c("A", "A", "B"), surname2 = c("A", "A", "B"),
+    age = 1L:3L, stringsAsFactors = FALSE
   )
   treatment <- data.frame(
     id = letters[1L:3L], name = c("a", "b", "b"),
-    surname = c("A", "A", "B"), treatment = LETTERS[1L:3L]
+    surname = c("A", "A", "B"), treatment = LETTERS[1L:3L],
+    stringsAsFactors = FALSE
   )
 
 
@@ -1076,20 +1093,21 @@ test_that("restore correctly restore filters filter type date_range and datetime
     ),
     step(
       filter(
-             "date_range", id = "issues_date", dataset = "issues",
-             variable = "date", range = c(as.Date("2010-10-01"), as.Date("2015-10-01"))
+        "date_range", id = "issues_date", dataset = "issues",
+        variable = "date", range = c(as.Date("2010-10-01"), as.Date("2015-10-01"))
       ),
       filter(
-             "date_range", id = "issues_date2", dataset = "issues",
-             variable = "date", range = as.Date(NULL)
+        "date_range", id = "issues_date2", dataset = "issues",
+        variable = "date", range = as.Date(NULL)
       ),
       filter(
-             "datetime_range", id = "issues_datetime", dataset = "issues",
-             variable = "date", range = c(as.POSIXct("2010-10-01"), as.POSIXct("2015-10-01"))
+        "datetime_range", id = "issues_datetime", dataset = "issues",
+        variable = "date", range = c(as.POSIXct("2010-10-01"), as.POSIXct("2015-10-01"))
       ),
       filter(
-             "datetime_range", id = "issues_datetime2", dataset = "issues",
-             variable = "date", range = as.POSIXct(NULL))
+        "datetime_range", id = "issues_datetime2", dataset = "issues",
+        variable = "date", range = as.POSIXct(NULL)
+      )
     )
   )
 
@@ -1109,16 +1127,16 @@ test_that("Verify that new custom class method works correctly", {
   .collect_data.custom_tblist <- function(source, data_object) {
     "custom_tblist_data_collect"
   }
-  
+
   registerS3method(".collect_data", "custom_tblist", .collect_data.custom_tblist)
-  
+
   coh <- cohort(
     set_source(
       tblist(iris = iris, extra_class = "custom_tblist")
     ),
     step(discrete_iris_one)
   )
-  
+
   run(coh)
   expect_identical(get_data(coh, 1, collect = TRUE), "custom_tblist_data_collect")
 })
@@ -1128,18 +1146,76 @@ test_that("Verify that new verbose class method works correctly", {
     message(nrow(data_object[[1]]))
     NextMethod()
   }
-  
+
   registerS3method(".collect_data", "verbose", .collect_data.verbose)
-  
+
   coh <- cohort(
     set_source(
       tblist(iris = iris, extra_class = "verbose")
     ),
     step(discrete_iris_one)
   )
-  
+
   run(coh)
   expect_message(get_data(coh, 1, collect = TRUE), regexp =  nrow(get_data(coh, 1, collect = TRUE[[1]])))
+})
+
+test_that("update_filter changed active status works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, discrete_iris_two)
+  )
+  first_filter_id <- "species_filter"
+  second_filter_id <- "species_filter_two"
+
+  #default TRUE
+  expect_true(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
+
+  coh$update_filter(1L, "species_filter", active = FALSE)
+
+  expect_false(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
+
+  coh$update_filter(1L, "species_filter", active = TRUE)
+
+  expect_true(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
+})
+
+test_that("update_filter trigger data calculations works fine", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  expect_null(get_data(coh))
+
+  #do not trigger data calculations without any changes
+  coh$update_filter(1L, "species_filter", run_flow = TRUE)
+
+  expect_null(get_data(coh))
+
+  #trigger data calculations
+  coh$update_filter(1L, "species_filter", active = FALSE, run_flow = TRUE)
+
+  expect_false(is.null(get_data(coh)))
+})
+
+test_that("Create cohort object with triggered data calculations", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one),
+    run_flow = TRUE
+  )
+
+  expect_false(is.null(get_data(coh)))
 })
 
 # if (!covr::in_covr()) { # covr modifies function body so the test doesn't pass
@@ -1164,3 +1240,27 @@ test_that("Verify that new verbose class method works correctly", {
 #     )
 #   })
 # }
+
+test_that("code returns expression to create filtered tblist", {
+
+  skip_on_covr()
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    step(discrete_iris_two),
+    run_flow = TRUE
+  )
+
+  code_as_text <- code(coh, include_methods = NULL, include_action = NULL, mark_step = FALSE)
+
+  for (line in code_as_text$text.tidy) {
+    rlang::eval_bare(rlang::parse_expr(line))
+  }
+
+  expect_identical(data_object$iris, get_data(coh)$iris)
+  expect_true(attr(data_object$iris, "filtered"))
+  expect_output(code(coh))
+})
