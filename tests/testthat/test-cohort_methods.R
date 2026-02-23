@@ -1123,6 +1123,43 @@ test_that("restore correctly restore filters filter type date_range and datetime
   expect_identical(get_state(coh), pre_state)
 })
 
+test_that("Verify that new custom class method works correctly", {
+  .collect_data.custom_tblist <- function(source, data_object) {
+    "custom_tblist_data_collect"
+  }
+
+  registerS3method(".collect_data", "custom_tblist", .collect_data.custom_tblist)
+
+  coh <- cohort(
+    set_source(
+      tblist(iris = iris, .class = "custom_tblist")
+    ),
+    step(discrete_iris_one)
+  )
+
+  run(coh)
+  expect_identical(get_data(coh, 1L, collect = TRUE), "custom_tblist_data_collect")
+})
+
+test_that("Verify that new verbose class method works correctly", {
+  .collect_data.verbose <- function(source, data_object) {
+    message(nrow(data_object[[1L]]))
+    NextMethod()
+  }
+
+  registerS3method(".collect_data", "verbose", .collect_data.verbose)
+
+  coh <- cohort(
+    set_source(
+      tblist(iris = iris, .class = "verbose")
+    ),
+    step(discrete_iris_one)
+  )
+
+  run(coh)
+  expect_message(get_data(coh, 1L, collect = TRUE), regexp =  nrow(get_data(coh, 1L, collect = TRUE[[1L]])))
+})
+
 test_that("update_filter changed active status works fine", {
   coh <- Cohort$new(
     set_source(
@@ -1181,6 +1218,38 @@ test_that("Create cohort object with triggered data calculations", {
   expect_false(is.null(get_data(coh)))
 })
 
+
+test_that("Retrieving reproducible code works fine", {
+  # Using direct Cohort methods
+
+  # covr modifies function body so the test doesn't pass
+  skip_on_covr()
+
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    discrete_iris_one
+  )
+  repro_code <- coh$get_code(
+    1L, "species_filter", mark_step = FALSE,
+    include_methods = character(0L), include_ations = character(0L),
+    output = FALSE, width.cutoff = 120L
+  )
+  target_code <- quote({
+    source <- list(dtconn = tblist(iris = iris))
+    data_object <- source$dtconn
+    data_object[["iris"]] <- data_object[["iris"]] %>%
+      dplyr::filter(Species %in% c("setosa", "virginica", NA))
+    attr(data_object[["iris"]], "filtered") <- TRUE
+  })
+  expect_identical(
+    gsub("\n|\\s+", " ", repro_code$text.tidy),
+    as.character(target_code)[-1L]
+  )
+})
+
+
 test_that("code returns expression to create filtered tblist", {
 
   skip_on_covr()
@@ -1194,7 +1263,7 @@ test_that("code returns expression to create filtered tblist", {
     run_flow = TRUE
   )
 
-  code_as_text <- code(coh, include_methods = NULL, include_action = NULL, mark_step = FALSE)
+  code_as_text <- code(coh, include_methods = NULL, include_action = NULL, mark_step = FALSE, output = FALSE)
 
   for (line in code_as_text$text.tidy) {
     rlang::eval_bare(rlang::parse_expr(line))

@@ -12,11 +12,15 @@
 #' @param ... Optionally named data frames.
 #' @param names A character vector describing provided tables names.
 #'   If missing names are constructed based on provided tables objects.
+#' @param .class The extra (highest priority) class added to the resulting object.
+#'   Having the extra class defined, enables to implement custom S3 methods for the object
+#'   having higher priority over the existing methods.
+#'   Especially useful if you want to change the built-in method behavior.
 #' @return Object of class 'tblist' being a named list of data frames.
 #' @export
-tblist <- function(..., names) {
+tblist <- function(..., names, .class = NULL) {
   tables <- rlang::dots_list(..., .named = TRUE)
-  out_class <- "tblist"
+  out_class <- c(.class, "tblist")
 
   tb_call <- sys.call(1L)
   if (purrr::every(tables, is.data.frame)) {
@@ -59,18 +63,18 @@ tblist <- function(..., names) {
 #' @param x an R object.
 #' @param ... additional arguments to be passed to or from methods.
 #' @export
-as.tblist <- function(x, ...) {
+as.tblist <- function(x, ..., .class = NULL) {
   UseMethod("as.tblist", x)
 }
 
 #' @export
-as.tblist.data.frame <- function(x, names, ...) {
-  tblist(x, names = names)
+as.tblist.data.frame <- function(x, names, ..., .class = NULL) {
+  tblist(x, names = names, .class = .class)
 }
 
 #' @export
-as.tblist.list <- function(x, names, ...) {
-  tblist(!!!x, names = names)
+as.tblist.list <- function(x, names, ..., .class = NULL) {
+  tblist(!!!x, names = names, .class = .class)
 }
 
 #' @rdname set_source
