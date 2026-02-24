@@ -4,7 +4,7 @@
 * Now cohort calculates only active filters cache while initializing source (results with significant performance improvement). 
   The `get_cache` method computes cache when called (and the related cache was missing).
 * Add new `datatime_filter` that handle POSIXct type.
-* Move unique/distinct to collapse::funique.
+* Move unique/distinct to `collapse::funique`.
 * Replace (internally) `%in%` with custom operator using `collapse::fmatch`, that seems to be more efficient.
 
 # cohortBuilder 0.3.0
