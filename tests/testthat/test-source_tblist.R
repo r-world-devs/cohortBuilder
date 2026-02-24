@@ -682,7 +682,7 @@ test_that("plot_data in datetime_range filter works fine", {
     }
   )
   vdiffr::expect_doppelganger(
-    "datetime_range - Breaks argument is passed properly",
+    "datetime_range - Breaks arg works",
     fig = function() {
       filter$plot_data(test_data, breaks = "hours")
     }
