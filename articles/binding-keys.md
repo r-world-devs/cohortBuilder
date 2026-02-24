@@ -77,7 +77,7 @@ How can we overcome the issue?
 
 ## Classic approach
 
-With the classic approach, we may iteractively extract each information
+With the classic approach, we may iteratively extract each information
 and extend cohort filters, for example we can define a new condition in
 the next filtering step:
 

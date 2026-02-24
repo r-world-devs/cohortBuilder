@@ -101,7 +101,7 @@ filter is.</p>
 <span><span class="co">#&gt; function(type, ...) {</span></span>
 <span><span class="co">#&gt;   UseMethod("filter", type)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55d8b57ecf80&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55814a94ee30&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
 <p>So in case of <code>discrete</code> filter, the proper used method
 is:</p>
@@ -122,7 +122,7 @@ is:</p>
 <span><span class="co">#&gt;     }</span></span>
 <span><span class="co">#&gt;   )</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55d8b5cf2208&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55814ae540b8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
 <p>that gathers provided parameters and returns function of
 <code>source</code> argument:</p>
@@ -135,8 +135,8 @@ is:</p>
 <span><span class="co">#&gt;         append(list(source = source), args)</span></span>
 <span><span class="co">#&gt;       )</span></span>
 <span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55d8b5cf9050&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55d8b5f00cc8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55814ae5af00&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55814b062b78&gt;</span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "function"              "cb_filter_constructor"</span></span></code></pre></div>
 <p>So whenever we define filter of specific type it returns unevaluated
@@ -149,7 +149,7 @@ provided source.</p>
 <span><span class="co">#&gt; function(source, ...) {</span></span>
 <span><span class="co">#&gt;   UseMethod("cb_filter.discrete", source)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55d8b57d2d50&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55814a934c00&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cohortBuilder&gt;</span></span></code></pre></div>
 <p>With such approach for having two layers of S3 methods, we are
 allowed to to build various filter types, for various source types. For
@@ -165,13 +165,13 @@ source, range filter for raw source etc.</p>
 <span>  give.attr <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 10</span></span>
-<span><span class="co">#&gt;  $ id          : chr "MWLEF1771890420545"</span></span>
+<span><span class="co">#&gt;  $ id          : chr "MWLEF1771929506813"</span></span>
 <span><span class="co">#&gt;  $ type        : 'discrete' chr "discrete"</span></span>
-<span><span class="co">#&gt;  $ name        : chr "MWLEF1771890420545"</span></span>
+<span><span class="co">#&gt;  $ name        : chr "MWLEF1771929506813"</span></span>
 <span><span class="co">#&gt;  $ input_param : chr "value"</span></span>
 <span><span class="co">#&gt;  $ filter_data :function (data_object)  </span></span>
 <span><span class="co">#&gt;  $ get_stats   :function (data_object, name)  </span></span>
-<span><span class="co">#&gt;  $ plot_data   :function (data_object)  </span></span>
+<span><span class="co">#&gt;  $ plot_data   :function (data_object, ...)  </span></span>
 <span><span class="co">#&gt;  $ get_params  :function (name)  </span></span>
 <span><span class="co">#&gt;  $ get_data    :function (data_object)  </span></span>
 <span><span class="co">#&gt;  $ get_defaults:function (data_object, cache_object)</span></span></code></pre></div>
@@ -351,9 +351,9 @@ configuration.</p>
 <span>        <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">stats</span><span class="op">[</span><span class="va">name</span><span class="op">]</span><span class="op">)</span></span>
 <span>      <span class="op">}</span></span>
 <span>    <span class="op">}</span>,</span>
-<span>    plot_data <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    plot_data <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_object</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">table</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html" class="external-link">barplot</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>        <span class="va">data_object</span><span class="op">[[</span><span class="va">dataset</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">variable</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">table</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html" class="external-link">barplot</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span>      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>        <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html" class="external-link">barplot</a></span><span class="op">(</span><span class="fl">0.0</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.0</span>, <span class="fl">0.1</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"No data"</span><span class="op">)</span></span>
 <span>      <span class="op">}</span></span>

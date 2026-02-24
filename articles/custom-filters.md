@@ -27,7 +27,7 @@ filter
 #> function(type, ...) {
 #>   UseMethod("filter", type)
 #> }
-#> <bytecode: 0x55d8b57ecf80>
+#> <bytecode: 0x55814a94ee30>
 #> <environment: namespace:cohortBuilder>
 ```
 
@@ -50,7 +50,7 @@ cohortBuilder:::filter.discrete
 #>     }
 #>   )
 #> }
-#> <bytecode: 0x55d8b5cf2208>
+#> <bytecode: 0x55814ae540b8>
 #> <environment: namespace:cohortBuilder>
 ```
 
@@ -66,8 +66,8 @@ spec_filter
 #>         append(list(source = source), args)
 #>       )
 #>     }
-#> <bytecode: 0x55d8b5cf9050>
-#> <environment: 0x55d8b5f00cc8>
+#> <bytecode: 0x55814ae5af00>
+#> <environment: 0x55814b062b78>
 #> attr(,"class")
 #> [1] "function"              "cb_filter_constructor"
 ```
@@ -84,7 +84,7 @@ cb_filter.discrete
 #> function(source, ...) {
 #>   UseMethod("cb_filter.discrete", source)
 #> }
-#> <bytecode: 0x55d8b57d2d50>
+#> <bytecode: 0x55814a934c00>
 #> <environment: namespace:cohortBuilder>
 ```
 
@@ -104,13 +104,13 @@ str(
   give.attr = FALSE
 )
 #> List of 10
-#>  $ id          : chr "MWLEF1771890420545"
+#>  $ id          : chr "MWLEF1771929506813"
 #>  $ type        : 'discrete' chr "discrete"
-#>  $ name        : chr "MWLEF1771890420545"
+#>  $ name        : chr "MWLEF1771929506813"
 #>  $ input_param : chr "value"
 #>  $ filter_data :function (data_object)  
 #>  $ get_stats   :function (data_object, name)  
-#>  $ plot_data   :function (data_object)  
+#>  $ plot_data   :function (data_object, ...)  
 #>  $ get_params  :function (name)  
 #>  $ get_data    :function (data_object)  
 #>  $ get_defaults:function (data_object, cache_object)
@@ -277,9 +277,9 @@ cb_filter.logical.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
+        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot(...)
       } else {
         graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
