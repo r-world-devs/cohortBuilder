@@ -1,14 +1,14 @@
 
 # cohortBuilder <img src="man/figures/logo.png" align="right" width="120" />
 
-[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.3.0.9000&color=ff69b4)](https://r-world-devs.github.io/cohortBuilder/)
-[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/cohortBuilder)](https://cran.r-project.org/package=cohortBuilder)
 [![R-CMD-check](https://github.com/r-world-devs/cohortBuilder/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-world-devs/cohortBuilder/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/r-world-devs/cohortBuilder/graph/badge.svg)](https://app.codecov.io/gh/r-world-devs/cohortBuilder)
+[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 ## Overview
@@ -33,7 +33,7 @@ With `cohortBuilder` you can share the cohort easier with useful
 methods:
 
 - `code` - to get reproducible cohort creation code,
-- `get_state` - to get cohort state (e.g. in JSON) that can be then
+- `get_state` - to get cohort state (e.g. in JSON) that can be then
   easily restored with `restore`.
 
 Or modify the cohort configuration with:
@@ -64,6 +64,305 @@ If you want to learn how to write custom source extension, please check
 
 ## Installation
 
+``` r
+# CRAN version
+install.packages("cohortBuilder")
+
+# Latest development version
+remotes::install_github("https://github.com/r-world-devs/cohortBuilder")
+```
+
+## Usage
+
+``` r
+librarian_source <- set_source(
+  as.tblist(librarian)
+)
+
+coh <- librarian_source %>% 
+  cohort(
+    filter(
+      "discrete", id = "author", dataset = "books", 
+      variable = "author", value = "Dan Brown"
+    ),
+    filter(
+      "range", id = "copies", dataset = "books", 
+      variable = "copies", range = c(5, 10)
+    ),
+    filter(
+      "date_range", id = "registered", dataset = "borrowers", 
+      variable = "registered", range = c(as.Date("2010-01-01"), Inf)
+    ) 
+  ) %>% 
+  run()
+
+get_data(coh)
+#> $books
+#> # A tibble: 1 × 6
+#>   isbn          title             genre                       publisher 
+#>   <chr>         <chr>             <chr>                       <chr>     
+#> 1 0-385-50420-9 The Da Vinci Code Crime, Thriller & Adventure Transworld
+#>   author    copies
+#>   <chr>      <int>
+#> 1 Dan Brown      7
+#> 
+#> $borrowers
+#> # A tibble: 8 × 6
+#>   id     registered address                                         
+#>   <chr>  <date>     <chr>                                           
+#> 1 000013 2011-09-30 534 Iroquois Ave. Watertown, MA 02472           
+#> 2 000014 2013-01-12 7968 Victoria Drive Dearborn, MI 48124          
+#> 3 000015 2013-12-24 9484 Somerset Road Romeoville, IL 60446         
+#> 4 000016 2014-01-20 48 Prairie Ave. Palos Verdes Peninsula, CA 90274
+#> 5 000017 2014-04-07 8501 Lawrence Rd. Terre Haute, IN 47802         
+#>   name                    phone_number program 
+#>   <chr>                   <chr>        <chr>   
+#> 1 Dr. Sharif Kunde        104-832-8013 premium 
+#> 2 Marlena Reichert PhD    044-876-8419 vip     
+#> 3 Mr. Brandan Oberbrunner 568-044-7463 vip     
+#> 4 Lloyd Adams III         001-017-0211 standard
+#> 5 Randy Ziemann           895-995-2326 premium 
+#> # ℹ 3 more rows
+#> 
+#> $issues
+#> # A tibble: 50 × 4
+#>   id     borrower_id isbn              date      
+#>   <chr>  <chr>       <chr>             <date>    
+#> 1 000001 000019      0-676-97976-9     2015-03-17
+#> 2 000002 000010      978-0-7528-6053-4 2008-09-13
+#> 3 000003 000016      0-09-177373-3     2014-09-28
+#> 4 000004 000005      0-224-06252-2     2005-11-14
+#> 5 000005 000004      0-340-89696-5     2006-03-19
+#> # ℹ 45 more rows
+#> 
+#> $returns
+#> # A tibble: 30 × 2
+#>   id     date      
+#>   <chr>  <date>    
+#> 1 000001 2015-04-06
+#> 2 000003 2014-10-23
+#> 3 000004 2005-12-29
+#> 4 000005 2006-03-26
+#> 5 000006 2016-08-30
+#> # ℹ 25 more rows
+#> 
+#> attr(,"class")
+#> [1] "tblist"
+#> attr(,"call")
+#> as.tblist(librarian)
+```
+
+``` r
+coh <- librarian_source %>% 
+  cohort() %->% 
+  step(
+    filter(
+      "discrete", id = "author", dataset = "books", 
+      variable = "author", value = "Dan Brown"
+    ),
+    filter(
+      "date_range", id = "registered", dataset = "borrowers", 
+      variable = "registered", range = c(as.Date("2010-01-01"), Inf)
+    )
+  ) %->% 
+  step(
+    filter(
+      "range", id = "copies", dataset = "books", 
+      variable = "copies", range = c(5, 10)
+    )
+  ) %>% 
+  run()
+```
+
+``` r
+get_data(coh, step_id = 1)
+#> $books
+#> # A tibble: 2 × 6
+#>   isbn          title             genre                       publisher 
+#>   <chr>         <chr>             <chr>                       <chr>     
+#> 1 0-385-50420-9 The Da Vinci Code Crime, Thriller & Adventure Transworld
+#> 2 0-671-02735-2 Angels and Demons Crime, Thriller & Adventure Transworld
+#>   author    copies
+#>   <chr>      <int>
+#> 1 Dan Brown      7
+#> 2 Dan Brown      4
+#> 
+#> $borrowers
+#> # A tibble: 8 × 6
+#>   id     registered address                                         
+#>   <chr>  <date>     <chr>                                           
+#> 1 000013 2011-09-30 534 Iroquois Ave. Watertown, MA 02472           
+#> 2 000014 2013-01-12 7968 Victoria Drive Dearborn, MI 48124          
+#> 3 000015 2013-12-24 9484 Somerset Road Romeoville, IL 60446         
+#> 4 000016 2014-01-20 48 Prairie Ave. Palos Verdes Peninsula, CA 90274
+#> 5 000017 2014-04-07 8501 Lawrence Rd. Terre Haute, IN 47802         
+#>   name                    phone_number program 
+#>   <chr>                   <chr>        <chr>   
+#> 1 Dr. Sharif Kunde        104-832-8013 premium 
+#> 2 Marlena Reichert PhD    044-876-8419 vip     
+#> 3 Mr. Brandan Oberbrunner 568-044-7463 vip     
+#> 4 Lloyd Adams III         001-017-0211 standard
+#> 5 Randy Ziemann           895-995-2326 premium 
+#> # ℹ 3 more rows
+#> 
+#> $issues
+#> # A tibble: 50 × 4
+#>   id     borrower_id isbn              date      
+#>   <chr>  <chr>       <chr>             <date>    
+#> 1 000001 000019      0-676-97976-9     2015-03-17
+#> 2 000002 000010      978-0-7528-6053-4 2008-09-13
+#> 3 000003 000016      0-09-177373-3     2014-09-28
+#> 4 000004 000005      0-224-06252-2     2005-11-14
+#> 5 000005 000004      0-340-89696-5     2006-03-19
+#> # ℹ 45 more rows
+#> 
+#> $returns
+#> # A tibble: 30 × 2
+#>   id     date      
+#>   <chr>  <date>    
+#> 1 000001 2015-04-06
+#> 2 000003 2014-10-23
+#> 3 000004 2005-12-29
+#> 4 000005 2006-03-26
+#> 5 000006 2016-08-30
+#> # ℹ 25 more rows
+#> 
+#> attr(,"class")
+#> [1] "tblist"
+#> attr(,"call")
+#> as.tblist(librarian)
+```
+
+``` r
+get_data(coh, step_id = 2)
+#> $books
+#> # A tibble: 1 × 6
+#>   isbn          title             genre                       publisher 
+#>   <chr>         <chr>             <chr>                       <chr>     
+#> 1 0-385-50420-9 The Da Vinci Code Crime, Thriller & Adventure Transworld
+#>   author    copies
+#>   <chr>      <int>
+#> 1 Dan Brown      7
+#> 
+#> $borrowers
+#> # A tibble: 8 × 6
+#>   id     registered address                                         
+#>   <chr>  <date>     <chr>                                           
+#> 1 000013 2011-09-30 534 Iroquois Ave. Watertown, MA 02472           
+#> 2 000014 2013-01-12 7968 Victoria Drive Dearborn, MI 48124          
+#> 3 000015 2013-12-24 9484 Somerset Road Romeoville, IL 60446         
+#> 4 000016 2014-01-20 48 Prairie Ave. Palos Verdes Peninsula, CA 90274
+#> 5 000017 2014-04-07 8501 Lawrence Rd. Terre Haute, IN 47802         
+#>   name                    phone_number program 
+#>   <chr>                   <chr>        <chr>   
+#> 1 Dr. Sharif Kunde        104-832-8013 premium 
+#> 2 Marlena Reichert PhD    044-876-8419 vip     
+#> 3 Mr. Brandan Oberbrunner 568-044-7463 vip     
+#> 4 Lloyd Adams III         001-017-0211 standard
+#> 5 Randy Ziemann           895-995-2326 premium 
+#> # ℹ 3 more rows
+#> 
+#> $issues
+#> # A tibble: 50 × 4
+#>   id     borrower_id isbn              date      
+#>   <chr>  <chr>       <chr>             <date>    
+#> 1 000001 000019      0-676-97976-9     2015-03-17
+#> 2 000002 000010      978-0-7528-6053-4 2008-09-13
+#> 3 000003 000016      0-09-177373-3     2014-09-28
+#> 4 000004 000005      0-224-06252-2     2005-11-14
+#> 5 000005 000004      0-340-89696-5     2006-03-19
+#> # ℹ 45 more rows
+#> 
+#> $returns
+#> # A tibble: 30 × 2
+#>   id     date      
+#>   <chr>  <date>    
+#> 1 000001 2015-04-06
+#> 2 000003 2014-10-23
+#> 3 000004 2005-12-29
+#> 4 000005 2006-03-26
+#> 5 000006 2016-08-30
+#> # ℹ 25 more rows
+#> 
+#> attr(,"class")
+#> [1] "tblist"
+#> attr(,"call")
+#> as.tblist(librarian)
+```
+
+``` r
+update_filter(
+  coh, step_id = 1, filter_id = "author",
+  range = c(5, 6)
+)
+run(coh)
+
+get_data(coh, step_id = 2)
+#> $books
+#> # A tibble: 1 × 6
+#>   isbn          title             genre                       publisher 
+#>   <chr>         <chr>             <chr>                       <chr>     
+#> 1 0-385-50420-9 The Da Vinci Code Crime, Thriller & Adventure Transworld
+#>   author    copies
+#>   <chr>      <int>
+#> 1 Dan Brown      7
+#> 
+#> $borrowers
+#> # A tibble: 8 × 6
+#>   id     registered address                                         
+#>   <chr>  <date>     <chr>                                           
+#> 1 000013 2011-09-30 534 Iroquois Ave. Watertown, MA 02472           
+#> 2 000014 2013-01-12 7968 Victoria Drive Dearborn, MI 48124          
+#> 3 000015 2013-12-24 9484 Somerset Road Romeoville, IL 60446         
+#> 4 000016 2014-01-20 48 Prairie Ave. Palos Verdes Peninsula, CA 90274
+#> 5 000017 2014-04-07 8501 Lawrence Rd. Terre Haute, IN 47802         
+#>   name                    phone_number program 
+#>   <chr>                   <chr>        <chr>   
+#> 1 Dr. Sharif Kunde        104-832-8013 premium 
+#> 2 Marlena Reichert PhD    044-876-8419 vip     
+#> 3 Mr. Brandan Oberbrunner 568-044-7463 vip     
+#> 4 Lloyd Adams III         001-017-0211 standard
+#> 5 Randy Ziemann           895-995-2326 premium 
+#> # ℹ 3 more rows
+#> 
+#> $issues
+#> # A tibble: 50 × 4
+#>   id     borrower_id isbn              date      
+#>   <chr>  <chr>       <chr>             <date>    
+#> 1 000001 000019      0-676-97976-9     2015-03-17
+#> 2 000002 000010      978-0-7528-6053-4 2008-09-13
+#> 3 000003 000016      0-09-177373-3     2014-09-28
+#> 4 000004 000005      0-224-06252-2     2005-11-14
+#> 5 000005 000004      0-340-89696-5     2006-03-19
+#> # ℹ 45 more rows
+#> 
+#> $returns
+#> # A tibble: 30 × 2
+#>   id     date      
+#>   <chr>  <date>    
+#> 1 000001 2015-04-06
+#> 2 000003 2014-10-23
+#> 3 000004 2005-12-29
+#> 4 000005 2006-03-26
+#> 5 000006 2016-08-30
+#> # ℹ 25 more rows
+#> 
+#> attr(,"class")
+#> [1] "tblist"
+#> attr(,"call")
+#> as.tblist(librarian)
+```
+
+``` r
+attrition(coh, dataset = "books")
+```
+
+<img src="man/figures/README-attrition-1.png" alt="" style="display: block; margin: auto;" />
+
+``` r
+get_state(coh, json = TRUE)
+#> [{"step":"1","filters":[{"range":[5,6],"type":"discrete","id":"author","name":"author","variable":"author","value":"Dan Brown","dataset":"books","keep_na":true,"description":null,"active":true},{"type":"date_range","id":"registered","name":"registered","variable":"registered","range":["2010-01-01","Inf"],"dataset":"borrowers","keep_na":true,"description":null,"active":true}]},{"step":"2","filters":[{"type":"range","id":"copies","name":"copies","variable":"copies","range":[5,10],"dataset":"books","keep_na":true,"description":null,"active":true}]}]
+```
 
 ## Acknowledgement
 
@@ -83,4 +382,5 @@ Special thanks to:
 In a case you found any bugs, have feature request or general question
 please file an issue at the package
 [Github](https://github.com/r-world-devs/cohortBuilder/issues). You may
-also contact the package author directly via email at [krystian8207@gmail.com](krystian8207@gmail.com).
+also contact the package author directly via email at
+<krystian8207@gmail.com>.
