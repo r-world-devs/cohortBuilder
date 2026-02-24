@@ -619,31 +619,9 @@ test_that("plot_data in discrete filter works fine", {
   vdiffr::expect_doppelganger("discrete - No data case works", filter$plot_data(test_data_null))
 })
 
-test_that("plot_data in discrete filter works fine", {
-  test_var <- c("a", "a", "b", "b", "b", "c", NA)
-  test_data <- list(
-    test_dataset = data.frame(
-      var1 = test_var
-    )
-  )
-
-  test_data_null <- list(
-    test_dataset = data.frame(
-      var1 = NULL
-    )
-  )
-
-  filter <- cb_filter.discrete.tblist(
-    variable = "var1", value = c("b", "c"),
-    dataset = "test_dataset", keep_na = TRUE
-  )
-
-  vdiffr::expect_doppelganger("discrete - Extra args work", filter$plot_data(test_data, axes = FALSE))
-  vdiffr::expect_doppelganger("discrete - No data case works", filter$plot_data(test_data_null))
-})
 
 test_that("plot_data in datetime_range filter works fine", {
-  test_var <- as.POSIXct("2026-02-24 10:34:44 UTC") + 360 * 1:20
+  test_var <- as.POSIXct("2026-02-24 10:34:44 UTC") + 360L * 1L:20L
   test_data <- list(
     test_dataset = data.frame(
       var1 = test_var
