@@ -566,10 +566,22 @@ test_that("plot_data in date range filter works fine", {
 
   vdiffr::expect_doppelganger(
     "date_range - breaks argument is passed properly",
-    filter$plot_data(test_data, breaks = "year")
+    fig = function() {
+      filter$plot_data(test_data, breaks = "year")
+    }
   )
-  vdiffr::expect_doppelganger("date_range - Extra args work", filter$plot_data(test_data, freq = TRUE, breaks = "year"))
-  vdiffr::expect_doppelganger("date_range - No data case works", filter$plot_data(test_data_null, breaks = "year"))
+  vdiffr::expect_doppelganger(
+    "date_range - Extra args work",
+    fig = function() {
+      filter$plot_data(test_data, freq = TRUE, breaks = "year")
+    }
+  )
+  vdiffr::expect_doppelganger(
+    "date_range - No data case works",
+    fig = function() {
+      filter$plot_data(test_data_null, breaks = "year")
+    }
+  )
 })
 
 test_that("plot_data in range filter works fine", {
@@ -591,9 +603,24 @@ test_that("plot_data in range filter works fine", {
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  vdiffr::expect_doppelganger("range - Breaks argument is passed properly", filter$plot_data(test_data, breaks = 10L))
-  vdiffr::expect_doppelganger("range - Extra args work", filter$plot_data(test_data, breaks = 5L, freq = TRUE))
-  vdiffr::expect_doppelganger("range - No data case works", filter$plot_data(test_data_null, breaks = c(-1L, 0L, 1L)))
+  vdiffr::expect_doppelganger(
+    "range - Breaks argument is passed properly",
+    fig = function() {
+      filter$plot_data(test_data, breaks = 10L)
+    }
+  )
+  vdiffr::expect_doppelganger(
+    "range - Extra args work",
+    fig = function() {
+      filter$plot_data(test_data, breaks = 5L, freq = TRUE)
+    }
+  )
+  vdiffr::expect_doppelganger(
+    "range - No data case works",
+    fig = function() {
+      filter$plot_data(test_data_null, breaks = c(-1L, 0L, 1L))
+    }
+  )
 })
 
 test_that("plot_data in discrete filter works fine", {
@@ -615,8 +642,18 @@ test_that("plot_data in discrete filter works fine", {
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  vdiffr::expect_doppelganger("discrete - Extra args work", filter$plot_data(test_data, axes = FALSE))
-  vdiffr::expect_doppelganger("discrete - No data case works", filter$plot_data(test_data_null))
+  vdiffr::expect_doppelganger(
+    "discrete - Extra args work",
+    fig = function() {
+      filter$plot_data(test_data, axes = FALSE)
+    }
+  )
+  vdiffr::expect_doppelganger(
+    "discrete - No data case works",
+    fig = function() {
+      filter$plot_data(test_data_null)
+    }
+  )
 })
 
 
@@ -639,16 +676,28 @@ test_that("plot_data in datetime_range filter works fine", {
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  vdiffr::expect_doppelganger("datetime_range - default breaks work", filter$plot_data(test_data))
+  vdiffr::expect_doppelganger(
+    "datetime_range - default breaks work", fig = function() {
+      filter$plot_data(test_data)
+    }
+  )
   vdiffr::expect_doppelganger(
     "datetime_range - Breaks argument is passed properly",
-    filter$plot_data(test_data, breaks = "hours")
+    fig = function() {
+      filter$plot_data(test_data, breaks = "hours")
+    }
   )
   vdiffr::expect_doppelganger(
     "datetime_range - Extra args work",
-    filter$plot_data(test_data, freq = TRUE, breaks = "hours")
+    fig = function() {
+      filter$plot_data(test_data, freq = TRUE, breaks = "hours")
+    }
   )
-  vdiffr::expect_doppelganger("datetime_range - No data case works", filter$plot_data(test_data_null))
+  vdiffr::expect_doppelganger(
+    "datetime_range - No data case works", fig = function() {
+      filter$plot_data(test_data_null)
+    }
+  )
 })
 
 test_that("plot_data in multi_discrete filter works fine", {
@@ -672,7 +721,24 @@ test_that("plot_data in multi_discrete filter works fine", {
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  vdiffr::expect_doppelganger("multi_discrete - standard call works", filter$plot_data(test_data))
-  vdiffr::expect_doppelganger("multi_discrete - Extra args work", filter$plot_data(test_data, axes = FALSE))
-  vdiffr::expect_doppelganger("multi_discrete - No data case works", filter$plot_data(test_data_null))
+  vdiffr::expect_doppelganger(
+    "multi_discrete - standard call works",
+    fig = function() {
+      filter$plot_data(test_data)
+    }
+  )
+
+  vdiffr::expect_doppelganger(
+    "multi_discrete - Extra args work",
+    fig = function() {
+      filter$plot_data(test_data, axes = FALSE)
+    }
+  )
+
+  vdiffr::expect_doppelganger(
+    "multi_discrete - No data case works",
+    fig = function() {
+      filter$plot_data(test_data_null)
+    }
+  )
 })
