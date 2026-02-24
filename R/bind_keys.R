@@ -71,14 +71,16 @@ primary_keys <- function(...) {
 #' - `data_key` - requires to provide two parameters:
 #' \itemize{
 #'   \item{\code{dataset} - Name of the dataset existing in Source.}
-#'   \item{\code{key} - Single character string or vector storing column names that are keys, which should be used to describe relation.}
+#'   \item{\code{key} - Single character string or vector storing column names that are keys,
+#'     which should be used to describe relation.}
 #' }
 #' For example `data_key('books', 'author_id')`.
 #'
 #' - `bind_key` - requires to provide two obligatory parameters
 #' \itemize{
 #'   \item{\code{update} - Data key describing which table should be updated.}
-#'   \item{\code{...} - \strong{Triggering data keys}. One or more data keys describing on which dataset(s) the one in `update` is dependent.}
+#'   \item{\code{...} - \strong{Triggering data keys}. One or more data keys describing on which dataset(s)
+#'     the one in `update` is dependent.}
 #' }
 #' The output of `bind_key` function is named \strong{binding key}.
 #' `bind_key` offers two extra parameters `post` and `activate`.

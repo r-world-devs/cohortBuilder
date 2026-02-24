@@ -76,7 +76,7 @@ cb_filter.{filter_type}.{source_type} <- function(
         return(stats[name])
       }}
     }},
-    plot_data = function(data_object) {{
+    plot_data = function(data_object, ...) {{
      #  if (_COMPLETE_ - when data if correct e.g. nrow(data_object[[dataset]]) > 0) {{
      #     _COMPLETE_ - plot generation code, e.g.
      #     data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
