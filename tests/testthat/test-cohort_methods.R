@@ -21,12 +21,15 @@ patients_source <- set_source(
 load(testthat::test_path("../data/sakila/sakila.rda"))
 sakila_source <- set_source(as.tblist(sakila))
 sakila_source$binding_keys <- bind_keys(
-  bind_key(update = data_key("actor", "actor_id"),
-           data_key("film_actor", "actor_id")
+  bind_key(
+    update = data_key("actor", "actor_id"),
+    data_key("film_actor", "actor_id")
   ),
-  bind_key(update = data_key("film_actor", "film_id"),
-           data_key("film", "film_id")
-  ))
+  bind_key(
+    update = data_key("film_actor", "film_id"),
+    data_key("film", "film_id")
+  )
+)
 
 range_filter_actor <- filter(
   type = "range", id = "actor_filter", name = "Actor",
