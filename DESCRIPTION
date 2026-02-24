@@ -29,9 +29,10 @@ Imports:
     formatR,
     collapse
 KeepSource: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 Suggests: 
     queryBuilder,
+    vdiffr,
     testthat (>= 3.0.0),
     shiny,
     knitr,

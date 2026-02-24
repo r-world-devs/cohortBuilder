@@ -369,9 +369,7 @@ Restore Cohort configuration.}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Cohort$restore(
   state,
-  modifier = function(prev_state, state) {
-     state
- },
+  modifier = function(prev_state, state) state,
   run_flow = FALSE,
   hook = list(pre = get_hook("pre_restore_hook"), post = get_hook("post_restore_hook"))
 )}\if{html}{\out{</div>}}
