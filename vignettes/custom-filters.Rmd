@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-options("tibble.print_min" = 5, "tibble.print_max" = 5)
+options("tibble.print_min" = 5L, "tibble.print_max" = 5L)
 library(magrittr)
 library(dplyr, exclude = "filter")
 library(cohortBuilder)
@@ -164,8 +164,8 @@ Inside of the method we call `def_filter` completing all of the parameters based
 
 ```{r}
 cb_filter.logical.tblist <- function(
-  source, type = "logical", id = .gen_id(), name = id, dataset, variable, 
-  value = NA, keep_na = TRUE, description = NULL, ..., active = TRUE) {
+    source, type = "logical", id = .gen_id(), name = id, dataset, variable, 
+    value = NA, keep_na = TRUE, description = NULL, ..., active = TRUE) {
   args <- list(...)
 
   def_filter(
@@ -203,13 +203,17 @@ cb_filter.logical.tblist <- function(
       }
       stats <- list(
         choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% 
-          stats::na.omit() %>% table() %>% as.list(),
+          stats::na.omit() %>% 
+          table() %>% 
+          as.list(),
         n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% 
           stats::na.omit() %>% 
           length(),
-        n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% is.na() %>% sum()
+        n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% 
+          is.na() %>% 
+          sum()
       )
-      if (length(name) == 1) {
+      if (length(name) == 1L) {
         return(stats[[name]])
       } else {
         return(stats[name])
@@ -219,7 +223,7 @@ cb_filter.logical.tblist <- function(
       if (nrow(data_object[[dataset]])) {
         data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot(...)
       } else {
-        graphics::barplot(0, ylim = c(0, 0.1), main = "No data")
+        graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
     },
     get_params = function(name) {

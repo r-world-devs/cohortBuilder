@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-options("tibble.print_min" = 5, "tibble.print_max" = 5)
+options("tibble.print_min" = 5L, "tibble.print_max" = 5L)
 library(magrittr)
 library(cohortBuilder)
 ```
@@ -75,7 +75,7 @@ If you want to operate on R-loaded list of tables, provide `tblist` class object
 **Note.** In order to convert list of data frames to 'tblist' just use `as.tblist`.
 
 ```{r}
-str(as.tblist(librarian), max.level = 1)
+str(as.tblist(librarian), max.level = 1L)
 ```
 
 Let's proceed with creating the source:
@@ -105,7 +105,7 @@ In the standard workflow we build `Cohort` on top of `Source`.
 We achieve it with `cohort` function:
 
 ```{r}
-librarian_cohort <- librarian_source %>% 
+librarian_cohort <- librarian_source %>%
   cohort()
 class(librarian_cohort)
 ```
@@ -169,7 +169,7 @@ librarian_cohort <- librarian_cohort %->%
 Or define the filter while creating Cohort:
 
 ```{r}
-librarian_cohort <- librarian_source %>% 
+librarian_cohort <- librarian_source %>%
   cohort(
     author_filter
   )
@@ -223,15 +223,15 @@ If you want to run data filtering automatically when the filter is defined you c
 set `run_flow = TRUE`:
 
 ```{r}
-librarian_cohort <- librarian_source %>% 
-  cohort() %>% 
+librarian_cohort <- librarian_source %>%
+  cohort() %>%
   add_filter(author_filter, run_flow = TRUE)
 ```
 
 when using `add_filter` or:
 
 ```{r}
-librarian_cohort <- librarian_source %>% 
+librarian_cohort <- librarian_source %>%
   cohort(
     author_filter,
     run_flow = TRUE
@@ -265,22 +265,25 @@ We'll include filters 1. and 2. in the first step - filter 3. in the second one.
 The below code does the job:
 
 ```{r}
-librarian_cohort <- librarian_source %>% 
+librarian_cohort <- librarian_source %>%
   cohort(
     step(
       filter(
-        "discrete", id = "author", dataset = "books", 
+        "discrete",
+        id = "author", dataset = "books",
         variable = "author", value = "Dan Brown"
       ),
       filter(
-        "discrete", id = "program", dataset = "borrowers", 
+        "discrete",
+        id = "program", dataset = "borrowers",
         variable = "program", value = "premium", keep_na = FALSE
       )
     ),
     step(
       filter(
-        "range", id = "copies", dataset = "books", 
-        variable = "copies", range = c(-Inf, 5)
+        "range",
+        id = "copies", dataset = "books",
+        variable = "copies", range = c(-Inf, 5L)
       )
     )
   )
@@ -309,8 +312,8 @@ In order to precise the step we want to get data from, just pass its id as `step
 
 ```{r}
 run(librarian_cohort)
-get_data(librarian_cohort, step_id = 1)
-get_data(librarian_cohort, step_id = 2)
+get_data(librarian_cohort, step_id = 1L)
+get_data(librarian_cohort, step_id = 2L)
 ```
 
 **Note.** When `step_id` is not provided, the method returns the last step data.
@@ -320,8 +323,8 @@ Because the proceeding step uses result from the previous one, we have:
 
 ```{r}
 identical(
-  get_data(librarian_cohort, step_id = 1, state = "post"),
-  get_data(librarian_cohort, step_id = 2, state = "pre")
+  get_data(librarian_cohort, step_id = 1L, state = "post"),
+  get_data(librarian_cohort, step_id = 2L, state = "pre")
 )
 ```
 
@@ -344,15 +347,15 @@ you can:
 - display data changes across filtering steps.
 
 ```{r}
-stat(librarian_cohort, step_id = 1, filter_id = "program")
-stat(librarian_cohort, step_id = 2, filter_id = "copies")
+stat(librarian_cohort, step_id = 1L, filter_id = "program")
+stat(librarian_cohort, step_id = 2L, filter_id = "copies")
 ```
 
 ```{r}
-plot_data(librarian_cohort, step_id = 1, filter_id = "program")
+plot_data(librarian_cohort, step_id = 1L, filter_id = "program")
 ```
 ```{r}
-plot_data(librarian_cohort, step_id = 2, filter_id = "copies")
+plot_data(librarian_cohort, step_id = 2L, filter_id = "copies")
 ```
 
 ```{r}
@@ -386,22 +389,25 @@ librarian_source <- set_source(
   })
 )
 
-librarian_cohort <- librarian_source %>% 
+librarian_cohort <- librarian_source %>%
   cohort(
     step(
       filter(
-        "discrete", id = "author", dataset = "books", 
+        "discrete",
+        id = "author", dataset = "books",
         variable = "author", value = "Dan Brown"
       ),
       filter(
-        "discrete", id = "program", dataset = "borrowers", 
+        "discrete",
+        id = "program", dataset = "borrowers",
         variable = "program", value = "premium", keep_na = FALSE
       )
     ),
     step(
       filter(
-        "range", id = "copies", dataset = "books", 
-        variable = "copies", range = c(-Inf, 5)
+        "range",
+        id = "copies", dataset = "books",
+        variable = "copies", range = c(-Inf, 5L)
       )
     ),
     run_flow = TRUE
