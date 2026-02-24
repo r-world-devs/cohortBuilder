@@ -168,9 +168,9 @@ cb_filter.discrete.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot()
+        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot(...)
       } else {
         graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
@@ -245,7 +245,7 @@ cb_filter.discrete_text.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {},
+    plot_data = function(data_object, ...) {},
     get_params = function(name) {
       params <- list(
         dataset = dataset,
@@ -383,9 +383,9 @@ cb_filter.range.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% graphics::hist()
+        data_object[[dataset]][[variable]] %>% graphics::hist(...)
       } else {
         graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
@@ -527,9 +527,9 @@ cb_filter.date_range.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ..., breaks) {
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% graphics::hist()
+        data_object[[dataset]][[variable]] %>% graphics::hist(..., breaks = breaks)
       } else {
         graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
@@ -665,15 +665,17 @@ cb_filter.datetime_range.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ..., breaks = NULL) {
       if (nrow(data_object[[dataset]])) {
-        breaks <- calculate_datetime_step(
-          min(data_object[[dataset]][[variable]], na.rm = TRUE),
-          max(data_object[[dataset]][[variable]], na.rm = TRUE)
-        ) %>% names()
+        if (is.null(breaks)) {
+          breaks <- calculate_datetime_step(
+            min(data_object[[dataset]][[variable]], na.rm = TRUE),
+            max(data_object[[dataset]][[variable]], na.rm = TRUE)
+          ) %>% names()
+        }
 
         data_object[[dataset]][[variable]] %>%
-          graphics::hist(breaks = breaks)
+          graphics::hist(..., breaks = breaks)
       } else {
         graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
@@ -767,13 +769,14 @@ cb_filter.multi_discrete.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
+      variables <- unlist(variables)
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][names(variables)] %>%
+        data_object[[dataset]][variables] %>%
           purrr::map(table) %>%
           purrr::imap_dfc(group_stats) %>%
           as.matrix() %>%
-          graphics::barplot()
+          graphics::barplot(...)
       } else {
         graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }
@@ -850,13 +853,13 @@ cb_filter.query.tblist <- function(
         return(stats[name])
       }
     },
-    plot_data = function(data_object) {
+    plot_data = function(data_object, ...) {
       if (nrow(data_object[[dataset]])) {
         data_object[[dataset]][variables] %>%
           purrr::map(table) %>%
           purrr::imap_dfc(group_stats) %>%
           as.matrix() %>%
-          graphics::barplot()
+          graphics::barplot(...)
       } else {
         graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
       }

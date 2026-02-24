@@ -386,23 +386,9 @@
     },
     "downlit": {
       "Package": "downlit",
-      "Version": "0.4.2",
+      "Version": "0.4.5",
       "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "brio",
-        "desc",
-        "digest",
-        "evaluate",
-        "fansi",
-        "memoise",
-        "rlang",
-        "vctrs",
-        "withr",
-        "yaml"
-      ],
-      "Hash": "79bf3f66590752ffbba20f8d2da94c7c"
+      "Repository": "CRAN"
     },
     "dplyr": {
       "Package": "dplyr",
@@ -976,33 +962,9 @@
     },
     "pkgdown": {
       "Package": "pkgdown",
-      "Version": "2.0.7",
+      "Version": "2.2.0",
       "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "bslib",
-        "callr",
-        "cli",
-        "desc",
-        "digest",
-        "downlit",
-        "fs",
-        "httr",
-        "jsonlite",
-        "magrittr",
-        "memoise",
-        "purrr",
-        "ragg",
-        "rlang",
-        "rmarkdown",
-        "tibble",
-        "whisker",
-        "withr",
-        "xml2",
-        "yaml"
-      ],
-      "Hash": "16fa15449c930bf3a7761d3c68f8abf9"
+      "Repository": "CRAN"
     },
     "pkgload": {
       "Package": "pkgload",
@@ -1128,14 +1090,9 @@
     },
     "ragg": {
       "Package": "ragg",
-      "Version": "1.2.5",
+      "Version": "1.5.0",
       "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "systemfonts",
-        "textshaping"
-      ],
-      "Hash": "690bc058ea2b1b8a407d3cfe3dce3ef9"
+      "Repository": "CRAN"
     },
     "rappdirs": {
       "Package": "rappdirs",
@@ -1521,15 +1478,9 @@
     },
     "textshaping": {
       "Package": "textshaping",
-      "Version": "0.3.6",
+      "Version": "1.0.4",
       "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "cpp11",
-        "systemfonts"
-      ],
-      "Hash": "1ab6223d3670fac7143202cb6a2d43d5"
+      "Repository": "CRAN"
     },
     "tibble": {
       "Package": "tibble",
@@ -1668,6 +1619,12 @@
       ],
       "Hash": "c03fa420630029418f7e6da3667aac4a"
     },
+    "vdiffr": {
+      "Package": "vdiffr",
+      "Version": "1.0.9",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
     "viridisLite": {
       "Package": "viridisLite",
       "Version": "0.4.1",
@@ -1699,8 +1656,7 @@
       "Package": "whisker",
       "Version": "0.4.1",
       "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "c6abfa47a46d281a7d5159d0a8891e88"
+      "Repository": "CRAN"
     },
     "withr": {
       "Package": "withr",
