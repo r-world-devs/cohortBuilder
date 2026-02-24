@@ -1,14 +1,14 @@
 
 # cohortBuilder <img src="man/figures/logo.png" align="right" width="120" />
 
-[![version](https://img.shields.io/static/v1.svg?label=github.com&message=v.0.3.0.9000&color=ff69b4)](https://r-world-devs.github.io/cohortBuilder/)
-[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/cohortBuilder)](https://cran.r-project.org/package=cohortBuilder)
 [![R-CMD-check](https://github.com/r-world-devs/cohortBuilder/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-world-devs/cohortBuilder/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/r-world-devs/cohortBuilder/graph/badge.svg)](https://app.codecov.io/gh/r-world-devs/cohortBuilder)
+[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 ## Overview
@@ -33,7 +33,7 @@ With `cohortBuilder` you can share the cohort easier with useful
 methods:
 
 - `code` - to get reproducible cohort creation code,
-- `get_state` - to get cohort state (e.g. in JSON) that can be then
+- `get_state` - to get cohort state (e.g. in JSON) that can be then
   easily restored with `restore`.
 
 Or modify the cohort configuration with:
@@ -382,4 +382,5 @@ Special thanks to:
 In a case you found any bugs, have feature request or general question
 please file an issue at the package
 [Github](https://github.com/r-world-devs/cohortBuilder/issues). You may
-also contact the package author directly via email at [krystian8207@gmail.com](krystian8207@gmail.com).
+also contact the package author directly via email at
+<krystian8207@gmail.com>.
