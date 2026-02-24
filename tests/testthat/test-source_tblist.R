@@ -618,3 +618,83 @@ test_that("plot_data in discrete filter works fine", {
   vdiffr::expect_doppelganger("discrete - Extra args work", filter$plot_data(test_data, axes = FALSE))
   vdiffr::expect_doppelganger("discrete - No data case works", filter$plot_data(test_data_null))
 })
+
+test_that("plot_data in discrete filter works fine", {
+  test_var <- c("a", "a", "b", "b", "b", "c", NA)
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = test_var
+    )
+  )
+
+  test_data_null <- list(
+    test_dataset = data.frame(
+      var1 = NULL
+    )
+  )
+
+  filter <- cb_filter.discrete.tblist(
+    variable = "var1", value = c("b", "c"),
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  vdiffr::expect_doppelganger("discrete - Extra args work", filter$plot_data(test_data, axes = FALSE))
+  vdiffr::expect_doppelganger("discrete - No data case works", filter$plot_data(test_data_null))
+})
+
+test_that("plot_data in datetime_range filter works fine", {
+  test_var <- as.POSIXct("2026-02-24 10:34:44 UTC") + 360 * 1:20
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = test_var
+    )
+  )
+
+  test_data_null <- list(
+    test_dataset = data.frame(
+      var1 = NULL
+    )
+  )
+
+  filter <- cb_filter.datetime_range.tblist(
+    variable = "var1", range = NA,
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  vdiffr::expect_doppelganger("datetime_range - default breaks work", filter$plot_data(test_data))
+  vdiffr::expect_doppelganger(
+    "datetime_range - Breaks argument is passed properly",
+    filter$plot_data(test_data, breaks = "hours")
+  )
+  vdiffr::expect_doppelganger(
+    "datetime_range - Extra args work",
+    filter$plot_data(test_data, freq = TRUE, breaks = "hours")
+  )
+  vdiffr::expect_doppelganger("datetime_range - No data case works", filter$plot_data(test_data_null))
+})
+
+test_that("plot_data in multi_discrete filter works fine", {
+  test_var1 <- c("a", "a", "b", "b", "b", "c")
+  test_var2 <- c("A", "A", "C", "A", "A", "B")
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = test_var1,
+      var2 = test_var2
+    )
+  )
+
+  test_data_null <- list(
+    test_dataset = data.frame(
+      var1 = NULL
+    )
+  )
+
+  filter <- cb_filter.multi_discrete.tblist(
+    variables = c("var1", "var2"), value = NA,
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  vdiffr::expect_doppelganger("multi_discrete - standard call works", filter$plot_data(test_data))
+  vdiffr::expect_doppelganger("multi_discrete - Extra args work", filter$plot_data(test_data, axes = FALSE))
+  vdiffr::expect_doppelganger("multi_discrete - No data case works", filter$plot_data(test_data_null))
+})

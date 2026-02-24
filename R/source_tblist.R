@@ -666,12 +666,13 @@ cb_filter.datetime_range.tblist <- function(
       }
     },
     plot_data = function(data_object, ..., breaks = NULL) {
-      args <- rlang::dots_list(...)
-      if (is.null(breaks) && nrow(data_object[[dataset]])) {
-        breaks <- calculate_datetime_step(
-          min(data_object[[dataset]][[variable]], na.rm = TRUE),
-          max(data_object[[dataset]][[variable]], na.rm = TRUE)
-        ) %>% names()
+      if (nrow(data_object[[dataset]])) {
+        if (is.null(breaks)) {
+          breaks <- calculate_datetime_step(
+            min(data_object[[dataset]][[variable]], na.rm = TRUE),
+            max(data_object[[dataset]][[variable]], na.rm = TRUE)
+          ) %>% names()
+        }
 
         data_object[[dataset]][[variable]] %>%
           graphics::hist(..., breaks = breaks)
@@ -769,8 +770,9 @@ cb_filter.multi_discrete.tblist <- function(
       }
     },
     plot_data = function(data_object, ...) {
+      variables <- unlist(variables)
       if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][names(variables)] %>%
+        data_object[[dataset]][variables] %>%
           purrr::map(table) %>%
           purrr::imap_dfc(group_stats) %>%
           as.matrix() %>%
