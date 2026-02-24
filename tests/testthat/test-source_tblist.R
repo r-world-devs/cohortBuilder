@@ -127,23 +127,6 @@ test_that("get_stats in discrete filter works fine", {
   expect_type(result, "integer")
 })
 
-test_that("plot_data in discrete filter works fine", {
-  test_var <- NULL
-
-  test_data <- list(
-    test_dataset = data.frame(
-      var1 = test_var
-    )
-  )
-
-  filter <- cb_filter.discrete.tblist(
-    variable = "var1", value = "A",
-    dataset = "test_dataset", keep_na = TRUE
-  )
-  filter$plot_data(test_data)
-  expect_silent(recordPlot())
-})
-
 test_that("get_params in discrete filter works fine", {
   filter <- cb_filter.discrete.tblist(
     variable = "var1", value = "A",
@@ -375,35 +358,6 @@ test_that("get_stats in range filter works fine", {
   expect_identical(result, length(test_var %>% na.omit()))
 })
 
-test_that("plot_data in range filter works fine", {
-  test_var <- c(42L, 7L, 89L, NA, 16L, 73L, 58L, 91L, 35L, NA, 24L, 67L)
-
-  test_data <- list(
-    test_dataset = data.frame(
-      var1 = test_var
-    )
-  )
-
-  test_data_null <- list(
-    test_dataset = data.frame(
-      var1 = NULL
-    )
-  )
-
-  filter <- cb_filter.range.tblist(
-    variable = "var1", range = c(1L, 40L),
-    dataset = "test_dataset", keep_na = TRUE
-  )
-
-  filter$plot_data(test_data)
-  expect_silent(recordPlot())
-  dev.off()
-
-  filter$plot_data(test_data_null)
-  expect_silent(recordPlot())
-  dev.off()
-})
-
 test_that("get_params in range filter works fine", {
   filter <- cb_filter.range.tblist(
     variable = "var1", range = c(1L, 40L),
@@ -610,20 +564,19 @@ test_that("plot_data in date range filter works fine", {
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  filter$plot_data(test_data, breaks = "year")
-  expect_silent(recordPlot())
-  dev.off()
-
-  filter$plot_data(test_data_null, breaks = "year")
-  expect_silent(recordPlot())
-  dev.off()
+  vdiffr::expect_doppelganger(
+    "date_range - breaks argument is passed properly",
+    filter$plot_data(test_data, breaks = "year")
+  )
+  vdiffr::expect_doppelganger("date_range - Extra args work", filter$plot_data(test_data, freq = TRUE, breaks = "year"))
+  vdiffr::expect_doppelganger("date_range - No data case works", filter$plot_data(test_data_null, breaks = "year"))
 })
 
 test_that("plot_data in range filter works fine", {
-  test_var <- c(rnorm(10), NA)
+  test_var <- c(seq(-2L, 2L, length.out = 10L), NA)
   test_data <- list(
     test_dataset = data.frame(
-      var1 = as.Date(test_var)
+      var1 = test_var
     )
   )
 
@@ -634,15 +587,34 @@ test_that("plot_data in range filter works fine", {
   )
 
   filter <- cb_filter.range.tblist(
-    variable = "var1", range = c(-1, 1),
+    variable = "var1", range = c(-1L, 1L),
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  filter$plot_data(test_data, breaks = 10)
-  expect_silent(recordPlot())
-  dev.off()
+  vdiffr::expect_doppelganger("range - Breaks argument is passed properly", filter$plot_data(test_data, breaks = 10L))
+  vdiffr::expect_doppelganger("range - Extra args work", filter$plot_data(test_data, breaks = 5L, freq = TRUE))
+  vdiffr::expect_doppelganger("range - No data case works", filter$plot_data(test_data_null, breaks = c(-1L, 0L, 1L)))
+})
 
-  filter$plot_data(test_data_null, breaks = c(-1, 0, 1))
-  expect_silent(recordPlot())
-  dev.off()
+test_that("plot_data in discrete filter works fine", {
+  test_var <- c("a", "a", "b", "b", "b", "c", NA)
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = test_var
+    )
+  )
+
+  test_data_null <- list(
+    test_dataset = data.frame(
+      var1 = NULL
+    )
+  )
+
+  filter <- cb_filter.discrete.tblist(
+    variable = "var1", value = c("b", "c"),
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  vdiffr::expect_doppelganger("discrete - Extra args work", filter$plot_data(test_data, axes = FALSE))
+  vdiffr::expect_doppelganger("discrete - No data case works", filter$plot_data(test_data_null))
 })
