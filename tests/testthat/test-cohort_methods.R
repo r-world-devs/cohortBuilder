@@ -1585,7 +1585,5 @@ test_that("Computing cache on request works as expected", {
     run_flow = FALSE
   )
   expect_null(coh$get_cache("1", state = "pre", .recalc_when_missing = FALSE))
-  expect_true(!is.null(coh$get_cache("1", state = "pre", .recalc_when_missing = TRUE)))
+  expect_false(is.null(coh$get_cache("1", state = "pre", .recalc_when_missing = TRUE)))
 })
-
-
