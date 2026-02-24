@@ -80,6 +80,8 @@ Cohort object is designed to make operations on source data possible.
 
 - [`Cohort$last_step_id()`](#method-Cohort-last_step_id)
 
+- [`Cohort$is_pending()`](#method-Cohort-is_pending)
+
 - [`Cohort$modify()`](#method-Cohort-modify)
 
 - [`Cohort$clone()`](#method-Cohort-clone)
@@ -828,7 +830,12 @@ Return step of filter specific cache.
 
 #### Usage
 
-    Cohort$get_cache(step_id, filter_id, state = "post")
+    Cohort$get_cache(
+      step_id,
+      filter_id,
+      state = "post",
+      .recalc_when_missing = TRUE
+    )
 
 #### Arguments
 
@@ -846,6 +853,11 @@ Return step of filter specific cache.
 
   Should cache be returned on data before ("pre") or after ("post")
   filtering in specified step.
+
+- `.recalc_when_missing`:
+
+  Should the function compute cache automatically when the one is not
+  computed yet?
 
 ------------------------------------------------------------------------
 
@@ -872,6 +884,22 @@ Return id of the last existing step in Cohort.
 #### Usage
 
     Cohort$last_step_id()
+
+------------------------------------------------------------------------
+
+### Method `is_pending()`
+
+Check if step is pending.
+
+#### Usage
+
+    Cohort$is_pending(step_id)
+
+#### Arguments
+
+- `step_id`:
+
+  Id of the step to be checked.
 
 ------------------------------------------------------------------------
 

@@ -1,9 +1,19 @@
 # Changelog
 
-## cohortBuilder (development version)
+## cohortBuilder 0.4.0
 
+- Multi discrete filter does not operate on
+  [`dplyr::across`](https://dplyr.tidyverse.org/reference/across.html)
+  and
+  [`dplyr::cur_column`](https://dplyr.tidyverse.org/reference/context.html)
+  anymore.
+- Now cohort calculates only active filters cache while initializing
+  source (results with significant performance improvement). The
+  `get_cache` method computes cache when called (and the related cache
+  was missing).
 - Add new `datatime_filter` that handle POSIXct type.
-- Move unique/distinct to collapse::funique.
+- Move unique/distinct to
+  [`collapse::funique`](https://fastverse.org/collapse/reference/funique.html).
 - Replace (internally) `%in%` with custom operator using
   [`collapse::fmatch`](https://fastverse.org/collapse/reference/fmatch.html),
   that seems to be more efficient.

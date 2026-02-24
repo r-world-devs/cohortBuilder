@@ -9,7 +9,7 @@ R6 class representing Cohort object."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">cohortBuilder</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,6 +99,7 @@ R6 class representing Cohort object."><meta property="og:image" content="https:/
 <li><p><a href="#method-Cohort-get_cache"><code>Cohort$get_cache()</code></a></p></li>
 <li><p><a href="#method-Cohort-list_active_filters"><code>Cohort$list_active_filters()</code></a></p></li>
 <li><p><a href="#method-Cohort-last_step_id"><code>Cohort$last_step_id()</code></a></p></li>
+<li><p><a href="#method-Cohort-is_pending"><code>Cohort$is_pending()</code></a></p></li>
 <li><p><a href="#method-Cohort-modify"><code>Cohort$modify()</code></a></p></li>
 <li><p><a href="#method-Cohort-clone"><code>Cohort$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-Cohort-new"></a><div class="section">
@@ -808,7 +809,12 @@ filtering in specified step.</p></dd>
 <h3 id="method-get-cache-">Method <code>get_cache()</code><a class="anchor" aria-label="anchor" href="#method-get-cache-"></a></h3>
 <p>Return step of filter specific cache.</p><div class="section">
 <h4 id="usage-28">Usage<a class="anchor" aria-label="anchor" href="#usage-28"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Cohort</span><span class="op">$</span><span class="fu">get_cache</span><span class="op">(</span><span class="va">step_id</span>, <span class="va">filter_id</span>, state <span class="op">=</span> <span class="st">"post"</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Cohort</span><span class="op">$</span><span class="fu">get_cache</span><span class="op">(</span></span>
+<span>  <span class="va">step_id</span>,</span>
+<span>  <span class="va">filter_id</span>,</span>
+<span>  state <span class="op">=</span> <span class="st">"post"</span>,</span>
+<span>  .recalc_when_missing <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -825,6 +831,10 @@ If `filter_id` is not missing, the parameter describes id of the step where filt
 <dt><code>state</code></dt>
 <dd><p>Should cache be returned on data before ("pre") or after ("post")
 filtering in specified step.</p></dd>
+
+
+<dt><code>.recalc_when_missing</code></dt>
+<dd><p>Should the function compute cache automatically when the one is not computed yet?</p></dd>
 
 
 </dl><p></p></div>
@@ -854,15 +864,31 @@ filtering in specified step.</p></dd>
 </div>
 
 
-</div><p></p><hr><a id="method-Cohort-modify"></a><div class="section">
-<h3 id="method-modify-">Method <code>modify()</code><a class="anchor" aria-label="anchor" href="#method-modify-"></a></h3>
-<p>Helper method enabling to run non-standard operation on Cohort object.</p><div class="section">
+</div><p></p><hr><a id="method-Cohort-is_pending"></a><div class="section">
+<h3 id="method-is-pending-">Method <code>is_pending()</code><a class="anchor" aria-label="anchor" href="#method-is-pending-"></a></h3>
+<p>Check if step is pending.</p><div class="section">
 <h4 id="usage-31">Usage<a class="anchor" aria-label="anchor" href="#usage-31"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Cohort</span><span class="op">$</span><span class="fu">modify</span><span class="op">(</span><span class="va">modifier</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Cohort</span><span class="op">$</span><span class="fu">is_pending</span><span class="op">(</span><span class="va">step_id</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-27">Arguments<a class="anchor" aria-label="anchor" href="#arguments-27"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>step_id</code></dt>
+<dd><p>Id of the step to be checked.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-Cohort-modify"></a><div class="section">
+<h3 id="method-modify-">Method <code>modify()</code><a class="anchor" aria-label="anchor" href="#method-modify-"></a></h3>
+<p>Helper method enabling to run non-standard operation on Cohort object.</p><div class="section">
+<h4 id="usage-32">Usage<a class="anchor" aria-label="anchor" href="#usage-32"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Cohort</span><span class="op">$</span><span class="fu">modify</span><span class="op">(</span><span class="va">modifier</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-28">Arguments<a class="anchor" aria-label="anchor" href="#arguments-28"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>modifier</code></dt>
 <dd><p>Function of two arguments `self` and `private`.</p></dd>
 
@@ -873,12 +899,12 @@ filtering in specified step.</p></dd>
 </div><p></p><hr><a id="method-Cohort-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-32">Usage<a class="anchor" aria-label="anchor" href="#usage-32"></a></h4>
+<h4 id="usage-33">Usage<a class="anchor" aria-label="anchor" href="#usage-33"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Cohort</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-28">Arguments<a class="anchor" aria-label="anchor" href="#arguments-28"></a></h4>
+<h4 id="arguments-29">Arguments<a class="anchor" aria-label="anchor" href="#arguments-29"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
