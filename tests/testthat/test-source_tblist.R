@@ -618,3 +618,31 @@ test_that("plot_data in date range filter works fine", {
   expect_silent(recordPlot())
   dev.off()
 })
+
+test_that("plot_data in range filter works fine", {
+  test_var <- c(rnorm(10), NA)
+  test_data <- list(
+    test_dataset = data.frame(
+      var1 = as.Date(test_var)
+    )
+  )
+
+  test_data_null <- list(
+    test_dataset = data.frame(
+      var1 = NULL
+    )
+  )
+
+  filter <- cb_filter.range.tblist(
+    variable = "var1", range = c(-1, 1),
+    dataset = "test_dataset", keep_na = TRUE
+  )
+
+  filter$plot_data(test_data, breaks = 10)
+  expect_silent(recordPlot())
+  dev.off()
+
+  filter$plot_data(test_data_null, breaks = c(-1, 0, 1))
+  expect_silent(recordPlot())
+  dev.off()
+})
