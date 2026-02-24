@@ -1668,6 +1668,12 @@
       ],
       "Hash": "c03fa420630029418f7e6da3667aac4a"
     },
+    "vdiffr": {
+      "Package": "vdiffr",
+      "Version": "1.0.9",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
     "viridisLite": {
       "Package": "viridisLite",
       "Version": "0.4.1",
