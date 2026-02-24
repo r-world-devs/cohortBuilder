@@ -1564,3 +1564,28 @@ test_that("Remove_step works fine", {
   coh$remove_step(100L)
   expect_identical(number_of_steps_pre, length(coh$get_state()))
 })
+
+test_that("Pending state is properly updated", {
+  coh <- Cohort$new(
+    sakila_source,
+    step_1,
+    run_flow = TRUE
+  )
+  expect_false(coh$get_step("1")$pending)
+  coh$update_filter(1L, "film_filter", value = "R", run_flow = FALSE)
+  expect_true(coh$get_step("1")$pending)
+  coh$run_flow()
+  expect_false(coh$get_step("1")$pending)
+})
+
+test_that("Computing cache on request works as expected", {
+  coh <- Cohort$new(
+    sakila_source,
+    step_1,
+    run_flow = FALSE
+  )
+  expect_null(coh$get_cache("1", state = "pre", .recalc_when_missing = FALSE))
+  expect_true(!is.null(coh$get_cache("1", state = "pre", .recalc_when_missing = TRUE)))
+})
+
+
