@@ -2,6 +2,8 @@
 
 ## cohortBuilder 0.4.0
 
+CRAN release: 2026-02-24
+
 - Multi discrete filter does not operate on
   [`dplyr::across`](https://dplyr.tidyverse.org/reference/across.html)
   and
