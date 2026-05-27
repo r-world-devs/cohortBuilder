@@ -16,6 +16,7 @@ Source <- R6::R6Class(
     #'   Used as a part of reproducible code output, see \link{code}.
     #' @param description A named list storing the source objects description.
     #'   Can be accessed with \link{description} Cohort method.
+    #' @param available_filters List of filter definitions available for the source.
     #' @param options List of options affecting methods output. Currently supported only `display_binding`
     #'   specifying whether reproducible code should include bindings definition.
     #' @return A new `Source` object of class `Source` (and `dtconn` object class appended).
@@ -146,7 +147,9 @@ Source <- R6::R6Class(
     },
     #' @field dtconn Data connection object the Source if based on.
     dtconn = NULL,
+    #' @field dtvalue Evaluated data connection value used for computing stats.
     dtvalue = NULL,
+    #' @field meta_stats Computed metadata statistics for available filters.
     meta_stats = NULL,
     #' @field description Source object description list.
     description = NULL,
@@ -160,6 +163,8 @@ Source <- R6::R6Class(
     primary_keys = NULL,
     #' @field source_code An expression which allows to recreate basic source structure.
     source_code = NULL,
+    #' @description
+    #' Calculate metadata statistics for available filters.
     calc_meta_stats = function() {
       keep_meta_stats <- getOption("cb.source_filters_meta_stats", TRUE)
       if (!is.null(private$meta_filters) && keep_meta_stats) {
@@ -175,6 +180,7 @@ Source <- R6::R6Class(
     }
   ),
   active = list(
+    #' @field available_filters List of filter definitions available for the source.
     available_filters = function(value) {
       if (missing(value)) {
         return(private$meta_filters)
@@ -425,6 +431,21 @@ rm_filter.Source <- function(x, step_id, filter_id, ...) {
 update_filter.Source <- function(x, step_id, filter_id, ...) {
   x$update_filter(step_id, filter_id, ...)
   return(x)
+}
+
+#' Create a description object
+#'
+#' Helper for building structured description entries used in source definition.
+#'
+#' @param description A single string describing the field.
+#' @param ... Additional named parameters to include in the description object.
+#' @return A named list with `text` and any extra parameters.
+#' @export
+describe <- function(description, ...) {
+  list(
+    text = description,
+    ...
+  )
 }
 
 #' @export

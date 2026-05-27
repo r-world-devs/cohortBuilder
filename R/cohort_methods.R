@@ -207,6 +207,7 @@ Cohort <- R6::R6Class(
     #' @param filter_id Id of the filter to be updated.
     #' @param ... Filter parameters that should be updated.
     #' @param active Mark filter as active (`TRUE`) or inactive (`FALSE`).
+    #' @param hook_args Named list of extra arguments passed to pre/post hooks.
     update_filter = function(step_id, filter_id, ..., active, run_flow = FALSE,
                              hook = list(
                                pre = get_hook("pre_update_filter_hook"),
@@ -517,7 +518,10 @@ Cohort <- R6::R6Class(
       if (!missing(step_id) && !missing(filter_id)) {
         filter <- self$get_filter(step_id, filter_id)
         description <- filter$get_params("description")
-        if (is.null(description)) {
+        if (is.list(description)) {
+          description <- description$text
+        }
+        if (is.null(description) && !missing(field)) {
           description <- shape(self$get_source(), field, filter_id)
         }
       }

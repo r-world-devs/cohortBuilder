@@ -29,7 +29,6 @@ Imports:
     formatR,
     collapse
 KeepSource: true
-RoxygenNote: 7.3.3
 Suggests: 
     queryBuilder,
     vdiffr,
@@ -56,3 +55,4 @@ VignetteBuilder: knitr
 URL: https://github.com/r-world-devs/cohortBuilder/,  https://r-world-devs.github.io/cohortBuilder/
 Depends: 
     R (>= 3.5.0)
+Config/roxygen2/version: 8.0.0

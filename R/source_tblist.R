@@ -1024,7 +1024,11 @@ shape.tblist <- function(source, field, subfield, ...) {
     subfield <- "dataset_"
   }
   if (!missing(field)) {
-    return(description_obj[[field]][[subfield]]$text)
+    field_val <- description_obj[[field]]
+    if (is.character(field_val)) {
+      return(field_val)
+    }
+    return(field_val[[subfield]]$text)
   }
   purrr::imap_dfr(
     description_obj,
@@ -1036,7 +1040,6 @@ shape.tblist <- function(source, field, subfield, ...) {
           if (field_name == "dataset_") {
             field_name <- NA
           }
-#browser()
           stats <- source$meta_stats$filters[[field_name]]
           stats <- stats[names(stats) %in% c("min", "max", "choices")]
           stats$type <- "range"
