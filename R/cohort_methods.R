@@ -89,7 +89,7 @@ Cohort <- R6::R6Class(
                           post = get_hook("post_add_step_hook")
                         )) {
 
-      new_step_id <- as.character(as.integer(self$last_step_id()) + 1)
+      new_step_id <- as.character(as.integer(self$last_step_id()) + 1L)
 
       run_hooks(hook$pre, self, private, new_step_id)
 
@@ -121,7 +121,7 @@ Cohort <- R6::R6Class(
           filters = purrr::map(filters, get_filter_state, extra_fields = NULL)
         )
       } else {
-        step_config <- self$get_state(step_id, json = FALSE)[[1]]
+        step_config <- self$get_state(step_id, json = FALSE)[[1L]]
         step_config$step <- next_step(step_id)
       }
 
@@ -150,7 +150,7 @@ Cohort <- R6::R6Class(
       run_hooks(hook$pre, self, private, step_id)
 
       step_id <- as.character(step_id)
-      clear_data_ids <- steps_range(step_id, rev(names(private$steps))[1])
+      clear_data_ids <- steps_range(step_id, rev(names(private$steps))[1L])
       private$steps[[step_id]] <- NULL
       private$cache[clear_data_ids] <- NULL
       private$data_objects[clear_data_ids] <- NULL
@@ -178,6 +178,7 @@ Cohort <- R6::R6Class(
       evaled_filter <- eval_filter(filter, step_id, private$source)
       private$steps[[step_id]]$filters[[evaled_filter$id]] <- evaled_filter
       private$steps[[step_id]]$id <- step_id
+      private$steps[[step_id]]$pending <- TRUE
       if (run_flow) {
         self$run_flow(min_step = step_id)
       }
@@ -191,7 +192,8 @@ Cohort <- R6::R6Class(
       filter_id <- as.character(filter_id)
 
       private$steps[[step_id]]$filters[[filter_id]] <- NULL
-      if (length(private$steps[[step_id]]$filters) == 0) {
+      private$steps[[step_id]]$pending <- TRUE
+      if (length(private$steps[[step_id]]$filters) == 0L) {
         self$remove_step(step_id, run_flow)
       } else {
         if (run_flow) {
@@ -238,10 +240,15 @@ Cohort <- R6::R6Class(
           filter_env[[param_name]] <- new_val
         }
       }
-
       if (!missing(active)) {
-        filter_env[["active"]] <- active
+        if (!is.logical(active)) {
+          warning("Active accepts only logical values.")
+        } else {
+          filter_env[["active"]] <- active
+        }
       }
+
+      private$steps[[step_id]]$pending <- TRUE
 
       run_hooks(
         hook$post, self, private, step_id = step_id, filter_id = filter_id,
@@ -266,7 +273,7 @@ Cohort <- R6::R6Class(
           list(step_id = step_id, filter_id = filter_id, run_flow = run_flow),
           self$get_filter(step_id, filter_id)$get_defaults(
             self$get_data(step_id, collect = FALSE, state = "pre"),
-            self$get_cache(step_id, filter_id, state = "pre")
+            self$get_cache(step_id, filter_id, state = "pre", .recalc_when_missing = TRUE)
           )
         )
       )
@@ -325,7 +332,7 @@ Cohort <- R6::R6Class(
     #' @param state List or JSON string containing steps and filters configuration.
     #' @param modifier Function two parameters combining the previous and provided state.
     #'   The returned state is then restored.
-    restore = function(state, modifier = function(prev_state, state) {state},
+    restore = function(state, modifier = function(prev_state, state) state,
                        run_flow = FALSE, hook = list(
                          pre = get_hook("pre_restore_hook"),
                          post = get_hook("post_restore_hook")
@@ -340,7 +347,8 @@ Cohort <- R6::R6Class(
       }
 
       if (is.character(state)) {
-        state <- jsonlite::fromJSON(txt = state, simplifyVector = TRUE, simplifyMatrix = FALSE, simplifyDataFrame = FALSE)
+        state <- jsonlite::fromJSON(txt = state, simplifyVector = TRUE,
+                                    simplifyMatrix = FALSE, simplifyDataFrame = FALSE)
       }
 
       state <- modifier(self$attributes$pre_restore_state, state)
@@ -359,10 +367,9 @@ Cohort <- R6::R6Class(
             filter_state$range <- na_fix(filter_state$range)
             filter_state$range <- as.Date(filter_state$range)
           }
-
           if (filter_state$type == "datetime_range") {
             filter_state$range <- na_fix(filter_state$range)
-            if (length(filter_state$range) == 0) filter_state$range <- NULL
+            if (length(filter_state$range) == 0L) filter_state$range <- NULL
             filter_state$range <- as.POSIXct(filter_state$range, origin = "1970-01-01 UTC")
           }
           add_filter(
@@ -439,7 +446,7 @@ Cohort <- R6::R6Class(
         ...
       )
       for (active_state in active_states) {
-        attrition_labels[length(attrition_labels) + 1] <- .get_attrition_label(
+        attrition_labels[length(attrition_labels) + 1L] <- .get_attrition_label(
           source = self$get_source(),
           step_id = active_state$step,
           step_filters = purrr::map(active_state$filters, get_filter_meta),
@@ -474,6 +481,11 @@ Cohort <- R6::R6Class(
       if (state == "pre") {
         data_id <- prev_step(step_id)
       }
+
+      if (is.null(self$get_step(step_id)) && step_id != 0L) {
+        stop("Step is not exist in this cohort object.")
+      }
+
       if (missing(filter_id)) {
         return(
           .get_stats(private$source, private$data_objects[[data_id]])
@@ -527,11 +539,11 @@ Cohort <- R6::R6Class(
     #' @param mark_step Include information which filtering step is performed.
     #' @param ... Other parameters passed to \link[formatR]{tidy_source}.
     get_code = function(
-    include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
-    include_action = c("pre_filtering", "post_filtering", "run_binding"),
-    modifier = .repro_code_tweak, mark_step = TRUE, ...) {
+        include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
+        include_action = c("pre_filtering", "post_filtering", "run_binding"),
+        modifier = .repro_code_tweak, mark_step = TRUE, ...) {
 
-      source_type <- class(private$source)[1]
+      source_type <- class(private$source)[1L]
       # todo improve
       fun_args <- environment()
       code_params <- c(
@@ -643,7 +655,7 @@ Cohort <- R6::R6Class(
       # todo code include once?
       res_quote <- combine_expressions(unlist(code_components_df$expr))
       formatR::tidy_source(
-        text = as.character(res_quote)[-1],
+        text = as.character(res_quote)[-1L],
         ...
       )
     },
@@ -654,7 +666,7 @@ Cohort <- R6::R6Class(
                         hook = list(pre = get_hook("pre_run_flow_hook"), post = get_hook("post_run_flow_hook"))) {
       run_hooks(hook$pre, self, private)
       if (missing(min_step)) {
-        min_step <- 1
+        min_step <- 1L
       }
       min_step <- min(length(private$data_objects), as.integer(min_step)) # make sure all steps data is evaluated
       steps_to_execute <- steps_range(min_step, length(private$steps))
@@ -700,22 +712,19 @@ Cohort <- R6::R6Class(
       )
 
       filter_ids <- names(self$get_step(step_id)$filters)
-      is_cached <- !is.null(self$get_cache(step_id, state = "pre"))
+      is_cached <- !is.null(self$get_cache(step_id, state = "pre", .recalc_when_missing = FALSE))
 
       # todo make sure is_cached logic is correct
       if (!is_cached) {
         self$update_cache(step_id, state = "pre")
       }
       self$update_cache(step_id, state = "post")
-      for (filter_id in filter_ids) {
-        is_cached <- !is.null(self$get_cache(step_id, filter_id, state = "pre"))
-        if (!is_cached) {
-          self$update_cache(step_id, filter_id, state = "pre")
-        }
-      }
       for (filter_id in active_filters) {
+        self$update_cache(step_id, filter_id, state = "pre")
         self$update_cache(step_id, filter_id, state = "post")
       }
+
+      private$steps[[step_id]]$pending <- FALSE
 
       run_hooks(hook$post, self, private, step_id)
     },
@@ -743,7 +752,7 @@ Cohort <- R6::R6Class(
     #' @description
     #' Print defined steps configuration.
     describe_state = function() {
-      if (length(private$steps) == 0) {
+      if (length(private$steps) == 0L) {
         cat("No steps configuration found.")
       } else {
         private$steps %>% purrr::walk(print_step)
@@ -813,16 +822,22 @@ Cohort <- R6::R6Class(
     #' @param filter_id Id of the filter for which cache data should be returned.
     #' @param state Should cache be returned on data before ("pre") or after ("post")
     #'    filtering in specified step.
-    get_cache = function(step_id, filter_id, state = "post") {
-      step_id <- as.character(step_id)
+    #' @param .recalc_when_missing Should the function compute cache automatically when the one is not computed yet?
+    get_cache = function(step_id, filter_id, state = "post", .recalc_when_missing = TRUE) {
+      cache_id <- as.character(step_id)
       if (state == "pre") {
-        step_id <- prev_step(step_id)
+        cache_id <- prev_step(step_id)
       }
       if (missing(filter_id)) {
-        private$cache[[step_id]]
+        res <- private$cache[[cache_id]]
       } else {
-        private$cache[[step_id]]$filters[[filter_id]]
+        res <- private$cache[[cache_id]]$filters[[filter_id]]
       }
+      if (is.null(res) && .recalc_when_missing) {
+        self$update_cache(step_id, filter_id, state)
+        res <- self$get_cache(step_id, filter_id, state, FALSE)
+      }
+      return(res)
     },
     #' @description
     #' List active filters included in selected step.
@@ -850,6 +865,15 @@ Cohort <- R6::R6Class(
       as.character(length(private$steps))
     },
     #' @description
+    #' Check if step is pending.
+    #' @param step_id Id of the step to be checked.
+    is_pending = function(step_id) {
+      if (missing(step_id)) {
+        return(private$steps %>% purrr::map_lgl("pending"))
+      }
+      private$steps[[step_id]]$pending
+    },
+    #' @description
     #' Helper method enabling to run non-standard operation on Cohort object.
     #' @param modifier Function of two arguments `self` and `private`.
     modify = function(modifier) {
@@ -868,7 +892,8 @@ Cohort <- R6::R6Class(
                              pre = get_hook("pre_init_source_hook"),
                              post = get_hook("post_init_source_hook")
                            )) {
-      run_hooks(hook$pre, self, private)
+
+      run_hooks(hook$pre, self, private, ...)
 
       private$source <- source
       private$steps <- register_steps_and_filters(source, ...)
@@ -881,7 +906,8 @@ Cohort <- R6::R6Class(
         self$attributes$available_filters <- purrr::map(source$available_filters, ~ .x(source))
       }
       private$cache[["0"]] <- private$source$meta_stats
-      run_hooks(hook$post, self, private)
+
+      run_hooks(hook$post, self, private, ...)
     }
   )
 )

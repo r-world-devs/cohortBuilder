@@ -74,7 +74,7 @@ test_that("pair_seq always returns a strictly increasing sequence of integers", 
   result <- pair_seq(input)
 
   # Expect numeric output
-  expect_type(result, "double")
+  expect_type(result, "integer")
 
   # Expect output is in strictly ascending order
   expect_true(all(diff(result) > 0L))

@@ -8,12 +8,12 @@ has_steps <- function(source) {
 
 structure_steps <- function(steps) {
 
-  if (length(steps) == 1) {
-    single_step <- "cb_step" %in% class(steps[[1]])
+  if (length(steps) == 1L) {
+    single_step <- "cb_step" %in% class(steps[[1L]])
     if (single_step) {
       return(steps)
     }
-    return(list(step(steps[[1]])))
+    return(list(step(steps[[1L]])))
   } else {
     is_list_of_steps <- all(purrr::map_lgl(steps, ~ "cb_step" %in% class(.)))
     if (is_list_of_steps) {
@@ -26,7 +26,7 @@ structure_steps <- function(steps) {
 }
 
 pull_steps <- function(source, ...) {
-  if (missing(source) || (!has_steps(source) && length(list(...)) == 0)) {
+  if (missing(source) || (!has_steps(source) && length(list(...)) == 0L)) {
     return(NULL)
   } else if (has_steps(source)) { # steps or raw filters are added as source attributes
     steps <- get_steps(source, ...)
@@ -41,7 +41,7 @@ pull_steps <- function(source, ...) {
 
 eval_step_filters <- function(step, source) {
 
-  if (length(step$filters) == 0) {
+  if (length(step$filters) == 0L) {
     return(list())
   }
 
@@ -49,11 +49,14 @@ eval_step_filters <- function(step, source) {
     purrr::map(eval_filter, step_id = step$id, source = source)
 
   filters_names <- step$filters %>% purrr::map_chr(~.x$id)
-  if (any(duplicated(filters_names))) {
+  if (anyDuplicated(filters_names) > 0L) {
     stop("Cannot create filters with the same id in a single step.")
   }
   step$filters <- step$filters %>%
     stats::setNames(filters_names)
+
+  step$pending <- TRUE
+
   return(step)
 }
 
@@ -71,7 +74,7 @@ attach_step_id <- function(step, id) {
 }
 
 attach_step_ids <- function(steps) {
-  step_ids <- as.character(seq_len(length(steps)))
+  step_ids <- as.character(seq_along(steps))
   steps %>%
     purrr::imodify(~ attach_step_id(.x, as.character(.y))) %>%
     stats::setNames(step_ids)
@@ -81,26 +84,27 @@ steps_range <- function(from, to) {
   from <- as.integer(from)
   to <- as.integer(to)
   if (from > to) {
-    return(character(0))
+    return(character(0L))
   }
   as.character(
-    seq(from = from, to = to, by = 1)
+    seq(from = from, to = to, by = 1L)
   )
 }
 
 readjust_step <- function(step, new_id) {
   step$id <- new_id
   step$filters <- purrr::modify(step$filters, modify_item, new_val = new_id, what = "step_id")
+  step$pending <- TRUE
 
   return(step)
 }
 
 prev_step <- function(idx) {
-  as.character(as.integer(idx) - 1)
+  as.character(as.integer(idx) - 1L)
 }
 
 next_step <- function(idx) {
-  as.character(as.integer(idx) + 1)
+  as.character(as.integer(idx) + 1L)
 }
 
 print_step <- function(step) {

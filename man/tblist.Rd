@@ -5,15 +5,20 @@
 \alias{as.tblist}
 \title{Create in memory tables connection}
 \usage{
-tblist(..., names)
+tblist(..., names, .class = NULL)
 
-as.tblist(x, ...)
+as.tblist(x, ..., .class = NULL)
 }
 \arguments{
 \item{...}{additional arguments to be passed to or from methods.}
 
 \item{names}{A character vector describing provided tables names.
 If missing names are constructed based on provided tables objects.}
+
+\item{.class}{The extra (highest priority) class added to the resulting object.
+Having the extra class defined, enables to implement custom S3 methods for the object
+having higher priority over the existing methods.
+Especially useful if you want to change the built-in method behavior.}
 
 \item{x}{an R object.}
 }

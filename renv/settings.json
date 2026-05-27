@@ -1,9 +1,7 @@
 {
   "bioconductor.version": null,
   "external.libraries": [],
-  "ignored.packages": [
-    "cohortBuilder"
-  ],
+  "ignored.packages": [],
   "package.dependency.fields": [
     "Imports",
     "Depends",
@@ -11,8 +9,8 @@
   ],
   "ppm.enabled": null,
   "ppm.ignored.urls": [],
-  "r.version": [],
-  "snapshot.type": "all",
+  "r.version": null,
+  "snapshot.type": "explicit",
   "use.cache": true,
   "vcs.ignore.cellar": true,
   "vcs.ignore.library": true,

@@ -29,7 +29,7 @@ Source <- R6::R6Class(
       self$dtvalue <- .init_step(self)
       self$available_filters <- available_filters
       self$attributes <- list(...)
-      self$source_code = source_code
+      self$source_code <- source_code
       self$description <- description
       if (!is.null(binding_keys)) {
         self$binding_keys <- binding_keys
@@ -58,7 +58,7 @@ Source <- R6::R6Class(
         private$steps,
         stats::setNames(
           list(step),
-          as.character(length(private$steps) + 1)
+          as.character(length(private$steps) + 1L)
         )
       )
     },
@@ -76,8 +76,8 @@ Source <- R6::R6Class(
       }
 
       private$steps[[step_id]] <- NULL
-      if (length(private$steps) >= 1) {
-        names(private$steps) <- as.character(seq_len(length(private$steps)))
+      if (length(private$steps) >= 1L) {
+        names(private$steps) <- as.character(seq_along(private$steps))
       } else {
         private$steps <- NULL
       }
@@ -90,7 +90,7 @@ Source <- R6::R6Class(
     add_filter = function(filter, step_id) {
 
       if (missing(step_id)) {
-        step_id <- 1
+        step_id <- 1L
         if (!is.null(private$steps)) {
           step_id <- length(private$steps)
         }
@@ -119,11 +119,11 @@ Source <- R6::R6Class(
 
       private$steps[[step_id]]$filters[[to_remove_idx]] <- NULL
 
-      if (length(private$steps[[step_id]]$filters) == 0) {
+      if (length(private$steps[[step_id]]$filters) == 0L) {
         private$steps[[step_id]] <- NULL # remove step when no more filters
       }
 
-      if (length(private$steps) == 0) {
+      if (length(private$steps) == 0L) {
         private$steps <- NULL
       }
     },

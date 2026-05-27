@@ -13,3 +13,5 @@ cran-comments.md
 .Rprofile
 meta_data.yaml
 ^\.github$
+^\.lintr
+dev/*
