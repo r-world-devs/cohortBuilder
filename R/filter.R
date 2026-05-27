@@ -3,6 +3,47 @@ static_params <- c("type", "id", "name")
 # S3 class registration for S7 dispatch
 tblist_class <- S7::new_S3_class("tblist")
 
+# -- Filter Type Registry -----------------------------------------------------
+
+#' Environment storing registered filter type constructors.
+#' @keywords internal
+.filter_registry <- new.env(parent = emptyenv())
+
+#' Register a custom filter type
+#'
+#' Registers an S7 filter constructor so it can be used with \code{\link{filter}("type", ...)}.
+#' The constructor must return an object inheriting from \link{CbFilter}.
+#'
+#' @param type Character string identifying the filter type.
+#' @param constructor S7 class constructor (e.g. created with [S7::new_class()]).
+#'
+#' @examples
+#' \dontrun{
+#' MyCbFilter <- S7::new_class("MyCbFilter",
+#'   parent = CbFilter,
+#'   package = "mypackage",
+#'   properties = list(variable = S7::class_character),
+#'   constructor = function(id = .gen_id(), name = id, variable, dataset, ...) {
+#'     S7::new_object(S7::S7_object(),
+#'       type = "my_filter", id = id, name = name, input_param = "value",
+#'       variable = variable, dataset = dataset,
+#'       active = TRUE, description = NULL, extra = list(...)
+#'     )
+#'   }
+#' )
+#' register_filter_type("my_filter", MyCbFilter)
+#' # Now filter("my_filter", ...) works
+#' }
+#'
+#' @export
+register_filter_type <- function(type, constructor) {
+  if (!is.character(type) || length(type) != 1L) {
+    stop("`type` must be a single character string.")
+  }
+  .filter_registry[[type]] <- constructor
+  invisible(type)
+}
+
 # -- S7 Filter Classes --------------------------------------------------------
 
 #' Base class for all cohortBuilder filters
@@ -360,8 +401,14 @@ filter <- function(type, ...) {
     datetime_range = CbFilterDatetimeRange,
     multi_discrete = CbFilterMultiDiscrete,
     query = CbFilterQuery,
-    stop(paste("Unknown filter type:", type))
+    NULL
   )
+  if (is.null(constructor)) {
+    constructor <- .filter_registry[[type]]
+  }
+  if (is.null(constructor)) {
+    stop(paste("Unknown filter type:", type))
+  }
   constructor(...)
 }
 

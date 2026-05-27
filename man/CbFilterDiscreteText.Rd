@@ -10,6 +10,7 @@ CbFilterDiscreteText(
   variable,
   value = NA,
   dataset,
+  keep_na = TRUE,
   description = NULL,
   active = getOption("cb_active_filter", default = TRUE),
   ...
@@ -25,6 +26,8 @@ CbFilterDiscreteText(
 \item{value}{Values to keep. `NA` means no filtering.}
 
 \item{dataset}{Dataset name.}
+
+\item{keep_na}{If `TRUE`, NA values are retained.}
 
 \item{description}{Optional description.}
 
