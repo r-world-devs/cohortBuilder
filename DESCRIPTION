@@ -17,6 +17,7 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     R6,
+    S7 (>= 0.2.0),
     jsonlite,
     purrr,
     tibble,
@@ -53,6 +54,6 @@ Collate:
     'data.R'
 VignetteBuilder: knitr
 URL: https://github.com/r-world-devs/cohortBuilder/,  https://r-world-devs.github.io/cohortBuilder/
-Depends: 
-    R (>= 3.5.0)
+Depends:
+    R (>= 4.1.0)
 Config/roxygen2/version: 8.0.0

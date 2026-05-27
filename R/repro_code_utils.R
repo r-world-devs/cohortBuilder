@@ -3,23 +3,6 @@ substitute_q <- function(x, env) {
   eval(call)
 }
 
-pair_seq <- function(idxs) {
-
-  if (length(idxs) == 0L) {
-    return(integer(0L))
-  }
-
-  if (!identical(length(idxs) %% 2L, 0L)) {
-    stop("The lenght of idxs is not even number")
-  }
-
-  idxs <- sort(idxs)
-  sequence <- c()
-  for (idx in seq(1L, length(idxs), by = 2L)) {
-    sequence <- c(sequence, seq(idxs[idx], idxs[idx + 1L], by = 1L))
-  }
-  return(sequence)
-}
 
 parse_func_expr <- function(func) {
 
@@ -76,42 +59,6 @@ assign_expr <- function(name, value) {
   )
 }
 
-parse_filter_expr <- function(filter) {
-  filter_env <- environment(filter$filter_data)
-  keep_na <- identical(filter_env$keep_na, TRUE)
-  selected_value <- filter_env[[filter$input_param]]
-  filter_expr <- utils::capture.output(filter$filter_data)
-  vars_env <- as.list(filter_env)
-
-  code_eval_idx <- sort(c(
-    pair_seq(grep("# code eval ", filter_expr, fixed = TRUE)),
-    grep("# code eval$", filter_expr)
-  ))
-  code_eval_expr <- parse(text = c("{", filter_expr[code_eval_idx], "}"))[[1L]]
-  rlang::eval_bare(code_eval_expr, filter_env)
-
-  keep_na_ind <- if (keep_na) "keep_na" else "!keep_na"
-  value_na_ind <- if (identical(selected_value, NA)) "value_na" else "!value_na"
-  expr_ind <- glue::glue(" {keep_na_ind} {value_na_ind} ")
-
-  expr_idx <- grep(expr_ind, filter_expr, fixed = TRUE)
-  code_include_idx <- grep("# code include ", filter_expr, fixed = TRUE)
-  sub_expr_idx <- pair_seq(c(expr_idx, code_include_idx))
-
-  sub_expr_idx <- sort(c(
-    sub_expr_idx,
-    grep("# code include$", filter_expr)
-  ))
-
-  if (length(sub_expr_idx) == 0L) {
-    return(str2lang("{}"))
-  }
-
-  filter_expr <- parse(text = c("{", filter_expr[sub_expr_idx], "}"))[[1L]]
-  sub_vars <- substitute_q(filter_expr, vars_env)
-  sub_syms <-   rlang::inject((!!rlang::expr)(!!sub_vars), filter_env)
-  return(sub_syms)
-}
 
 combine_expressions <- function(expressions_list) {
   expressions_list <- lapply(expressions_list, function(x) {
@@ -205,11 +152,6 @@ take_first_line <- function(expr) {
 pipe_reassignment <- function(expr_l, expr_r) {
   rlang::expr(!!expr1 %>% expr_r)
 }
-
-nos <- rlang::expr({
-  a %>% sum()
-  b <- 1L
-})
 
 pipe_filtering <- function(filtering_exprs) {
   n_exprs <- length(filtering_exprs)

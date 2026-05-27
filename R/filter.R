@@ -1,11 +1,297 @@
 static_params <- c("type", "id", "name")
 
-eval_filter <- function(filter_fun, step_id, source) {
-  evaled_filter <- filter_fun(source)
-  evaled_filter$step_id <- step_id
+# S3 class registration for S7 dispatch
+tblist_class <- S7::new_S3_class("tblist")
 
-  evaled_filter
-}
+# -- S7 Filter Classes --------------------------------------------------------
+
+#' Base class for all cohortBuilder filters
+#'
+#' @param type Filter type string.
+#' @param id Filter identifier.
+#' @param name Filter display name.
+#' @param input_param Name of the parameter holding the filtering value.
+#' @param dataset Dataset name to apply the filter on.
+#' @param active Whether the filter is active.
+#' @param description Optional filter description.
+#' @param step_id Step identifier (set when filter is attached to a step).
+#' @param extra Named list of extra parameters.
+#'
+#' @export
+CbFilter <- S7::new_class("CbFilter",
+  package = "cohortBuilder",
+  properties = list(
+    type = S7::class_character,
+    id = S7::class_character,
+    name = S7::class_character,
+    input_param = S7::class_character,
+    dataset = S7::class_character,
+    active = S7::class_logical,
+    description = S7::class_any,
+    step_id = S7::new_property(S7::class_any, default = NULL),
+    extra = S7::new_property(S7::class_any, default = list())
+  )
+)
+
+#' Discrete filter class
+#'
+#' Filters data by matching a variable against a set of discrete values.
+#'
+#' @param id Filter identifier.
+#' @param name Filter display name (defaults to `id`).
+#' @param variable Column name to filter on.
+#' @param value Values to keep. `NA` means no filtering.
+#' @param dataset Dataset name.
+#' @param keep_na If `TRUE`, NA values are retained.
+#' @param description Optional description.
+#' @param active If `FALSE`, filter is skipped.
+#' @param ... Extra parameters.
+#'
+#' @export
+CbFilterDiscrete <- S7::new_class("CbFilterDiscrete",
+  parent = CbFilter,
+  package = "cohortBuilder",
+  properties = list(
+    variable = S7::class_character,
+    value = S7::class_any,
+    keep_na = S7::class_logical
+  ),
+  constructor = function(id = .gen_id(), name = id, variable, value = NA,
+                         dataset, keep_na = TRUE, description = NULL,
+                         active = getOption("cb_active_filter", default = TRUE), ...) {
+    S7::new_object(S7::S7_object(),
+      type = "discrete", id = id, name = name, input_param = "value",
+      variable = variable, value = value, dataset = dataset,
+      keep_na = keep_na, active = active, description = description,
+      extra = list(...)
+    )
+  }
+)
+
+#' Discrete text filter class
+#'
+#' Filters data by matching a variable against comma-separated text values.
+#'
+#' @inheritParams CbFilterDiscrete
+#' @export
+CbFilterDiscreteText <- S7::new_class("CbFilterDiscreteText",
+  parent = CbFilter,
+  package = "cohortBuilder",
+  properties = list(
+    variable = S7::class_character,
+    value = S7::class_any,
+    keep_na = S7::new_property(S7::class_logical, default = TRUE)
+  ),
+  constructor = function(id = .gen_id(), name = id, variable, value = NA,
+                         dataset, keep_na = TRUE, description = NULL,
+                         active = getOption("cb_active_filter", default = TRUE), ...) {
+    S7::new_object(S7::S7_object(),
+      type = "discrete_text", id = id, name = name, input_param = "value",
+      variable = variable, value = value, dataset = dataset,
+      keep_na = keep_na, active = active, description = description,
+      extra = list(...)
+    )
+  }
+)
+
+#' Range filter class
+#'
+#' Filters data by a numeric range.
+#'
+#' @param range Numeric vector of length 2 (min, max). `NA` means no filtering.
+#' @inheritParams CbFilterDiscrete
+#' @export
+CbFilterRange <- S7::new_class("CbFilterRange",
+  parent = CbFilter,
+  package = "cohortBuilder",
+  properties = list(
+    variable = S7::class_character,
+    range = S7::class_any,
+    keep_na = S7::class_logical
+  ),
+  constructor = function(id = .gen_id(), name = id, variable, range = NA,
+                         dataset, keep_na = TRUE, description = NULL,
+                         active = getOption("cb_active_filter", default = TRUE), ...) {
+    S7::new_object(S7::S7_object(),
+      type = "range", id = id, name = name, input_param = "range",
+      variable = variable, range = range, dataset = dataset,
+      keep_na = keep_na, active = active, description = description,
+      extra = list(...)
+    )
+  }
+)
+
+#' Date range filter class
+#'
+#' Filters data by a date range.
+#'
+#' @inheritParams CbFilterRange
+#' @export
+CbFilterDateRange <- S7::new_class("CbFilterDateRange",
+  parent = CbFilter,
+  package = "cohortBuilder",
+  properties = list(
+    variable = S7::class_character,
+    range = S7::class_any,
+    keep_na = S7::class_logical
+  ),
+  constructor = function(id = .gen_id(), name = id, variable, range = NA,
+                         dataset, keep_na = TRUE, description = NULL,
+                         active = getOption("cb_active_filter", default = TRUE), ...) {
+    S7::new_object(S7::S7_object(),
+      type = "date_range", id = id, name = name, input_param = "range",
+      variable = variable, range = range, dataset = dataset,
+      keep_na = keep_na, active = active, description = description,
+      extra = list(...)
+    )
+  }
+)
+
+#' Datetime range filter class
+#'
+#' Filters data by a datetime (POSIXct) range.
+#'
+#' @inheritParams CbFilterRange
+#' @export
+CbFilterDatetimeRange <- S7::new_class("CbFilterDatetimeRange",
+  parent = CbFilter,
+  package = "cohortBuilder",
+  properties = list(
+    variable = S7::class_character,
+    range = S7::class_any,
+    keep_na = S7::class_logical
+  ),
+  constructor = function(id = .gen_id(), name = id, variable, range = NA,
+                         dataset, keep_na = TRUE, description = NULL,
+                         active = getOption("cb_active_filter", default = TRUE), ...) {
+    S7::new_object(S7::S7_object(),
+      type = "datetime_range", id = id, name = name, input_param = "range",
+      variable = variable, range = range, dataset = dataset,
+      keep_na = keep_na, active = active, description = description,
+      extra = list(...)
+    )
+  }
+)
+
+#' Multi-discrete filter class
+#'
+#' Filters data by matching multiple variables against sets of discrete values.
+#'
+#' @param variables Vector of column names to filter on.
+#' @param values Named list of values to filter by, keyed by variable name.
+#' @inheritParams CbFilterDiscrete
+#' @export
+CbFilterMultiDiscrete <- S7::new_class("CbFilterMultiDiscrete",
+  parent = CbFilter,
+  package = "cohortBuilder",
+  properties = list(
+    variables = S7::class_any,
+    values = S7::class_any,
+    keep_na = S7::class_logical
+  ),
+  constructor = function(id = .gen_id(), name = id, values, variables,
+                         dataset, keep_na = TRUE, description = NULL,
+                         active = getOption("cb_active_filter", default = TRUE), ...) {
+    S7::new_object(S7::S7_object(),
+      type = "multi_discrete", id = id, name = name, input_param = "values",
+      variables = variables, values = values, dataset = dataset,
+      keep_na = keep_na, active = active, description = description,
+      extra = list(...)
+    )
+  }
+)
+
+#' Query filter class
+#'
+#' Filters data using a queryBuilder query object.
+#'
+#' @param variables Vector of column names used in the query.
+#' @param value Query object (from queryBuilder package). `NA` means no filtering.
+#' @inheritParams CbFilterDiscrete
+#' @export
+CbFilterQuery <- S7::new_class("CbFilterQuery",
+  parent = CbFilter,
+  package = "cohortBuilder",
+  properties = list(
+    variables = S7::class_any,
+    value = S7::class_any,
+    keep_na = S7::class_logical
+  ),
+  constructor = function(id = .gen_id(), name = id, variables, value = NA,
+                         dataset, keep_na = TRUE, description = NULL,
+                         active = getOption("cb_active_filter", default = TRUE), ...) {
+    S7::new_object(S7::S7_object(),
+      type = "query", id = id, name = name, input_param = "value",
+      variables = variables, value = value, dataset = dataset,
+      keep_na = keep_na, active = active, description = description,
+      extra = list(...)
+    )
+  }
+)
+
+# -- S7 Generics (multi-dispatch on filter + source) --------------------------
+
+#' Apply filter to data object
+#'
+#' @param filter S7 filter object.
+#' @param source Source object.
+#' @param data_object Data object to filter.
+#' @param ... Additional arguments.
+#' @return Filtered data object.
+#' @export
+cb_filter_data <- S7::new_generic("cb_filter_data", c("filter", "source"))
+
+#' Get filter statistics
+#'
+#' @param filter S7 filter object.
+#' @param source Source object.
+#' @param data_object Data object to compute statistics from.
+#' @param ... Additional arguments.
+#' @return List of statistics.
+#' @export
+cb_get_filter_stats <- S7::new_generic("cb_get_filter_stats", c("filter", "source"))
+
+#' Plot filter data
+#'
+#' @param filter S7 filter object.
+#' @param source Source object.
+#' @param data_object Data object to plot.
+#' @param ... Additional arguments passed to plotting functions.
+#' @return Plot side effect.
+#' @export
+cb_plot_filter_data <- S7::new_generic("cb_plot_filter_data", c("filter", "source"))
+
+#' Get filter-related data
+#'
+#' @param filter S7 filter object.
+#' @param source Source object.
+#' @param data_object Data object.
+#' @param ... Additional arguments.
+#' @return Filter-related data subset.
+#' @export
+cb_get_filter_data <- S7::new_generic("cb_get_filter_data", c("filter", "source"))
+
+#' Get filter default values
+#'
+#' @param filter S7 filter object.
+#' @param source Source object.
+#' @param data_object Data object.
+#' @param cache_object Cached statistics object.
+#' @param ... Additional arguments.
+#' @return Named list of default parameter values.
+#' @export
+cb_get_filter_defaults <- S7::new_generic("cb_get_filter_defaults", c("filter", "source"))
+
+#' Generate reproducible code expression for filter
+#'
+#' @param filter S7 filter object.
+#' @param source Source object.
+#' @param ... Additional arguments.
+#' @return An R expression representing the filter operation.
+#' @export
+cb_filter_to_expr <- S7::new_generic("cb_filter_to_expr", c("filter", "source"))
+
+# -- Helper functions ---------------------------------------------------------
 
 #' Generate random ID
 #'
@@ -18,98 +304,68 @@ eval_filter <- function(filter_fun, step_id, source) {
   )
 }
 
-get_filter_state <- function(filter, extra_fields) {
-  filter_params <- as.list(environment(filter$filter_data))
-  filter_params <- append(
-    filter_params,
-    filter_params$args
-  )
-  filter_params$args <- NULL
-  filter_params$source <- NULL
-  filter_params$type <- as.character(filter_params$type)
+#' Get filter parameters as a list
+#'
+#' Extracts all user-facing properties from an S7 filter object.
+#'
+#' @param filter S7 filter object.
+#' @param name Optional parameter name to retrieve a single value.
+#' @return Named list of filter parameters, or a single value if `name` is given.
+#' @export
+get_filter_params <- function(filter, name) {
+  all_props <- S7::props(filter)
+  # Remove internal properties
+  all_props$step_id <- NULL
+  all_props$extra <- NULL
+  all_props$input_param <- NULL
+  # Merge extra params
+  all_props <- c(all_props, filter@extra)
+  # description is returned as-is (may be NULL, character, or list)
+  if (!missing(name)) return(all_props[[name]])
+  all_props
+}
 
+get_filter_state <- function(filter, extra_fields) {
+  params <- get_filter_params(filter)
   if (!is.null(extra_fields)) {
     for (field in extra_fields) {
-      filter_params[[field]] <- filter[[field]]
+      params[[field]] <- S7::prop(filter, field)
     }
   }
-
-  return(filter_params)
+  params
 }
 
-#' Define custom filter.
+eval_filter <- function(filter_obj, step_id, source) {
+  filter_obj@step_id <- step_id
+  filter_obj
+}
+
+# -- Filter factory -----------------------------------------------------------
+
+#' Define Cohort filter
 #'
-#' Methods available for creating new filters easier.
+#' Creates an S7 filter object of the specified type.
 #'
-#' `def_filter` designates list of parameters and methods required to define new type of filter.
-#'
-#' `new_filter` creates a new file with new filter definition template.
-#'
-#' See vignettes("custom-filters") to learn how to create a custom filter.
-#'
-#' @name creating-filters
-#' @param type Filter type.
-#' @param id Filter id.
-#' @param name Filter name.
-#' @param input_param Name of parameter responsible for providing filtering value.
-#' @param filter_data Function of `data_object` parameter defining filtering logic on Source data object.
-#' @param get_stats Function of `data_object` and `name` parameters
-#' defining what and how data statistics should be calculated.
-#' @param plot_data Function of `data_object` parameter defining how filter data should be plotted.
-#' @param get_params Function of `name` parameter returning
-#' filter parameters (if names is skipped all the parameters are returned).
-#' @param get_data Function of `data_object` returning filter related data.
-#' @param get_defaults Function of `data_object` and `cache_object` parameters
-#' returning default `input_param` parameter value.
-#' @return A list of filter specific values and methods (`def_filter`) or no value (`new_filter`).
+#' @param type Type of filter to use (e.g., "discrete", "range", "date_range").
+#' @param ... Filter type-specific parameters.
+#' @return An S7 filter object inheriting from `CbFilter`.
 #'
 #' @export
-def_filter <- function(type, id = .gen_id(), name = id, input_param = NULL,
-                       filter_data, get_stats, plot_data, get_params, get_data, get_defaults) {
-
-  structure(
-    list(
-      id = id,
-      type = type,
-      name = name,
-      input_param = input_param,
-      filter_data = filter_data,
-      get_stats = get_stats,
-      plot_data = plot_data,
-      get_params = get_params,
-      get_data = get_data,
-      get_defaults = get_defaults
-    ),
-    class = c("cb_filter", type)
+filter <- function(type, ...) {
+  constructor <- switch(type,
+    discrete = CbFilterDiscrete,
+    discrete_text = CbFilterDiscreteText,
+    range = CbFilterRange,
+    date_range = CbFilterDateRange,
+    datetime_range = CbFilterDatetimeRange,
+    multi_discrete = CbFilterMultiDiscrete,
+    query = CbFilterQuery,
+    stop(paste("Unknown filter type:", type))
   )
+  constructor(...)
 }
 
-#' @rdname creating-filters
-#' @param filter_type Type of new filter.
-#' @param source_type Type of source for which filter should be defined.
-#' @param input_param Name of the parameter taking filtering value.
-#' @param extra_params Vector of extra parameters name that should be available for filter.
-#' @param file File path where filter should be created.
-#' @export
-new_filter <- function(filter_type, source_type, input_param = "value", extra_params = "", file) {
-  template_content <- as.list(c(
-    readLines(system.file("filter_template", package = "cohortBuilder")),
-    .sep = "\n"
-  ))
-  extra_params_assign <- ""
-  if (!identical(extra_params, "")) {
-    extra_params_assign <- paste0(toString(
-      glue::glue("{extra_params} = {extra_params}")
-    ), ",")
-    extra_params <- paste0(toString(extra_params), ",")
-  }
-  file <- file.path(getwd(), glue::glue("filter_{filter_type}_{source_type}.R"))
-  writeLines(
-    do.call(glue::glue, as.list(template_content)),
-    con = file
-  )
-  utils::file.edit(file)
-}
+# -- Printing -----------------------------------------------------------------
 
 #' Method for printing filter details
 #'
@@ -121,274 +377,23 @@ new_filter <- function(filter_type, source_type, input_param = "value", extra_pa
 }
 
 #' @export
-.print_filter.default <- function(filter, data_objects) {
-  meta <- filter$get_params()
-  params <- meta[setdiff(names(meta), static_params)]
-  cat(glue::glue("-> Filter ID: {filter$id}"), sep = "\n")
-  cat(glue::glue("   Filter Type: {filter$type}"), sep = "\n")
+.print_filter.CbFilter <- function(filter, data_objects) {
+  params <- get_filter_params(filter)
+  params <- params[setdiff(names(params), static_params)]
+  cat(glue::glue("-> Filter ID: {filter@id}"), sep = "\n")
+  cat(glue::glue("   Filter Type: {filter@type}"), sep = "\n")
   cat("   Filter Parameters:", sep = "\n")
   for (param_name in names(params)) {
     cat(glue::glue("     {param_name}: {paste(params[[param_name]], collapse = ', ')}"), sep = "\n")
   }
 }
 
-#' Operator simplifying adding steps or filters to Cohort and Source objects
-#'
-#' When called with filter or step object, runs add_filter and add_step respectively.
-#'
-#' @param x Source or Cohort object. Otherwise works as a standard pipe operator.
-#' @param object Filter or step to be added to `x`.
-#' @return And object (`Source` or `Cohort`) having new filter of step added.
-#'
 #' @export
-`%->%` <- function(x, object) {
-  method <- NULL
-  if (inherits(object, "cb_step")) {
-    method <- add_step
-  }
-  if (inherits(object, "cb_filter_constructor")) {
-    method <- add_filter
-  }
-  if (is.null(method)) {
-    method <- `%>%`
-  }
-  return(method(x, object))
-}
-
-#' Attach proper class to filter constructor
-#'
-#' @param filter_constructor Function defining filter.
-#' @return A function having `cb_filter_constructor` class attached.
-#'
-#' @export
-.as_constructor <- function(filter_constructor) {
-  class(filter_constructor) <- c(class(filter_constructor), "cb_filter_constructor")
-  return(filter_constructor)
-}
-
-#' Define Cohort filter
-#'
-#' @param type Type of filter to use.
-#' @param ... Filter type-specific parameters (see \link{filter-types}),
-#'   and filter source-specific parameters (see \link{filter-source-types}).
-#' @return A function of class `cb_filter_constructor`.
-#'
-#' @export
-filter <- function(type, ...) {
-  UseMethod("filter", type)
-}
-
-#' @rdname filter
-#' @export
-filter.character <- function(type, ...) {
-  base_filter <- structure(
-    type,
-    class = c(type, "cb_filter")
-  )
-  filter(base_filter, ...)
-}
-
-#' Filter types
-#'
-#' @name filter-types
-#' @param type Character string defining filter type (having class of the same value as type).
-#' @param id Id of the filter.
-#' @param name Filter name.
-#' @param active If FALSE filter will be skipped during Cohort filtering.
-#' @param description Filter description object. Preferable a character value.
-#' @param ... Source specific parameters passed to filter (see \link{filter-source-types}).
-#' @return A function of class `cb_filter_constructor`.
-NULL
-
-#' Filter Source types methods
-#'
-#' @inheritParams filter-types
-#' @name filter-source-types
-#' @param source Source object.
-#' @param ... Source type specific parameters (or extra ones if not matching specific S3 method arguments).
-#' @return List of filter-specific metadata and methods - result of evaluation of
-#'    `cb_filter_constructor` function on `Source` object.
-NULL
-
-#' @rdname filter-types
-#' @export
-filter.discrete <- function(type, id, name, ..., active = getOption("cb_active_filter", default = TRUE)) {
-  args <- append(
-    environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
-    list(...)
-  )
-
-  .as_constructor(
-    function(source) {
-      do.call(
-        cb_filter.discrete,
-        append(list(source = source), args)
-      )
-    }
-  )
-}
-
-#' @rdname filter-source-types
-#' @export
-cb_filter.discrete <- function(source, ...) {
-  UseMethod("cb_filter.discrete", source)
-}
-
-#' @rdname filter-types
-#' @export
-filter.discrete_text <- function(type, id, name, ..., description = NULL,
-                                 active = getOption("cb_active_filter", default = TRUE)) {
-  args <- append(
-    environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
-    list(...)
-  )
-
-  .as_constructor(
-    function(source) {
-      do.call(
-        cb_filter.discrete_text,
-        append(list(source = source), args)
-      )
-    }
-  )
-}
-
-#' @rdname filter-source-types
-#' @export
-cb_filter.discrete_text <- function(source, ...) {
-  UseMethod("cb_filter.discrete_text", source)
-}
-
-#' @rdname filter-types
-#' @export
-filter.range <- function(type, id, name, ..., description = NULL,
-                         active = getOption("cb_active_filter", default = TRUE)) {
-  args <- append(
-    environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
-    list(...)
-  )
-
-  .as_constructor(
-    function(source) {
-      do.call(
-        cb_filter.range,
-        append(list(source = source), args)
-      )
-    }
-  )
-}
-
-#' @rdname filter-source-types
-#' @export
-cb_filter.range <- function(source, ...) {
-  UseMethod("cb_filter.range", source)
-}
-
-#' @rdname filter-types
-#' @export
-filter.date_range <- function(type, id, name, ..., description = NULL,
-                              active = getOption("cb_active_filter", default = TRUE)) {
-  args <- append(
-    environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
-    list(...)
-  )
-
-  .as_constructor(
-    function(source) {
-      do.call(
-        cb_filter.date_range,
-        append(list(source = source), args)
-      )
-    }
-  )
-}
-
-#' @rdname filter-source-types
-#' @export
-cb_filter.date_range <- function(source, ...) {
-  UseMethod("cb_filter.date_range", source)
-}
-
-#' @rdname filter-types
-#' @export
-filter.datetime_range <- function(type, id, name, ..., description = NULL,
-                                  active = getOption("cb_active_filter", default = TRUE)) {
-  args <- append(
-    environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
-    list(...)
-  )
-
-  .as_constructor(
-    function(source) {
-      do.call(
-        cb_filter.datetime_range,
-        append(list(source = source), args)
-      )
-    }
-  )
-}
-
-#' @rdname filter-source-types
-#' @export
-cb_filter.datetime_range <- function(source, ...) {
-  UseMethod("cb_filter.datetime_range", source)
-}
-
-#' @rdname filter-types
-#' @export
-filter.multi_discrete <- function(type, id, name, ..., description = NULL,
-                                  active = getOption("cb_active_filter", default = TRUE)) {
-  args <- append(
-    environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
-    list(...)
-  )
-
-  .as_constructor(
-    function(source) {
-      do.call(
-        cb_filter.multi_discrete,
-        append(list(source = source), args)
-      )
-    }
-  )
-}
-
-#' @rdname filter-source-types
-#' @export
-cb_filter.multi_discrete <- function(source, ...) {
-  UseMethod("cb_filter.multi_discrete", source)
-}
-
-#' @rdname filter-types
-#' @export
-filter.query <- function(type, id, name, ..., active = getOption("cb_active_filter", default = TRUE)) {
-  args <- append(
-    environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
-    list(...)
-  )
-
-  .as_constructor(
-    function(source) {
-      do.call(
-        cb_filter.query,
-        append(list(source = source), args)
-      )
-    }
-  )
-}
-
-#' @rdname filter-source-types
-#' @export
-cb_filter.query <- function(source, ...) {
-  UseMethod("cb_filter.query", source)
-}
-
-#' @export
-.print_filter.query <- function(filter, data_objects) {
-  meta <- filter$get_params()
-  params <- meta[setdiff(names(meta), static_params)]
-  cat(glue::glue("-> Filter ID: {filter$id}"), sep = "\n")
-  cat(glue::glue("   Filter Type: {filter$type}"), sep = "\n")
+.print_filter.CbFilterQuery <- function(filter, data_objects) {
+  params <- get_filter_params(filter)
+  params <- params[setdiff(names(params), static_params)]
+  cat(glue::glue("-> Filter ID: {filter@id}"), sep = "\n")
+  cat(glue::glue("   Filter Type: {filter@type}"), sep = "\n")
   cat("   Filter Parameters:", sep = "\n")
   for (param_name in names(params)) {
     if (param_name == "value") {
@@ -397,4 +402,25 @@ cb_filter.query <- function(source, ...) {
       cat(glue::glue("     {param_name}: {paste(params[[param_name]], collapse = ', ')}"), sep = "\n")
     }
   }
+}
+
+# -- Operators ----------------------------------------------------------------
+
+#' Operator simplifying adding steps or filters to Cohort and Source objects
+#'
+#' When called with filter or step object, runs add_filter and add_step respectively.
+#'
+#' @param x Source or Cohort object. Otherwise works as a standard pipe operator.
+#' @param object Filter or step to be added to `x`.
+#' @return An object (`Source` or `Cohort`) having new filter or step added.
+#'
+#' @export
+`%->%` <- function(x, object) {
+  if (inherits(object, "cb_step")) {
+    return(add_step(x, object))
+  }
+  if (S7::S7_inherits(object, CbFilter)) {
+    return(add_filter(x, object))
+  }
+  `%>%`(x, object)
 }

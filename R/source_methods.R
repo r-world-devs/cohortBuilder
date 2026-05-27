@@ -141,9 +141,15 @@ Source <- R6::R6Class(
         filter_id
       )
 
+      filter_obj <- private$steps[[step_id]]$filters[[to_update_idx]]
       for (param in names(new_params)) {
-        environment(private$steps[[step_id]]$filters[[to_update_idx]])$args[[param]] <- new_params[[param]]
+        if (param %in% names(S7::props(filter_obj))) {
+          S7::prop(filter_obj, param) <- new_params[[param]]
+        } else {
+          filter_obj@extra[[param]] <- new_params[[param]]
+        }
       }
+      private$steps[[step_id]]$filters[[to_update_idx]] <- filter_obj
     },
     #' @field dtconn Data connection object the Source if based on.
     dtconn = NULL,
@@ -170,10 +176,10 @@ Source <- R6::R6Class(
       if (!is.null(private$meta_filters) && keep_meta_stats) {
         self$meta_stats <- .get_stats(self, self$dtvalue)
         self$meta_stats$changed <- FALSE
-        for (filter_fun in self$available_filters) {
-          evaled_filter <- eval_filter(filter_fun, step_id = NULL, source = self)
-          self$meta_stats$filters[[evaled_filter$id]] <- evaled_filter$get_stats(self$dtvalue)
-          self$meta_stats$filters[[evaled_filter$id]]$changed <- FALSE
+        for (filter_obj in self$available_filters) {
+          evaled_filter <- eval_filter(filter_obj, step_id = NULL, source = self)
+          self$meta_stats$filters[[evaled_filter@id]] <- cb_get_filter_stats(evaled_filter, self, self$dtvalue)
+          self$meta_stats$filters[[evaled_filter@id]]$changed <- FALSE
         }
       }
       return(self$meta_stats)
@@ -197,7 +203,7 @@ Source <- R6::R6Class(
 
 match_filter_id <- function(filters, filter_id) {
   filters_ids <- filters %>%
-    purrr::map_chr(~ environment(.x)$id)
+    purrr::map_chr(~ .x@id)
   which(filters_ids == filter_id)
 }
 

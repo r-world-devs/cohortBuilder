@@ -48,7 +48,7 @@ eval_step_filters <- function(step, source) {
   step$filters <- step$filters %>%
     purrr::map(eval_filter, step_id = step$id, source = source)
 
-  filters_names <- step$filters %>% purrr::map_chr(~.x$id)
+  filters_names <- step$filters %>% purrr::map_chr(~.x@id)
   if (anyDuplicated(filters_names) > 0L) {
     stop("Cannot create filters with the same id in a single step.")
   }
@@ -93,7 +93,7 @@ steps_range <- function(from, to) {
 
 readjust_step <- function(step, new_id) {
   step$id <- new_id
-  step$filters <- purrr::modify(step$filters, modify_item, new_val = new_id, what = "step_id")
+  step$filters <- purrr::modify(step$filters, function(f) { f@step_id <- new_id; f })
   step$pending <- TRUE
 
   return(step)

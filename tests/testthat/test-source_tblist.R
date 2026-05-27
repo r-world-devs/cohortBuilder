@@ -73,35 +73,37 @@ test_that("filter_data in discrete filter works fine", {
     )
   )
 
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
   # filter_data with keep_na = TRUE and value != NA
-  filter <- cb_filter.discrete.tblist(
+  filter_obj <- filter("discrete",
     variable = "var1", value = "A",
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  result <- filter$filter_data(test_data)
+  result <- cb_filter_data(filter_obj, source, test_data)
   expect_type(result$test_dataset$var1, "character")
   expect_length(result$test_dataset$var1, length(test_var %>% .[. == "A"]))
   expect_setequal(result$test_dataset$var1, c("A", NA))
 
   # filter_data with keep_na = FALSE and value = NA
-  filter2 <- cb_filter.discrete.tblist(
+  filter_obj2 <- filter("discrete",
     variable = "var1", value = NA,
     dataset = "test_dataset", keep_na = FALSE
   )
 
-  result <- filter2$filter_data(test_data)
+  result <- cb_filter_data(filter_obj2, source, test_data)
   expect_type(result$test_dataset$var1, "character")
   expect_length(result$test_dataset$var1, length(test_var %>% na.omit()))
   expect_false(anyNA(result$test_dataset$var1))
 
   # filter_data with keep_na = FALSE and value != NA
-  filter3 <- cb_filter.discrete.tblist(
+  filter_obj3 <- filter("discrete",
     variable = "var1", value = "B",
     dataset = "test_dataset", keep_na = FALSE
   )
 
-  result <- filter3$filter_data(test_data)
+  result <- cb_filter_data(filter_obj3, source, test_data)
   expect_type(result$test_dataset$var1, "character")
   expect_length(result$test_dataset$var1, length(test_var %>% na.omit() %>% .[. == "B"]))
   expect_setequal(result$test_dataset$var1, "B")
@@ -117,24 +119,26 @@ test_that("get_stats in discrete filter works fine", {
     )
   )
 
-  filter <- cb_filter.discrete.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("discrete",
     variable = "var1", value = "A",
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  result <- filter$get_stats(test_data, "n_data")
+  result <- cb_get_filter_stats(filter_obj, source, test_data, name = "n_data")
   expect_identical(result, length(test_var %>% na.omit()))
   expect_type(result, "integer")
 })
 
 test_that("get_params in discrete filter works fine", {
-  filter <- cb_filter.discrete.tblist(
+  filter_obj <- filter("discrete",
     variable = "var1", value = "A",
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  expect_type(filter$get_params("value"), "character")
-  expect_type(filter$get_params(), "list")
+  expect_type(get_filter_params(filter_obj, "value"), "character")
+  expect_type(get_filter_params(filter_obj), "list")
 })
 
 test_that("get_data in discrete filter works fine", {
@@ -152,21 +156,23 @@ test_that("get_data in discrete filter works fine", {
     )
   )
 
-  filter <- cb_filter.discrete.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("discrete",
     variable = "var1", value = "A",
     dataset = "test_dataset", keep_na = TRUE
   )
 
   # Filter with non-existing variable
-  wrong_filter <- cb_filter.discrete.tblist(
+  wrong_filter <- filter("discrete",
     variable = "non-existing", value = "A",
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  expect_type(filter$get_data(test_data), "character")
-  expect_length(filter$get_data(test_data), length(test_var))
-  expect_null(wrong_filter$get_data(test_data))
-  expect_null(filter$get_data(test_data_null))
+  expect_type(cb_get_filter_data(filter_obj, source, test_data), "character")
+  expect_length(cb_get_filter_data(filter_obj, source, test_data), length(test_var))
+  expect_null(cb_get_filter_data(wrong_filter, source, test_data))
+  expect_null(cb_get_filter_data(filter_obj, source, test_data_null))
 })
 
 test_that("get_defaults in discrete filter works fine", {
@@ -178,12 +184,15 @@ test_that("get_defaults in discrete filter works fine", {
     )
   )
 
-  filter <- cb_filter.discrete.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("discrete",
     variable = "var1", value = "A",
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  result <- filter$get_defaults(test_data, filter$get_stats(test_data))
+  stats <- cb_get_filter_stats(filter_obj, source, test_data)
+  result <- cb_get_filter_defaults(filter_obj, source, test_data, stats)
 
   expect_type(result, "list")
   expect_length(result, 1L)
@@ -201,24 +210,26 @@ test_that("get_stats in discrete text filter works fine", {
     )
   )
 
-  filter <- cb_filter.discrete_text.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("discrete_text",
     variable = "var1", value = "A",
-    dataset = "test_dataset", keep_na = TRUE
+    dataset = "test_dataset"
   )
 
-  result <- filter$get_stats(test_data, "n_missing")
+  result <- cb_get_filter_stats(filter_obj, source, test_data, name = "n_missing")
   expect_identical(result, length(test_var[is.na(test_var)]))
   expect_type(result, "integer")
 })
 
 test_that("get_params in discrete text filter works fine", {
-  filter <- cb_filter.discrete_text.tblist(
+  filter_obj <- filter("discrete_text",
     variable = "var1", value = "A",
-    dataset = "test_dataset", keep_na = TRUE
+    dataset = "test_dataset"
   )
 
-  expect_type(filter$get_params("value"), "character")
-  expect_type(filter$get_params(), "list")
+  expect_type(get_filter_params(filter_obj, "value"), "character")
+  expect_type(get_filter_params(filter_obj), "list")
 })
 
 test_that("get_data in discrete text filter works fine", {
@@ -236,21 +247,23 @@ test_that("get_data in discrete text filter works fine", {
     )
   )
 
-  filter <- cb_filter.discrete_text.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("discrete_text",
     variable = "var1", value = "A",
-    dataset = "test_dataset", keep_na = TRUE
+    dataset = "test_dataset"
   )
 
   # Filter with non-existing variable
-  wrong_filter <- cb_filter.discrete_text.tblist(
+  wrong_filter <- filter("discrete_text",
     variable = "non-existing", value = "A",
-    dataset = "test_dataset", keep_na = TRUE
+    dataset = "test_dataset"
   )
 
-  expect_type(filter$get_data(test_data), "character")
-  expect_length(filter$get_data(test_data), length(test_var))
-  expect_null(wrong_filter$get_data(test_data))
-  expect_null(filter$get_data(test_data_null))
+  expect_type(cb_get_filter_data(filter_obj, source, test_data), "character")
+  expect_length(cb_get_filter_data(filter_obj, source, test_data), length(test_var))
+  expect_null(cb_get_filter_data(wrong_filter, source, test_data))
+  expect_null(cb_get_filter_data(filter_obj, source, test_data_null))
 })
 
 test_that("get_defaults in discrete text filter works fine", {
@@ -262,12 +275,15 @@ test_that("get_defaults in discrete text filter works fine", {
     )
   )
 
-  filter <- cb_filter.discrete_text.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("discrete_text",
     variable = "var1", value = "A",
-    dataset = "test_dataset", keep_na = TRUE
+    dataset = "test_dataset"
   )
 
-  result <- filter$get_defaults(test_data, filter$get_stats(test_data))
+  stats <- cb_get_filter_stats(filter_obj, source, test_data)
+  result <- cb_get_filter_defaults(filter_obj, source, test_data, stats)
 
   expect_type(result, "list")
   expect_length(result, 1L)
@@ -298,13 +314,15 @@ test_that("filter_data in range filter works fine", {
     )
   )
 
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
   # filter_data with keep_na = TRUE and value != NA
-  filter <- cb_filter.range.tblist(
+  filter_obj <- filter("range",
     variable = "var1", range = c(1L, 40L),
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  result <- filter$filter_data(test_data)
+  result <- cb_filter_data(filter_obj, source, test_data)
 
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
@@ -312,12 +330,12 @@ test_that("filter_data in range filter works fine", {
   expect_gt(length(result$test_dataset$var1), 0L)
 
   # filter_data with keep_na = FALSE and value = NA
-  filter2 <- cb_filter.range.tblist(
+  filter_obj2 <- filter("range",
     variable = "var1", range = NA,
     dataset = "test_dataset", keep_na = FALSE
   )
 
-  result <- filter2$filter_data(test_data)
+  result <- cb_filter_data(filter_obj2, source, test_data)
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
   expect_type(result$test_dataset$var1, "integer")
@@ -325,12 +343,12 @@ test_that("filter_data in range filter works fine", {
   expect_false(anyNA(result$test_dataset$var1))
 
   # filter_data with keep_na = FALSE and value != NA
-  filter3 <- cb_filter.range.tblist(
+  filter_obj3 <- filter("range",
     variable = "var1", range = c(1L, 40L),
     dataset = "test_dataset", keep_na = FALSE
   )
 
-  result <- filter3$filter_data(test_data)
+  result <- cb_filter_data(filter_obj3, source, test_data)
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
   expect_type(result$test_dataset$var1, "integer")
@@ -346,12 +364,14 @@ test_that("get_stats in range filter works fine", {
     )
   )
 
-  filter <- cb_filter.range.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("range",
     variable = "var1", range = c(1L, 40L),
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  result <- filter$get_stats(test_data, "n_data")
+  result <- cb_get_filter_stats(filter_obj, source, test_data, name = "n_data")
 
   expect_type(result, "integer")
   expect_length(result, 1L)
@@ -359,16 +379,16 @@ test_that("get_stats in range filter works fine", {
 })
 
 test_that("get_params in range filter works fine", {
-  filter <- cb_filter.range.tblist(
+  filter_obj <- filter("range",
     variable = "var1", range = c(1L, 40L),
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  result <- filter$get_params("variable")
+  result <- get_filter_params(filter_obj, "variable")
   expect_type(result, "character")
   expect_length(result, 1L)
 
-  result2 <- filter$get_params()
+  result2 <- get_filter_params(filter_obj)
 
   expect_type(result2, "list")
   expect_type(result2$dataset, "character")
@@ -384,12 +404,14 @@ test_that("get_data in range filter works fine", {
     )
   )
 
-  filter <- cb_filter.range.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("range",
     variable = "var1", range = c(1L, 40L),
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  result <- filter$get_data(test_data)
+  result <- cb_get_filter_data(filter_obj, source, test_data)
 
   expect_type(result, "integer")
   expect_identical(result, test_var)
@@ -404,12 +426,15 @@ test_that("get_defaults in range filter works fine", {
     )
   )
 
-  filter <- cb_filter.range.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("range",
     variable = "var1", range = c(1L, 40L),
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  result <- filter$get_defaults(test_data, filter$get_stats(test_data))
+  stats <- cb_get_filter_stats(filter_obj, source, test_data)
+  result <- cb_get_filter_defaults(filter_obj, source, test_data, stats)
   expect_type(result, "list")
   expect_length(result$range, 2L)
 })
@@ -474,37 +499,39 @@ test_that("filter_data in date range filter works fine", {
     )
   )
 
+  source <- set_source(tblist(test_dataset = data.frame(var1 = as.Date(test_var))))
+
   # filter_data with keep_na = TRUE and value != NA
-  filter <- cb_filter.date_range.tblist(
+  filter_obj <- filter("date_range",
     variable = "var1", range = as.Date(c("2021-01-02", "2024-01-03")),
     dataset = "test_dataset", keep_na = TRUE
   )
 
-  result <- filter$filter_data(test_data)
+  result <- cb_filter_data(filter_obj, source, test_data)
 
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
   expect_s3_class(result$test_dataset$var1, "Date")
 
   # filter_data with keep_na = FALSE and value = NA
-  filter2 <- cb_filter.date_range.tblist(
+  filter_obj2 <- filter("date_range",
     variable = "var1", range = NA,
     dataset = "test_dataset", keep_na = FALSE
   )
 
-  result <- filter2$filter_data(test_data)
+  result <- cb_filter_data(filter_obj2, source, test_data)
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
   expect_s3_class(result$test_dataset$var1, "Date")
   expect_false(anyNA(result$test_dataset$var1))
 
   # filter_data with keep_na = FALSE and value != NA
-  filter3 <- cb_filter.date_range.tblist(
+  filter_obj3 <- filter("date_range",
     variable = "var1", range = as.Date(c("2021-01-02", "2024-01-03")),
     dataset = "test_dataset", keep_na = FALSE
   )
 
-  result <- filter3$filter_data(test_data)
+  result <- cb_filter_data(filter_obj3, source, test_data)
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
   expect_s3_class(result$test_dataset$var1, "Date")
@@ -523,13 +550,15 @@ test_that("get_stats in date range filter works fine", {
     )
   )
 
-  filter <- cb_filter.date_range.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = as.Date(test_var))))
+
+  filter_obj <- filter("date_range",
     variable = "var1", range = as.Date(c("2021-01-02", "2024-01-03")),
     dataset = "test_dataset", keep_na = TRUE
   )
 
   # All stats
-  result <- filter$get_stats(test_data)
+  result <- cb_get_filter_stats(filter_obj, source, test_data)
 
   expect_type(result, "list")
   expect_type(result$n_data, "integer")
@@ -537,8 +566,8 @@ test_that("get_stats in date range filter works fine", {
   expect_type(result$n_missing, "integer")
 
   # One stat
-  expect_type(filter$get_stats(test_data, "n_data"), "integer")
-  expect_identical(filter$get_stats(test_data, "n_data"), result$n_data)
+  expect_type(cb_get_filter_stats(filter_obj, source, test_data, name = "n_data"), "integer")
+  expect_identical(cb_get_filter_stats(filter_obj, source, test_data, name = "n_data"), result$n_data)
 })
 
 test_that("plot_data in date range filter works fine", {
@@ -559,7 +588,9 @@ test_that("plot_data in date range filter works fine", {
     )
   )
 
-  filter <- cb_filter.date_range.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = as.Date(test_var))))
+
+  filter_obj <- filter("date_range",
     variable = "var1", range = as.Date(c("2021-01-02", "2024-01-03")),
     dataset = "test_dataset", keep_na = TRUE
   )
@@ -567,19 +598,19 @@ test_that("plot_data in date range filter works fine", {
   vdiffr::expect_doppelganger(
     "date_range - breaks argument is passed properly",
     fig = function() {
-      filter$plot_data(test_data, breaks = "year")
+      cb_plot_filter_data(filter_obj, source, test_data, breaks = "year")
     }
   )
   vdiffr::expect_doppelganger(
     "date_range - Extra args work",
     fig = function() {
-      filter$plot_data(test_data, freq = TRUE, breaks = "year")
+      cb_plot_filter_data(filter_obj, source, test_data, freq = TRUE, breaks = "year")
     }
   )
   vdiffr::expect_doppelganger(
     "date_range - No data case works",
     fig = function() {
-      filter$plot_data(test_data_null, breaks = "year")
+      cb_plot_filter_data(filter_obj, source, test_data_null, breaks = "year")
     }
   )
 })
@@ -598,7 +629,9 @@ test_that("plot_data in range filter works fine", {
     )
   )
 
-  filter <- cb_filter.range.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("range",
     variable = "var1", range = c(-1L, 1L),
     dataset = "test_dataset", keep_na = TRUE
   )
@@ -606,19 +639,19 @@ test_that("plot_data in range filter works fine", {
   vdiffr::expect_doppelganger(
     "range - Breaks argument is passed properly",
     fig = function() {
-      filter$plot_data(test_data, breaks = 10L)
+      cb_plot_filter_data(filter_obj, source, test_data, breaks = 10L)
     }
   )
   vdiffr::expect_doppelganger(
     "range - Extra args work",
     fig = function() {
-      filter$plot_data(test_data, breaks = 5L, freq = TRUE)
+      cb_plot_filter_data(filter_obj, source, test_data, breaks = 5L, freq = TRUE)
     }
   )
   vdiffr::expect_doppelganger(
     "range - No data case works",
     fig = function() {
-      filter$plot_data(test_data_null, breaks = c(-1L, 0L, 1L))
+      cb_plot_filter_data(filter_obj, source, test_data_null, breaks = c(-1L, 0L, 1L))
     }
   )
 })
@@ -637,7 +670,9 @@ test_that("plot_data in discrete filter works fine", {
     )
   )
 
-  filter <- cb_filter.discrete.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("discrete",
     variable = "var1", value = c("b", "c"),
     dataset = "test_dataset", keep_na = TRUE
   )
@@ -645,13 +680,13 @@ test_that("plot_data in discrete filter works fine", {
   vdiffr::expect_doppelganger(
     "discrete - Extra args work",
     fig = function() {
-      filter$plot_data(test_data, axes = FALSE)
+      cb_plot_filter_data(filter_obj, source, test_data, axes = FALSE)
     }
   )
   vdiffr::expect_doppelganger(
     "discrete - No data case works",
     fig = function() {
-      filter$plot_data(test_data_null)
+      cb_plot_filter_data(filter_obj, source, test_data_null)
     }
   )
 })
@@ -671,31 +706,33 @@ test_that("plot_data in datetime_range filter works fine", {
     )
   )
 
-  filter <- cb_filter.datetime_range.tblist(
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var)))
+
+  filter_obj <- filter("datetime_range",
     variable = "var1", range = NA,
     dataset = "test_dataset", keep_na = TRUE
   )
 
   vdiffr::expect_doppelganger(
     "datetime_range - default breaks work", fig = function() {
-      filter$plot_data(test_data)
+      cb_plot_filter_data(filter_obj, source, test_data)
     }
   )
   vdiffr::expect_doppelganger(
     "datetime_range - Breaks arg works",
     fig = function() {
-      filter$plot_data(test_data, breaks = "hours")
+      cb_plot_filter_data(filter_obj, source, test_data, breaks = "hours")
     }
   )
   vdiffr::expect_doppelganger(
     "datetime_range - Extra args work",
     fig = function() {
-      filter$plot_data(test_data, freq = TRUE, breaks = "hours")
+      cb_plot_filter_data(filter_obj, source, test_data, freq = TRUE, breaks = "hours")
     }
   )
   vdiffr::expect_doppelganger(
     "datetime_range - No data case works", fig = function() {
-      filter$plot_data(test_data_null)
+      cb_plot_filter_data(filter_obj, source, test_data_null)
     }
   )
 })
@@ -716,29 +753,31 @@ test_that("plot_data in multi_discrete filter works fine", {
     )
   )
 
-  filter <- cb_filter.multi_discrete.tblist(
-    variables = c("var1", "var2"), value = NA,
+  source <- set_source(tblist(test_dataset = data.frame(var1 = test_var1, var2 = test_var2)))
+
+  filter_obj <- filter("multi_discrete",
+    variables = c("var1", "var2"), values = NA,
     dataset = "test_dataset", keep_na = TRUE
   )
 
   vdiffr::expect_doppelganger(
     "multi_discrete - standard call works",
     fig = function() {
-      filter$plot_data(test_data)
+      cb_plot_filter_data(filter_obj, source, test_data)
     }
   )
 
   vdiffr::expect_doppelganger(
     "multi_discrete - Extra args work",
     fig = function() {
-      filter$plot_data(test_data, axes = FALSE)
+      cb_plot_filter_data(filter_obj, source, test_data, axes = FALSE)
     }
   )
 
   vdiffr::expect_doppelganger(
     "multi_discrete - No data case works",
     fig = function() {
-      filter$plot_data(test_data_null)
+      cb_plot_filter_data(filter_obj, source, test_data_null)
     }
   )
 })

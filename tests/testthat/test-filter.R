@@ -4,28 +4,31 @@ discrete_filter <- filter(
 patients_source <- set_source(
   tblist(patients = data.frame(id = 1L:2L, age = 50L:51L))
 )
-variable_filter <- discrete_filter(patients_source)
 
-test_that("Calling filter with id returns function of source param, calling valid S3 method", {
-  expect_named(formals(discrete_filter), "source")
-  expect_s3_class(discrete_filter, "function")
-
-  skip_on_covr()
-  expect_identical(as.character(body(discrete_filter)[[2L]][[2L]]), "cb_filter.discrete")
+test_that("Calling filter returns S7 object with correct class", {
+  expect_true(S7::S7_inherits(discrete_filter, CbFilterDiscrete))
+  expect_true(S7::S7_inherits(discrete_filter, CbFilter))
+  expect_identical(discrete_filter@type, "discrete")
+  expect_identical(discrete_filter@id, "age_filter")
+  expect_identical(discrete_filter@name, "Age")
+  expect_identical(discrete_filter@variable, "age")
+  expect_identical(discrete_filter@dataset, "patients")
+  expect_identical(discrete_filter@value, 50L)
+  expect_identical(discrete_filter@input_param, "value")
 })
 
-test_that("Calling filter on source returns list with valid methods and parameters", {
-  expect_type(variable_filter, "list")
-  expect_identical(
-    c("id", "type", "name", "input_param", "filter_data",
-      "get_stats", "plot_data", "get_params", "get_data", "get_defaults"),
-    names(variable_filter)
-  )
+test_that("Filter properties can be accessed via get_filter_params", {
+  params <- get_filter_params(discrete_filter)
+  expect_type(params, "list")
+  expect_true(all(c("type", "id", "name", "variable", "value", "dataset", "active", "keep_na") %in% names(params)))
 })
 
-test_that("Filter methods operate correctly based on its definition", {
-  expect_identical(variable_filter$filter_data(patients_source$dtconn)$patients$age, 50L)
-  expect_identical(variable_filter$get_stats(patients_source$dtconn)$choices, as.list(table(50L:51L)))
+test_that("Filter S7 generics dispatch correctly on tblist source", {
+  data_object <- patients_source$dtconn
+  filtered <- cb_filter_data(discrete_filter, patients_source, data_object)
+  expect_identical(filtered$patients$age, 50L)
+  stats <- cb_get_filter_stats(discrete_filter, patients_source, data_object)
+  expect_identical(stats$choices, as.list(table(50L:51L)))
 })
 
 test_that("Discrete text filter works fine", {

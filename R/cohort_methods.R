@@ -176,7 +176,7 @@ Cohort <- R6::R6Class(
       }
       step_id <- as.character(step_id)
       evaled_filter <- eval_filter(filter, step_id, private$source)
-      private$steps[[step_id]]$filters[[evaled_filter$id]] <- evaled_filter
+      private$steps[[step_id]]$filters[[evaled_filter@id]] <- evaled_filter
       private$steps[[step_id]]$id <- step_id
       private$steps[[step_id]]$pending <- TRUE
       if (run_flow) {
@@ -226,7 +226,7 @@ Cohort <- R6::R6Class(
         ..., active = active, hook_args = hook_args$pre
       )
 
-      filter_env <- environment(private$steps[[step_id]]$filters[[filter_id]]$filter_data)
+      filter_obj <- private$steps[[step_id]]$filters[[filter_id]]
       if (any(static_params %in% names(new_args))) {
         warning(glue::glue("Cannot modify filter {paste(sQuote(static_params), collapse = ', ')} parameters."))
       }
@@ -236,18 +236,27 @@ Cohort <- R6::R6Class(
 
       for (param_name in params_to_change) {
         new_val <- new_args[[param_name]]
-        if (!identical(filter_env[[param_name]], new_val)) {
-          any_changed <- TRUE
-          filter_env[[param_name]] <- new_val
+        if (param_name %in% names(S7::props(filter_obj))) {
+          if (!identical(S7::prop(filter_obj, param_name), new_val)) {
+            any_changed <- TRUE
+            S7::prop(filter_obj, param_name) <- new_val
+          }
+        } else {
+          # Extra parameter stored in filter@extra
+          if (!identical(filter_obj@extra[[param_name]], new_val)) {
+            any_changed <- TRUE
+            filter_obj@extra[[param_name]] <- new_val
+          }
         }
       }
       if (!missing(active)) {
         if (!is.logical(active)) {
           warning("Active accepts only logical values.")
         } else {
-          filter_env[["active"]] <- active
+          filter_obj@active <- active
         }
       }
+      private$steps[[step_id]]$filters[[filter_id]] <- filter_obj
 
       private$steps[[step_id]]$pending <- TRUE
 
@@ -272,7 +281,9 @@ Cohort <- R6::R6Class(
         self$update_filter,
         append(
           list(step_id = step_id, filter_id = filter_id, run_flow = run_flow),
-          self$get_filter(step_id, filter_id)$get_defaults(
+          cb_get_filter_defaults(
+            self$get_filter(step_id, filter_id),
+            private$source,
             self$get_data(step_id, collect = FALSE, state = "pre"),
             self$get_cache(step_id, filter_id, state = "pre", .recalc_when_missing = TRUE)
           )
@@ -415,7 +426,9 @@ Cohort <- R6::R6Class(
       if (state == "pre") {
         data_id <- prev_step(step_id)
       }
-      private$steps[[step_id]]$filters[[filter_id]]$plot_data(
+      cb_plot_filter_data(
+        private$steps[[step_id]]$filters[[filter_id]],
+        private$source,
         private$data_objects[[data_id]],
         ...
       )
@@ -492,7 +505,9 @@ Cohort <- R6::R6Class(
           .get_stats(private$source, private$data_objects[[data_id]])
         )
       }
-      private$steps[[step_id]]$filters[[filter_id]]$get_stats(
+      cb_get_filter_stats(
+        private$steps[[step_id]]$filters[[filter_id]],
+        private$source,
         private$data_objects[[data_id]],
         ...
       )
@@ -517,7 +532,7 @@ Cohort <- R6::R6Class(
       }
       if (!missing(step_id) && !missing(filter_id)) {
         filter <- self$get_filter(step_id, filter_id)
-        description <- filter$get_params("description")
+        description <- get_filter_params(filter, "description")
         if (is.list(description)) {
           description <- description$text
         }
@@ -610,14 +625,14 @@ Cohort <- R6::R6Class(
           )
         }
         active_filters <- private$steps[[step_id]]$filters %>%
-          purrr::keep(~ .x$get_params("active"))
+          purrr::keep(~ .x@active)
         for (filter in active_filters) {
-          filter_params <- filter$get_params()
+          filter_params <- get_filter_params(filter)
           code_components <- append(
             code_components,
             type_expr(
               type = "filtering", step = step_id,
-              expr = parse_filter_expr(filter),
+              expr = cb_filter_to_expr(filter, private$source),
               !!!filter_params
             )
           )
@@ -698,8 +713,7 @@ Cohort <- R6::R6Class(
       active_filters <- self$list_active_filters(step_id)
       for (filter_id in active_filters) {
         data_filter <- self$get_filter(step_id, filter_id)
-        temp_data_object <- temp_data_object %>%
-          data_filter$filter_data()
+        temp_data_object <- cb_filter_data(data_filter, private$source, temp_data_object)
       }
 
       private$data_objects[[step_id]] <- .post_filtering(
@@ -812,7 +826,7 @@ Cohort <- R6::R6Class(
         filter <- self$get_filter(step_id, filter_id)
         prev_cache <- private$cache[[cache_id]]$filters[[filter_id]]
         cache_changed <- FALSE
-        private$cache[[cache_id]]$filters[[filter_id]] <- filter$get_stats(self$get_data(step_id, state, FALSE))
+        private$cache[[cache_id]]$filters[[filter_id]] <- cb_get_filter_stats(filter, private$source, self$get_data(step_id, state, FALSE))
         if (!identical(prev_cache, private$cache[[cache_id]]$filters[[filter_id]])) {
           cache_changed <- TRUE
         }
@@ -849,7 +863,7 @@ Cohort <- R6::R6Class(
     list_active_filters = function(step_id) {
       get_active_filters <- function(step_id, self) {
         active_names <- self$get_filter(step_id) %>%
-          purrr::keep(~ .x$get_params("active")) %>%
+          purrr::keep(~ .x@active) %>%
           names()
         active_names
       }
@@ -907,7 +921,10 @@ Cohort <- R6::R6Class(
         private$data_objects[["0"]] <- initial_data
       }
       if (!is.null(source$available_filters)) {
-        self$attributes$available_filters <- purrr::map(source$available_filters, ~ .x(source))
+        self$attributes$available_filters <- purrr::map(
+          source$available_filters,
+          ~ eval_filter(.x, step_id = NULL, source = source)
+        )
       }
       private$cache[["0"]] <- private$source$meta_stats
 

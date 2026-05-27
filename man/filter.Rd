@@ -2,22 +2,18 @@
 % Please edit documentation in R/filter.R
 \name{filter}
 \alias{filter}
-\alias{filter.character}
 \title{Define Cohort filter}
 \usage{
 filter(type, ...)
-
-\method{filter}{character}(type, ...)
 }
 \arguments{
-\item{type}{Type of filter to use.}
+\item{type}{Type of filter to use (e.g., "discrete", "range", "date_range").}
 
-\item{...}{Filter type-specific parameters (see \link{filter-types}),
-and filter source-specific parameters (see \link{filter-source-types}).}
+\item{...}{Filter type-specific parameters.}
 }
 \value{
-A function of class `cb_filter_constructor`.
+An S7 filter object inheriting from `CbFilter`.
 }
 \description{
-Define Cohort filter
+Creates an S7 filter object of the specified type.
 }

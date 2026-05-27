@@ -1217,18 +1217,18 @@ test_that("update_filter changed active status works fine", {
   second_filter_id <- "species_filter_two"
 
   #default TRUE
-  expect_true(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
-  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter")@active)
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")@active)
 
   coh$update_filter(1L, "species_filter", active = FALSE)
 
-  expect_false(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
-  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
+  expect_false(coh$get_filter(step_id = 1L, "species_filter")@active)
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")@active)
 
   coh$update_filter(1L, "species_filter", active = TRUE)
 
-  expect_true(coh$get_filter(step_id = 1L, "species_filter")$get_params("active"))
-  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")$get_params("active"))
+  expect_true(coh$get_filter(step_id = 1L, "species_filter")@active)
+  expect_true(coh$get_filter(step_id = 1L, "species_filter_two")@active)
 })
 
 test_that("update_filter trigger data calculations works fine", {
@@ -1287,7 +1287,6 @@ test_that("Retrieving reproducible code works fine", {
     data_object <- source$dtconn
     data_object[["iris"]] <- data_object[["iris"]] %>%
       dplyr::filter(Species %in% c("setosa", "virginica", NA))
-    attr(data_object[["iris"]], "filtered") <- TRUE
   })
   expect_identical(
     gsub("\n|\\s+", " ", repro_code$text.tidy),
@@ -1315,8 +1314,7 @@ test_that("code returns expression to create filtered tblist", {
     rlang::eval_bare(rlang::parse_expr(line))
   }
 
-  expect_identical(data_object$iris, get_data(coh)$iris)
-  expect_true(attr(data_object$iris, "filtered"))
+  expect_equal(data_object$iris, get_data(coh)$iris, ignore_attr = "filtered")
   expect_output(code(coh))
 })
 
