@@ -13,7 +13,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 options("tibble.print_min" = 5L, "tibble.print_max" = 5L)
-library(magrittr)
 library(dplyr, exclude = "filter")
 library(cohortBuilder)
 ```
@@ -141,15 +140,15 @@ S7::method(cb_filter_data, list(CbFilterLogical, tblist_class)) <- function(filt
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(value, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!!sym(variable) == !!value | is.na(!!sym(variable)))
   }
   if (!keep_na && identical(value, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!is.na(!!sym(variable)))
   }
   if (!keep_na && !identical(value, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!!sym(variable) == !!value)
   }
   attr(data_object[[dataset]], "filtered") <- TRUE
@@ -172,12 +171,12 @@ S7::method(cb_get_filter_stats, list(CbFilterLogical, tblist_class)) <- function
     name <- c("n_data", "choices", "n_missing")
   }
   stats <- list(
-    choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>%
-      stats::na.omit() %>% table() %>% as.list(),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] %>%
-      stats::na.omit() %>% length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>%
-      is.na() %>% sum()
+    choices = if ("choices" %in% name) data_object[[dataset]][[variable]] |>
+      stats::na.omit() |>table() |>as.list(),
+    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
+      stats::na.omit() |>length(),
+    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
+      is.na() |>sum()
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -192,7 +191,7 @@ S7::method(cb_plot_filter_data, list(CbFilterLogical, tblist_class)) <- function
   dataset <- filter@dataset
   variable <- filter@variable
   if (nrow(data_object[[dataset]])) {
-    data_object[[dataset]][[variable]] %>% table() %>% prop.table() %>% graphics::barplot(...)
+    data_object[[dataset]][[variable]] |>table() |>prop.table() |>graphics::barplot(...)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
   }
@@ -226,17 +225,17 @@ S7::method(cb_filter_to_expr, list(CbFilterLogical, tblist_class)) <- function(f
 
   if (keep_na && !identical(value, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!sym(variable) == !!value | is.na(!!sym(variable)))
     })
   } else if (!keep_na && identical(value, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!is.na(!!sym(variable)))
     })
   } else if (!keep_na && !identical(value, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!sym(variable) == !!value)
     })
   } else {
@@ -252,10 +251,10 @@ For the example we'll use an extended `iris` table:
 
 ```{r}
 iris2 <- dplyr::mutate(iris, is_setosa = Species == "setosa")
-coh <- set_source(tblist(iris = iris2)) %>%
+coh <- set_source(tblist(iris = iris2)) |>
   cohort(
     filter("logical", dataset = "iris", variable = "is_setosa", value = TRUE)
-  ) %>%
+  ) |>
   run()
 ```
 

@@ -13,7 +13,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 options("tibble.print_min" = 5L, "tibble.print_max" = 5L)
-library(magrittr)
 library(cohortBuilder)
 ```
 
@@ -29,7 +28,7 @@ You can achieve configuring filtering steps in Source using `add_step` method:
 ```{r}
 librarian_source <- set_source(
   as.tblist(librarian)
-) %>%
+) |>
   add_step(
     step(
       filter(
@@ -71,7 +70,7 @@ You can also configure filtering steps using `add_filter` methods, passing `step
 ```{r}
 librarian_source <- set_source(
   as.tblist(librarian)
-) %>%
+) |>
   add_filter(
     filter(
       "discrete",
@@ -79,7 +78,7 @@ librarian_source <- set_source(
       variable = "author", value = "Dan Brown"
     ),
     step_id = 1L
-  ) %>%
+  ) |>
   add_filter(
     filter(
       "discrete",
@@ -129,7 +128,7 @@ librarian_source <- set_source(
   as.tblist(librarian)
 )
 
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     step(
       filter(
@@ -149,7 +148,7 @@ librarian_cohort <- librarian_source %>%
 Or if you want to define only one step, place filters directly:
 
 ```{r}
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     filter(
       "discrete",
@@ -170,9 +169,9 @@ while adding filtering steps to source.
 Using `add_step`:
 
 ```{r}
-librarian_cohort <- librarian_source %>% cohort()
+librarian_cohort <- librarian_source |> cohort()
 
-librarian_cohort %>%
+librarian_cohort |>
   add_step(
     step(
       filter(
@@ -192,7 +191,7 @@ librarian_cohort %>%
 Using `%->%` pipe operator:
 
 ```{r}
-librarian_cohort <- librarian_source %>% cohort()
+librarian_cohort <- librarian_source |> cohort()
 
 librarian_cohort %->%
   step(
@@ -212,16 +211,16 @@ librarian_cohort %->%
 You can also configure filtering steps using `add_filter` methods, passing `step_id` inside:
 
 ```{r}
-librarian_cohort <- librarian_source %>% cohort()
+librarian_cohort <- librarian_source |> cohort()
 
-librarian_cohort %>%
+librarian_cohort |>
   add_filter(
     filter(
       "discrete",
       id = "author", dataset = "books",
       variable = "author", value = "Dan Brown"
     )
-  ) %>%
+  ) |>
   add_filter(
     filter(
       "discrete",
@@ -236,7 +235,7 @@ librarian_cohort %>%
 Or even simpler using `%->%` (to put filters in the last existing step):
 
 ```{r}
-librarian_cohort <- librarian_source %>% cohort()
+librarian_cohort <- librarian_source |> cohort()
 
 librarian_cohort %->%
   filter(

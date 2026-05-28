@@ -13,7 +13,7 @@ get_attrition_coords <- function(labels, n_included, space = 1L, percent = FALSE
   dt <- data.frame(
     label = label,
     label_excl = label_excl
-  ) %>%
+  ) |>
     dplyr::mutate(
       label_heights = nchar(label) - nchar(gsub("\n", "", label, fixed = TRUE)),
       label_position_y = dplyr::lag(cumsum(label_heights + space), default = 0L),
@@ -65,9 +65,9 @@ get_attrition_plot <- function(attrition_coords) {
 
 get_attrition_filter_label <- function(name, value_name, value) {
   if (is.list(value)) {
-    value <- value %>%
-      purrr::map_chr(~paste(., collapse = ",")) %>%
-      purrr::imap(~paste(.y, " = ", .x)) %>%
+    value <- value |>
+      purrr::map_chr(~paste(., collapse = ",")) |>
+      purrr::imap(~paste(.y, " = ", .x)) |>
       paste(collapse = ", ")
   } else if (is.vector(value)) {
     value <- toString(value)
@@ -98,14 +98,14 @@ get_attrition_filter_label <- function(name, value_name, value) {
       return(glue::glue("{dataset}\n primary key: {paste(dataset_pkey, collapse = ', ')}"))
     }
   }
-  filters_section <- step_filters %>%
-    purrr::map(~get_attrition_filter_label(.$name, .$value_name, .$value)) %>%
+  filters_section <- step_filters |>
+    purrr::map(~get_attrition_filter_label(.$name, .$value_name, .$value)) |>
     paste(collapse = "\n")
   bind_keys_section <- ""
   if (!is.null(binding_keys)) {
-    dependent_datasets <- binding_keys %>%
-      purrr::map(~names(.[["data_keys"]])) %>%
-      unlist() %>%
+    dependent_datasets <- binding_keys |>
+      purrr::map(~names(.[["data_keys"]])) |>
+      unlist() |>
       collapse::funique()
     if (length(dependent_datasets) > 0L) {
       bind_keys_section <- glue::glue(
@@ -132,6 +132,6 @@ get_attrition_filter_label <- function(name, value_name, value) {
 #' @rdname source-layer
 #' @export
 .get_attrition_count.default <- function(source, data_stats, ...) {
-  data_stats %>%
+  data_stats |>
     purrr::map_int("n_rows")
 }

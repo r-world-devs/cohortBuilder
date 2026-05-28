@@ -8,7 +8,7 @@ adjust_names <- function(list_obj) {
 }
 
 list_names <- function(list_obj) {
-  list_obj %>% purrr::map(names) %>% stats::setNames(names(list_obj))
+  list_obj |> purrr::map(names) |> stats::setNames(names(list_obj))
 }
 
 last_item <- function(list_obj) {
@@ -28,7 +28,7 @@ step_filter_state <- function(steps, method = length, raw = FALSE) {
     if (raw) return(steps)
     return(method(steps))
   }
-  steps %>%
+  steps |>
     purrr::map(~method(.x$filters))
 }
 

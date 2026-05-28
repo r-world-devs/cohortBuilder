@@ -89,7 +89,7 @@ test_that("Running steps filter raw data properly", {
   )
   expect_identical(coh$get_data(1L, state = "pre")$iris, iris)
 
-  coh <- coh %>% run()
+  coh <- coh |> run()
   expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("setosa", "virginica"))
   expect_setequal(collapse::funique(coh$get_data(2L, state = "post")$iris$Species), c("virginica"))
 })
@@ -113,7 +113,7 @@ test_that("Adding source on empty cohort works fine", {
   iris_source <- set_source(
     tblist(iris = iris)
   )
-  coh <- coh %>% add_source(iris_source)
+  coh <- coh |> add_source(iris_source)
   state <- coh$sum_up_state()
   expect_true(state$source)
   expect_null(state$source_vars)
@@ -166,8 +166,8 @@ test_that("Adding step on source-only cohort works fine", {
   iris_source <- set_source(
     tblist(iris = iris)
   )
-  coh <- coh %>% add_source(iris_source)
-  coh <- coh %>% add_step(
+  coh <- coh |> add_source(iris_source)
+  coh <- coh |> add_step(
     step(
       discrete_iris_one
     )
@@ -177,15 +177,15 @@ test_that("Adding step on source-only cohort works fine", {
   expect_identical(state$n_filters, list("1" = 1L))
   expect_identical(state$steps_structure, list("1" = "species_filter"))
 
-  coh <- coh %>% run()
+  coh <- coh |> run()
   expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("setosa", "virginica"))
 
   coh <- Cohort$new()
   iris_source <- set_source(
     tblist(iris = iris)
   )
-  coh <- coh %>%
-    add_source(iris_source) %>%
+  coh <- coh |>
+    add_source(iris_source) |>
     add_step(
       step(
         discrete_iris_one,
@@ -197,7 +197,7 @@ test_that("Adding step on source-only cohort works fine", {
   expect_identical(state$n_filters, list("1" = 2L))
   expect_identical(state$steps_structure, list("1" = c("species_filter", "species_filter_two")))
 
-  coh <- coh %>% run()
+  coh <- coh |> run()
   expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("virginica"))
 })
 
@@ -248,7 +248,7 @@ test_that("Adding step on existing cohort with step works fine", {
     ),
     discrete_iris_one
   )
-  coh <- coh %>% add_step(
+  coh <- coh |> add_step(
     step(
       discrete_iris_two
     )
@@ -258,7 +258,7 @@ test_that("Adding step on existing cohort with step works fine", {
   expect_identical(state$n_filters, list("1" = 1L, "2" = 1L))
   expect_identical(state$steps_structure, list("1" = "species_filter", "2" = "species_filter_two"))
 
-  coh <- coh %>% run()
+  coh <- coh |> run()
   expect_setequal(collapse::funique(coh$get_data(2L, state = "post")$iris$Species), c("virginica"))
 
   ## auto-run flow
@@ -268,7 +268,7 @@ test_that("Adding step on existing cohort with step works fine", {
     ),
     discrete_iris_one
   )
-  coh <- coh %>% add_step(
+  coh <- coh |> add_step(
     step(
       discrete_iris_two
     ),
@@ -347,7 +347,7 @@ test_that("Removing step works fine", {
       discrete_iris_two
     )
   )
-  coh <- coh %>% rm_step(2L)
+  coh <- coh |> rm_step(2L)
   state <- coh$sum_up_state()
   expect_identical(state$n_steps, 1L)
   expect_identical(state$n_filters, list("1" = 1L))
@@ -365,7 +365,7 @@ test_that("Removing step works fine", {
       discrete_iris_two
     )
   )
-  coh <- coh %>% rm_step(1L)
+  coh <- coh |> rm_step(1L)
   state <- coh$sum_up_state()
   expect_identical(state$n_steps, 1L)
   expect_identical(state$n_filters, list("1" = 1L))
@@ -380,7 +380,7 @@ test_that("Removing step works fine", {
       discrete_iris_one
     )
   )
-  coh <- coh %>% rm_step(1L)
+  coh <- coh |> rm_step(1L)
   state <- coh$sum_up_state()
   expect_identical(state$n_steps, 0L)
   expect_identical(state$n_filters, 0L)
@@ -408,7 +408,7 @@ test_that("Adding filter works fine", {
       tblist(iris = iris)
     )
   )
-  coh <- coh %>%
+  coh <- coh |>
     add_filter(
       discrete_iris_one
     )
@@ -460,7 +460,7 @@ test_that("Removing filter works fine", {
       discrete_iris_one
     )
   )
-  coh <- coh %>% rm_filter(1L, "species_filter")
+  coh <- coh |> rm_filter(1L, "species_filter")
   state <- coh$sum_up_state()
   expect_identical(state$n_steps, 0L)
   expect_identical(state$n_filters, 0L)
@@ -477,7 +477,7 @@ test_that("Removing filter works fine", {
       discrete_iris_two
     )
   )
-  coh <- coh %>% rm_filter(1L, "species_filter_two")
+  coh <- coh |> rm_filter(1L, "species_filter_two")
   state <- coh$sum_up_state()
   expect_identical(state$n_filters, list("1" = 1L))
   expect_identical(state$steps_structure, list("1" = "species_filter"))
@@ -492,7 +492,7 @@ test_that("Removing filter works fine", {
       discrete_iris_two
     )
   )
-  coh <- coh %>% rm_filter(1L, "species_filter")
+  coh <- coh |> rm_filter(1L, "species_filter")
   state <- coh$sum_up_state()
   expect_identical(state$n_filters, list("1" = 1L))
   expect_identical(state$steps_structure, list("1" = "species_filter_two"))
@@ -506,7 +506,7 @@ test_that("Removing filter works fine", {
       discrete_iris_one
     )
   )
-  coh <- coh %>% rm_filter(1L, "species_filter")
+  coh <- coh |> rm_filter(1L, "species_filter")
   state <- coh$sum_up_state()
   expect_identical(state$n_steps, 0L)
   expect_identical(state$n_filters, 0L)
@@ -553,12 +553,12 @@ test_that("Updating filter works fine", {
       discrete_iris_two
     )
   )
-  coh <- coh %>% update_filter(1L, "species_filter_two", value = "setosa")
-  coh <- coh %>% run()
+  coh <- coh |> update_filter(1L, "species_filter_two", value = "setosa")
+  coh <- coh |> run()
   expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), "setosa")
 
-  coh <- coh %>% update_filter(1L, "sepal_l", variable = "Petal.Length", range = c(1.0, 1.5))
-  coh <- coh %>% run()
+  coh <- coh |> update_filter(1L, "sepal_l", variable = "Petal.Length", range = c(1.0, 1.5))
+  coh <- coh |> run()
   var_range <- range(coh$get_data(1L, state = "post")$iris$Petal.Length)
   expect_true(var_range[1L] >= 1L && var_range[2L] <= 1.5)
 
@@ -641,7 +641,7 @@ test_that("Updating source works fine", {
   )
 
   ## setting up new source with erasing steps
-  coh <- coh %>% update_source(new_source, keep_steps = FALSE)
+  coh <- coh |> update_source(new_source, keep_steps = FALSE)
 
   state <- coh$sum_up_state()
   expect_identical(coh$get_data(1L, state = "pre")$iris, iris2)
@@ -660,7 +660,7 @@ test_that("Updating source works fine", {
       range_iris_two
     )
   )
-  coh <- coh %>% update_source(new_source, keep_steps =  TRUE)
+  coh <- coh |> update_source(new_source, keep_steps =  TRUE)
 
   state <- coh$sum_up_state()
   expect_identical(coh$get_data(1L, state = "pre")$iris, iris2)
@@ -669,7 +669,7 @@ test_that("Updating source works fine", {
   expect_identical(state$n_filters, list("1" = 2L))
   expect_identical(state$steps_structure, list("1" = c("species_filter", "sepal_l_two")))
 
-  coh <- coh %>% run()
+  coh <- coh |> run()
   expect_identical(coh$get_data(1L, state = "post")$iris$Sepal.Length, 10.0)
 })
 
@@ -702,7 +702,7 @@ test_that("Getting filter stats works fine", {
   )
 
   expect_identical(stat(coh, 1L, "species_filter", state = "pre")$choices, as.list(table(iris$Species)))
-  coh <- coh %>% run()
+  coh <- coh |> run()
   expect_identical(
     stat(coh, 1L, "species_filter", state = "post")$choices,
     as.list(table(iris$Species[iris$Species %in% c("setosa", "virginica")]))
@@ -1285,7 +1285,7 @@ test_that("Retrieving reproducible code works fine", {
   target_code <- quote({
     source <- list(dtconn = tblist(iris = iris))
     data_object <- source$dtconn
-    data_object[["iris"]] <- data_object[["iris"]] %>%
+    data_object[["iris"]] <- data_object[["iris"]] |>
       dplyr::filter(Species %in% c("setosa", "virginica", NA))
   })
   expect_identical(
@@ -1425,7 +1425,7 @@ test_that("Update filter works fine", {
 
   expect_identical(get_state(coh, 1L)[[1L]]$filters[[2L]]$value, "non_existent_vaule")
   expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$film$rating), "R")
-  coh %>% run()
+  coh |> run()
   expect_identical(coh$get_data(1L, state = "post")$film$rating, character(0L))
 
   # Change active status

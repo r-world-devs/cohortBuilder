@@ -29,11 +29,10 @@ The method should analyze source data structure, generate proper filters based o
 the data (e.g. column types) and attach them to source.
 }
 \examples{
-library(magrittr)
 library(cohortBuilder)
 library(shinyCohortBuilder)
 
-iris_source <- set_source(tblist(iris = iris)) \%>\%
+iris_source <- set_source(tblist(iris = iris)) |>
   autofilter()
 iris_cohort <- cohort(iris_source)
 sum_up(iris_cohort)

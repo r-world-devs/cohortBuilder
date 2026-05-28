@@ -63,7 +63,7 @@ Cohort <- R6::R6Class(
         for (step_state in state) {
           steps[[step_state$step]] <- do.call(
             step,
-            step_state$filters %>% purrr::map(~do.call(filter, .))
+            step_state$filters |> purrr::map(~do.call(filter, .))
           )
         }
         do.call(private$init_source, append(list(source = source), steps))
@@ -93,9 +93,9 @@ Cohort <- R6::R6Class(
 
       run_hooks(hook$pre, self, private, new_step_id)
 
-      private$steps[new_step_id] <- step %>%
-        attach_step_id(new_step_id) %>%
-        list() %>%
+      private$steps[new_step_id] <- step |>
+        attach_step_id(new_step_id) |>
+        list() |>
         purrr::map(eval_step_filters, source = private$source)
       names(private$steps[new_step_id]) <- new_step_id
 
@@ -128,7 +128,7 @@ Cohort <- R6::R6Class(
       self$add_step(
         do.call(
           step,
-          step_config$filters %>% purrr::map(~do.call(filter, .))
+          step_config$filters |> purrr::map(~do.call(filter, .))
         )
       )
       if (run_flow) {
@@ -327,11 +327,11 @@ Cohort <- R6::R6Class(
       }
 
       get_filters_state <- function(filters) {
-        filters %>% purrr::map(get_filter_state, extra_fields = extra_fields) %>% unname()
+        filters |> purrr::map(get_filter_state, extra_fields = extra_fields) |> unname()
       }
 
-      filters_state <- private$steps[step_id] %>%
-        purrr::imap(~ list(step = .y, filters = get_filters_state(.x$filters))) %>%
+      filters_state <- private$steps[step_id] |>
+        purrr::imap(~ list(step = .y, filters = get_filters_state(.x$filters))) |>
         unname()
 
       if (json) {
@@ -370,7 +370,7 @@ Cohort <- R6::R6Class(
       private$data_objects <- private$data_objects["0"]
 
       na_fix <- function(params) {
-        params %>%
+        params |>
           purrr::modify_if(~ identical(., "NA"), ~ NA)
       }
       for (step_state in state) {
@@ -440,7 +440,7 @@ Cohort <- R6::R6Class(
     show_attrition = function(..., percent = FALSE) {
 
       keep_active_state <- function(step_state) {
-        step_state$filters <- step_state$filters %>%
+        step_state$filters <- step_state$filters |>
           purrr::keep(~.$active)
         step_state
       }
@@ -451,7 +451,7 @@ Cohort <- R6::R6Class(
 
         return(filter_state)
       }
-      active_states <- self$get_state(json = FALSE, extra_fields = "input_param") %>%
+      active_states <- self$get_state(json = FALSE, extra_fields = "input_param") |>
         purrr::map(keep_active_state)
       attrition_labels <- .get_attrition_label(
         source = self$get_source(),
@@ -565,10 +565,10 @@ Cohort <- R6::R6Class(
       source_type <- class(private$source)[1L]
       # todo improve
       fun_args <- environment()
-      code_params <- c(
+      code_param_names <- c(
         "include_source", "include_methods", "include_action", "modifier", "mark_step"
-      ) %>%
-        stats::setNames(nm = .) %>%
+      )
+      code_params <- stats::setNames(code_param_names, code_param_names) |>
         purrr::map(
           ~if (is.null(self$attributes[[.x]]) & !.x %in% names(self$attributes)) {
             fun_args[[.x]]
@@ -624,7 +624,7 @@ Cohort <- R6::R6Class(
             )
           )
         }
-        active_filters <- private$steps[[step_id]]$filters %>%
+        active_filters <- private$steps[[step_id]]$filters |>
           purrr::keep(~ .x@active)
         for (filter in active_filters) {
           filter_params <- get_filter_params(filter)
@@ -666,8 +666,8 @@ Cohort <- R6::R6Class(
         }
       }
 
-      code_components_df <- code_components %>%
-        purrr::map_dfr(function(x) x) %>%
+      code_components_df <- code_components |>
+        purrr::map_dfr(function(x) x) |>
         dplyr::filter(purrr::map_lgl(expr, ~!is.null(.)))
 
       code_components_df <- code_params$modifier(private$source, code_components_df)
@@ -773,7 +773,7 @@ Cohort <- R6::R6Class(
       if (length(private$steps) == 0L) {
         cat("No steps configuration found.")
       } else {
-        private$steps %>% purrr::walk(print_step)
+        private$steps |> purrr::walk(print_step)
       }
     },
     #' @description
@@ -862,15 +862,15 @@ Cohort <- R6::R6Class(
     #' @param step_id Id of the step where filters should be found.
     list_active_filters = function(step_id) {
       get_active_filters <- function(step_id, self) {
-        active_names <- self$get_filter(step_id) %>%
-          purrr::keep(~ .x@active) %>%
+        active_names <- self$get_filter(step_id) |>
+          purrr::keep(~ .x@active) |>
           names()
         active_names
       }
 
       if (missing(step_id)) {
-        names(self$get_step()) %>%
-          purrr::map(get_active_filters, self = self) %>%
+        names(self$get_step()) |>
+          purrr::map(get_active_filters, self = self) |>
           unlist()
       } else {
         step_id <- as.character(step_id)
@@ -887,7 +887,7 @@ Cohort <- R6::R6Class(
     #' @param step_id Id of the step to be checked.
     is_pending = function(step_id) {
       if (missing(step_id)) {
-        return(private$steps %>% purrr::map_lgl("pending"))
+        return(private$steps |> purrr::map_lgl("pending"))
       }
       private$steps[[step_id]]$pending
     },

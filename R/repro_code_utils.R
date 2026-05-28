@@ -87,7 +87,7 @@ get_source_expr <- function(source_type, public, private) {
 
 type_expr <- function(type, expr, step = NA, ...) {
   args <- rlang::dots_list(...)
-  args <- args %>%
+  args <- args |>
     purrr::modify(list)
   base_data <- tibble::tibble(type = type, expr = list(expr), step = step)
   if (!length(args)) {
@@ -101,13 +101,13 @@ type_expr <- function(type, expr, step = NA, ...) {
 
 exclude_first_pipe <- function(expr, after) {
   if (expr[[1L]] == as.symbol("{")) {
-    if (identical(expr[[2L]][[2L]], after) && expr[[2L]][[1L]] == as.symbol("%>%")) {
+    if (identical(expr[[2L]][[2L]], after) && expr[[2L]][[1L]] == as.symbol("|>")) {
       expr[[2L]] <- expr[[2L]][[3L]]
     } else {
       expr[[2L]][[2L]] <- exclude_first_pipe(expr[[2L]][[2L]], after)
     }
   } else {
-    if (identical(expr[[2L]], after) && expr[[1L]] == as.symbol("%>%")) {
+    if (identical(expr[[2L]], after) && expr[[1L]] == as.symbol("|>")) {
       expr <- expr[[3L]]
     } else {
       expr[[2L]] <- exclude_first_pipe(expr[[2L]], after)
@@ -150,7 +150,7 @@ take_first_line <- function(expr) {
 }
 
 pipe_reassignment <- function(expr_l, expr_r) {
-  rlang::expr(!!expr1 %>% expr_r)
+  call("|>", expr_l, expr_r)
 }
 
 pipe_filtering <- function(filtering_exprs) {
@@ -161,21 +161,18 @@ pipe_filtering <- function(filtering_exprs) {
   if (n_exprs > 1L) {
     for (expr_id in seq_along(filtering_exprs)) {
       if (expr_id > 1L) {
-        filtering_exprs[[expr_id]] <- filtering_exprs[[expr_id]] %>%
+        filtering_exprs[[expr_id]] <- filtering_exprs[[expr_id]] |>
           exclude_reassignment(along_with = "both")
       }
       if (expr_id < n_exprs) {
-        filtering_exprs[[expr_id]] <- filtering_exprs[[expr_id]] %>%
+        filtering_exprs[[expr_id]] <- filtering_exprs[[expr_id]] |>
           take_first_line()
       }
       if (expr_id == 1L) {
         res_expr <- exclude_reassignment(filtering_exprs[[expr_id]], along_with = "left")
       } else {
         if (filtering_exprs[[expr_id]][[1L]] == as.symbol("{")) {
-          res_expr <- rlang::expr(
-            !!res_expr %>%
-              !!filtering_exprs[[expr_id]][[2L]]
-          )
+          res_expr <- call("|>", res_expr, filtering_exprs[[expr_id]][[2L]])
           for (i in setdiff(seq_along(filtering_exprs[[expr_id]]), 1L:2L)) {
             res_expr <- rlang::expr({
               !!res_expr
@@ -183,10 +180,7 @@ pipe_filtering <- function(filtering_exprs) {
             })
           }
         } else {
-          res_expr <- rlang::expr(
-            !!res_expr %>%
-              !!filtering_exprs[[expr_id]]
-          )
+          res_expr <- call("|>", res_expr, filtering_exprs[[expr_id]])
         }
       }
     }
@@ -218,25 +212,25 @@ flatten_listcol <- function(x) {
 pipe_all_filters <- function(expr_df) {
 
   if (!"dataset" %in% colnames(expr_df)) {
-    expr_df <- expr_df %>% dplyr::mutate(dataset = NA)
+    expr_df <- expr_df |> dplyr::mutate(dataset = NA)
   }
 
-  expr_df <- expr_df %>% dplyr::mutate(dataset = purrr::map_chr(dataset, flatten_listcol))
-  filtering_expr_df <- expr_df %>% dplyr::filter(type == "filtering")
+  expr_df <- expr_df |> dplyr::mutate(dataset = purrr::map_chr(dataset, flatten_listcol))
+  filtering_expr_df <- expr_df |> dplyr::filter(type == "filtering")
 
   if (nrow(filtering_expr_df) == 0L) {
     return(dplyr::select(expr_df, type, expr))
   }
 
-  expr_df %>% dplyr::left_join(
-    filtering_expr_df %>%
-      dplyr::group_by(type, step, dataset) %>%
-      dplyr::summarise(new_expr = pipe_filtering(expr)) %>%
+  expr_df |> dplyr::left_join(
+    filtering_expr_df |>
+      dplyr::group_by(type, step, dataset) |>
+      dplyr::summarise(new_expr = pipe_filtering(expr)) |>
       dplyr::ungroup(),
     by = c("type", "step", "dataset")
-  ) %>%
-    dplyr::mutate(expr = purrr::map2(expr, new_expr, if_null_default_list)) %>%
-    dplyr::select(type, expr) %>%
+  ) |>
+    dplyr::mutate(expr = purrr::map2(expr, new_expr, if_null_default_list)) |>
+    dplyr::select(type, expr) |>
     # collapse::funique not support nested tables with custom values
     dplyr::distinct()
 }

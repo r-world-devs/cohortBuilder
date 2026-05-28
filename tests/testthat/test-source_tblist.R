@@ -83,7 +83,7 @@ test_that("filter_data in discrete filter works fine", {
 
   result <- cb_filter_data(filter_obj, source, test_data)
   expect_type(result$test_dataset$var1, "character")
-  expect_length(result$test_dataset$var1, length(test_var %>% .[. == "A"]))
+  expect_length(result$test_dataset$var1, sum(test_var == "A" | is.na(test_var), na.rm = TRUE))
   expect_setequal(result$test_dataset$var1, c("A", NA))
 
   # filter_data with keep_na = FALSE and value = NA
@@ -94,7 +94,7 @@ test_that("filter_data in discrete filter works fine", {
 
   result <- cb_filter_data(filter_obj2, source, test_data)
   expect_type(result$test_dataset$var1, "character")
-  expect_length(result$test_dataset$var1, length(test_var %>% na.omit()))
+  expect_length(result$test_dataset$var1, length(test_var |> na.omit()))
   expect_false(anyNA(result$test_dataset$var1))
 
   # filter_data with keep_na = FALSE and value != NA
@@ -105,7 +105,7 @@ test_that("filter_data in discrete filter works fine", {
 
   result <- cb_filter_data(filter_obj3, source, test_data)
   expect_type(result$test_dataset$var1, "character")
-  expect_length(result$test_dataset$var1, length(test_var %>% na.omit() %>% .[. == "B"]))
+  expect_length(result$test_dataset$var1, sum(test_var == "B", na.rm = TRUE))
   expect_setequal(result$test_dataset$var1, "B")
   expect_false(anyNA(result$test_dataset$var1))
 })
@@ -127,7 +127,7 @@ test_that("get_stats in discrete filter works fine", {
   )
 
   result <- cb_get_filter_stats(filter_obj, source, test_data, name = "n_data")
-  expect_identical(result, length(test_var %>% na.omit()))
+  expect_identical(result, length(test_var |> na.omit()))
   expect_type(result, "integer")
 })
 
@@ -197,8 +197,8 @@ test_that("get_defaults in discrete filter works fine", {
   expect_type(result, "list")
   expect_length(result, 1L)
   expect_type(result$value, "character")
-  expect_length(result$value, length(test_var %>% na.omit() %>% collapse::funique()))
-  expect_identical(result$value, as.vector(test_var %>% na.omit() %>% collapse::funique()))
+  expect_length(result$value, length(test_var |> na.omit() |> collapse::funique()))
+  expect_identical(result$value, as.vector(test_var |> na.omit() |> collapse::funique()))
 })
 
 test_that("get_stats in discrete text filter works fine", {
@@ -339,7 +339,7 @@ test_that("filter_data in range filter works fine", {
   expect_type(result, "list")
   expect_type(result$test_dataset, "list")
   expect_type(result$test_dataset$var1, "integer")
-  expect_length(result$test_dataset$var1, length(test_var %>% na.omit()))
+  expect_length(result$test_dataset$var1, length(test_var |> na.omit()))
   expect_false(anyNA(result$test_dataset$var1))
 
   # filter_data with keep_na = FALSE and value != NA
@@ -375,7 +375,7 @@ test_that("get_stats in range filter works fine", {
 
   expect_type(result, "integer")
   expect_length(result, 1L)
-  expect_identical(result, length(test_var %>% na.omit()))
+  expect_identical(result, length(test_var |> na.omit()))
 })
 
 test_that("get_params in range filter works fine", {

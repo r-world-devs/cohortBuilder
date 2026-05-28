@@ -49,13 +49,13 @@ shape(dt_source)
 
 coh <- cohort(
   source = dt_source
-)# %>%
+)# |>
   # add_filter(
   #   filter("discrete", id = "Species", dataset = "iris", variable = "Species", value = c("setosa", "versicolor"), active = FALSE)
-  # ) %>%
+  # ) |>
   # add_filter(
   #   filter("range", id = "Petal.Length", dataset = "iris", variable = "Petal.Length", range = c(5, 6))
-  # ) %>%
+  # ) |>
   # add_filter(
   #   filter("range", id = "qsec", dataset = "mtcars", variable = "qsec", range = NA)
   # )
@@ -151,7 +151,7 @@ add_filters_tool <- function(cohort, action = c("edit_last", "new_step"), ...) {
     action <- match.arg(action, several.ok = FALSE)
     data_source <- cohort$get_source()
     available_filters <- data_source$available_filters
-    filters_to_set <- available_filters %>%
+    filters_to_set <- available_filters |>
       purrr::map(~.x(data_source)) |>
       purrr::keep(function(x) {x$name %in% filter_ids})
     # if (action == "edit_last") {

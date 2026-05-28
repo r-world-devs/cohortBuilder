@@ -469,5 +469,5 @@ filter <- function(type, ...) {
   if (S7::S7_inherits(object, CbFilter)) {
     return(add_filter(x, object))
   }
-  `%>%`(x, object)
+  object(x)
 }

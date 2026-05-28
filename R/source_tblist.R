@@ -104,10 +104,10 @@ set_source.tblist <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
 #' @export
 .get_stats.tblist <- function(source, data_object) {
   dataset_names <- names(source$dtconn)
-  dataset_names %>%
+  dataset_names |>
     purrr::map(
       ~ list(n_rows = nrow(data_object[[.x]]))
-    ) %>%
+    ) |>
     stats::setNames(dataset_names)
 }
 
@@ -120,15 +120,15 @@ S7::method(cb_filter_data, list(CbFilterDiscrete, tblist_class)) <- function(fil
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(value, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!!sym(variable) %in% !!c(value, NA))
   }
   if (!keep_na && identical(value, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!is.na(!!sym(variable)))
   }
   if (!keep_na && !identical(value, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!!sym(variable) %in% !!value)
   }
   attr(data_object[[dataset]], "filtered") <- TRUE
@@ -142,12 +142,12 @@ S7::method(cb_get_filter_stats, list(CbFilterDiscrete, tblist_class)) <- functio
     name <- c("n_data", "choices", "n_missing")
   }
   stats <- list(
-    choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>%
-      stats::na.omit() %>% table() %>% as.list(),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] %>%
-      stats::na.omit() %>% length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>%
-      is.na() %>% sum()
+    choices = if ("choices" %in% name) data_object[[dataset]][[variable]] |>
+      stats::na.omit() |> table() |> as.list(),
+    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
+      stats::na.omit() |> length(),
+    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
+      is.na() |> sum()
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -156,7 +156,7 @@ S7::method(cb_plot_filter_data, list(CbFilterDiscrete, tblist_class)) <- functio
   dataset <- filter@dataset
   variable <- filter@variable
   if (nrow(data_object[[dataset]])) {
-    data_object[[dataset]][[variable]] %>% table() %>% prop.table() %>% graphics::barplot(...)
+    data_object[[dataset]][[variable]] |> table() |> prop.table() |> graphics::barplot(...)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
   }
@@ -178,7 +178,7 @@ S7::method(cb_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function
   value <- filter@value
 
   if (!identical(value, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(
         !!sym(variable) %in% !!strsplit(
           sub(" ", "", value, fixed = TRUE),
@@ -197,12 +197,12 @@ S7::method(cb_get_filter_stats, list(CbFilterDiscreteText, tblist_class)) <- fun
     name <- c("n_data", "choices", "n_missing")
   }
   stats <- list(
-    choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>%
-      collapse::funique() %>% paste(collapse = ","),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] %>%
-      stats::na.omit() %>% collapse::funique() %>% length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>%
-      is.na() %>% sum()
+    choices = if ("choices" %in% name) data_object[[dataset]][[variable]] |>
+      collapse::funique() |> paste(collapse = ","),
+    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
+      stats::na.omit() |> collapse::funique() |> length(),
+    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
+      is.na() |> sum()
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -257,19 +257,19 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
   breaks[1L] <- breaks[1L] - 0.01
   breaks[length(breaks)] <- breaks[length(breaks)] + 0.01
 
-  data_object[[dataset]][, variable, drop = FALSE] %>%
-    dplyr::filter(!is.na(!!sym(variable))) %>%
+  data_object[[dataset]][, variable, drop = FALSE] |>
+    dplyr::filter(!is.na(!!sym(variable))) |>
     dplyr::mutate(
       level = factor(
         findInterval(!!sym(variable), breaks, rightmost.closed = FALSE),
         levels = seq_along(breaks),
         labels = as.character(seq_along(breaks))
       )
-    ) %>%
-    dplyr::group_by(level) %>%
-    dplyr::summarise(count = dplyr::n()) %>%
-    tidyr::complete(level, fill = list(count = 0L)) %>%
-    dplyr::arrange(level) %>%
+    ) |>
+    dplyr::group_by(level) |>
+    dplyr::summarise(count = dplyr::n()) |>
+    tidyr::complete(level, fill = list(count = 0L)) |>
+    dplyr::arrange(level) |>
     dplyr::mutate(
       l_bound = bounds,
       u_bound = c(bounds[-1L], bounds[length(bounds)])
@@ -283,18 +283,18 @@ range_filter_data_impl <- function(filter, data_object) {
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(range, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(
         (!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L]) |
           is.na(!!sym(variable))
       )
   }
   if (!keep_na && identical(range, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!is.na(!!sym(variable)))
   }
   if (!keep_na && !identical(range, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L])
   }
   attr(data_object[[dataset]], "filtered") <- TRUE
@@ -330,10 +330,10 @@ S7::method(cb_get_filter_stats, list(CbFilterRange, tblist_class)) <- function(f
     },
     min = if ("min" %in% name) min(data_object[[dataset]][[variable]], na.rm = TRUE),
     max = if ("max" %in% name) max(data_object[[dataset]][[variable]], na.rm = TRUE),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] %>%
-      stats::na.omit() %>% length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>%
-      is.na() %>% sum()
+    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
+      stats::na.omit() |> length(),
+    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
+      is.na() |> sum()
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -342,7 +342,7 @@ S7::method(cb_plot_filter_data, list(CbFilterRange, tblist_class)) <- function(f
   dataset <- filter@dataset
   variable <- filter@variable
   if (nrow(data_object[[dataset]])) {
-    data_object[[dataset]][[variable]] %>% graphics::hist(...)
+    data_object[[dataset]][[variable]] |> graphics::hist(...)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
   }
@@ -389,19 +389,19 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
     breaks[length(breaks) + 1L] <- max_val
   }
 
-  data_object[[dataset]][, variable, drop = FALSE] %>%
-    dplyr::filter(!is.na(!!sym(variable))) %>%
+  data_object[[dataset]][, variable, drop = FALSE] |>
+    dplyr::filter(!is.na(!!sym(variable))) |>
     dplyr::mutate(
       level = factor(
         findInterval(!!sym(variable), breaks, rightmost.closed = FALSE),
         levels = seq_along(breaks),
         labels = as.character(seq_along(breaks))
       )
-    ) %>%
-    dplyr::group_by(level) %>%
-    dplyr::summarise(count = dplyr::n()) %>%
-    tidyr::complete(level, fill = list(count = 0L)) %>%
-    dplyr::arrange(level) %>%
+    ) |>
+    dplyr::group_by(level) |>
+    dplyr::summarise(count = dplyr::n()) |>
+    tidyr::complete(level, fill = list(count = 0L)) |>
+    dplyr::arrange(level) |>
     dplyr::mutate(
       l_bound = breaks,
       u_bound = c(breaks[-1L], breaks[length(breaks)])
@@ -428,10 +428,10 @@ S7::method(cb_get_filter_stats, list(CbFilterDateRange, tblist_class)) <- functi
     },
     min = if ("min" %in% name) min(data_object[[dataset]][[variable]], na.rm = TRUE),
     max = if ("max" %in% name) max(data_object[[dataset]][[variable]], na.rm = TRUE),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] %>%
-      stats::na.omit() %>% length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>%
-      is.na() %>% sum()
+    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
+      stats::na.omit() |> length(),
+    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
+      is.na() |> sum()
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -440,7 +440,7 @@ S7::method(cb_plot_filter_data, list(CbFilterDateRange, tblist_class)) <- functi
   dataset <- filter@dataset
   variable <- filter@variable
   if (nrow(data_object[[dataset]])) {
-    data_object[[dataset]][[variable]] %>% graphics::hist(..., breaks = breaks)
+    data_object[[dataset]][[variable]] |> graphics::hist(..., breaks = breaks)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
   }
@@ -462,7 +462,7 @@ col_choices <- function(vec) {
 }
 
 group_stats <- function(vec_stats, name) {
-  data.frame(val = as.vector(vec_stats), row.names = names(vec_stats)) %>%
+  data.frame(val = as.vector(vec_stats), row.names = names(vec_stats)) |>
     stats::setNames(name)
 }
 
@@ -497,7 +497,7 @@ S7::method(cb_get_filter_stats, list(CbFilterDatetimeRange, tblist_class)) <- fu
   if (is.null(extra_params$step) && !identical(length(data_object[[dataset]][[variable]]), 0L)) {
     min_val <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
     max_val <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
-    extra_params$step <- calculate_datetime_step(min_val, max_val) %>% unname()
+    extra_params$step <- calculate_datetime_step(min_val, max_val) |> unname()
   }
 
   stats <- list(
@@ -506,10 +506,10 @@ S7::method(cb_get_filter_stats, list(CbFilterDatetimeRange, tblist_class)) <- fu
     },
     min = if ("min" %in% name) min(data_object[[dataset]][[variable]], na.rm = TRUE),
     max = if ("max" %in% name) max(data_object[[dataset]][[variable]], na.rm = TRUE),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] %>%
-      stats::na.omit() %>% length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>%
-      is.na() %>% sum()
+    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
+      stats::na.omit() |> length(),
+    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
+      is.na() |> sum()
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -522,9 +522,9 @@ S7::method(cb_plot_filter_data, list(CbFilterDatetimeRange, tblist_class)) <- fu
       breaks <- calculate_datetime_step(
         min(data_object[[dataset]][[variable]], na.rm = TRUE),
         max(data_object[[dataset]][[variable]], na.rm = TRUE)
-      ) %>% names()
+      ) |> names()
     }
-    data_object[[dataset]][[variable]] %>% graphics::hist(..., breaks = breaks)
+    data_object[[dataset]][[variable]] |> graphics::hist(..., breaks = breaks)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
   }
@@ -556,7 +556,7 @@ S7::method(cb_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- functio
     if (keep_na) is.na(vec) | val_mask else !is.na(vec) & val_mask
   }
 
-  data_object[[dataset]] <- data_object[[dataset]] %>%
+  data_object[[dataset]] <- data_object[[dataset]] |>
     dplyr::filter(
       dplyr::if_all(
         dplyr::all_of(names(values)),
@@ -574,11 +574,11 @@ S7::method(cb_get_filter_stats, list(CbFilterMultiDiscrete, tblist_class)) <- fu
     name <- c("n_data", "choices", "n_missing")
   }
   stats <- list(
-    choices = if ("choices" %in% name) data_object[[dataset]][variables] %>%
+    choices = if ("choices" %in% name) data_object[[dataset]][variables] |>
       purrr::map(~ as.list(table(.))),
     n_data = if ("n_data" %in% name) nrow(data_object[[dataset]][variables]),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][variables] %>%
-      is.na() %>% colSums() %>% as.list()
+    n_missing = if ("n_missing" %in% name) data_object[[dataset]][variables] |>
+      is.na() |> colSums() |> as.list()
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -587,10 +587,10 @@ S7::method(cb_plot_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- fu
   dataset <- filter@dataset
   variables <- unlist(filter@variables)
   if (nrow(data_object[[dataset]])) {
-    data_object[[dataset]][variables] %>%
-      purrr::map(table) %>%
-      purrr::imap_dfc(group_stats) %>%
-      as.matrix() %>%
+    data_object[[dataset]][variables] |>
+      purrr::map(table) |>
+      purrr::imap_dfc(group_stats) |>
+      as.matrix() |>
       graphics::barplot(...)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
@@ -613,11 +613,11 @@ S7::method(cb_filter_data, list(CbFilterQuery, tblist_class)) <- function(filter
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(value, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!!queryBuilder::queryToExpr(value, keep_na = keep_na))
   }
   if (!keep_na && !identical(value, NA)) {
-    data_object[[dataset]] <- data_object[[dataset]] %>%
+    data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!!queryBuilder::queryToExpr(value))
   }
   attr(data_object[[dataset]], "filtered") <- TRUE
@@ -632,11 +632,11 @@ S7::method(cb_get_filter_stats, list(CbFilterQuery, tblist_class)) <- function(f
   }
   stat_from_column <- base::get("stat_from_column", envir = asNamespace("queryBuilder"), inherits = FALSE)
   stats <- list(
-    specs = if ("specs" %in% name) data_object[[dataset]][variables] %>%
+    specs = if ("specs" %in% name) data_object[[dataset]][variables] |>
       purrr::imap(stat_from_column),
     n_data = if ("n_data" %in% name) nrow(data_object[[dataset]][variables]),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][variables] %>%
-      is.na() %>% colSums() %>% as.list()
+    n_missing = if ("n_missing" %in% name) data_object[[dataset]][variables] |>
+      is.na() |> colSums() |> as.list()
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -645,10 +645,10 @@ S7::method(cb_plot_filter_data, list(CbFilterQuery, tblist_class)) <- function(f
   dataset <- filter@dataset
   variables <- filter@variables
   if (nrow(data_object[[dataset]])) {
-    data_object[[dataset]][variables] %>%
-      purrr::map(table) %>%
-      purrr::imap_dfc(group_stats) %>%
-      as.matrix() %>%
+    data_object[[dataset]][variables] |>
+      purrr::map(table) |>
+      purrr::imap_dfc(group_stats) |>
+      as.matrix() |>
       graphics::barplot(...)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
@@ -673,17 +673,17 @@ S7::method(cb_filter_to_expr, list(CbFilterDiscrete, tblist_class)) <- function(
 
   if (keep_na && !identical(value, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!sym(variable) %in% !!c(value, NA))
     })
   } else if (!keep_na && identical(value, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!is.na(!!sym(variable)))
     })
   } else if (!keep_na && !identical(value, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!sym(variable) %in% !!value)
     })
   } else {
@@ -699,7 +699,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDiscreteText, tblist_class)) <- funct
   if (!identical(value, NA)) {
     split_values <- strsplit(sub(" ", "", value, fixed = TRUE), split = ",", fixed = TRUE)[[1L]]
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!sym(variable) %in% !!split_values)
     })
   } else {
@@ -715,7 +715,7 @@ S7::method(cb_filter_to_expr, list(CbFilterRange, tblist_class)) <- function(fil
 
   if (keep_na && !identical(range, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(
           (!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L]) |
             is.na(!!sym(variable))
@@ -723,12 +723,12 @@ S7::method(cb_filter_to_expr, list(CbFilterRange, tblist_class)) <- function(fil
     })
   } else if (!keep_na && identical(range, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!is.na(!!sym(variable)))
     })
   } else if (!keep_na && !identical(range, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L])
     })
   } else {
@@ -744,7 +744,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDateRange, tblist_class)) <- function
 
   if (keep_na && !identical(range, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(
           (!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L]) |
             is.na(!!sym(variable))
@@ -752,12 +752,12 @@ S7::method(cb_filter_to_expr, list(CbFilterDateRange, tblist_class)) <- function
     })
   } else if (!keep_na && identical(range, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!is.na(!!sym(variable)))
     })
   } else if (!keep_na && !identical(range, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L])
     })
   } else {
@@ -773,7 +773,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDatetimeRange, tblist_class)) <- func
 
   if (keep_na && !identical(range, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(
           (!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L]) |
             is.na(!!sym(variable))
@@ -781,12 +781,12 @@ S7::method(cb_filter_to_expr, list(CbFilterDatetimeRange, tblist_class)) <- func
     })
   } else if (!keep_na && identical(range, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!is.na(!!sym(variable)))
     })
   } else if (!keep_na && !identical(range, NA)) {
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!sym(variable) <= !!range[2L] & !!sym(variable) >= !!range[1L])
     })
   } else {
@@ -803,7 +803,7 @@ S7::method(cb_filter_to_expr, list(CbFilterMultiDiscrete, tblist_class)) <- func
     if (!keep_na) {
       vars <- names(values)
       rlang::expr({
-        data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+        data_object[[!!dataset]] <- data_object[[!!dataset]] |>
           dplyr::filter(dplyr::if_all(dplyr::all_of(!!vars), ~ !is.na(.x)))
       })
     } else {
@@ -817,13 +817,13 @@ S7::method(cb_filter_to_expr, list(CbFilterMultiDiscrete, tblist_class)) <- func
       } else {
         rlang::expr(!!sym(var) %in% !!val)
       }
-    }) %>% purrr::compact()
+    }) |> purrr::compact()
 
     if (length(filter_exprs) == 0L) return(NULL)
 
     combined <- Reduce(function(a, b) rlang::expr(!!a & !!b), filter_exprs)
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!combined)
     })
   }
@@ -837,7 +837,7 @@ S7::method(cb_filter_to_expr, list(CbFilterQuery, tblist_class)) <- function(fil
   if (!identical(value, NA)) {
     query_expr <- queryBuilder::queryToExpr(value, keep_na = keep_na)
     rlang::expr({
-      data_object[[!!dataset]] <- data_object[[!!dataset]] %>%
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!query_expr)
     })
   } else {
@@ -851,8 +851,8 @@ S7::method(cb_filter_to_expr, list(CbFilterQuery, tblist_class)) <- function(fil
 .run_binding.tblist <- function(source, binding_key, data_object_pre, data_object_post, ...) {
   binding_dataset <- binding_key$update$dataset
   dependent_datasets <- names(binding_key$data_keys)
-  active_datasets <- data_object_post %>%
-    purrr::keep(~ attr(., "filtered")) %>%
+  active_datasets <- data_object_post |>
+    purrr::keep(~ attr(., "filtered")) |>
     names()
 
   if (!any(dependent_datasets %in% active_datasets)) {
@@ -863,7 +863,7 @@ S7::method(cb_filter_to_expr, list(CbFilterQuery, tblist_class)) <- function(fil
   common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1L]]$key))
   for (dependent_dataset in dependent_datasets) {
     key_names <- binding_key$data_keys[[dependent_dataset]]$key
-    tmp_key_values <- collapse::funique(data_object_post[[dependent_dataset]][, key_names, drop = FALSE]) %>%
+    tmp_key_values <- collapse::funique(data_object_post[[dependent_dataset]][, key_names, drop = FALSE]) |>
       stats::setNames(common_key_names)
     if (is.null(key_values)) {
       key_values <- tmp_key_values
@@ -917,9 +917,9 @@ S7::method(cb_filter_to_expr, list(CbFilterQuery, tblist_class)) <- function(fil
       return(glue::glue("{dataset}\n primary key: {paste(dataset_pkey, collapse = ', ')}"))
     }
   }
-  filters_section <- step_filters %>%
-    purrr::keep(~ .$dataset == dataset) %>%
-    purrr::map(~ get_attrition_filter_label(.$name, .$value_name, .$value)) %>%
+  filters_section <- step_filters |>
+    purrr::keep(~ .$dataset == dataset) |>
+    purrr::map(~ get_attrition_filter_label(.$name, .$value_name, .$value)) |>
     paste(collapse = "\n")
   bind_keys_section <- ""
   if (!is.null(binding_keys)) {
@@ -928,9 +928,9 @@ S7::method(cb_filter_to_expr, list(CbFilterQuery, tblist_class)) <- function(fil
       operator = function(value, target) {
         value == target$dataset
       }
-    ) %>%
-      purrr::map(~ names(.[["data_keys"]])) %>%
-      unlist() %>%
+    ) |>
+      purrr::map(~ names(.[["data_keys"]])) |>
+      unlist() |>
       collapse::funique()
     if (length(dependent_datasets) > 0L) {
       bind_keys_section <- glue::glue(
@@ -952,7 +952,7 @@ S7::method(cb_filter_to_expr, list(CbFilterQuery, tblist_class)) <- function(fil
       "Argument {sQuote('dataset')} is required to print attrition plot for 'tblist' Source."
     ))
   }
-  data_stats %>%
+  data_stats |>
     purrr::map_int(~ .[[dataset]][["n_rows"]])
 }
 
@@ -1078,7 +1078,7 @@ filter_rule <- function(column, name, dataset_name) {
 }
 
 filter_rules <- function(dataset, dataset_name) {
-  dataset %>%
+  dataset |>
     purrr::imap(~ filter_rule(.x, .y, dataset_name = dataset_name))
 }
 
@@ -1086,17 +1086,17 @@ filter_rules <- function(dataset, dataset_name) {
 #' @export
 autofilter.tblist <- function(source, attach_as = c("step", "meta"), ...) {
   attach_as <- rlang::arg_match(attach_as)
-  step_rule <- source$dtconn %>%
-    purrr::imap(~ filter_rules(.x, .y)) %>%
-    unlist(recursive = FALSE) %>%
-    purrr::discard(~ is.null(.x)) %>%
-    purrr::map(~ do.call(cohortBuilder::filter, .)) %>%
+  step_rule <- source$dtconn |>
+    purrr::imap(~ filter_rules(.x, .y)) |>
+    unlist(recursive = FALSE) |>
+    purrr::discard(~ is.null(.x)) |>
+    purrr::map(~ do.call(cohortBuilder::filter, .)) |>
     unname()
 
   if (identical(attach_as, "meta")) {
     source$available_filters <- step_rule
   } else {
-    source %>%
+    source |>
       cohortBuilder::add_step(do.call(cohortBuilder::step, step_rule))
   }
 

@@ -23,7 +23,6 @@ Imports:
     tibble,
     dplyr (>= 1.0.0),
     tidyr,
-    magrittr,
     glue,
     ggplot2,
     rlang (>= 1.0),

@@ -202,7 +202,7 @@ Source <- R6::R6Class(
 )
 
 match_filter_id <- function(filters, filter_id) {
-  filters_ids <- filters %>%
+  filters_ids <- filters |>
     purrr::map_chr(~ .x@id)
   which(filters_ids == filter_id)
 }
@@ -481,11 +481,10 @@ shape.default <- function(source, field, subfield, ...) {
 #' @seealso \link{source-gui-layer}
 #'
 #' @examples
-#' library(magrittr)
 #' library(cohortBuilder)
 #' library(shinyCohortBuilder)
 #'
-#' iris_source <- set_source(tblist(iris = iris)) %>%
+#' iris_source <- set_source(tblist(iris = iris)) |>
 #'   autofilter()
 #' iris_cohort <- cohort(iris_source)
 #' sum_up(iris_cohort)

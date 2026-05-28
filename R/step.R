@@ -34,8 +34,8 @@ pull_steps <- function(source, ...) {
     steps <- list(...)
   }
 
-  steps %>%
-    structure_steps() %>%
+  steps |>
+    structure_steps() |>
     attach_step_ids()
 }
 
@@ -45,14 +45,14 @@ eval_step_filters <- function(step, source) {
     return(list())
   }
 
-  step$filters <- step$filters %>%
+  step$filters <- step$filters |>
     purrr::map(eval_filter, step_id = step$id, source = source)
 
-  filters_names <- step$filters %>% purrr::map_chr(~.x@id)
+  filters_names <- step$filters |> purrr::map_chr(~.x@id)
   if (anyDuplicated(filters_names) > 0L) {
     stop("Cannot create filters with the same id in a single step.")
   }
-  step$filters <- step$filters %>%
+  step$filters <- step$filters |>
     stats::setNames(filters_names)
 
   step$pending <- TRUE
@@ -62,7 +62,7 @@ eval_step_filters <- function(step, source) {
 
 register_steps_and_filters <- function(source, ...) {
 
-  steps <- pull_steps(source = source, ...) %>%
+  steps <- pull_steps(source = source, ...) |>
     purrr::map(eval_step_filters, source = source)
 
   return(steps)
@@ -75,8 +75,8 @@ attach_step_id <- function(step, id) {
 
 attach_step_ids <- function(steps) {
   step_ids <- as.character(seq_along(steps))
-  steps %>%
-    purrr::imodify(~ attach_step_id(.x, as.character(.y))) %>%
+  steps |>
+    purrr::imodify(~ attach_step_id(.x, as.character(.y))) |>
     stats::setNames(step_ids)
 }
 
@@ -109,7 +109,7 @@ next_step <- function(idx) {
 
 print_step <- function(step) {
   cat(glue::glue(">> Step ID: {step$id}"), sep = "\n")
-  step$filters %>%
+  step$filters |>
     purrr::walk(.print_filter, data_objects = NULL)
 }
 
@@ -118,7 +118,6 @@ print_step <- function(step) {
 #' Steps all to perform multiple stages of Source data filtering.
 #'
 #' @examples
-#' library(magrittr)
 #' iris_step_1 <- step(
 #'   filter('discrete', dataset = 'iris', variable = 'Species', value = 'setosa'),
 #'   filter('discrete', dataset = 'iris', variable = 'Petal.Length', range = c(1.5, 2))
@@ -129,22 +128,22 @@ print_step <- function(step) {
 #'
 #' # Add step directly to Cohort
 #' iris_source <- set_source(tblist(iris = iris))
-#' coh <- iris_source %>%
+#' coh <- iris_source |>
 #'   cohort(
 #'     iris_step_1,
 #'     iris_step_2
-#'   ) %>%
+#'   ) |>
 #'   run()
 #'
 #' nrow(get_data(coh, step_id = 1)$iris)
 #' nrow(get_data(coh, step_id = 2)$iris)
 #'
 #' # Add step to Cohort using add_step method
-#' coh <- iris_source %>%
+#' coh <- iris_source |>
 #'   cohort()
-#' coh <- coh %>%
-#'   add_step(iris_step_1) %>%
-#'   add_step(iris_step_2) %>%
+#' coh <- coh |>
+#'   add_step(iris_step_1) |>
+#'   add_step(iris_step_2) |>
 #'   run()
 #'
 #' @param ... Filters. See \link{filter}.

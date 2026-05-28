@@ -4,32 +4,32 @@ test_that("calculate_datetime_step selects appropriate step", {
   # 1. Test for a small range in minutes (expecting "mins" step)
   min_date <- as.POSIXct("2023-01-01 12:00:00")
   max_date <- as.POSIXct("2023-01-01 15:00:00")  # 3 hours later
-  expect_identical(calculate_datetime_step(min_date, max_date) %>% unname(), 60L)
+  expect_identical(calculate_datetime_step(min_date, max_date) |> unname(), 60L)
 
   # 2. Test for a range in hours (expecting "hours" step)
   min_date <- as.POSIXct("2023-01-01 12:00:00")
   max_date <- as.POSIXct("2023-01-02 12:00:00")  # 1 day later
-  expect_identical(calculate_datetime_step(min_date, max_date) %>% unname(), 3600L)
+  expect_identical(calculate_datetime_step(min_date, max_date) |> unname(), 3600L)
 
   # 3. Test for a range in days (expecting "days" step)
   min_date <- as.POSIXct("2023-01-01 12:00:00")
   max_date <- as.POSIXct("2023-03-01 12:00:00")  # 7 month later
-  expect_identical(calculate_datetime_step(min_date, max_date) %>% unname(), 86400L)
+  expect_identical(calculate_datetime_step(min_date, max_date) |> unname(), 86400L)
 
   # 4. Test for a range in weeks (expecting "weeks" step)
   min_date <- as.POSIXct("2023-01-01 12:00:00")
   max_date <- as.POSIXct("2023-08-01 12:00:00")  # 10 months later
-  expect_identical(calculate_datetime_step(min_date, max_date) %>% unname(), 604800L)
+  expect_identical(calculate_datetime_step(min_date, max_date) |> unname(), 604800L)
 
   # 5. Test for a range in months (expecting "months" step)
   min_date <- as.POSIXct("2023-01-01 12:00:00")
   max_date <- as.POSIXct("2033-01-01 12:00:00")  # 10 year later
-  expect_identical(calculate_datetime_step(min_date, max_date) %>% unname(), 2592000L)
+  expect_identical(calculate_datetime_step(min_date, max_date) |> unname(), 2592000L)
 
   # 6. Test for a range in years (expecting "years" step)
   min_date <- as.POSIXct("1900-01-01 12:00:00")
   max_date <- as.POSIXct("2000-01-01 12:00:00")  # 100 years later
-  expect_identical(calculate_datetime_step(min_date, max_date) %>% unname(), 31104000L)
+  expect_identical(calculate_datetime_step(min_date, max_date) |> unname(), 31104000L)
 })
 
 test_that("CbFilterDatetimeRange applies date time range filter correctly via S7", {
@@ -110,7 +110,7 @@ test_that("datetime_range high level test", {
   # Set up source and apply a datetime_range filter from 2023-01-01 12:00:00 to 2023-01-02 12:00:00
   source <- set_source(
     tblist(data = data)
-  ) %>%
+  ) |>
     add_step(
       filter(
         "datetime_range", id = "date_var", dataset = "data",
@@ -127,7 +127,7 @@ test_that("datetime_range high level test", {
   filtered_data <- coh$get_data("1")$data
 
   # Define expected data (rows in range or NA)
-  expected_data <- data %>%
+  expected_data <- data |>
     dplyr::filter(date_var >= "2023-01-01 12:00:00" & date_var <= "2023-01-02 12:00:00" | is.na(date_var))
 
   # Check if filtered data matches expected data, ignoring attributes
