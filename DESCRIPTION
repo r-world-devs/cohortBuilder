@@ -44,6 +44,7 @@ Collate:
     'source_methods.R'
     'step.R'
     'filter.R'
+    'ai_tools.R'
     'attrition.R'
     'bind_keys.R'
     'hooks.R'
