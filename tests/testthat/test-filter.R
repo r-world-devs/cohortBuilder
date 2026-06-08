@@ -14,7 +14,7 @@ test_that("Calling filter returns S7 object with correct class", {
   expect_identical(discrete_filter@variable, "age")
   expect_identical(discrete_filter@dataset, "patients")
   expect_identical(discrete_filter@value, 50L)
-  expect_identical(discrete_filter@input_param, "value")
+  expect_identical(discrete_filter@private$input_param, "value")
 })
 
 test_that("Filter properties can be accessed via get_filter_params", {

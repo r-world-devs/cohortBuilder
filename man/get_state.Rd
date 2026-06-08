@@ -4,7 +4,7 @@
 \alias{get_state}
 \title{Get Cohort configuration state.}
 \usage{
-get_state(x, step_id, json = FALSE, extra_fields = NULL)
+get_state(x, step_id, json = FALSE)
 }
 \arguments{
 \item{x}{Cohort object.}
@@ -12,8 +12,6 @@ get_state(x, step_id, json = FALSE, extra_fields = NULL)
 \item{step_id}{If provided, the selected step state is returned.}
 
 \item{json}{If TRUE, return state in JSON format.}
-
-\item{extra_fields}{Names of extra fields included in filter to be added to state.}
 }
 \value{
 List object of character string being the list convertion to JSON format.

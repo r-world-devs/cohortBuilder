@@ -358,15 +358,14 @@ See \link{hooks} for more details.}
   Get Cohort configuration state.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{Cohort$get_state(step_id, json = FALSE, extra_fields = NULL)}
+    \preformatted{Cohort$get_state(step_id, json = FALSE)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{step_id}}{If provided, the selected step state is returned.}
-      \item{\code{json}}{If TRUE, return state in JSON format.}
-      \item{\code{extra_fields}}{Names of extra fields included in filter to be added to state.
+      \item{\code{json}}{If TRUE, return state in JSON format.
 Restore Cohort configuration.}
     }
     \if{html}{\out{</div>}}

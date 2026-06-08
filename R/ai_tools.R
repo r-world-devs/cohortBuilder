@@ -130,7 +130,7 @@ cb_tool_add_filters <- function(cohort) {
       }
       step_id <- cohort$last_step_id()
       for (f in matching) {
-        state <- get_filter_state(f, extra_fields = NULL)
+        state <- get_filter_params(f)
         cohort$add_filter(do.call(filter, state), step_id = step_id)
       }
     }
@@ -289,7 +289,7 @@ cb_tool_apply_filters <- function(cohort) {
       }
       step_id <- cohort$last_step_id()
       for (f in matching) {
-        state <- get_filter_state(f, extra_fields = NULL)
+        state <- get_filter_params(f)
         cohort$add_filter(do.call(filter, state), step_id = step_id)
       }
     }

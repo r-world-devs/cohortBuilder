@@ -4,19 +4,16 @@
 \alias{cb_tool_add_filters}
 \title{Create a tool for adding filters to a cohort}
 \usage{
-cb_tool_add_filters(cohort, action = c("new_step", "edit_last"))
+cb_tool_add_filters(cohort)
 }
 \arguments{
 \item{cohort}{A \code{\link{Cohort}} object.}
-
-\item{action}{One of \code{"new_step"} (default) or \code{"edit_last"}.
-This is set by the developer, not exposed to the LLM.}
 }
 \value{
 A \code{cb_tool} object.
 }
 \description{
 Returns a \code{\link{cb_tool}} that adds selected filters from the source's
-\code{available_filters} to the cohort. The \code{action} parameter controls
-whether filters are added to a new step or appended to the last existing step.
+\code{available_filters} to the cohort. The LLM chooses whether to add to a
+new step or the existing last step via the \code{action} argument.
 }

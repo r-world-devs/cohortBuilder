@@ -13,6 +13,7 @@ get_filter_params(filter, name)
 }
 \value{
 Named list of filter parameters, or a single value if `name` is given.
+  Properties stored in `filter@private` are always excluded.
 }
 \description{
 Extracts all user-facing properties from an S7 filter object.

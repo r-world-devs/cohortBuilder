@@ -25,9 +25,10 @@ tblist_class <- S7::new_S3_class("tblist")
 #'   properties = list(variable = S7::class_character),
 #'   constructor = function(id = .gen_id(), name = id, variable, dataset, ...) {
 #'     S7::new_object(S7::S7_object(),
-#'       type = "my_filter", id = id, name = name, input_param = "value",
+#'       type = "my_filter", id = id, name = name,
 #'       variable = variable, dataset = dataset,
-#'       active = TRUE, description = NULL, extra = list(...)
+#'       active = TRUE, description = NULL,
+#'       extra = list(...), private = list(input_param = "value")
 #'     )
 #'   }
 #' )
@@ -51,7 +52,6 @@ register_filter_type <- function(type, constructor) {
 #' @param type Filter type string.
 #' @param id Filter identifier.
 #' @param name Filter display name.
-#' @param input_param Name of the parameter holding the filtering value.
 #' @param dataset Dataset name to apply the filter on.
 #' @param active Whether the filter is active.
 #' @param description Optional filter description.
@@ -65,12 +65,12 @@ CbFilter <- S7::new_class("CbFilter",
     type = S7::class_character,
     id = S7::class_character,
     name = S7::class_character,
-    input_param = S7::class_character,
     dataset = S7::class_character,
     active = S7::class_logical,
     description = S7::class_any,
     step_id = S7::new_property(S7::class_any, default = NULL),
-    extra = S7::new_property(S7::class_any, default = list())
+    extra = S7::new_property(S7::class_any, default = list()),
+    private = S7::new_property(S7::class_any, default = list())
   )
 )
 
@@ -101,10 +101,10 @@ CbFilterDiscrete <- S7::new_class("CbFilterDiscrete",
                          dataset, keep_na = TRUE, description = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
-      type = "discrete", id = id, name = name, input_param = "value",
+      type = "discrete", id = id, name = name,
       variable = variable, value = value, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
-      extra = list(...)
+      extra = list(...), private = list(input_param = "value")
     )
   }
 )
@@ -127,10 +127,10 @@ CbFilterDiscreteText <- S7::new_class("CbFilterDiscreteText",
                          dataset, keep_na = TRUE, description = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
-      type = "discrete_text", id = id, name = name, input_param = "value",
+      type = "discrete_text", id = id, name = name,
       variable = variable, value = value, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
-      extra = list(...)
+      extra = list(...), private = list(input_param = "value")
     )
   }
 )
@@ -154,10 +154,10 @@ CbFilterRange <- S7::new_class("CbFilterRange",
                          dataset, keep_na = TRUE, description = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
-      type = "range", id = id, name = name, input_param = "range",
+      type = "range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
-      extra = list(...)
+      extra = list(...), private = list(input_param = "range")
     )
   }
 )
@@ -180,10 +180,10 @@ CbFilterDateRange <- S7::new_class("CbFilterDateRange",
                          dataset, keep_na = TRUE, description = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
-      type = "date_range", id = id, name = name, input_param = "range",
+      type = "date_range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
-      extra = list(...)
+      extra = list(...), private = list(input_param = "range")
     )
   }
 )
@@ -206,10 +206,10 @@ CbFilterDatetimeRange <- S7::new_class("CbFilterDatetimeRange",
                          dataset, keep_na = TRUE, description = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
-      type = "datetime_range", id = id, name = name, input_param = "range",
+      type = "datetime_range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
-      extra = list(...)
+      extra = list(...), private = list(input_param = "range")
     )
   }
 )
@@ -234,10 +234,10 @@ CbFilterMultiDiscrete <- S7::new_class("CbFilterMultiDiscrete",
                          dataset, keep_na = TRUE, description = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
-      type = "multi_discrete", id = id, name = name, input_param = "values",
+      type = "multi_discrete", id = id, name = name,
       variables = variables, values = values, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
-      extra = list(...)
+      extra = list(...), private = list(input_param = "values")
     )
   }
 )
@@ -262,10 +262,10 @@ CbFilterQuery <- S7::new_class("CbFilterQuery",
                          dataset, keep_na = TRUE, description = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
-      type = "query", id = id, name = name, input_param = "value",
+      type = "query", id = id, name = name,
       variables = variables, value = value, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
-      extra = list(...)
+      extra = list(...), private = list(input_param = "value")
     )
   }
 )
@@ -352,30 +352,20 @@ cb_filter_to_expr <- S7::new_generic("cb_filter_to_expr", c("filter", "source"))
 #' @param filter S7 filter object.
 #' @param name Optional parameter name to retrieve a single value.
 #' @return Named list of filter parameters, or a single value if `name` is given.
+#'   Properties stored in `filter@private` are always excluded.
 #' @export
 get_filter_params <- function(filter, name) {
   all_props <- S7::props(filter)
   # Remove internal properties
   all_props$step_id <- NULL
   all_props$extra <- NULL
-  all_props$input_param <- NULL
-  # Merge extra params
-  all_props <- c(all_props, filter@extra)
+  all_props$private <- NULL
+  # Merge extra params, excluding private keys
+  extra <- filter@extra[setdiff(names(filter@extra), names(filter@private))]
+  all_props <- c(all_props, extra)
   # description is returned as-is (may be NULL, character, or list)
   if (!missing(name)) return(all_props[[name]])
   all_props
-}
-
-get_filter_state <- function(filter, extra_fields) {
-  params <- get_filter_params(filter)
-  # Remove gui closures attached by shinyCohortBuilder
-  params$gui <- NULL
-  if (!is.null(extra_fields)) {
-    for (field in extra_fields) {
-      params[[field]] <- S7::prop(filter, field)
-    }
-  }
-  params
 }
 
 eval_filter <- function(filter_obj, step_id, source) {

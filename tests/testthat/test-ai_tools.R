@@ -100,15 +100,16 @@ test_that("cb_tool_add_filters returns cb_tool", {
   t <- cb_tool_add_filters(coh)
   expect_s3_class(t, "cb_tool")
   expect_identical(t$name, "cb_add_filters")
-  expect_named(t$arguments, "filter_ids")
+
+  expect_true(all(c("filter_ids", "action") %in% names(t$arguments)))
 })
 
 test_that("cb_tool_add_filters with new_step creates a step", {
   skip_if_not_installed("ellmer")
   coh <- make_test_cohort()
-  t <- cb_tool_add_filters(coh, action = "new_step")
+  t <- cb_tool_add_filters(coh)
 
-  result <- t$fun("Species, hp")
+  result <- t$fun("Species, hp", action = "new_step")
   expect_true(grepl("Species", result))
   expect_true(grepl("hp", result))
   expect_identical(coh$last_step_id(), "1")
@@ -123,8 +124,8 @@ test_that("cb_tool_add_filters with edit_last adds to existing step", {
   ))
   expect_identical(coh$last_step_id(), "1")
 
-  t <- cb_tool_add_filters(coh, action = "edit_last")
-  result <- t$fun("hp")
+  t <- cb_tool_add_filters(coh)
+  result <- t$fun("hp", action = "edit_last")
   expect_true(grepl("hp", result))
   # Still step 1, filter was added to it
   expect_identical(coh$last_step_id(), "1")
@@ -225,10 +226,10 @@ test_that("cb_register_tool rejects non-cb_tool", {
   )
 })
 
-test_that("cb_register_tools registers all three tools", {
+test_that("cb_register_tools registers all four tools", {
   skip_if_not_installed("ellmer")
   coh <- make_test_cohort()
   chat <- MockChat$new()
   cb_register_tools(chat, coh)
-  expect_identical(length(chat$tools), 3L)
+  expect_identical(length(chat$tools), 4L)
 })

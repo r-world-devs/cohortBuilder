@@ -118,7 +118,7 @@ Cohort <- R6::R6Class(
         step_id <- self$last_step_id()
         step_config <- list(
           step = next_step(step_id),
-          filters = purrr::map(filters, get_filter_state, extra_fields = NULL)
+          filters = purrr::map(filters, get_filter_params)
         )
       } else {
         step_config <- self$get_state(step_id, json = FALSE)[[1L]]
@@ -319,15 +319,14 @@ Cohort <- R6::R6Class(
     #' Get Cohort configuration state.
     #' @param step_id If provided, the selected step state is returned.
     #' @param json If TRUE, return state in JSON format.
-    #' @param extra_fields Names of extra fields included in filter to be added to state.
-    get_state = function(step_id, json = FALSE, extra_fields = NULL) {
+    get_state = function(step_id, json = FALSE) {
 
       if (missing(step_id)) {
         step_id <- names(private$steps)
       }
 
       get_filters_state <- function(filters) {
-        filters |> purrr::map(get_filter_state, extra_fields = extra_fields) |> unname()
+        filters |> purrr::map(get_filter_params) |> unname()
       }
 
       filters_state <- private$steps[step_id] |>
@@ -439,20 +438,18 @@ Cohort <- R6::R6Class(
     #' @param percent Should attrition changes be presented with percentage values.
     show_attrition = function(..., percent = FALSE) {
 
-      keep_active_state <- function(step_state) {
-        step_state$filters <- step_state$filters |>
-          purrr::keep(~.$active)
-        step_state
+      get_filter_meta <- function(filter) {
+        input_param <- filter@private$input_param
+        params <- get_filter_params(filter)
+        params$name <- params$id
+        params$value_name <- input_param
+        params$value <- params[[input_param]]
+        params
       }
-      get_filter_meta <- function(filter_state) {
-        filter_state$name <- filter_state$id
-        filter_state$value_name <- filter_state$input_param
-        filter_state$value <- filter_state[[filter_state$input_param]]
-
-        return(filter_state)
-      }
-      active_states <- self$get_state(json = FALSE, extra_fields = "input_param") |>
-        purrr::map(keep_active_state)
+      active_states <- purrr::imap(private$steps, function(step, step_id) {
+        active <- purrr::keep(step$filters, ~ .@active)
+        list(step = step_id, filters = active)
+      })
       attrition_labels <- .get_attrition_label(
         source = self$get_source(),
         step_id = "0",
@@ -1261,13 +1258,12 @@ sum_up <- function(x) {
 #' @param x Cohort object.
 #' @param step_id If provided, the selected step state is returned.
 #' @param json If TRUE, return state in JSON format.
-#' @param extra_fields Names of extra fields included in filter to be added to state.
 #' @return List object of character string being the list convertion to JSON format.
 #'
 #' @seealso \link{cohort-methods}
 #' @export
-get_state <- function(x, step_id, json = FALSE, extra_fields = NULL) {
-  x$get_state(step_id = step_id, json = json, extra_fields = extra_fields)
+get_state <- function(x, step_id, json = FALSE) {
+  x$get_state(step_id = step_id, json = json)
 }
 #' Restore Cohort object.
 #'

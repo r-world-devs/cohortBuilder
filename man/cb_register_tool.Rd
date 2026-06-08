@@ -7,7 +7,7 @@
 \usage{
 cb_register_tool(chat, tool)
 
-cb_register_tools(chat, cohort, action = c("new_step", "edit_last"))
+cb_register_tools(chat, cohort)
 }
 \arguments{
 \item{chat}{An \pkg{ellmer} chat object (e.g. from \code{ellmer::chat_openai()}).}
@@ -15,8 +15,6 @@ cb_register_tools(chat, cohort, action = c("new_step", "edit_last"))
 \item{tool}{A \code{\link{cb_tool}} object.}
 
 \item{cohort}{A \code{\link{Cohort}} object.}
-
-\item{action}{Passed to \code{\link{cb_tool_add_filters}}.}
 }
 \value{
 The \code{chat} object, invisibly (for piping).

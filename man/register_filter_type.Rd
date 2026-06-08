@@ -23,9 +23,10 @@ MyCbFilter <- S7::new_class("MyCbFilter",
   properties = list(variable = S7::class_character),
   constructor = function(id = .gen_id(), name = id, variable, dataset, ...) {
     S7::new_object(S7::S7_object(),
-      type = "my_filter", id = id, name = name, input_param = "value",
+      type = "my_filter", id = id, name = name,
       variable = variable, dataset = dataset,
-      active = TRUE, description = NULL, extra = list(...)
+      active = TRUE, description = NULL,
+      extra = list(...), private = list(input_param = "value")
     )
   }
 )
