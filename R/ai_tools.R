@@ -80,20 +80,18 @@ cb_tool_filters_meta <- function(cohort) {
 #' Create a tool for adding filters to a cohort
 #'
 #' Returns a \code{\link{cb_tool}} that adds selected filters from the source's
-#' \code{available_filters} to the cohort. The \code{action} parameter controls
-#' whether filters are added to a new step or appended to the last existing step.
+#' \code{available_filters} to the cohort. The LLM chooses whether to add to a
+#' new step or the existing last step via the \code{action} argument.
 #'
 #' @param cohort A \code{\link{Cohort}} object.
-#' @param action One of \code{"new_step"} (default) or \code{"edit_last"}.
-#'   This is set by the developer, not exposed to the LLM.
 #' @return A \code{cb_tool} object.
 #'
 #' @export
-cb_tool_add_filters <- function(cohort, action = c("new_step", "edit_last")) {
+cb_tool_add_filters <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
-  action <- match.arg(action)
 
-  fun <- function(filter_ids) {
+  fun <- function(filter_ids, action = "new_step") {
+    action <- match.arg(action, c("new_step", "edit_last"))
     filter_ids <- trimws(strsplit(filter_ids, ",")[[1L]])
     available <- cohort$get_source()$available_filters
 
@@ -112,6 +110,17 @@ cb_tool_add_filters <- function(cohort, action = c("new_step", "edit_last")) {
 
     matched_ids <- purrr::map_chr(matching, ~ .x@id)
     unknown <- setdiff(filter_ids, matched_ids)
+
+    # Guard against duplicate calls (e.g. LLM parallel tool invocations)
+    last_id <- cohort$last_step_id()
+    if (last_id != "0") {
+      existing_ids <- names(cohort$get_step(last_id)$filters)
+      if (all(matched_ids %in% existing_ids)) {
+        return(as.character(glue::glue(
+          "Filters already present in step {last_id}: {paste(matched_ids, collapse = ', ')}"
+        )))
+      }
+    }
 
     if (action == "new_step") {
       cohort$copy_step(filters = matching, run_flow = FALSE)
@@ -137,13 +146,21 @@ cb_tool_add_filters <- function(cohort, action = c("new_step", "edit_last")) {
     fun = fun,
     name = "cb_add_filters",
     description = paste(
-      "Adds a set of filters to the cohort.",
+      "Adds a set of filters to the cohort without setting their values.",
+      "Use this tool when the user wants to add filters but does not specify concrete values.",
+      "If the user provides specific filter values, use 'cb_apply_filters' instead.",
       "Available filter ids can be found using the 'cb_get_filters_meta' tool.",
-      "Important: call this tool once with all desired filter ids."
+      "Important: call this tool once with all desired filter ids.",
+      "Use action='edit_last' when the user asks to add filters to the current/existing step.",
+      "Use action='new_step' (default) when the user wants a new filtering step."
     ),
     arguments = list(
       filter_ids = ellmer::type_string(
         "Comma-separated filter ids to add to the cohort."
+      ),
+      action = ellmer::type_enum(
+        "Whether to create a new step or add to the existing last step.",
+        values = c("new_step", "edit_last")
       )
     )
   )
@@ -206,7 +223,9 @@ cb_tool_set_filter_values <- function(cohort) {
     fun = fun,
     name = "cb_set_filter_values",
     description = paste(
-      "Sets filter values on the cohort's last step and runs the data pipeline.",
+      "Sets values on filters that already exist in the cohort's last step.",
+      "Use this tool when the user wants to update values of previously added filters,",
+      "not to add new filters. To add new filters with values, use 'cb_apply_filters'.",
       "Filter domains can be found using the 'cb_get_filters_meta' tool (stats field)."
     ),
     arguments = list(
@@ -216,6 +235,120 @@ cb_tool_set_filter_values <- function(cohort) {
         "'value' - array of values for discrete-type filters,",
         "'range' - array of two numbers [min, max] for range-type filters."
       ))
+    )
+  )
+}
+
+#' Create a tool that adds filters and sets their values in one call
+#'
+#' Returns a \code{\link{cb_tool}} that combines filter addition and value
+#' assignment into a single tool call. This avoids issues with LLMs splitting
+#' the work across multiple parallel calls.
+#'
+#' @param cohort A \code{\link{Cohort}} object.
+#' @return A \code{cb_tool} object.
+#'
+#' @export
+cb_tool_apply_filters <- function(cohort) {
+  rlang::check_installed("ellmer", reason = "to create cohort AI tools")
+
+  fun <- function(filters, action = "new_step") {
+    action <- match.arg(action, c("new_step", "edit_last"))
+    filter_vals <- tryCatch(
+      jsonlite::fromJSON(filters),
+      error = function(e) NULL
+    )
+    if (is.null(filter_vals) || length(filter_vals) == 0L) {
+      return("Invalid or empty JSON input. Provide a JSON object keyed by filter id.")
+    }
+
+    filter_ids <- names(filter_vals)
+    available <- cohort$get_source()$available_filters
+    if (is.null(available) || length(available) == 0L) {
+      return("No available filters. Use autofilter(attach_as = 'meta') on the source first.")
+    }
+
+    matching <- purrr::keep(available, function(f) f@id %in% filter_ids)
+    if (length(matching) == 0L) {
+      available_ids <- purrr::map_chr(available, ~ .x@id)
+      return(as.character(glue::glue(
+        "No filters found matching: {paste(filter_ids, collapse = ', ')}. ",
+        "Available filter ids: {paste(available_ids, collapse = ', ')}"
+      )))
+    }
+
+    matched_ids <- purrr::map_chr(matching, ~ .x@id)
+    unknown <- setdiff(filter_ids, matched_ids)
+
+    # Add filters to the cohort
+    if (action == "new_step") {
+      cohort$copy_step(filters = matching, run_flow = FALSE)
+    } else {
+      if (cohort$last_step_id() == "0") {
+        cohort$add_step(step())
+      }
+      step_id <- cohort$last_step_id()
+      for (f in matching) {
+        state <- get_filter_state(f, extra_fields = NULL)
+        cohort$add_filter(do.call(filter, state), step_id = step_id)
+      }
+    }
+
+    # Set filter values
+    step_id <- cohort$last_step_id()
+    updated <- character(0L)
+    for (fid in matched_ids) {
+      vals <- filter_vals[[fid]]
+      if (is.null(vals) || length(vals) == 0L) next
+      tryCatch(
+        {
+          do.call(
+            cohort$update_filter,
+            c(list(step_id = step_id, filter_id = fid), vals)
+          )
+          updated <- c(updated, fid)
+        },
+        error = function(e) {
+          warning(glue::glue("Failed to update filter '{fid}': {conditionMessage(e)}"))
+        }
+      )
+    }
+
+    run(cohort)
+
+    msg <- glue::glue("Filters applied ({action}): {paste(matched_ids, collapse = ', ')}")
+    if (length(updated) > 0L) {
+      msg <- glue::glue("{msg}. Values set for: {paste(updated, collapse = ', ')}")
+    }
+    if (length(unknown) > 0L) {
+      msg <- glue::glue("{msg}. Unknown filter ids ignored: {paste(unknown, collapse = ', ')}")
+    }
+    as.character(msg)
+  }
+
+  cb_tool(
+    fun = fun,
+    name = "cb_apply_filters",
+    description = paste(
+      "Adds filters to the cohort and sets their values in a single operation.",
+      "Available filter ids and their domains can be found using 'cb_get_filters_meta' (stats field).",
+      "Always use this tool to apply filters - do not call it multiple times for separate filters,",
+      "instead include all filters in a single call.",
+      "Use action='edit_last' when the user asks to add filters to the current/existing step.",
+      "Use action='new_step' (default) when the user wants a new filtering step."
+    ),
+    arguments = list(
+      filters = ellmer::type_string(paste(
+        "JSON object keyed by filter id.",
+        "Each value is an object with:",
+        "'value' - array of values for discrete-type filters,",
+        "'range' - array of two numbers [min, max] for range-type filters.",
+        "Example: {\"Species\":{\"value\":[\"setosa\"]},\"hp\":{\"range\":[100,335]}}"
+      )),
+      action = ellmer::type_enum(
+        "Whether to create a new step or add to the existing last step.",
+        values = c("new_step", "edit_last")
+      )
     )
   )
 }
@@ -260,12 +393,11 @@ cb_register_tool <- function(chat, tool) {
 
 #' @rdname cb_register_tool
 #' @param cohort A \code{\link{Cohort}} object.
-#' @param action Passed to \code{\link{cb_tool_add_filters}}.
 #' @export
-cb_register_tools <- function(chat, cohort, action = c("new_step", "edit_last")) {
-  action <- match.arg(action)
+cb_register_tools <- function(chat, cohort) {
   chat |>
     cb_register_tool(cb_tool_filters_meta(cohort)) |>
-    cb_register_tool(cb_tool_add_filters(cohort, action = action)) |>
-    cb_register_tool(cb_tool_set_filter_values(cohort))
+    cb_register_tool(cb_tool_add_filters(cohort)) |>
+    cb_register_tool(cb_tool_set_filter_values(cohort)) |>
+    cb_register_tool(cb_tool_apply_filters(cohort))
 }

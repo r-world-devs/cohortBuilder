@@ -2,9 +2,12 @@
 % Please edit documentation in R/filter.R
 \name{.print_filter}
 \alias{.print_filter}
+\alias{.print_filter.default}
 \title{Method for printing filter details}
 \usage{
 .print_filter(filter, data_objects)
+
+\method{.print_filter}{default}(filter, data_objects)
 }
 \arguments{
 \item{filter}{The defined filter object.}

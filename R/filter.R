@@ -368,6 +368,8 @@ get_filter_params <- function(filter, name) {
 
 get_filter_state <- function(filter, extra_fields) {
   params <- get_filter_params(filter)
+  # Remove gui closures attached by shinyCohortBuilder
+  params$gui <- NULL
   if (!is.null(extra_fields)) {
     for (field in extra_fields) {
       params[[field]] <- S7::prop(filter, field)
@@ -421,6 +423,22 @@ filter <- function(type, ...) {
 #' @export
 .print_filter <- function(filter, data_objects) {
   UseMethod(".print_filter", filter)
+}
+
+#' @rdname dot-print_filter
+#' @export
+.print_filter.default <- function(filter, data_objects) {
+  if (S7::S7_inherits(filter, CbFilterQuery)) {
+    return(.print_filter.CbFilterQuery(filter, data_objects))
+  }
+  if (S7::S7_inherits(filter, CbFilter)) {
+    return(.print_filter.CbFilter(filter, data_objects))
+  }
+  stop(
+    "No applicable .print_filter method for class: ",
+    paste(class(filter), collapse = ", "),
+    call. = FALSE
+  )
 }
 
 #' @export

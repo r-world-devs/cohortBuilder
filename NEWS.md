@@ -1,3 +1,42 @@
+# cohortBuilder (development version)
+
+## Breaking changes
+
+* **Filter system rewritten to S7.** Filters are now S7 objects (e.g. `CbFilterDiscrete`, `CbFilterRange`)
+  with dual dispatch on (filter_class, source_class). Properties are accessed via `@` instead of
+  closure environments. New S7 generics: `cb_filter_data()`, `cb_get_filter_stats()`,
+  `cb_plot_filter_data()`, `cb_get_filter_data()`, `cb_get_filter_defaults()`, `cb_filter_to_expr()`.
+* Removed `def_filter()`, `new_filter()`, and `.as_constructor()` — replaced by S7 constructors.
+* Switched from magrittr `%>%` to native pipe `|>`. Requires R >= 4.1.0.
+
+## New features
+
+* Custom filter types can now be registered via `register_filter_type()`, enabling extensions
+  without modifying core package code.
+* New `describe()` helper to attach metadata (descriptions) to datasets and filters.
+* New `shape()` generic extracts structured filter/dataset metadata from a source,
+  including statistics (min/max for range, choices for discrete).
+* New `autofilter()` generic auto-generates filters based on column types
+  (character/factor → discrete, numeric → range, Date → date_range, POSIXct → datetime_range).
+  Supports `attach_as = "step"` (add as filtering step) or `attach_as = "meta"` (store as available filters).
+* New `.class` parameter in `tblist()` to prepend custom S3 classes for method dispatch customization.
+* Steps now track `pending` status — only pending steps trigger cache recalculation,
+  improving performance for multi-step workflows.
+* `update_filter()` now supports pre/post hooks via `hook_args`.
+
+## AI/LLM integration
+
+* New `cb_tool()` system for defining LLM-compatible tool specifications (requires `ellmer`).
+* Built-in tools: `cb_tool_filters_meta()`, `cb_tool_add_filters()`, `cb_tool_set_filter_values()`,
+  `cb_tool_apply_filters()` (combined add + set values).
+* `cb_register_tool()` and `cb_register_tools()` register tools with an `ellmer` chat object.
+
+## Improvements
+
+* Use `collapse` for binding operations (joins), with `verbose` option for diagnostics.
+* Reorganized `breaks` argument for date_range filter plots.
+* Extensive test coverage improvements including vdiffr snapshot tests for all filter plot types.
+
 # cohortBuilder 0.4.0
 
 * Multi discrete filter does not operate on `dplyr::across` and `dplyr::cur_column` anymore.
