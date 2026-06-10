@@ -22,11 +22,11 @@ tblist_class <- S7::new_S3_class("tblist")
 #' MyCbFilter <- S7::new_class("MyCbFilter",
 #'   parent = CbFilter,
 #'   package = "mypackage",
-#'   properties = list(variable = S7::class_character),
+#'   properties = list(dataset = S7::class_character, variable = S7::class_character),
 #'   constructor = function(id = .gen_id(), name = id, variable, dataset, ...) {
 #'     S7::new_object(S7::S7_object(),
 #'       type = "my_filter", id = id, name = name,
-#'       variable = variable, dataset = dataset,
+#'       dataset = dataset, variable = variable,
 #'       active = TRUE, description = NULL,
 #'       extra = list(...), private = list(input_param = "value")
 #'     )
@@ -52,7 +52,6 @@ register_filter_type <- function(type, constructor) {
 #' @param type Filter type string.
 #' @param id Filter identifier.
 #' @param name Filter display name.
-#' @param dataset Dataset name to apply the filter on.
 #' @param active Whether the filter is active.
 #' @param description Optional filter description.
 #' @param step_id Step identifier (set when filter is attached to a step).
@@ -65,7 +64,6 @@ CbFilter <- S7::new_class("CbFilter",
     type = S7::class_character,
     id = S7::class_character,
     name = S7::class_character,
-    dataset = S7::class_character,
     active = S7::class_logical,
     description = S7::class_any,
     step_id = S7::new_property(S7::class_any, default = NULL),
@@ -93,6 +91,7 @@ CbFilterDiscrete <- S7::new_class("CbFilterDiscrete",
   parent = CbFilter,
   package = "cohortBuilder",
   properties = list(
+    dataset = S7::class_character,
     variable = S7::class_character,
     value = S7::class_any,
     keep_na = S7::class_logical
@@ -119,6 +118,7 @@ CbFilterDiscreteText <- S7::new_class("CbFilterDiscreteText",
   parent = CbFilter,
   package = "cohortBuilder",
   properties = list(
+    dataset = S7::class_character,
     variable = S7::class_character,
     value = S7::class_any,
     keep_na = S7::new_property(S7::class_logical, default = TRUE)
@@ -146,6 +146,7 @@ CbFilterRange <- S7::new_class("CbFilterRange",
   parent = CbFilter,
   package = "cohortBuilder",
   properties = list(
+    dataset = S7::class_character,
     variable = S7::class_character,
     range = S7::class_any,
     keep_na = S7::class_logical
@@ -172,6 +173,7 @@ CbFilterDateRange <- S7::new_class("CbFilterDateRange",
   parent = CbFilter,
   package = "cohortBuilder",
   properties = list(
+    dataset = S7::class_character,
     variable = S7::class_character,
     range = S7::class_any,
     keep_na = S7::class_logical
@@ -198,6 +200,7 @@ CbFilterDatetimeRange <- S7::new_class("CbFilterDatetimeRange",
   parent = CbFilter,
   package = "cohortBuilder",
   properties = list(
+    dataset = S7::class_character,
     variable = S7::class_character,
     range = S7::class_any,
     keep_na = S7::class_logical
@@ -226,6 +229,7 @@ CbFilterMultiDiscrete <- S7::new_class("CbFilterMultiDiscrete",
   parent = CbFilter,
   package = "cohortBuilder",
   properties = list(
+    dataset = S7::class_character,
     variables = S7::class_any,
     values = S7::class_any,
     keep_na = S7::class_logical
@@ -254,6 +258,7 @@ CbFilterQuery <- S7::new_class("CbFilterQuery",
   parent = CbFilter,
   package = "cohortBuilder",
   properties = list(
+    dataset = S7::class_character,
     variables = S7::class_any,
     value = S7::class_any,
     keep_na = S7::class_logical
@@ -368,7 +373,7 @@ get_filter_params <- function(filter, name) {
   all_props
 }
 
-eval_filter <- function(filter_obj, step_id, source) {
+assign_filter_step_id <- function(filter_obj, step_id) {
   filter_obj@step_id <- step_id
   filter_obj
 }

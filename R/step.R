@@ -36,17 +36,17 @@ pull_steps <- function(source, ...) {
 
   steps |>
     structure_steps() |>
-    attach_step_ids()
+    assign_step_ids()
 }
 
-eval_step_filters <- function(step, source) {
+assign_filters_to_step <- function(step) {
 
   if (length(step$filters) == 0L) {
     return(list())
   }
 
   step$filters <- step$filters |>
-    purrr::map(eval_filter, step_id = step$id, source = source)
+    purrr::map(assign_filter_step_id, step_id = step$id)
 
   filters_names <- step$filters |> purrr::map_chr(~.x@id)
   if (anyDuplicated(filters_names) > 0L) {
@@ -55,28 +55,26 @@ eval_step_filters <- function(step, source) {
   step$filters <- step$filters |>
     stats::setNames(filters_names)
 
-  step$pending <- TRUE
-
   return(step)
 }
 
 register_steps_and_filters <- function(source, ...) {
 
   steps <- pull_steps(source = source, ...) |>
-    purrr::map(eval_step_filters, source = source)
+    purrr::map(assign_filters_to_step)
 
   return(steps)
 }
 
-attach_step_id <- function(step, id) {
+assign_step_id <- function(step, id) {
   step$id <- id
   return(step)
 }
 
-attach_step_ids <- function(steps) {
+assign_step_ids <- function(steps) {
   step_ids <- as.character(seq_along(steps))
   steps |>
-    purrr::imodify(~ attach_step_id(.x, as.character(.y))) |>
+    purrr::imodify(~ assign_step_id(.x, as.character(.y))) |>
     stats::setNames(step_ids)
 }
 
@@ -94,7 +92,6 @@ steps_range <- function(from, to) {
 readjust_step <- function(step, new_id) {
   step$id <- new_id
   step$filters <- purrr::modify(step$filters, function(f) { f@step_id <- new_id; f })
-  step$pending <- TRUE
 
   return(step)
 }

@@ -94,10 +94,11 @@ Cohort <- R6::R6Class(
       run_hooks(hook$pre, self, private, new_step_id)
 
       private$steps[new_step_id] <- step |>
-        attach_step_id(new_step_id) |>
+        assign_step_id(new_step_id) |>
         list() |>
-        purrr::map(eval_step_filters, source = private$source)
+        purrr::map(assign_filters_to_step)
       names(private$steps[new_step_id]) <- new_step_id
+      self$set_pending(new_step_id)
 
       run_hooks(hook$post, self, private, new_step_id)
 
@@ -156,6 +157,9 @@ Cohort <- R6::R6Class(
       private$data_objects[clear_data_ids] <- NULL
       private$steps <- adjust_names(private$steps)
       private$steps <- purrr::imodify(private$steps, readjust_step)
+      for (sid in names(private$steps)) {
+        self$set_pending(sid)
+      }
       if (!is.null(private$steps) && run_flow) {
         self$run_flow(min_step = step_id)
       }
@@ -175,10 +179,9 @@ Cohort <- R6::R6Class(
         }
       }
       step_id <- as.character(step_id)
-      evaled_filter <- eval_filter(filter, step_id, private$source)
-      private$steps[[step_id]]$filters[[evaled_filter@id]] <- evaled_filter
+      private$steps[[step_id]]$filters[[filter@id]] <- assign_filter_step_id(filter, step_id)
       private$steps[[step_id]]$id <- step_id
-      private$steps[[step_id]]$pending <- TRUE
+      self$set_pending(step_id)
       if (run_flow) {
         self$run_flow(min_step = step_id)
       }
@@ -192,7 +195,7 @@ Cohort <- R6::R6Class(
       filter_id <- as.character(filter_id)
 
       private$steps[[step_id]]$filters[[filter_id]] <- NULL
-      private$steps[[step_id]]$pending <- TRUE
+      self$set_pending(step_id)
       if (length(private$steps[[step_id]]$filters) == 0L) {
         self$remove_step(step_id, run_flow)
       } else {
@@ -258,7 +261,7 @@ Cohort <- R6::R6Class(
       }
       private$steps[[step_id]]$filters[[filter_id]] <- filter_obj
 
-      private$steps[[step_id]]$pending <- TRUE
+      self$set_pending(step_id)
 
       run_hooks(
         hook$post, self, private, step_id = step_id, filter_id = filter_id,
@@ -727,19 +730,26 @@ Cohort <- R6::R6Class(
       )
 
       filter_ids <- names(self$get_step(step_id)$filters)
-      is_cached <- !is.null(self$get_cache(step_id, state = "pre", .recalc_when_missing = FALSE))
 
       # todo make sure is_cached logic is correct
+      is_cached <- !is.null(self$get_cache(step_id, state = "pre", .recalc_when_missing = FALSE))
       if (!is_cached) {
         self$update_cache(step_id, state = "pre")
       }
-      self$update_cache(step_id, state = "post")
+      if (self$is_pending(step_id)) {
+        self$update_cache(step_id, state = "post")
+      }
       for (filter_id in active_filters) {
-        self$update_cache(step_id, filter_id, state = "pre")
-        self$update_cache(step_id, filter_id, state = "post")
+        is_cached <- !is.null(self$get_cache(step_id, filter_id, state = "pre", .recalc_when_missing = FALSE))
+        if (!is_cached) {
+          self$update_cache(step_id, filter_id, state = "pre")
+        }
+        if (self$is_pending(step_id)) {
+          self$update_cache(step_id, filter_id, state = "post")
+        }
       }
 
-      private$steps[[step_id]]$pending <- FALSE
+      self$set_pending(step_id, pending = FALSE)
 
       run_hooks(hook$post, self, private, step_id)
     },
@@ -889,6 +899,21 @@ Cohort <- R6::R6Class(
       private$steps[[step_id]]$pending
     },
     #' @description
+    #' Mark step as pending or resolved.
+    #' @param step_id Id of the step.
+    #' @param pending Logical; `TRUE` to mark pending, `FALSE` to resolve.
+    set_pending = function(step_id, pending = TRUE,
+                           hook = list(
+                             pre = get_hook("pre_set_pending_hook"),
+                             post = get_hook("post_set_pending_hook")
+                           )) {
+      step_id <- as.character(step_id)
+      run_hooks(hook$pre, self, private, step_id = step_id, pending = pending)
+      private$steps[[step_id]]$pending <- pending
+      run_hooks(hook$post, self, private, step_id = step_id, pending = pending)
+      invisible(self)
+    },
+    #' @description
     #' Helper method enabling to run non-standard operation on Cohort object.
     #' @param modifier Function of two arguments `self` and `private`.
     modify = function(modifier) {
@@ -912,16 +937,13 @@ Cohort <- R6::R6Class(
 
       private$source <- source
       private$steps <- register_steps_and_filters(source, ...)
+      for (step_id in names(private$steps)) {
+        self$set_pending(step_id)
+      }
       initial_data <- .init_step(source)
       if (!is.null(initial_data)) {
         # important note: data objects and cache are indexed from 0, whereas steps and filters from 1
         private$data_objects[["0"]] <- initial_data
-      }
-      if (!is.null(source$available_filters)) {
-        self$attributes$available_filters <- purrr::map(
-          source$available_filters,
-          ~ eval_filter(.x, step_id = NULL, source = source)
-        )
       }
       private$cache[["0"]] <- private$source$meta_stats
 

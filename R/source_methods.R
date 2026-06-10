@@ -177,9 +177,8 @@ Source <- R6::R6Class(
         self$meta_stats <- .get_stats(self, self$dtvalue)
         self$meta_stats$changed <- FALSE
         for (filter_obj in self$available_filters) {
-          evaled_filter <- eval_filter(filter_obj, step_id = NULL, source = self)
-          self$meta_stats$filters[[evaled_filter@id]] <- cb_get_filter_stats(evaled_filter, self, self$dtvalue)
-          self$meta_stats$filters[[evaled_filter@id]]$changed <- FALSE
+          self$meta_stats$filters[[filter_obj@id]] <- cb_get_filter_stats(filter_obj, self, self$dtvalue)
+          self$meta_stats$filters[[filter_obj@id]]$changed <- FALSE
         }
       }
       return(self$meta_stats)

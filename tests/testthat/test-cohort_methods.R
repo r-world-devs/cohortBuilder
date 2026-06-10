@@ -899,8 +899,8 @@ test_that("steps_range returns empty character when from is greater than to", {
   expect_identical(steps_range(3L, 2L), character(0L))
 })
 
-test_that("eval_step_filters returns empty character when step id is equal", {
-  expect_identical(eval_step_filters(list(0L, id = "2"), patients_source), list())
+test_that("assign_filters_to_step returns empty list when no filters", {
+  expect_identical(assign_filters_to_step(list(0L, id = "2")), list())
 })
 
 test_that("next_step returns the next index as a character string", {

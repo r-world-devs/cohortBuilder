@@ -132,6 +132,7 @@ cb_tool_add_filters <- function(cohort) {
       for (f in matching) {
         state <- get_filter_params(f)
         cohort$add_filter(do.call(filter, state), step_id = step_id)
+        cohort$update_cache(step_id, f@id, state = "pre")
       }
     }
 
@@ -280,38 +281,39 @@ cb_tool_apply_filters <- function(cohort) {
     matched_ids <- purrr::map_chr(matching, ~ .x@id)
     unknown <- setdiff(filter_ids, matched_ids)
 
-    # Add filters to the cohort
-    if (action == "new_step") {
-      cohort$copy_step(filters = matching, run_flow = FALSE)
-    } else {
-      if (cohort$last_step_id() == "0") {
-        cohort$add_step(step())
-      }
-      step_id <- cohort$last_step_id()
-      for (f in matching) {
-        state <- get_filter_params(f)
-        cohort$add_filter(do.call(filter, state), step_id = step_id)
-      }
-    }
-
-    # Set filter values
-    step_id <- cohort$last_step_id()
+    # Apply desired values directly to filter objects before adding
     updated <- character(0L)
-    for (fid in matched_ids) {
+    for (i in seq_along(matching)) {
+      fid <- matched_ids[[i]]
       vals <- filter_vals[[fid]]
       if (is.null(vals) || length(vals) == 0L) next
-      tryCatch(
-        {
-          do.call(
-            cohort$update_filter,
-            c(list(step_id = step_id, filter_id = fid), vals)
-          )
-          updated <- c(updated, fid)
-        },
+      state <- get_filter_params(matching[[i]])
+      state[names(vals)] <- vals
+      matching[[i]] <- tryCatch(
+        do.call(filter, state),
         error = function(e) {
-          warning(glue::glue("Failed to update filter '{fid}': {conditionMessage(e)}"))
+          warning(glue::glue("Failed to set values for filter '{fid}': {conditionMessage(e)}"))
+          matching[[i]]
         }
       )
+      updated <- c(updated, fid)
+    }
+
+    # Add filters to the cohort
+    if (action == "new_step") {
+      print("new step")
+      cohort$copy_step(filters = matching, run_flow = FALSE)
+    } else {
+      print("edit last step")
+      if (cohort$last_step_id() == "0") {
+        cohort$add_step(do.call(step, matching))
+      } else {
+        step_id <- cohort$last_step_id()
+        for (f in matching) {
+          state <- get_filter_params(f)
+          cohort$add_filter(do.call(filter, state), step_id = step_id)
+        }
+      }
     }
 
     run(cohort)
