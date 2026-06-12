@@ -20,11 +20,11 @@ The constructor must return an object inheriting from \link{CbFilter}.
 MyCbFilter <- S7::new_class("MyCbFilter",
   parent = CbFilter,
   package = "mypackage",
-  properties = list(variable = S7::class_character),
+  properties = list(dataset = S7::class_character, variable = S7::class_character),
   constructor = function(id = .gen_id(), name = id, variable, dataset, ...) {
     S7::new_object(S7::S7_object(),
       type = "my_filter", id = id, name = name,
-      variable = variable, dataset = dataset,
+      dataset = dataset, variable = variable,
       active = TRUE, description = NULL,
       extra = list(...), private = list(input_param = "value")
     )

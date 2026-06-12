@@ -96,11 +96,21 @@ get_hook <- function(name) {
   getOption(name, default = function(...) {})
 }
 
-run_hooks <- function(hooks, ...) {
+run_hooks <- function(hooks, ..., hook_args = list()) {
+  # if no hook_args the run with defaults
+  if (length(hook_args) == 0) {
+    if (is.function(hooks)) {
+      return(hooks(...))
+    }
+    for (hook in hooks) {
+      hook(...)
+    }
+    return(invisible(TRUE))
+  }
   if (is.function(hooks)) {
-    return(hooks(...))
+    return(hooks(..., hook_args = hook_args))
   }
   for (hook in hooks) {
-    hook(...)
+    hook(..., hook_args = hook_args)
   }
 }

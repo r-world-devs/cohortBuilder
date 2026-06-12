@@ -85,11 +85,11 @@ get_source_expr <- function(source_type, public, private) {
   return(combine_expressions(list(source_expr, init_step_expr)))
 }
 
-type_expr <- function(type, expr, step = NA, ...) {
+type_expr <- function(action, expr, step = NA, ...) {
   args <- rlang::dots_list(...)
   args <- args |>
     purrr::modify(list)
-  base_data <- tibble::tibble(type = type, expr = list(expr), step = step)
+  base_data <- tibble::tibble(action = action, expr = list(expr), step = step)
   if (!length(args)) {
     return(list(base_data))
   }
@@ -100,18 +100,24 @@ type_expr <- function(type, expr, step = NA, ...) {
 }
 
 exclude_first_pipe <- function(expr, after) {
+  if (is.symbol(expr) || is.atomic(expr)) {
+    return(expr)
+  }
   if (expr[[1L]] == as.symbol("{")) {
     if (identical(expr[[2L]][[2L]], after) && expr[[2L]][[1L]] == as.symbol("|>")) {
       expr[[2L]] <- expr[[2L]][[3L]]
     } else {
       expr[[2L]][[2L]] <- exclude_first_pipe(expr[[2L]][[2L]], after)
     }
-  } else {
-    if (identical(expr[[2L]], after) && expr[[1L]] == as.symbol("|>")) {
+  } else if (expr[[1L]] == as.symbol("|>")) {
+    if (identical(expr[[2L]], after)) {
       expr <- expr[[3L]]
     } else {
       expr[[2L]] <- exclude_first_pipe(expr[[2L]], after)
     }
+  } else if (identical(expr[[2L]], after)) {
+    # Function call with `after` as first argument — remove it
+    expr[[2L]] <- NULL
   }
   return(expr)
 }
@@ -150,7 +156,9 @@ take_first_line <- function(expr) {
 }
 
 pipe_reassignment <- function(expr_l, expr_r) {
-  call("|>", expr_l, expr_r)
+  # Native pipe |> is syntactic: x |> f(y) parses to f(x, y).
+  # Reproduce this by inserting expr_l as the first argument of expr_r.
+  as.call(append(as.list(expr_r), list(expr_l), after = 1L))
 }
 
 pipe_filtering <- function(filtering_exprs) {
@@ -172,7 +180,7 @@ pipe_filtering <- function(filtering_exprs) {
         res_expr <- exclude_reassignment(filtering_exprs[[expr_id]], along_with = "left")
       } else {
         if (filtering_exprs[[expr_id]][[1L]] == as.symbol("{")) {
-          res_expr <- call("|>", res_expr, filtering_exprs[[expr_id]][[2L]])
+          res_expr <- pipe_reassignment(res_expr, filtering_exprs[[expr_id]][[2L]])
           for (i in setdiff(seq_along(filtering_exprs[[expr_id]]), 1L:2L)) {
             res_expr <- rlang::expr({
               !!res_expr
@@ -180,7 +188,7 @@ pipe_filtering <- function(filtering_exprs) {
             })
           }
         } else {
-          res_expr <- call("|>", res_expr, filtering_exprs[[expr_id]])
+          res_expr <- pipe_reassignment(res_expr, filtering_exprs[[expr_id]])
         }
       }
     }
@@ -216,21 +224,21 @@ pipe_all_filters <- function(expr_df) {
   }
 
   expr_df <- expr_df |> dplyr::mutate(dataset = purrr::map_chr(dataset, flatten_listcol))
-  filtering_expr_df <- expr_df |> dplyr::filter(type == "filtering")
+  filtering_expr_df <- expr_df |> dplyr::filter(action == "filtering")
 
   if (nrow(filtering_expr_df) == 0L) {
-    return(dplyr::select(expr_df, type, expr))
+    return(dplyr::select(expr_df, action, expr))
   }
 
   expr_df |> dplyr::left_join(
     filtering_expr_df |>
-      dplyr::group_by(type, step, dataset) |>
+      dplyr::group_by(action, step, dataset) |>
       dplyr::summarise(new_expr = pipe_filtering(expr)) |>
       dplyr::ungroup(),
-    by = c("type", "step", "dataset")
+    by = c("action", "step", "dataset")
   ) |>
     dplyr::mutate(expr = purrr::map2(expr, new_expr, if_null_default_list)) |>
-    dplyr::select(type, expr) |>
+    dplyr::select(action, expr) |>
     # collapse::funique not support nested tables with custom values
     dplyr::distinct()
 }

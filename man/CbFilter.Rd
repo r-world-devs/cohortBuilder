@@ -8,7 +8,6 @@ CbFilter(
   type = character(0),
   id = character(0),
   name = character(0),
-  dataset = character(0),
   active = logical(0),
   description = NULL,
   step_id = NULL,
@@ -22,8 +21,6 @@ CbFilter(
 \item{id}{Filter identifier.}
 
 \item{name}{Filter display name.}
-
-\item{dataset}{Dataset name to apply the filter on.}
 
 \item{active}{Whether the filter is active.}
 

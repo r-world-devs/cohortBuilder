@@ -52,6 +52,8 @@ print.cb_tool <- function(x, ...) {
 #' @export
 cb_tool_filters_meta <- function(cohort) {
   fun <- function() {
+    print("cb_tool_filters_meta")
+
     source <- cohort$get_source()
     if (is.null(source$available_filters) || length(source$available_filters) == 0L) {
       return("No filters metadata available. Use autofilter(attach_as = 'meta') on the source first.")
@@ -91,6 +93,10 @@ cb_tool_add_filters <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
   fun <- function(filter_ids, action = "new_step") {
+    print("cb_tool_add_filters")
+    print(filter_ids)
+    print(action)
+
     action <- match.arg(action, c("new_step", "edit_last"))
     filter_ids <- trimws(strsplit(filter_ids, ",")[[1L]])
     available <- cohort$get_source()$available_filters
@@ -132,8 +138,11 @@ cb_tool_add_filters <- function(cohort) {
       for (f in matching) {
         state <- get_filter_params(f)
         cohort$add_filter(do.call(filter, state), step_id = step_id)
-        cohort$update_cache(step_id, f@id, state = "pre")
       }
+    }
+
+    if (getOption("cb_tool_run_cohort", TRUE)) {
+      run(cohort)
     }
 
     msg <- glue::glue("Filters added ({action}): {paste(matched_ids, collapse = ', ')}")
@@ -180,6 +189,9 @@ cb_tool_set_filter_values <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
   fun <- function(filter_values) {
+    print("cb_tool_set_filter_values")
+    print(filter_values)
+
     filter_vals <- tryCatch(
       jsonlite::fromJSON(filter_values),
       error = function(e) NULL
@@ -212,7 +224,9 @@ cb_tool_set_filter_values <- function(cohort) {
       )
     }
 
-    run(cohort)
+    if (getOption("cb_tool_run_cohort", TRUE)) {
+      run(cohort)
+    }
 
     if (length(updated) == 0L) {
       return("No filters were updated.")
@@ -254,6 +268,9 @@ cb_tool_apply_filters <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
   fun <- function(filters, action = "new_step") {
+    print("cb_tool_apply_filters")
+    print(action)
+
     action <- match.arg(action, c("new_step", "edit_last"))
     filter_vals <- tryCatch(
       jsonlite::fromJSON(filters),
@@ -302,7 +319,7 @@ cb_tool_apply_filters <- function(cohort) {
     # Add filters to the cohort
     if (action == "new_step") {
       print("new step")
-      cohort$copy_step(filters = matching, run_flow = FALSE)
+      cohort$add_step(do.call(step, matching))
     } else {
       print("edit last step")
       if (cohort$last_step_id() == "0") {
@@ -316,7 +333,9 @@ cb_tool_apply_filters <- function(cohort) {
       }
     }
 
-    run(cohort)
+    if (getOption("cb_tool_run_cohort", TRUE)) {
+      run(cohort)
+    }
 
     msg <- glue::glue("Filters applied ({action}): {paste(matched_ids, collapse = ', ')}")
     if (length(updated) > 0L) {

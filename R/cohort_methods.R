@@ -171,7 +171,11 @@ Cohort <- R6::R6Class(
     #' @param filter Filter definition created with \link{filter}.
     #' @param step_id Id of the step to add the filter to.
     #'     If missing, filter is added to the last step.
-    add_filter = function(filter, step_id, run_flow = FALSE) {
+    add_filter = function(filter, step_id, run_flow = FALSE,
+                          hook = list(
+                            pre = get_hook("pre_add_filter_hook"),
+                            post = get_hook("post_add_filter_hook")
+                          )) {
       if (missing(step_id)) {
         step_id <- self$last_step_id()
         if (step_id == "0") {
@@ -179,9 +183,15 @@ Cohort <- R6::R6Class(
         }
       }
       step_id <- as.character(step_id)
+
+      run_hooks(hook$pre, self, private, step_id = step_id, filter = filter)
+
       private$steps[[step_id]]$filters[[filter@id]] <- assign_filter_step_id(filter, step_id)
       private$steps[[step_id]]$id <- step_id
       self$set_pending(step_id)
+
+      run_hooks(hook$post, self, private, step_id = step_id, filter = filter)
+
       if (run_flow) {
         self$run_flow(min_step = step_id)
       }
@@ -190,12 +200,21 @@ Cohort <- R6::R6Class(
     #' Remove filter definition
     #' @param step_id Id of the step from which filter should be removed.
     #' @param filter_id Id of the filter to be removed.
-    remove_filter = function(step_id, filter_id, run_flow = FALSE) {
+    remove_filter = function(step_id, filter_id, run_flow = FALSE,
+                             hook = list(
+                               pre = get_hook("pre_rm_filter_hook"),
+                               post = get_hook("post_rm_filter_hook")
+                             )) {
       step_id <- as.character(step_id)
       filter_id <- as.character(filter_id)
 
+      run_hooks(hook$pre, self, private, step_id = step_id, filter_id = filter_id)
+
       private$steps[[step_id]]$filters[[filter_id]] <- NULL
       self$set_pending(step_id)
+
+      run_hooks(hook$post, self, private, step_id = step_id, filter_id = filter_id)
+
       if (length(private$steps[[step_id]]$filters) == 0L) {
         self$remove_step(step_id, run_flow)
       } else {
@@ -368,7 +387,7 @@ Cohort <- R6::R6Class(
       state <- modifier(self$attributes$pre_restore_state, state)
 
       private$steps <- NULL
-      private$cache <- NULL
+      private$cache <- private$cache["0"]
       private$data_objects <- private$data_objects["0"]
 
       na_fix <- function(params) {
@@ -582,13 +601,13 @@ Cohort <- R6::R6Class(
       for (extra_method in code_params$include_methods) {
         code_components <- append(
           code_components,
-          type_expr(type = "meta", expr = method_to_expr(extra_method, source_type))
+          type_expr(action = "meta", expr = method_to_expr(extra_method, source_type))
         )
       }
       if (code_params$include_source) {
         code_components <- append(
           code_components,
-          type_expr(type = "source", expr = get_source_expr(source_type, self, private))
+          type_expr(action = "source", expr = get_source_expr(source_type, self, private))
         )
       }
       for (step_id in names(self$get_step())) {
@@ -596,7 +615,7 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "step_init", step = step_id,
+              action = "step_init", step = step_id,
               expr = rlang::expr(step_id <- !!step_id)
             )
           )
@@ -606,7 +625,7 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "run_binding", step = step_id,
+              action = "run_binding", step = step_id,
               expr = rlang::expr(
                 pre_data_object <- data_object
               )
@@ -617,7 +636,7 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "pre_filtering", step = step_id,
+              action = "pre_filtering", step = step_id,
               expr = rlang::expr(
                 data_object <- .pre_filtering(source, data_object, !!step_id)
               )
@@ -631,7 +650,7 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "filtering", step = step_id,
+              action = "filtering", step = step_id,
               expr = cb_filter_to_expr(filter, private$source),
               !!!filter_params
             )
@@ -641,7 +660,7 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "post_filtering", step = step_id,
+              action = "post_filtering", step = step_id,
               expr = rlang::expr(
                 data_object <- .post_filtering(source, data_object, !!step_id)
               )
@@ -652,7 +671,7 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "run_binding", step = step_id,
+              action = "run_binding", step = step_id,
               expr = rlang::expr(
                 for (binding_key in binding_keys) {
                   data_object <- .run_binding(

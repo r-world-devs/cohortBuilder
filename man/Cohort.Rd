@@ -48,6 +48,7 @@ Cohort object is designed to make operations on source data possible.
     \item \href{#method-Cohort-list_active_filters}{\code{Cohort$list_active_filters()}}
     \item \href{#method-Cohort-last_step_id}{\code{Cohort$last_step_id()}}
     \item \href{#method-Cohort-is_pending}{\code{Cohort$is_pending()}}
+    \item \href{#method-Cohort-set_pending}{\code{Cohort$set_pending()}}
     \item \href{#method-Cohort-modify}{\code{Cohort$modify()}}
     \item \href{#method-Cohort-clone}{\code{Cohort$clone()}}
   }
@@ -227,7 +228,13 @@ See \link{hooks} for more details.}
   Add filter definition
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{Cohort$add_filter(filter, step_id, run_flow = FALSE)}
+    \preformatted{Cohort$add_filter(
+  filter,
+  step_id,
+  run_flow = FALSE,
+  hook = list(pre = get_hook("pre_add_filter_hook"), post =
+    get_hook("post_add_filter_hook"))
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -237,6 +244,8 @@ See \link{hooks} for more details.}
       \item{\code{step_id}}{Id of the step to add the filter to.
 If missing, filter is added to the last step.}
       \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+See \link{hooks} for more details.}
     }
     \if{html}{\out{</div>}}
   }
@@ -249,7 +258,13 @@ If missing, filter is added to the last step.}
   Remove filter definition
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{Cohort$remove_filter(step_id, filter_id, run_flow = FALSE)}
+    \preformatted{Cohort$remove_filter(
+  step_id,
+  filter_id,
+  run_flow = FALSE,
+  hook = list(pre = get_hook("pre_rm_filter_hook"), post =
+    get_hook("post_rm_filter_hook"))
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -258,6 +273,8 @@ If missing, filter is added to the last step.}
       \item{\code{step_id}}{Id of the step from which filter should be removed.}
       \item{\code{filter_id}}{Id of the filter to be removed.}
       \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+See \link{hooks} for more details.}
     }
     \if{html}{\out{</div>}}
   }
@@ -771,6 +788,33 @@ filtering in specified step.}
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{step_id}}{Id of the step to be checked.}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-set_pending"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-set_pending}{}}}
+\subsection{\code{Cohort$set_pending()}}{
+  Mark step as pending or resolved.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$set_pending(
+  step_id,
+  pending = TRUE,
+  hook = list(pre = get_hook("pre_set_pending_hook"), post =
+    get_hook("post_set_pending_hook"))
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step.}
+      \item{\code{pending}}{Logical; `TRUE` to mark pending, `FALSE` to resolve.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+See \link{hooks} for more details.}
     }
     \if{html}{\out{</div>}}
   }
