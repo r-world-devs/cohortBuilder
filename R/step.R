@@ -104,8 +104,16 @@ next_step <- function(idx) {
   as.character(as.integer(idx) + 1L)
 }
 
-print_step <- function(step) {
-  cat(glue::glue(">> Step ID: {step$id}"), sep = "\n")
+print_step <- function(step, to_string = FALSE) {
+  pending_flag <- if (isTRUE(step$pending)) " [pending]" else ""
+  header <- glue::glue(">> Step ID: {step$id}{pending_flag}")
+  if (to_string) {
+    filter_lines <- step$filters |>
+      purrr::map(~ .print_filter(.x, data_objects = NULL, to_string = TRUE)) |>
+      unlist()
+    return(c(as.character(header), filter_lines))
+  }
+  cat(header, sep = "\n")
   step$filters |>
     purrr::walk(.print_filter, data_objects = NULL)
 }

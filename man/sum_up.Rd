@@ -4,13 +4,17 @@
 \alias{sum_up}
 \title{Sum up Cohort state.}
 \usage{
-sum_up(x)
+sum_up(x, to_string = FALSE)
 }
 \arguments{
 \item{x}{Cohort object.}
+
+\item{to_string}{If `TRUE`, return the output as a character string
+instead of printing it. Defaults to `FALSE`.}
 }
 \value{
-None (invisible NULL). Printed summary of Cohort state.
+When `to_string = FALSE` (default), `invisible(NULL)` (prints to console).
+  When `to_string = TRUE`, a single character string.
 }
 \description{
 Sum up Cohort state.

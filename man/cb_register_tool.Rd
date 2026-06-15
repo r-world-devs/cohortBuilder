@@ -22,7 +22,7 @@ The \code{chat} object, invisibly (for piping).
 \description{
 \code{cb_register_tool} registers a single \code{\link{cb_tool}} with
 an \pkg{ellmer} chat object. \code{cb_register_tools} is a convenience
-wrapper that registers all three built-in tools at once.
+wrapper that registers all built-in tools at once.
 }
 \examples{
 \dontrun{

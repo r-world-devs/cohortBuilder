@@ -795,12 +795,21 @@ Cohort <- R6::R6Class(
     },
     #' @description
     #' Print defined steps configuration.
-    describe_state = function() {
+    #' @param to_string If `TRUE`, return the output as a character string
+    #'   instead of printing it. Defaults to `FALSE`.
+    describe_state = function(to_string = FALSE) {
       if (length(private$steps) == 0L) {
+        if (to_string) return("No steps configuration found.")
         cat("No steps configuration found.")
-      } else {
-        private$steps |> purrr::walk(print_step)
+        return(invisible(NULL))
       }
+      if (to_string) {
+        lines <- private$steps |>
+          purrr::map(~ print_step(.x, to_string = TRUE)) |>
+          unlist()
+        return(paste(lines, collapse = "\n"))
+      }
+      private$steps |> purrr::walk(print_step)
     },
     #' @description
     #' Get selected step configuration.
@@ -1286,12 +1295,15 @@ get_data <- function(x, step_id, state = "post", collect = FALSE) {
 #' Sum up Cohort state.
 #'
 #' @param x Cohort object.
-#' @return None (invisible NULL). Printed summary of Cohort state.
+#' @param to_string If `TRUE`, return the output as a character string
+#'   instead of printing it. Defaults to `FALSE`.
+#' @return When `to_string = FALSE` (default), `invisible(NULL)` (prints to console).
+#'   When `to_string = TRUE`, a single character string.
 #'
 #' @seealso \link{cohort-methods}
 #' @export
-sum_up <- function(x) {
-  x$describe_state()
+sum_up <- function(x, to_string = FALSE) {
+  x$describe_state(to_string = to_string)
 }
 
 #' Get Cohort configuration state.

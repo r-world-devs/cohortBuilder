@@ -644,7 +644,15 @@ See \link{hooks} for more details.}
   Print defined steps configuration.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{Cohort$describe_state()}
+    \preformatted{Cohort$describe_state(to_string = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{to_string}}{If `TRUE`, return the output as a character string
+instead of printing it. Defaults to `FALSE`.}
+    }
     \if{html}{\out{</div>}}
   }
 }

@@ -25,7 +25,7 @@ lintr::lint_package()            # Lint (config in .lintr)
 
 **Source** (`R/source_methods.R`) — Wraps a data connection (`dtconn`) with metadata: primary keys, binding keys, available filters, and computed stats. Defines S3 generics for source-type-specific operations (`.init_step()`, `.pre_filtering()`, `.post_filtering()`, `.collect_data()`, `.get_stats()`, `.run_binding()`, etc.).
 
-**Cohort** (`R/cohort_methods.R`) — Orchestrates the filtering workflow. Manages steps (ordered filter groups), executes the data pipeline via `run_flow()`, and provides state serialization (`get_state()`/`restore()`), reproducible code generation (`get_code()`), and statistics/attrition reporting. Supports pre/post hooks for most operations.
+**Cohort** (`R/cohort_methods.R`) — Orchestrates the filtering workflow. Manages steps (ordered filter groups), executes the data pipeline via `run_flow()`, and provides state serialization (`get_state()`/`restore()`), reproducible code generation (`get_code()`), and statistics/attrition reporting. Supports pre/post hooks for most operations (including `update_filter`).
 
 ### Filter System (S7 Dual Dispatch)
 
@@ -57,7 +57,29 @@ To support a new data backend, implement:
 - Source-layer S3 methods (`.init_step`, `.pre_filtering`, `.collect_data`, `.get_stats`, etc.)
 - S7 methods for each filter type × source type combination (`cb_filter_data`, `cb_get_filter_stats`, etc.)
 
-The `tblist` implementation in `R/source_tblist.R` serves as the reference (60+ S7 method implementations).
+The `tblist` implementation in `R/source_tblist.R` serves as the reference (60+ S7 method implementations). `tblist(..., .class = NULL)` accepts an optional `.class` parameter for adding custom subclasses, enabling S3 method overrides for specialized source types.
+
+### Source Intelligence (`shape`, `autofilter`, `describe`)
+
+- `describe(text, ...)` — Creates a description object (text + extra fields) for datasets/filters
+- `autofilter(source, attach_as)` — S3 generic; auto-generates filters from data types using filter rules (`rule_character`, `rule_factor`, `rule_numeric`, etc.). `attach_as = "step"` adds filters as a step; `attach_as = "meta"` stores them in `source$available_filters`
+- `shape(source)` — S3 generic; returns a tibble of filter metadata (dataset, filter id, description, stats/domain)
+- `description(cohort, ...)` — Retrieves descriptions; supports custom modifier via `cb_help_modifier` option
+
+### Pending Step System
+
+Cohort methods `set_pending(step_id)` and `is_pending(step_id)` track whether a step needs recalculation. Steps are marked pending when filters are added/updated/removed, and resolved after `run_step()`. This optimizes caching by skipping stat recomputation for unchanged steps.
+
+### AI/LLM Tool Integration (`R/ai_tools.R`)
+
+`cb_tool` S3 class wraps tool definitions (function, name, description, arguments) for registration with `ellmer` chat objects. Four built-in tool factories:
+
+- `cb_tool_filters_meta(cohort)` — returns filter metadata JSON via `shape()`
+- `cb_tool_add_filters(cohort)` — adds filters without setting values
+- `cb_tool_set_filter_values(cohort)` — updates values on existing filters
+- `cb_tool_apply_filters(cohort)` — adds filters and sets values in one call
+
+Registration helpers: `cb_register_tool(chat, tool)` and `cb_register_tools(chat, cohort)` (registers all four). Requires `ellmer` (suggested dependency).
 
 ### Key Supporting Modules
 
@@ -66,6 +88,7 @@ The `tblist` implementation in `R/source_tblist.R` serves as the reference (60+ 
 - `R/hooks.R` — Hook registration and execution system
 - `R/repro_code_utils.R` — Expression manipulation for reproducible code generation
 - `R/attrition.R` — Attrition statistics and ggplot2 visualization
+- `R/ai_tools.R` — LLM tool definitions and ellmer registration
 
 ## Linting Rules
 

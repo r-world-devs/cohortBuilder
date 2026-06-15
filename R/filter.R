@@ -415,19 +415,21 @@ filter <- function(type, ...) {
 #'
 #' @param filter The defined filter object.
 #' @param data_objects List of data objects for the underlying filtering step.
+#' @param to_string If `TRUE`, return the output as a character vector
+#'   instead of printing it. Defaults to `FALSE`.
 #' @export
-.print_filter <- function(filter, data_objects) {
+.print_filter <- function(filter, data_objects, to_string = FALSE) {
   UseMethod(".print_filter", filter)
 }
 
 #' @rdname dot-print_filter
 #' @export
-.print_filter.default <- function(filter, data_objects) {
+.print_filter.default <- function(filter, data_objects, to_string = FALSE) {
   if (S7::S7_inherits(filter, CbFilterQuery)) {
-    return(.print_filter.CbFilterQuery(filter, data_objects))
+    return(.print_filter.CbFilterQuery(filter, data_objects, to_string = to_string))
   }
   if (S7::S7_inherits(filter, CbFilter)) {
-    return(.print_filter.CbFilter(filter, data_objects))
+    return(.print_filter.CbFilter(filter, data_objects, to_string = to_string))
   }
   stop(
     "No applicable .print_filter method for class: ",
@@ -437,31 +439,39 @@ filter <- function(type, ...) {
 }
 
 #' @export
-.print_filter.CbFilter <- function(filter, data_objects) {
+.print_filter.CbFilter <- function(filter, data_objects, to_string = FALSE) {
   params <- get_filter_params(filter)
   params <- params[setdiff(names(params), static_params)]
-  cat(glue::glue("-> Filter ID: {filter@id}"), sep = "\n")
-  cat(glue::glue("   Filter Type: {filter@type}"), sep = "\n")
-  cat("   Filter Parameters:", sep = "\n")
+  lines <- c(
+    glue::glue("-> Filter ID: {filter@id}"),
+    glue::glue("   Filter Type: {filter@type}"),
+    "   Filter Parameters:"
+  )
   for (param_name in names(params)) {
-    cat(glue::glue("     {param_name}: {paste(params[[param_name]], collapse = ', ')}"), sep = "\n")
+    lines <- c(lines, glue::glue("     {param_name}: {paste(params[[param_name]], collapse = ', ')}"))
   }
+  if (to_string) return(lines)
+  cat(lines, sep = "\n")
 }
 
 #' @export
-.print_filter.CbFilterQuery <- function(filter, data_objects) {
+.print_filter.CbFilterQuery <- function(filter, data_objects, to_string = FALSE) {
   params <- get_filter_params(filter)
   params <- params[setdiff(names(params), static_params)]
-  cat(glue::glue("-> Filter ID: {filter@id}"), sep = "\n")
-  cat(glue::glue("   Filter Type: {filter@type}"), sep = "\n")
-  cat("   Filter Parameters:", sep = "\n")
+  lines <- c(
+    glue::glue("-> Filter ID: {filter@id}"),
+    glue::glue("   Filter Type: {filter@type}"),
+    "   Filter Parameters:"
+  )
   for (param_name in names(params)) {
     if (param_name == "value") {
-      cat(glue::glue("     {param_name}: {deparse(queryBuilder::queryToExpr(params[[param_name]]))}"), sep = "\n")
+      lines <- c(lines, glue::glue("     {param_name}: {deparse(queryBuilder::queryToExpr(params[[param_name]]))}"))
     } else {
-      cat(glue::glue("     {param_name}: {paste(params[[param_name]], collapse = ', ')}"), sep = "\n")
+      lines <- c(lines, glue::glue("     {param_name}: {paste(params[[param_name]], collapse = ', ')}"))
     }
   }
+  if (to_string) return(lines)
+  cat(lines, sep = "\n")
 }
 
 # -- Operators ----------------------------------------------------------------

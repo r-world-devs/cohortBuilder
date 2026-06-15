@@ -5,14 +5,17 @@
 \alias{.print_filter.default}
 \title{Method for printing filter details}
 \usage{
-.print_filter(filter, data_objects)
+.print_filter(filter, data_objects, to_string = FALSE)
 
-\method{.print_filter}{default}(filter, data_objects)
+\method{.print_filter}{default}(filter, data_objects, to_string = FALSE)
 }
 \arguments{
 \item{filter}{The defined filter object.}
 
 \item{data_objects}{List of data objects for the underlying filtering step.}
+
+\item{to_string}{If `TRUE`, return the output as a character vector
+instead of printing it. Defaults to `FALSE`.}
 }
 \description{
 Method for printing filter details
