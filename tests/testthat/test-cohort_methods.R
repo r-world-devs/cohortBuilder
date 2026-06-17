@@ -1585,3 +1585,48 @@ test_that("Computing cache on request works as expected", {
   expect_null(coh$get_cache("1", state = "pre", .recalc_when_missing = FALSE))
   expect_false(is.null(coh$get_cache("1", state = "pre", .recalc_when_missing = TRUE)))
 })
+
+# -- Cache control tests ------------------------------------------------------
+
+test_that("cache = FALSE skips update_cache in run_step", {
+  iris_source <- set_source(tblist(iris = iris))
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    value = "setosa", domain = c("setosa", "versicolor", "virginica")
+  )
+  coh <- Cohort$new(iris_source, f, cache = FALSE)
+  coh$run_flow()
+
+  # Filtering still works
+  result <- coh$get_data(1L, state = "post")$iris
+  expect_true(all(result$Species == "setosa"))
+
+  # But no filter-level cache computed during run_step
+  expect_null(coh$get_cache("1", "sp", state = "post", .recalc_when_missing = FALSE))
+})
+
+test_that("cache = TRUE (default) computes cache normally", {
+  iris_source <- set_source(tblist(iris = iris))
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    value = "setosa"
+  )
+  coh <- Cohort$new(iris_source, f)
+  coh$run_flow()
+
+  expect_false(is.null(coh$get_cache("1", "sp", state = "post", .recalc_when_missing = FALSE)))
+})
+
+# -- .propagate_domains tests -------------------------------------------------
+
+test_that(".propagate_domains.default is a no-op", {
+  iris_source <- set_source(tblist(iris = iris))
+  result <- .propagate_domains(iris_source, iris_source$dtconn, "1", NULL)
+  expect_null(result)
+})
+
+test_that(".propagate_domains.tblist is a no-op", {
+  iris_source <- set_source(tblist(iris = iris))
+  result <- .propagate_domains(iris_source, iris_source$dtconn, "1", NULL)
+  expect_null(result)
+})

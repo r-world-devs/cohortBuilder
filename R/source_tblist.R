@@ -1021,6 +1021,12 @@ shape.tblist <- function(source, field, subfield, ...) {
   )
 }
 
+#' @rdname dot-propagate_domains
+#' @export
+.propagate_domains.tblist <- function(source, data_object, step_id, cohort, ...) {
+  invisible(NULL)
+}
+
 # -- Autofilter rules ---------------------------------------------------------
 
 rule_character <- function(column, name, dataset_name, field_description = NULL) {

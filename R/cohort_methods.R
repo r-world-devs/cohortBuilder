@@ -13,12 +13,13 @@ Cohort <- R6::R6Class(
     #' @param ... Steps definition (optional). Can be also defined as a sequence of
     #'     filters - the filters will be added to the first step.
     #' @return The object of class `Cohort`.
-    initialize = function(source, ..., run_flow = FALSE,
+    initialize = function(source, ..., run_flow = FALSE, cache = TRUE,
                           hook = list(
                             pre = get_hook("pre_cohort_hook"),
                             post = get_hook("post_cohort_hook")
                           )) {
       run_hooks(hook$pre, self, private)
+      private$cache_enabled <- cache
 
       if (!missing(source)) {
         private$init_source(source, ...)
@@ -748,23 +749,32 @@ Cohort <- R6::R6Class(
         step_id = step_id
       )
 
+      .propagate_domains(
+        source = private$source,
+        data_object = private$data_objects[[step_id]],
+        step_id = step_id,
+        cohort = self
+      )
+
       filter_ids <- names(self$get_step(step_id)$filters)
 
-      # todo make sure is_cached logic is correct
-      is_cached <- !is.null(self$get_cache(step_id, state = "pre", .recalc_when_missing = FALSE))
-      if (!is_cached) {
-        self$update_cache(step_id, state = "pre")
-      }
-      if (self$is_pending(step_id)) {
-        self$update_cache(step_id, state = "post")
-      }
-      for (filter_id in active_filters) {
-        is_cached <- !is.null(self$get_cache(step_id, filter_id, state = "pre", .recalc_when_missing = FALSE))
+      if (private$cache_enabled) {
+        # todo make sure is_cached logic is correct
+        is_cached <- !is.null(self$get_cache(step_id, state = "pre", .recalc_when_missing = FALSE))
         if (!is_cached) {
-          self$update_cache(step_id, filter_id, state = "pre")
+          self$update_cache(step_id, state = "pre")
         }
         if (self$is_pending(step_id)) {
-          self$update_cache(step_id, filter_id, state = "post")
+          self$update_cache(step_id, state = "post")
+        }
+        for (filter_id in active_filters) {
+          is_cached <- !is.null(self$get_cache(step_id, filter_id, state = "pre", .recalc_when_missing = FALSE))
+          if (!is_cached) {
+            self$update_cache(step_id, filter_id, state = "pre")
+          }
+          if (self$is_pending(step_id)) {
+            self$update_cache(step_id, filter_id, state = "post")
+          }
         }
       }
 
@@ -954,6 +964,7 @@ Cohort <- R6::R6Class(
     source = NULL,
     steps = list(),
     cache = list(),
+    cache_enabled = TRUE,
     data_objects = list(),
     init_source = function(source, ...,
                            hook = list(

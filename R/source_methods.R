@@ -403,6 +403,30 @@ NULL
   return(data_object)
 }
 
+#' Propagate domains between steps
+#'
+#' Source-layer generic called after filtering + binding in `run_step()`.
+#' Override to implement dynamic domain narrowing: compute new domains from
+#' filtered data and push them to next step's filters.
+#'
+#' The default is a no-op (static domains).
+#'
+#' @param source Source object.
+#' @param data_object Filtered data after binding.
+#' @param step_id Current step id.
+#' @param cohort Cohort object (for accessing next step's filters).
+#' @param ... Additional arguments.
+#' @export
+.propagate_domains <- function(source, data_object, step_id, cohort, ...) {
+  UseMethod(".propagate_domains", source)
+}
+
+#' @rdname dot-propagate_domains
+#' @export
+.propagate_domains.default <- function(source, data_object, step_id, cohort, ...) {
+  invisible(NULL)
+}
+
 #' @rdname add_step
 #' @export
 add_step.Source <- function(x, step, ...) {
