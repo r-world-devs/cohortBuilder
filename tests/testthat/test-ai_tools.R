@@ -226,10 +226,10 @@ test_that("cb_register_tool rejects non-cb_tool", {
   )
 })
 
-test_that("cb_register_tools registers all four tools", {
+test_that("cb_register_tools registers all twelve tools", {
   skip_if_not_installed("ellmer")
   coh <- make_test_cohort()
   chat <- MockChat$new()
   cb_register_tools(chat, coh)
-  expect_identical(length(chat$tools), 4L)
+  expect_identical(length(chat$tools), 12L)
 })

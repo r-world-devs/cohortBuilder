@@ -116,7 +116,7 @@ set_source.tblist <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
 S7::method(cb_filter_data, list(CbFilterDiscrete, tblist_class)) <- function(filter, source, data_object, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  value <- filter@value
+  value <- intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(value, NA)) {
@@ -175,7 +175,7 @@ S7::method(cb_get_filter_defaults, list(CbFilterDiscrete, tblist_class)) <- func
 S7::method(cb_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, data_object, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  value <- filter@value
+  value <- intersect_domain(filter)
 
   if (!identical(value, NA)) {
     data_object[[dataset]] <- data_object[[dataset]] |>
@@ -279,7 +279,7 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
 range_filter_data_impl <- function(filter, data_object) {
   dataset <- filter@dataset
   variable <- filter@variable
-  range <- filter@range
+  range <- intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(range, NA)) {
@@ -542,7 +542,7 @@ S7::method(cb_get_filter_defaults, list(CbFilterDatetimeRange, tblist_class)) <-
 
 S7::method(cb_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, data_object, ...) {
   dataset <- filter@dataset
-  values <- filter@values
+  values <- intersect_domain(filter)
   keep_na <- filter@keep_na
 
   col_in_val <- function(vec, value, keep_na) {
@@ -668,7 +668,7 @@ S7::method(cb_get_filter_defaults, list(CbFilterQuery, tblist_class)) <- functio
 S7::method(cb_filter_to_expr, list(CbFilterDiscrete, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  value <- filter@value
+  value <- intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(value, NA)) {
@@ -694,7 +694,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDiscrete, tblist_class)) <- function(
 S7::method(cb_filter_to_expr, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  value <- filter@value
+  value <- intersect_domain(filter)
 
   if (!identical(value, NA)) {
     split_values <- strsplit(sub(" ", "", value, fixed = TRUE), split = ",", fixed = TRUE)[[1L]]
@@ -710,7 +710,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDiscreteText, tblist_class)) <- funct
 S7::method(cb_filter_to_expr, list(CbFilterRange, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  range <- filter@range
+  range <- intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(range, NA)) {
@@ -739,7 +739,7 @@ S7::method(cb_filter_to_expr, list(CbFilterRange, tblist_class)) <- function(fil
 S7::method(cb_filter_to_expr, list(CbFilterDateRange, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  range <- filter@range
+  range <- intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(range, NA)) {
@@ -768,7 +768,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDateRange, tblist_class)) <- function
 S7::method(cb_filter_to_expr, list(CbFilterDatetimeRange, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  range <- filter@range
+  range <- intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(range, NA)) {
@@ -796,7 +796,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDatetimeRange, tblist_class)) <- func
 
 S7::method(cb_filter_to_expr, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
-  values <- filter@values
+  values <- intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (all(purrr::map_lgl(values, ~ identical(.x, NA)))) {
@@ -999,8 +999,20 @@ shape.tblist <- function(source, field, subfield, ...) {
             stats$choices <- names(stats$choices)
             stats$type <- "discrete"
           }
+          domain_value <- NULL
+          available <- source$available_filters
+          if (!is.null(available) && !is.na(field_name)) {
+            match_idx <- purrr::detect_index(available, ~ .x@id == field_name)
+            if (match_idx > 0L) {
+              domain_value <- available[[match_idx]]@domain
+            }
+          }
+          if (is.null(domain_value)) {
+            domain_value <- field$domain
+          }
           tibble::tibble(
             dataset = dataset_name, filter = field_name, description = field,
+            domain = list(domain_value),
             stats = list(stats)
           )
         }
@@ -1011,7 +1023,7 @@ shape.tblist <- function(source, field, subfield, ...) {
 
 # -- Autofilter rules ---------------------------------------------------------
 
-rule_character <- function(column, name, dataset_name) {
+rule_character <- function(column, name, dataset_name, field_description = NULL) {
   type <- "discrete"
   gui_input <- NULL
   n_unique <- length(unique(column))
@@ -1020,16 +1032,17 @@ rule_character <- function(column, name, dataset_name) {
   } else if (length(unique(column)) > 3) {
     gui_input <- "vs"
   }
+  domain <- field_description$domain %||% collapse::funique(column)
   drop_nulls(
     list(
       type = type, id = name, name = name, variable = name,
       dataset = dataset_name, value = NA, keep_na = TRUE,
-      gui_input = gui_input
+      domain = domain, gui_input = gui_input
     )
   )
 }
 
-rule_factor <- function(column, name, dataset_name) {
+rule_factor <- function(column, name, dataset_name, field_description = NULL) {
   type <- "discrete"
   gui_input <- NULL
   n_levels <- length(levels(column))
@@ -1038,56 +1051,66 @@ rule_factor <- function(column, name, dataset_name) {
   } else if (length(unique(column)) > 3) {
     gui_input <- "vs"
   }
+  domain <- field_description$domain %||% levels(column)
   drop_nulls(
     list(
       type = type, id = name, name = name, variable = name,
       dataset = dataset_name, value = NA, keep_na = TRUE,
-      gui_input = gui_input
+      domain = domain, gui_input = gui_input
     )
   )
 }
 
-rule_numeric <- function(column, name, dataset_name) {
+rule_numeric <- function(column, name, dataset_name, field_description = NULL) {
+  domain <- field_description$domain %||% c(min(column, na.rm = TRUE), max(column, na.rm = TRUE))
   list(
     type = "range", id = name, name = name, variable = name,
-    dataset = dataset_name, range = NA, keep_na = TRUE
+    dataset = dataset_name, range = NA, keep_na = TRUE,
+    domain = domain
   )
 }
 rule_integer <- rule_numeric
 
-rule_Date <- function(column, name, dataset_name) {
+rule_Date <- function(column, name, dataset_name, field_description = NULL) {
+  domain <- field_description$domain %||% c(min(column, na.rm = TRUE), max(column, na.rm = TRUE))
   list(
     type = "date_range", id = name, name = name, variable = name,
-    dataset = dataset_name, range = NA, keep_na = TRUE
+    dataset = dataset_name, range = NA, keep_na = TRUE,
+    domain = domain
   )
 }
 
-rule_POSIXct <- function(column, name, dataset_name) {
+rule_POSIXct <- function(column, name, dataset_name, field_description = NULL) {
+  domain <- field_description$domain %||% c(min(column, na.rm = TRUE), max(column, na.rm = TRUE))
   list(
     type = "datetime_range", id = name, name = name, variable = name,
-    dataset = dataset_name, range = NA, keep_na = TRUE
+    dataset = dataset_name, range = NA, keep_na = TRUE,
+    domain = domain
   )
 }
 
-filter_rule <- function(column, name, dataset_name) {
+filter_rule <- function(column, name, dataset_name, field_description = NULL) {
   rule_method <- paste0("rule_", class(column)[[1]])
   do.call(
     rule_method,
-    list(column = column, name = name, dataset_name = dataset_name)
+    list(column = column, name = name, dataset_name = dataset_name,
+         field_description = field_description)
   )
 }
 
-filter_rules <- function(dataset, dataset_name) {
+filter_rules <- function(dataset, dataset_name, description = NULL) {
   dataset |>
-    purrr::imap(~ filter_rule(.x, .y, dataset_name = dataset_name))
+    purrr::imap(~ filter_rule(.x, .y, dataset_name = dataset_name,
+                              field_description = description[[.y]]))
 }
 
 #' @rdname autofilter
 #' @export
 autofilter.tblist <- function(source, attach_as = c("step", "meta"), ...) {
   attach_as <- rlang::arg_match(attach_as)
+  description_obj <- source$description
   step_rule <- source$dtconn |>
-    purrr::imap(~ filter_rules(.x, .y)) |>
+    purrr::imap(~ filter_rules(.x, .y, description = description_obj[[.y]])) |>
     unlist(recursive = FALSE) |>
     purrr::discard(~ is.null(.x)) |>
     purrr::map(~ do.call(cohortBuilder::filter, .)) |>

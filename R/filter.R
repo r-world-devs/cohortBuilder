@@ -23,11 +23,12 @@ tblist_class <- S7::new_S3_class("tblist")
 #'   parent = CbFilter,
 #'   package = "mypackage",
 #'   properties = list(dataset = S7::class_character, variable = S7::class_character),
-#'   constructor = function(id = .gen_id(), name = id, variable, dataset, ...) {
+#'   constructor = function(id = .gen_id(), name = id, variable, dataset,
+#'                          description = NULL, domain = NULL, ...) {
 #'     S7::new_object(S7::S7_object(),
 #'       type = "my_filter", id = id, name = name,
 #'       dataset = dataset, variable = variable,
-#'       active = TRUE, description = NULL,
+#'       active = TRUE, description = description, domain = domain,
 #'       extra = list(...), private = list(input_param = "value")
 #'     )
 #'   }
@@ -54,6 +55,10 @@ register_filter_type <- function(type, constructor) {
 #' @param name Filter display name.
 #' @param active Whether the filter is active.
 #' @param description Optional filter description.
+#' @param domain Optional domain constraining valid filter values. Structure depends on filter
+#'   type: character vector for discrete, 2-length vector for range, named list for multi_discrete.
+#'   When set, filter values are intersected with the domain. When value is unset (`NA`) and
+#'   domain is provided, the domain serves as the effective value.
 #' @param step_id Step identifier (set when filter is attached to a step).
 #' @param extra Named list of extra parameters.
 #'
@@ -66,6 +71,7 @@ CbFilter <- S7::new_class("CbFilter",
     name = S7::class_character,
     active = S7::class_logical,
     description = S7::class_any,
+    domain = S7::new_property(S7::class_any, default = NULL),
     step_id = S7::new_property(S7::class_any, default = NULL),
     extra = S7::new_property(S7::class_any, default = list()),
     private = S7::new_property(S7::class_any, default = list())
@@ -98,11 +104,13 @@ CbFilterDiscrete <- S7::new_class("CbFilterDiscrete",
   ),
   constructor = function(id = .gen_id(), name = id, variable, value = NA,
                          dataset, keep_na = TRUE, description = NULL,
+                         domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
       type = "discrete", id = id, name = name,
       variable = variable, value = value, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
+      domain = domain,
       extra = list(...), private = list(input_param = "value")
     )
   }
@@ -125,11 +133,13 @@ CbFilterDiscreteText <- S7::new_class("CbFilterDiscreteText",
   ),
   constructor = function(id = .gen_id(), name = id, variable, value = NA,
                          dataset, keep_na = TRUE, description = NULL,
+                         domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
       type = "discrete_text", id = id, name = name,
       variable = variable, value = value, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
+      domain = domain,
       extra = list(...), private = list(input_param = "value")
     )
   }
@@ -153,11 +163,13 @@ CbFilterRange <- S7::new_class("CbFilterRange",
   ),
   constructor = function(id = .gen_id(), name = id, variable, range = NA,
                          dataset, keep_na = TRUE, description = NULL,
+                         domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
       type = "range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
+      domain = domain,
       extra = list(...), private = list(input_param = "range")
     )
   }
@@ -180,11 +192,13 @@ CbFilterDateRange <- S7::new_class("CbFilterDateRange",
   ),
   constructor = function(id = .gen_id(), name = id, variable, range = NA,
                          dataset, keep_na = TRUE, description = NULL,
+                         domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
       type = "date_range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
+      domain = domain,
       extra = list(...), private = list(input_param = "range")
     )
   }
@@ -207,11 +221,13 @@ CbFilterDatetimeRange <- S7::new_class("CbFilterDatetimeRange",
   ),
   constructor = function(id = .gen_id(), name = id, variable, range = NA,
                          dataset, keep_na = TRUE, description = NULL,
+                         domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
       type = "datetime_range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
+      domain = domain,
       extra = list(...), private = list(input_param = "range")
     )
   }
@@ -236,11 +252,13 @@ CbFilterMultiDiscrete <- S7::new_class("CbFilterMultiDiscrete",
   ),
   constructor = function(id = .gen_id(), name = id, values, variables,
                          dataset, keep_na = TRUE, description = NULL,
+                         domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
       type = "multi_discrete", id = id, name = name,
       variables = variables, values = values, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
+      domain = domain,
       extra = list(...), private = list(input_param = "values")
     )
   }
@@ -265,11 +283,13 @@ CbFilterQuery <- S7::new_class("CbFilterQuery",
   ),
   constructor = function(id = .gen_id(), name = id, variables, value = NA,
                          dataset, keep_na = TRUE, description = NULL,
+                         domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     S7::new_object(S7::S7_object(),
       type = "query", id = id, name = name,
       variables = variables, value = value, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
+      domain = domain,
       extra = list(...), private = list(input_param = "value")
     )
   }
@@ -371,6 +391,65 @@ get_filter_params <- function(filter, name) {
   # description is returned as-is (may be NULL, character, or list)
   if (!missing(name)) return(all_props[[name]])
   all_props
+}
+
+# -- Domain intersection -------------------------------------------------------
+
+intersect_domain_discrete <- function(value, domain) {
+  if (is.null(domain)) return(value)
+  if (identical(value, NA)) return(domain)
+  result <- intersect(value, domain)
+  if (!identical(sort(as.character(value)), sort(as.character(result)))) {
+    warning("Filter value trimmed to domain.", call. = FALSE)
+  }
+  result
+}
+
+intersect_domain_range <- function(value, domain) {
+  if (is.null(domain)) return(value)
+  if (identical(value, NA)) return(domain)
+  result <- c(max(value[1L], domain[1L]), min(value[2L], domain[2L]))
+  if (!identical(value, result)) {
+    warning("Filter value trimmed to domain.", call. = FALSE)
+  }
+  result
+}
+
+intersect_domain_multi <- function(values, domain) {
+  if (is.null(domain)) return(values)
+  if (identical(values, NA)) return(domain)
+  result <- purrr::imap(values, function(val, nm) {
+    if (nm %in% names(domain)) intersect(val, domain[[nm]]) else val
+  })
+  if (!identical(values, result)) {
+    warning("Filter value trimmed to domain.", call. = FALSE)
+  }
+  result
+}
+
+#' Get effective filter value after domain intersection
+#'
+#' Returns the filter's value intersected with its domain. When value is `NA`
+#' and domain is set, returns the domain as the effective value.
+#'
+#' @param filter S7 filter object.
+#' @return The effective value for filtering.
+#' @keywords internal
+intersect_domain <- function(filter) {
+  input_param <- filter@private$input_param
+  value <- S7::prop(filter, input_param)
+  domain <- filter@domain
+
+  switch(filter@type,
+    discrete = ,
+    discrete_text = intersect_domain_discrete(value, domain),
+    range = ,
+    date_range = ,
+    datetime_range = intersect_domain_range(value, domain),
+    multi_discrete = intersect_domain_multi(value, domain),
+    query = value,
+    value
+  )
 }
 
 assign_filter_step_id <- function(filter_obj, step_id) {

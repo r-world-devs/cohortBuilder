@@ -132,3 +132,209 @@ test_that("Query discrete filter works fine", {
   )
 
 })
+
+# -- Domain property tests ----------------------------------------------------
+
+test_that("Filter created with domain stores it as S7 property", {
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    domain = c("setosa", "versicolor", "virginica")
+  )
+  expect_identical(f@domain, c("setosa", "versicolor", "virginica"))
+})
+
+test_that("Filter domain defaults to NULL when not provided", {
+  f <- filter(type = "discrete", id = "sp", variable = "Species", dataset = "iris")
+  expect_null(f@domain)
+})
+
+test_that("domain appears in get_filter_params output", {
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    domain = c("setosa", "versicolor")
+  )
+  params <- get_filter_params(f)
+  expect_true("domain" %in% names(params))
+  expect_identical(params$domain, c("setosa", "versicolor"))
+})
+
+test_that("domain works for all filter types", {
+  f_range <- filter(
+    type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
+    domain = c(4, 8)
+  )
+  expect_identical(f_range@domain, c(4, 8))
+
+  f_date <- filter(
+    type = "date_range", id = "d", variable = "date", dataset = "d",
+    domain = as.Date(c("2020-01-01", "2025-12-31"))
+  )
+  expect_identical(f_date@domain, as.Date(c("2020-01-01", "2025-12-31")))
+
+  f_md <- filter(
+    type = "multi_discrete", id = "md", variables = c("a", "b"), dataset = "d",
+    values = list(a = "x", b = "y"),
+    domain = list(a = c("x", "y", "z"), b = c("y", "w"))
+  )
+  expect_identical(f_md@domain, list(a = c("x", "y", "z"), b = c("y", "w")))
+
+  f_query <- filter(
+    type = "query", id = "q", variables = "col1", dataset = "d",
+    domain = NULL
+  )
+  expect_null(f_query@domain)
+})
+
+# -- intersect_domain tests ---------------------------------------------------
+
+test_that("intersect_domain returns NA when no domain and value is NA", {
+  f <- filter(type = "discrete", id = "x", variable = "a", dataset = "d")
+  expect_identical(intersect_domain(f), NA)
+})
+
+test_that("intersect_domain returns value when no domain", {
+  f <- filter(type = "discrete", id = "x", variable = "a", dataset = "d", value = c("a", "b"))
+  expect_identical(intersect_domain(f), c("a", "b"))
+})
+
+test_that("intersect_domain returns domain when value is NA", {
+  f <- filter(
+    type = "discrete", id = "x", variable = "a", dataset = "d",
+    domain = c("a", "b", "c")
+  )
+  expect_identical(intersect_domain(f), c("a", "b", "c"))
+})
+
+test_that("intersect_domain intersects value with domain for discrete", {
+  f <- filter(
+    type = "discrete", id = "x", variable = "a", dataset = "d",
+    value = c("a", "b", "z"), domain = c("a", "b", "c")
+  )
+  expect_warning(result <- intersect_domain(f), "trimmed to domain")
+  expect_identical(result, c("a", "b"))
+})
+
+test_that("intersect_domain does not warn when value already within domain", {
+  f <- filter(
+    type = "discrete", id = "x", variable = "a", dataset = "d",
+    value = c("a", "b"), domain = c("a", "b", "c")
+  )
+  expect_silent(result <- intersect_domain(f))
+  expect_identical(result, c("a", "b"))
+})
+
+test_that("intersect_domain works for range types", {
+  f <- filter(
+    type = "range", id = "x", variable = "a", dataset = "d",
+    range = c(1, 100), domain = c(10, 50)
+  )
+  expect_warning(result <- intersect_domain(f), "trimmed to domain")
+  expect_identical(result, c(10, 50))
+})
+
+test_that("intersect_domain returns domain when range is NA", {
+  f <- filter(
+    type = "range", id = "x", variable = "a", dataset = "d",
+    domain = c(10, 50)
+  )
+  expect_identical(intersect_domain(f), c(10, 50))
+})
+
+test_that("intersect_domain works for multi_discrete", {
+  f <- filter(
+    type = "multi_discrete", id = "x", variables = c("a", "b"), dataset = "d",
+    values = list(a = c("x", "z"), b = c("y")),
+    domain = list(a = c("x", "y"), b = c("y", "w"))
+  )
+  expect_warning(result <- intersect_domain(f), "trimmed to domain")
+  expect_identical(result, list(a = "x", b = "y"))
+})
+
+test_that("intersect_domain returns value as-is for query filters", {
+  qval <- queryBuilder::queryGroup(
+    condition = "AND",
+    queryBuilder::queryRule("col1", "equal", "A")
+  )
+  f <- filter(type = "query", id = "q", variables = "col1", dataset = "d", value = qval)
+  expect_identical(intersect_domain(f), qval)
+})
+
+# -- Domain filtering end-to-end tests ----------------------------------------
+
+test_that("Discrete filter with domain constrains results", {
+  iris_source <- set_source(tblist(iris = iris))
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    value = c("setosa", "versicolor", "virginica"),
+    domain = c("setosa", "versicolor")
+  )
+  coh <- Cohort$new(iris_source, f)
+  suppressWarnings(coh$run_flow())
+  result <- coh$get_data(1L, state = "post")$iris
+  expect_true(all(result$Species %in% c("setosa", "versicolor")))
+})
+
+test_that("Range filter with domain constrains results", {
+  iris_source <- set_source(tblist(iris = iris))
+  f <- filter(
+    type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
+    range = c(1, 10), domain = c(5, 6)
+  )
+  coh <- Cohort$new(iris_source, f)
+  suppressWarnings(coh$run_flow())
+  result <- coh$get_data(1L, state = "post")$iris
+  expect_true(all(result$Sepal.Length >= 5 & result$Sepal.Length <= 6))
+})
+
+test_that("update_filter can change domain", {
+  iris_source <- set_source(tblist(iris = iris))
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    domain = c("setosa", "versicolor", "virginica")
+  )
+  coh <- Cohort$new(iris_source, f)
+  coh$update_filter("1", "sp", domain = c("setosa"))
+  expect_identical(coh$get_filter("1", "sp")@domain, "setosa")
+})
+
+test_that("get_state/restore round-trips domain", {
+  iris_source <- set_source(tblist(iris = iris))
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    domain = c("setosa", "versicolor")
+  )
+  coh <- Cohort$new(iris_source, f)
+  state <- coh$get_state()
+
+  coh2 <- Cohort$new(iris_source, f)
+  coh2$restore(state)
+  expect_identical(coh2$get_filter("1", "sp")@domain, c("setosa", "versicolor"))
+})
+
+# -- cb_filter_to_expr domain tests -------------------------------------------
+
+test_that("cb_filter_to_expr uses domain-intersected value for discrete filter", {
+  iris_source <- set_source(tblist(iris = iris))
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    value = c("setosa", "versicolor", "virginica"),
+    domain = c("setosa", "versicolor")
+  )
+  expr <- suppressWarnings(cb_filter_to_expr(f, iris_source))
+  # Evaluate the generated code to verify it uses the intersected value
+  data_object <- iris_source$dtconn
+  eval(expr)
+  expect_true(all(data_object$iris$Species %in% c("setosa", "versicolor")))
+})
+
+test_that("cb_filter_to_expr uses domain as value when range is NA", {
+  iris_source <- set_source(tblist(iris = iris))
+  f <- filter(
+    type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
+    domain = c(5, 6)
+  )
+  expr <- cb_filter_to_expr(f, iris_source)
+  data_object <- iris_source$dtconn
+  eval(expr)
+  expect_true(all(data_object$iris$Sepal.Length >= 5 & data_object$iris$Sepal.Length <= 6))
+})

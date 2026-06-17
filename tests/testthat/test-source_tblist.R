@@ -781,3 +781,67 @@ test_that("plot_data in multi_discrete filter works fine", {
     }
   )
 })
+
+# -- Domain integration tests ------------------------------------------------
+
+test_that("autofilter populates domain from data", {
+  source <- set_source(tblist(iris = iris)) |>
+    autofilter(attach_as = "meta")
+  filters <- source$available_filters
+  species_filter <- purrr::detect(filters, ~ .x@id == "Species")
+  expect_false(is.null(species_filter@domain))
+  expect_true(all(c("setosa", "versicolor", "virginica") %in% species_filter@domain))
+
+  sl_filter <- purrr::detect(filters, ~ .x@id == "Sepal.Length")
+  expect_identical(sl_filter@domain, c(min(iris$Sepal.Length), max(iris$Sepal.Length)))
+})
+
+test_that("autofilter inherits domain from describe()", {
+  custom_domain <- c("setosa", "versicolor")
+  source <- set_source(
+    tblist(iris = iris),
+    description = list(
+      iris = list(
+        Species = describe("species", domain = custom_domain)
+      )
+    )
+  ) |> autofilter(attach_as = "meta")
+
+  species_filter <- purrr::detect(source$available_filters, ~ .x@id == "Species")
+  expect_identical(species_filter@domain, custom_domain)
+})
+
+test_that("shape() returns domain column", {
+  custom_domain <- c("setosa", "versicolor")
+  source <- set_source(
+    tblist(iris = iris),
+    description = list(
+      iris = list(
+        dataset_ = describe("iris data"),
+        Species = describe("species", domain = custom_domain)
+      )
+    )
+  ) |> autofilter(attach_as = "meta")
+
+  result <- shape(source)
+  expect_true("domain" %in% names(result))
+  species_row <- result[result$filter == "Species" & !is.na(result$filter), ]
+  expect_identical(species_row$domain[[1L]], custom_domain)
+})
+
+test_that("shape() domain falls back to description when no available_filters", {
+  custom_domain <- c("setosa", "versicolor")
+  source <- set_source(
+    tblist(iris = iris),
+    description = list(
+      iris = list(
+        dataset_ = describe("iris data"),
+        Species = describe("species", domain = custom_domain)
+      )
+    )
+  )
+
+  result <- shape(source)
+  species_row <- result[result$filter == "Species" & !is.na(result$filter), ]
+  expect_identical(species_row$domain[[1L]], custom_domain)
+})
