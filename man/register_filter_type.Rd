@@ -21,11 +21,12 @@ MyCbFilter <- S7::new_class("MyCbFilter",
   parent = CbFilter,
   package = "mypackage",
   properties = list(dataset = S7::class_character, variable = S7::class_character),
-  constructor = function(id = .gen_id(), name = id, variable, dataset, ...) {
+  constructor = function(id = .gen_id(), name = id, variable, dataset,
+                         description = NULL, domain = NULL, ...) {
     S7::new_object(S7::S7_object(),
       type = "my_filter", id = id, name = name,
       dataset = dataset, variable = variable,
-      active = TRUE, description = NULL,
+      active = TRUE, description = description, domain = domain,
       extra = list(...), private = list(input_param = "value")
     )
   }

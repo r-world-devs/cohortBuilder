@@ -12,14 +12,22 @@ Cohort <- R6::R6Class(
     #' Create Cohort object.
     #' @param ... Steps definition (optional). Can be also defined as a sequence of
     #'     filters - the filters will be added to the first step.
+    #' @param cache If `TRUE` (default), filter statistics are cached after each step.
+    #'     Set to `FALSE` to skip cache computation (useful for metadata-only operation).
+    #' @param propagate_domains Domain propagation mode between steps.
+    #'     One of `"none"` (default, no propagation), `"filter"` (derive from
+    #'     previous step filter values), `"cache"` (derive from cached statistics),
+    #'     or `"data"` (scan filtered data).
     #' @return The object of class `Cohort`.
     initialize = function(source, ..., run_flow = FALSE, cache = TRUE,
+                          propagate_domains = c("none", "filter", "cache", "data"),
                           hook = list(
                             pre = get_hook("pre_cohort_hook"),
                             post = get_hook("post_cohort_hook")
                           )) {
       run_hooks(hook$pre, self, private)
       private$cache_enabled <- cache
+      private$propagate_domains_mode <- match.arg(propagate_domains)
 
       if (!missing(source)) {
         private$init_source(source, ...)
@@ -749,13 +757,6 @@ Cohort <- R6::R6Class(
         step_id = step_id
       )
 
-      .propagate_domains(
-        source = private$source,
-        data_object = private$data_objects[[step_id]],
-        step_id = step_id,
-        cohort = self
-      )
-
       filter_ids <- names(self$get_step(step_id)$filters)
 
       if (private$cache_enabled) {
@@ -776,6 +777,16 @@ Cohort <- R6::R6Class(
             self$update_cache(step_id, filter_id, state = "post")
           }
         }
+      }
+
+      if (private$propagate_domains_mode != "none") {
+        .propagate_domains(
+          source = private$source,
+          data_object = private$data_objects[[step_id]],
+          step_id = step_id,
+          cohort = self,
+          mode = private$propagate_domains_mode
+        )
       }
 
       self$set_pending(step_id, pending = FALSE)
@@ -965,6 +976,7 @@ Cohort <- R6::R6Class(
     steps = list(),
     cache = list(),
     cache_enabled = TRUE,
+    propagate_domains_mode = "none",
     data_objects = list(),
     init_source = function(source, ...,
                            hook = list(

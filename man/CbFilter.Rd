@@ -10,6 +10,7 @@ CbFilter(
   name = character(0),
   active = logical(0),
   description = NULL,
+  domain = NULL,
   step_id = NULL,
   extra = list(),
   private = list()
@@ -25,6 +26,11 @@ CbFilter(
 \item{active}{Whether the filter is active.}
 
 \item{description}{Optional filter description.}
+
+\item{domain}{Optional domain constraining valid filter values. Structure depends on filter
+type: character vector for discrete, 2-length vector for range, named list for multi_discrete.
+When set, filter values are intersected with the domain. When value is unset (`NA`) and
+domain is provided, the domain serves as the effective value.}
 
 \item{step_id}{Step identifier (set when filter is attached to a step).}
 

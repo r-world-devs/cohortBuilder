@@ -12,6 +12,7 @@ CbFilterQuery(
   dataset,
   keep_na = TRUE,
   description = NULL,
+  domain = NULL,
   active = getOption("cb_active_filter", default = TRUE),
   ...
 )

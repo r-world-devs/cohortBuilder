@@ -1621,12 +1621,219 @@ test_that("cache = TRUE (default) computes cache normally", {
 
 test_that(".propagate_domains.default is a no-op", {
   iris_source <- set_source(tblist(iris = iris))
-  result <- .propagate_domains(iris_source, iris_source$dtconn, "1", NULL)
+  result <- .propagate_domains(iris_source, iris_source$dtconn, "1", NULL, mode = "data")
   expect_null(result)
 })
 
-test_that(".propagate_domains.tblist is a no-op", {
+test_that("propagate_domains = 'none' (default) does not propagate", {
   iris_source <- set_source(tblist(iris = iris))
-  result <- .propagate_domains(iris_source, iris_source$dtconn, "1", NULL)
-  expect_null(result)
+  step1 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           value = c("setosa", "versicolor"))
+  )
+  step2 <- step(
+    filter("discrete", id = "sp2", variable = "Species", dataset = "iris",
+           domain = c("setosa", "versicolor", "virginica"))
+  )
+  coh <- Cohort$new(iris_source, step1, step2)
+  coh$run_flow()
+
+  # Domain unchanged — propagation disabled
+  step2_filter <- coh$get_filter("2", "sp2")
+  expect_identical(step2_filter@domain, c("setosa", "versicolor", "virginica"))
+})
+
+# -- mode = "data" tests ------------------------------------------------------
+
+test_that("propagate_domains = 'data' narrows discrete domain", {
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           value = c("setosa", "versicolor"))
+  )
+  step2 <- step(
+    filter("discrete", id = "sp2", variable = "Species", dataset = "iris",
+           domain = c("setosa", "versicolor", "virginica"))
+  )
+  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "data")
+  coh$run_flow()
+
+  step2_filter <- coh$get_filter("2", "sp2")
+  expect_true(all(step2_filter@domain %in% c("setosa", "versicolor")))
+  expect_false("virginica" %in% step2_filter@domain)
+})
+
+test_that("propagate_domains = 'data' narrows range domain", {
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("range", id = "sl1", variable = "Sepal.Length", dataset = "iris",
+           range = c(5, 6))
+  )
+  step2 <- step(
+    filter("range", id = "sl2", variable = "Sepal.Length", dataset = "iris",
+           domain = c(4, 8))
+  )
+  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "data")
+  coh$run_flow()
+
+  step2_filter <- coh$get_filter("2", "sl2")
+  expect_true(step2_filter@domain[1L] >= 5)
+  expect_true(step2_filter@domain[2L] <= 6)
+})
+
+test_that("propagate_domains = 'data' skips filters without domain", {
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           value = "setosa")
+  )
+  step2 <- step(
+    filter("discrete", id = "sp2", variable = "Species", dataset = "iris")
+  )
+  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "data")
+  coh$run_flow()
+
+  # No domain was set, so propagation should not add one
+  expect_null(coh$get_filter("2", "sp2")@domain)
+})
+
+test_that("propagate_domains = 'data' does not affect last step", {
+  iris_source <- set_source(tblist(iris = iris))
+  f <- filter("discrete", id = "sp", variable = "Species", dataset = "iris",
+              value = "setosa", domain = c("setosa", "versicolor", "virginica"))
+  coh <- Cohort$new(iris_source, f, propagate_domains = "data")
+  coh$run_flow()
+
+  step1_filter <- coh$get_filter("1", "sp")
+  expect_identical(step1_filter@domain, c("setosa", "versicolor", "virginica"))
+})
+
+# -- mode = "cache" tests -----------------------------------------------------
+
+test_that("propagate_domains = 'cache' narrows discrete domain from stats", {
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           value = c("setosa", "versicolor"))
+  )
+  step2 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           domain = c("setosa", "versicolor", "virginica"))
+  )
+  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "cache")
+  coh$run_flow()
+
+  step2_filter <- coh$get_filter("2", "sp1")
+  expect_true(all(step2_filter@domain %in% c("setosa", "versicolor")))
+  expect_false("virginica" %in% step2_filter@domain)
+})
+
+test_that("propagate_domains = 'cache' does nothing when cache disabled", {
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           value = c("setosa", "versicolor"))
+  )
+  step2 <- step(
+    filter("discrete", id = "sp2", variable = "Species", dataset = "iris",
+           domain = c("setosa", "versicolor", "virginica"))
+  )
+  coh <- Cohort$new(iris_source, step1, step2,
+                    cache = FALSE, propagate_domains = "cache")
+  coh$run_flow()
+
+  # No cache computed, so domain stays unchanged
+  step2_filter <- coh$get_filter("2", "sp2")
+  expect_identical(step2_filter@domain, c("setosa", "versicolor", "virginica"))
+})
+
+# -- mode = "filter" tests ----------------------------------------------------
+
+test_that("propagate_domains = 'filter' narrows domain from filter value (no data access)", {
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           value = c("setosa", "versicolor"))
+  )
+  step2 <- step(
+    filter("discrete", id = "sp2", variable = "Species", dataset = "iris",
+           domain = c("setosa", "versicolor", "virginica"))
+  )
+  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "filter")
+  coh$run_flow()
+
+  step2_filter <- coh$get_filter("2", "sp2")
+  expect_identical(step2_filter@domain, c("setosa", "versicolor"))
+})
+
+test_that("propagate_domains = 'filter' works with range filters", {
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("range", id = "sl1", variable = "Sepal.Length", dataset = "iris",
+           range = c(5, 6))
+  )
+  step2 <- step(
+    filter("range", id = "sl2", variable = "Sepal.Length", dataset = "iris",
+           domain = c(4, 8))
+  )
+  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "filter")
+  coh$run_flow()
+
+  step2_filter <- coh$get_filter("2", "sl2")
+  expect_identical(step2_filter@domain, c(5, 6))
+})
+
+test_that("propagate_domains = 'filter' works with cache disabled", {
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           value = c("setosa"))
+  )
+  step2 <- step(
+    filter("discrete", id = "sp2", variable = "Species", dataset = "iris",
+           domain = c("setosa", "versicolor", "virginica"))
+  )
+  coh <- Cohort$new(iris_source, step1, step2,
+                    cache = FALSE, propagate_domains = "filter")
+  coh$run_flow()
+
+  # filter mode doesn't need cache
+  step2_filter <- coh$get_filter("2", "sp2")
+  expect_identical(step2_filter@domain, "setosa")
+})
+
+test_that("propagate_domains = 'filter' skips when no matching filter in current step", {
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           value = c("setosa"))
+  )
+  step2 <- step(
+    filter("range", id = "sl2", variable = "Sepal.Length", dataset = "iris",
+           domain = c(4, 8))
+  )
+  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "filter")
+  coh$run_flow()
+
+  # No matching filter for Sepal.Length in step 1 — domain unchanged
+  step2_filter <- coh$get_filter("2", "sl2")
+  expect_identical(step2_filter@domain, c(4, 8))
+})
+
+test_that("propagate_domains = 'filter' uses domain as value when filter is unset", {
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           domain = c("setosa", "versicolor"))
+  )
+  step2 <- step(
+    filter("discrete", id = "sp2", variable = "Species", dataset = "iris",
+           domain = c("setosa", "versicolor", "virginica"))
+  )
+  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "filter")
+  coh$run_flow()
+
+  # Step 1 filter has value = NA, so intersect_domain returns domain c("setosa", "versicolor")
+  step2_filter <- coh$get_filter("2", "sp2")
+  expect_identical(step2_filter@domain, c("setosa", "versicolor"))
 })

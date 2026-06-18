@@ -64,6 +64,8 @@ Cohort object is designed to make operations on source data possible.
   source,
   ...,
   run_flow = FALSE,
+  cache = TRUE,
+  propagate_domains = c("none", "filter", "cache", "data"),
   hook = list(pre = get_hook("pre_cohort_hook"), post = get_hook("post_cohort_hook"))
 )}
     \if{html}{\out{</div>}}
@@ -75,6 +77,12 @@ Cohort object is designed to make operations on source data possible.
       \item{\code{...}}{Steps definition (optional). Can be also defined as a sequence of
 filters - the filters will be added to the first step.}
       \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{cache}}{If `TRUE` (default), filter statistics are cached after each step.
+Set to `FALSE` to skip cache computation (useful for metadata-only operation).}
+      \item{\code{propagate_domains}}{Domain propagation mode between steps.
+One of `"none"` (default, no propagation), `"filter"` (derive from
+previous step filter values), `"cache"` (derive from cached statistics),
+or `"data"` (scan filtered data).}
       \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
     }

@@ -1023,8 +1023,102 @@ shape.tblist <- function(source, field, subfield, ...) {
 
 #' @rdname dot-propagate_domains
 #' @export
-.propagate_domains.tblist <- function(source, data_object, step_id, cohort, ...) {
+.propagate_domains.tblist <- function(source, data_object, step_id, cohort, mode, ...) {
+  if (is.null(cohort)) return(invisible(NULL))
+  next_id <- next_step(step_id)
+  next_step_obj <- cohort$get_step(next_id)
+  if (is.null(next_step_obj)) return(invisible(NULL))
+
+  current_filters <- cohort$get_step(step_id)$filters
+
+  for (filter_id in names(next_step_obj$filters)) {
+    filter_obj <- next_step_obj$filters[[filter_id]]
+    if (is.null(filter_obj@domain)) next
+
+    new_domain <- switch(mode,
+      filter = domain_from_filter(filter_obj, current_filters),
+      cache = {
+        matched <- find_matching_filter(filter_obj, current_filters)
+        if (is.null(matched)) NULL
+        else domain_from_cache(
+          filter_obj,
+          cohort$get_cache(step_id, matched@id, state = "post", .recalc_when_missing = FALSE)
+        )
+      },
+      data = domain_from_data(filter_obj, data_object)
+    )
+
+    if (!is.null(new_domain)) {
+      cohort$update_filter(next_id, filter_id, domain = new_domain)
+    }
+  }
+
   invisible(NULL)
+}
+
+# -- Domain propagation helpers ------------------------------------------------
+
+find_matching_filter <- function(target_filter, filters) {
+  type <- target_filter@type
+  if (type %in% c("multi_discrete", "query")) return(NULL)
+  purrr::detect(filters, function(f) {
+    f@type != "query" &&
+      identical(f@dataset, target_filter@dataset) &&
+      "variable" %in% names(S7::props(f)) &&
+      identical(f@variable, target_filter@variable)
+  })
+}
+
+domain_from_filter <- function(target_filter, current_filters) {
+  if (target_filter@type == "query") return(NULL)
+  match <- find_matching_filter(target_filter, current_filters)
+  if (is.null(match)) return(NULL)
+  effective <- intersect_domain(match)
+  if (identical(effective, NA)) return(NULL)
+  effective
+}
+
+domain_from_cache <- function(filter, cache) {
+  if (is.null(cache)) return(NULL)
+  type <- filter@type
+
+  if (type %in% c("discrete", "discrete_text")) {
+    if (!is.null(cache$choices)) {
+      # Exclude zero-count choices (e.g. unused factor levels)
+      return(names(purrr::keep(cache$choices, ~ .x > 0L)))
+    }
+    return(NULL)
+  }
+  if (type %in% c("range", "date_range", "datetime_range")) {
+    if (!is.null(cache$min) && !is.null(cache$max)) return(c(cache$min, cache$max))
+    return(NULL)
+  }
+  if (type == "multi_discrete") {
+    if (!is.null(cache$choices)) return(purrr::map(cache$choices, names))
+    return(NULL)
+  }
+  NULL
+}
+
+domain_from_data <- function(filter, data_object) {
+  type <- filter@type
+  if (type == "query") return(NULL)
+
+  if (type %in% c("discrete", "discrete_text")) {
+    column <- data_object[[filter@dataset]][[filter@variable]]
+    return(collapse::funique(stats::na.omit(column)))
+  }
+  if (type %in% c("range", "date_range", "datetime_range")) {
+    column <- stats::na.omit(data_object[[filter@dataset]][[filter@variable]])
+    if (length(column) == 0L) return(NULL)
+    return(c(min(column), max(column)))
+  }
+  if (type == "multi_discrete") {
+    variables <- names(filter@values)
+    dataset <- data_object[[filter@dataset]]
+    return(purrr::map(rlang::set_names(variables), ~ collapse::funique(stats::na.omit(dataset[[.x]]))))
+  }
+  NULL
 }
 
 # -- Autofilter rules ---------------------------------------------------------
