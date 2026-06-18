@@ -185,6 +185,90 @@ test_that("domain works for all filter types", {
   expect_null(f_query@domain)
 })
 
+# -- .default_filter_id tests -------------------------------------------------
+
+test_that(".default_filter_id generates correct ID for single variable", {
+  expect_identical(.default_filter_id("iris", "Species"), "iris-Species")
+})
+
+test_that(".default_filter_id strips non-alphanumeric characters", {
+  expect_identical(.default_filter_id("my_data", "Sepal.Length"), "mydata-SepalLength")
+})
+
+test_that(".default_filter_id handles suffix", {
+  expect_identical(
+    .default_filter_id("data", c("col1", "col2"), suffix = "md"),
+    "data-col1-col2-md"
+  )
+})
+
+test_that(".default_filter_id truncates to 3 vars + hash for >3 variables", {
+  vars <- c("alpha", "beta", "gamma", "delta", "epsilon")
+  result <- .default_filter_id("ds", vars, suffix = "md")
+  parts <- strsplit(result, "-")[[1L]]
+  expect_identical(parts[1L], "ds")
+  expect_identical(parts[2L], "alpha")
+  expect_identical(parts[3L], "beta")
+  expect_identical(parts[4L], "gamma")
+  expect_identical(nchar(parts[5L]), 4L)
+  expect_identical(parts[6L], "md")
+})
+
+test_that(".default_filter_id hash is deterministic", {
+  vars <- c("a", "b", "c", "d")
+  id1 <- .default_filter_id("ds", vars, suffix = "q")
+  id2 <- .default_filter_id("ds", vars, suffix = "q")
+  expect_identical(id1, id2)
+})
+
+test_that(".default_filter_id hash is the same regardless of variable order", {
+  id1 <- .default_filter_id("ds", c("a", "b", "c", "d"), suffix = "md")
+  id2 <- .default_filter_id("ds", c("d", "c", "b", "a"), suffix = "md")
+  # First 3 vars differ by input order, but the hash portion is identical
+  hash1 <- strsplit(id1, "-")[[1L]][5L]
+  hash2 <- strsplit(id2, "-")[[1L]][5L]
+  expect_identical(hash1, hash2)
+})
+
+# -- deterministic ID integration tests ---------------------------------------
+
+test_that("filter() generates deterministic ID when id is omitted", {
+  f <- filter("discrete", variable = "Species", dataset = "iris")
+  expect_identical(f@id, "iris-Species")
+  expect_identical(f@name, "iris-Species")
+})
+
+test_that("filter() respects explicit id", {
+  f <- filter("discrete", id = "custom", variable = "Species", dataset = "iris")
+  expect_identical(f@id, "custom")
+})
+
+test_that("filter() respects explicit name while generating id", {
+  f <- filter("discrete", name = "My Filter", variable = "Species", dataset = "iris")
+  expect_identical(f@id, "iris-Species")
+  expect_identical(f@name, "My Filter")
+})
+
+test_that("filter() name defaults to explicit id", {
+  f <- filter("discrete", id = "my_id", variable = "Species", dataset = "iris")
+  expect_identical(f@name, "my_id")
+})
+
+test_that("range filter gets deterministic ID", {
+  f <- filter("range", variable = "Sepal.Width", dataset = "iris")
+  expect_identical(f@id, "iris-SepalWidth")
+})
+
+test_that("multi_discrete filter gets ID with md suffix", {
+  f <- filter("multi_discrete", variables = c("col1", "col2"), values = NA, dataset = "data")
+  expect_identical(f@id, "data-col1-col2-md")
+})
+
+test_that("query filter gets ID with q suffix", {
+  f <- filter("query", variables = c("col1", "col2"), dataset = "data")
+  expect_identical(f@id, "data-col1-col2-q")
+})
+
 # -- cb_intersect_domain tests ------------------------------------------------
 
 test_that("cb_intersect_domain returns NA when no domain and value is NA", {

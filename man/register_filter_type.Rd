@@ -21,8 +21,10 @@ MyCbFilter <- S7::new_class("MyCbFilter",
   parent = CbFilter,
   package = "mypackage",
   properties = list(dataset = S7::class_character, variable = S7::class_character),
-  constructor = function(id = .gen_id(), name = id, variable, dataset,
+  constructor = function(id = NULL, name = NULL, variable, dataset,
                          description = NULL, domain = NULL, ...) {
+    id <- id \%||\% .default_filter_id(dataset, variable)
+    name <- name \%||\% id
     S7::new_object(S7::S7_object(),
       type = "my_filter", id = id, name = name,
       dataset = dataset, variable = variable,

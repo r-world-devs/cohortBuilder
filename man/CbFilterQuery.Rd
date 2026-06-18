@@ -5,8 +5,8 @@
 \title{Query filter class}
 \usage{
 CbFilterQuery(
-  id = .gen_id(),
-  name = id,
+  id = NULL,
+  name = NULL,
   variables,
   value = NA,
   dataset,

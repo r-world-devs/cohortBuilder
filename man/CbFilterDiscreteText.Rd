@@ -5,8 +5,8 @@
 \title{Discrete text filter class}
 \usage{
 CbFilterDiscreteText(
-  id = .gen_id(),
-  name = id,
+  id = NULL,
+  name = NULL,
   variable,
   value = NA,
   dataset,

@@ -5,8 +5,8 @@
 \title{Date range filter class}
 \usage{
 CbFilterDateRange(
-  id = .gen_id(),
-  name = id,
+  id = NULL,
+  name = NULL,
   variable,
   range = NA,
   dataset,

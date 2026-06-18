@@ -1059,12 +1059,7 @@ shape.tblist <- function(source, field, subfield, ...) {
 # -- Domain propagation helpers ------------------------------------------------
 
 find_matching_filter <- function(target_filter, filters) {
-  if (!"variable" %in% names(S7::props(target_filter))) return(NULL)
-  purrr::detect(filters, function(f) {
-    "variable" %in% names(S7::props(f)) &&
-      identical(f@dataset, target_filter@dataset) &&
-      identical(f@variable, target_filter@variable)
-  })
+  filters[[target_filter@id]]
 }
 
 domain_from_filter <- function(target_filter, current_filters) {

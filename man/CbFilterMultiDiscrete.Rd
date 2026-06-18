@@ -5,8 +5,8 @@
 \title{Multi-discrete filter class}
 \usage{
 CbFilterMultiDiscrete(
-  id = .gen_id(),
-  name = id,
+  id = NULL,
+  name = NULL,
   values,
   variables,
   dataset,

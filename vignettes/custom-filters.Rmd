@@ -91,9 +91,11 @@ CbFilterLogical <- S7::new_class("CbFilterLogical",
     value = S7::class_any,
     keep_na = S7::class_logical
   ),
-  constructor = function(id = .gen_id(), name = id, variable, value = NA,
+  constructor = function(id = NULL, name = NULL, variable, value = NA,
                          dataset, keep_na = TRUE, description = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
+    id <- id %||% .default_filter_id(dataset, variable)
+    name <- name %||% id
     S7::new_object(S7::S7_object(),
       type = "logical", id = id, name = name, input_param = "value",
       variable = variable, value = value, dataset = dataset,

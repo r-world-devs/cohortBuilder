@@ -5,8 +5,8 @@
 \title{Datetime range filter class}
 \usage{
 CbFilterDatetimeRange(
-  id = .gen_id(),
-  name = id,
+  id = NULL,
+  name = NULL,
   variable,
   range = NA,
   dataset,

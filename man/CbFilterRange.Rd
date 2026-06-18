@@ -5,8 +5,8 @@
 \title{Range filter class}
 \usage{
 CbFilterRange(
-  id = .gen_id(),
-  name = id,
+  id = NULL,
+  name = NULL,
   variable,
   range = NA,
   dataset,

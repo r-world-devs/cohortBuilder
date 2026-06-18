@@ -23,8 +23,10 @@ tblist_class <- S7::new_S3_class("tblist")
 #'   parent = CbFilter,
 #'   package = "mypackage",
 #'   properties = list(dataset = S7::class_character, variable = S7::class_character),
-#'   constructor = function(id = .gen_id(), name = id, variable, dataset,
+#'   constructor = function(id = NULL, name = NULL, variable, dataset,
 #'                          description = NULL, domain = NULL, ...) {
+#'     id <- id %||% .default_filter_id(dataset, variable)
+#'     name <- name %||% id
 #'     S7::new_object(S7::S7_object(),
 #'       type = "my_filter", id = id, name = name,
 #'       dataset = dataset, variable = variable,
@@ -102,10 +104,12 @@ CbFilterDiscrete <- S7::new_class("CbFilterDiscrete",
     value = S7::class_any,
     keep_na = S7::class_logical
   ),
-  constructor = function(id = .gen_id(), name = id, variable, value = NA,
+  constructor = function(id = NULL, name = NULL, variable, value = NA,
                          dataset, keep_na = TRUE, description = NULL,
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
+    id <- id %||% .default_filter_id(dataset, variable)
+    name <- name %||% id
     S7::new_object(S7::S7_object(),
       type = "discrete", id = id, name = name,
       variable = variable, value = value, dataset = dataset,
@@ -131,10 +135,12 @@ CbFilterDiscreteText <- S7::new_class("CbFilterDiscreteText",
     value = S7::class_any,
     keep_na = S7::new_property(S7::class_logical, default = TRUE)
   ),
-  constructor = function(id = .gen_id(), name = id, variable, value = NA,
+  constructor = function(id = NULL, name = NULL, variable, value = NA,
                          dataset, keep_na = TRUE, description = NULL,
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
+    id <- id %||% .default_filter_id(dataset, variable)
+    name <- name %||% id
     S7::new_object(S7::S7_object(),
       type = "discrete_text", id = id, name = name,
       variable = variable, value = value, dataset = dataset,
@@ -161,10 +167,12 @@ CbFilterRange <- S7::new_class("CbFilterRange",
     range = S7::class_any,
     keep_na = S7::class_logical
   ),
-  constructor = function(id = .gen_id(), name = id, variable, range = NA,
+  constructor = function(id = NULL, name = NULL, variable, range = NA,
                          dataset, keep_na = TRUE, description = NULL,
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
+    id <- id %||% .default_filter_id(dataset, variable)
+    name <- name %||% id
     S7::new_object(S7::S7_object(),
       type = "range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
@@ -190,10 +198,12 @@ CbFilterDateRange <- S7::new_class("CbFilterDateRange",
     range = S7::class_any,
     keep_na = S7::class_logical
   ),
-  constructor = function(id = .gen_id(), name = id, variable, range = NA,
+  constructor = function(id = NULL, name = NULL, variable, range = NA,
                          dataset, keep_na = TRUE, description = NULL,
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
+    id <- id %||% .default_filter_id(dataset, variable)
+    name <- name %||% id
     S7::new_object(S7::S7_object(),
       type = "date_range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
@@ -219,10 +229,12 @@ CbFilterDatetimeRange <- S7::new_class("CbFilterDatetimeRange",
     range = S7::class_any,
     keep_na = S7::class_logical
   ),
-  constructor = function(id = .gen_id(), name = id, variable, range = NA,
+  constructor = function(id = NULL, name = NULL, variable, range = NA,
                          dataset, keep_na = TRUE, description = NULL,
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
+    id <- id %||% .default_filter_id(dataset, variable)
+    name <- name %||% id
     S7::new_object(S7::S7_object(),
       type = "datetime_range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
@@ -250,10 +262,12 @@ CbFilterMultiDiscrete <- S7::new_class("CbFilterMultiDiscrete",
     values = S7::class_any,
     keep_na = S7::class_logical
   ),
-  constructor = function(id = .gen_id(), name = id, values, variables,
+  constructor = function(id = NULL, name = NULL, values, variables,
                          dataset, keep_na = TRUE, description = NULL,
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
+    id <- id %||% .default_filter_id(dataset, variables, suffix = "md")
+    name <- name %||% id
     S7::new_object(S7::S7_object(),
       type = "multi_discrete", id = id, name = name,
       variables = variables, values = values, dataset = dataset,
@@ -281,10 +295,12 @@ CbFilterQuery <- S7::new_class("CbFilterQuery",
     value = S7::class_any,
     keep_na = S7::class_logical
   ),
-  constructor = function(id = .gen_id(), name = id, variables, value = NA,
+  constructor = function(id = NULL, name = NULL, variables, value = NA,
                          dataset, keep_na = TRUE, description = NULL,
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
+    id <- id %||% .default_filter_id(dataset, variables, suffix = "q")
+    name <- name %||% id
     S7::new_object(S7::S7_object(),
       type = "query", id = id, name = name,
       variables = variables, value = value, dataset = dataset,
@@ -368,6 +384,23 @@ cb_filter_to_expr <- S7::new_generic("cb_filter_to_expr", c("filter", "source"))
     paste(sample(LETTERS, 5L, TRUE), collapse = ""),
     round(as.numeric(Sys.time()) * 1000L)
   )
+}
+
+#' Generate a deterministic filter ID from dataset and variable names.
+#'
+#' @param dataset Dataset name.
+#' @param variables Character vector of variable names.
+#' @param suffix Optional suffix (e.g. `"md"`, `"q"`).
+#' @return A single character string suitable for use as a filter ID.
+#' @keywords internal
+.default_filter_id <- function(dataset, variables, suffix = NULL) {
+  sanitize <- function(x) gsub("[^[:alnum:]]", "", x)
+  parts <- sanitize(c(dataset, head(variables, 3L)))
+  if (length(variables) > 3L) {
+    parts <- c(parts, substring(rlang::hash(sort(variables)), 1L, 4L))
+  }
+  if (!is.null(suffix)) parts <- c(parts, suffix)
+  paste(parts, collapse = "-")
 }
 
 #' Get filter parameters as a list
