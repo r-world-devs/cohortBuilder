@@ -432,24 +432,110 @@ intersect_domain_multi <- function(values, domain) {
 #' Returns the filter's value intersected with its domain. When value is `NA`
 #' and domain is set, returns the domain as the effective value.
 #'
+#' Custom filter types should implement an S7 method for this generic.
+#' The default method returns the raw value with no domain logic.
+#'
 #' @param filter S7 filter object.
 #' @return The effective value for filtering.
+#' @export
+cb_intersect_domain <- S7::new_generic("cb_intersect_domain", "filter")
+
+S7::method(cb_intersect_domain, CbFilter) <- function(filter) {
+  S7::prop(filter, filter@private$input_param)
+}
+
+S7::method(cb_intersect_domain, CbFilterDiscrete) <- function(filter) {
+  intersect_domain_discrete(filter@value, filter@domain)
+}
+
+S7::method(cb_intersect_domain, CbFilterDiscreteText) <- function(filter) {
+  intersect_domain_discrete(filter@value, filter@domain)
+}
+
+S7::method(cb_intersect_domain, CbFilterRange) <- function(filter) {
+  intersect_domain_range(filter@range, filter@domain)
+}
+
+S7::method(cb_intersect_domain, CbFilterDateRange) <- function(filter) {
+  intersect_domain_range(filter@range, filter@domain)
+}
+
+S7::method(cb_intersect_domain, CbFilterDatetimeRange) <- function(filter) {
+  intersect_domain_range(filter@range, filter@domain)
+}
+
+S7::method(cb_intersect_domain, CbFilterMultiDiscrete) <- function(filter) {
+  intersect_domain_multi(filter@values, filter@domain)
+}
+
+S7::method(cb_intersect_domain, CbFilterQuery) <- function(filter) {
+  filter@value
+}
+
 #' @keywords internal
 intersect_domain <- function(filter) {
-  input_param <- filter@private$input_param
-  value <- S7::prop(filter, input_param)
-  domain <- filter@domain
+  cb_intersect_domain(filter)
+}
 
-  switch(filter@type,
-    discrete = ,
-    discrete_text = intersect_domain_discrete(value, domain),
-    range = ,
-    date_range = ,
-    datetime_range = intersect_domain_range(value, domain),
-    multi_discrete = intersect_domain_multi(value, domain),
-    query = value,
-    value
-  )
+#' Extract domain from cached filter statistics
+#'
+#' Derives a domain (set of valid values) from previously computed cache
+#' statistics. Custom filter types should implement an S7 method for this
+#' generic. The default method returns `NULL` (no domain).
+#'
+#' @param filter S7 filter object.
+#' @param cache List of cached statistics for the filter.
+#' @return Domain value appropriate for the filter type, or `NULL`.
+#' @export
+cb_domain_from_cache <- S7::new_generic("cb_domain_from_cache", "filter")
+
+S7::method(cb_domain_from_cache, CbFilter) <- function(filter, cache) {
+  NULL
+}
+
+S7::method(cb_domain_from_cache, CbFilterDiscrete) <- function(filter, cache) {
+  if (is.null(cache$choices)) return(NULL)
+  names(purrr::keep(cache$choices, ~ .x > 0L))
+}
+
+S7::method(cb_domain_from_cache, CbFilterDiscreteText) <- function(filter, cache) {
+  if (is.null(cache$choices)) return(NULL)
+  names(purrr::keep(cache$choices, ~ .x > 0L))
+}
+
+S7::method(cb_domain_from_cache, CbFilterRange) <- function(filter, cache) {
+  if (!is.null(cache$min) && !is.null(cache$max)) c(cache$min, cache$max) else NULL
+}
+
+S7::method(cb_domain_from_cache, CbFilterDateRange) <- function(filter, cache) {
+  if (!is.null(cache$min) && !is.null(cache$max)) c(cache$min, cache$max) else NULL
+}
+
+S7::method(cb_domain_from_cache, CbFilterDatetimeRange) <- function(filter, cache) {
+  if (!is.null(cache$min) && !is.null(cache$max)) c(cache$min, cache$max) else NULL
+}
+
+S7::method(cb_domain_from_cache, CbFilterMultiDiscrete) <- function(filter, cache) {
+  if (!is.null(cache$choices)) purrr::map(cache$choices, names) else NULL
+}
+
+#' Extract domain from data
+#'
+#' Derives a domain (set of valid values) directly from the data object.
+#' Uses dual dispatch on filter type and source type. Custom filter types
+#' should implement S7 methods for this generic. The default method returns
+#' `NULL` (no domain).
+#'
+#' @param filter S7 filter object.
+#' @param source Source object.
+#' @param data_object Data object to extract domain from.
+#' @param ... Additional arguments.
+#' @return Domain value appropriate for the filter type, or `NULL`.
+#' @export
+cb_domain_from_data <- S7::new_generic("cb_domain_from_data", c("filter", "source"))
+
+S7::method(cb_domain_from_data, list(CbFilter, S7::class_any)) <- function(filter, source, data_object, ...) {
+  NULL
 }
 
 assign_filter_step_id <- function(filter_obj, step_id) {

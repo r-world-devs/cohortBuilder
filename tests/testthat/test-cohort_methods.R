@@ -1833,7 +1833,7 @@ test_that("propagate_domains = 'filter' uses domain as value when filter is unse
   coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "filter")
   coh$run_flow()
 
-  # Step 1 filter has value = NA, so intersect_domain returns domain c("setosa", "versicolor")
+  # Step 1 filter has value = NA, so cb_intersect_domain returns domain c("setosa", "versicolor")
   step2_filter <- coh$get_filter("2", "sp2")
   expect_identical(step2_filter@domain, c("setosa", "versicolor"))
 })

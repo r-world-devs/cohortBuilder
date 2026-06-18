@@ -116,7 +116,7 @@ set_source.tblist <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
 S7::method(cb_filter_data, list(CbFilterDiscrete, tblist_class)) <- function(filter, source, data_object, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  value <- intersect_domain(filter)
+  value <- cb_intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(value, NA)) {
@@ -175,7 +175,7 @@ S7::method(cb_get_filter_defaults, list(CbFilterDiscrete, tblist_class)) <- func
 S7::method(cb_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, data_object, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  value <- intersect_domain(filter)
+  value <- cb_intersect_domain(filter)
 
   if (!identical(value, NA)) {
     data_object[[dataset]] <- data_object[[dataset]] |>
@@ -279,7 +279,7 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
 range_filter_data_impl <- function(filter, data_object) {
   dataset <- filter@dataset
   variable <- filter@variable
-  range <- intersect_domain(filter)
+  range <- cb_intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(range, NA)) {
@@ -542,7 +542,7 @@ S7::method(cb_get_filter_defaults, list(CbFilterDatetimeRange, tblist_class)) <-
 
 S7::method(cb_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, data_object, ...) {
   dataset <- filter@dataset
-  values <- intersect_domain(filter)
+  values <- cb_intersect_domain(filter)
   keep_na <- filter@keep_na
 
   col_in_val <- function(vec, value, keep_na) {
@@ -668,7 +668,7 @@ S7::method(cb_get_filter_defaults, list(CbFilterQuery, tblist_class)) <- functio
 S7::method(cb_filter_to_expr, list(CbFilterDiscrete, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  value <- intersect_domain(filter)
+  value <- cb_intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(value, NA)) {
@@ -694,7 +694,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDiscrete, tblist_class)) <- function(
 S7::method(cb_filter_to_expr, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  value <- intersect_domain(filter)
+  value <- cb_intersect_domain(filter)
 
   if (!identical(value, NA)) {
     split_values <- strsplit(sub(" ", "", value, fixed = TRUE), split = ",", fixed = TRUE)[[1L]]
@@ -710,7 +710,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDiscreteText, tblist_class)) <- funct
 S7::method(cb_filter_to_expr, list(CbFilterRange, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  range <- intersect_domain(filter)
+  range <- cb_intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(range, NA)) {
@@ -739,7 +739,7 @@ S7::method(cb_filter_to_expr, list(CbFilterRange, tblist_class)) <- function(fil
 S7::method(cb_filter_to_expr, list(CbFilterDateRange, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  range <- intersect_domain(filter)
+  range <- cb_intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(range, NA)) {
@@ -768,7 +768,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDateRange, tblist_class)) <- function
 S7::method(cb_filter_to_expr, list(CbFilterDatetimeRange, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
   variable <- filter@variable
-  range <- intersect_domain(filter)
+  range <- cb_intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (keep_na && !identical(range, NA)) {
@@ -796,7 +796,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDatetimeRange, tblist_class)) <- func
 
 S7::method(cb_filter_to_expr, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, ...) {
   dataset <- filter@dataset
-  values <- intersect_domain(filter)
+  values <- cb_intersect_domain(filter)
   keep_na <- filter@keep_na
 
   if (all(purrr::map_lgl(values, ~ identical(.x, NA)))) {
@@ -1040,12 +1040,12 @@ shape.tblist <- function(source, field, subfield, ...) {
       cache = {
         matched <- find_matching_filter(filter_obj, current_filters)
         if (is.null(matched)) NULL
-        else domain_from_cache(
+        else cb_domain_from_cache(
           filter_obj,
           cohort$get_cache(step_id, matched@id, state = "post", .recalc_when_missing = FALSE)
         )
       },
-      data = domain_from_data(filter_obj, data_object)
+      data = cb_domain_from_data(filter_obj, source, data_object)
     )
 
     if (!is.null(new_domain)) {
@@ -1059,66 +1059,46 @@ shape.tblist <- function(source, field, subfield, ...) {
 # -- Domain propagation helpers ------------------------------------------------
 
 find_matching_filter <- function(target_filter, filters) {
-  type <- target_filter@type
-  if (type %in% c("multi_discrete", "query")) return(NULL)
+  if (!"variable" %in% names(S7::props(target_filter))) return(NULL)
   purrr::detect(filters, function(f) {
-    f@type != "query" &&
+    "variable" %in% names(S7::props(f)) &&
       identical(f@dataset, target_filter@dataset) &&
-      "variable" %in% names(S7::props(f)) &&
       identical(f@variable, target_filter@variable)
   })
 }
 
 domain_from_filter <- function(target_filter, current_filters) {
-  if (target_filter@type == "query") return(NULL)
   match <- find_matching_filter(target_filter, current_filters)
   if (is.null(match)) return(NULL)
-  effective <- intersect_domain(match)
+  effective <- cb_intersect_domain(match)
   if (identical(effective, NA)) return(NULL)
   effective
 }
 
-domain_from_cache <- function(filter, cache) {
-  if (is.null(cache)) return(NULL)
-  type <- filter@type
+# -- cb_domain_from_data: tblist methods ---------------------------------------
 
-  if (type %in% c("discrete", "discrete_text")) {
-    if (!is.null(cache$choices)) {
-      # Exclude zero-count choices (e.g. unused factor levels)
-      return(names(purrr::keep(cache$choices, ~ .x > 0L)))
-    }
-    return(NULL)
-  }
-  if (type %in% c("range", "date_range", "datetime_range")) {
-    if (!is.null(cache$min) && !is.null(cache$max)) return(c(cache$min, cache$max))
-    return(NULL)
-  }
-  if (type == "multi_discrete") {
-    if (!is.null(cache$choices)) return(purrr::map(cache$choices, names))
-    return(NULL)
-  }
-  NULL
+domain_from_data_discrete_impl <- function(filter, source, data_object, ...) {
+  column <- data_object[[filter@dataset]][[filter@variable]]
+  collapse::funique(stats::na.omit(column))
 }
 
-domain_from_data <- function(filter, data_object) {
-  type <- filter@type
-  if (type == "query") return(NULL)
+S7::method(cb_domain_from_data, list(CbFilterDiscrete, tblist_class)) <- domain_from_data_discrete_impl
+S7::method(cb_domain_from_data, list(CbFilterDiscreteText, tblist_class)) <- domain_from_data_discrete_impl
 
-  if (type %in% c("discrete", "discrete_text")) {
-    column <- data_object[[filter@dataset]][[filter@variable]]
-    return(collapse::funique(stats::na.omit(column)))
-  }
-  if (type %in% c("range", "date_range", "datetime_range")) {
-    column <- stats::na.omit(data_object[[filter@dataset]][[filter@variable]])
-    if (length(column) == 0L) return(NULL)
-    return(c(min(column), max(column)))
-  }
-  if (type == "multi_discrete") {
-    variables <- names(filter@values)
-    dataset <- data_object[[filter@dataset]]
-    return(purrr::map(rlang::set_names(variables), ~ collapse::funique(stats::na.omit(dataset[[.x]]))))
-  }
-  NULL
+domain_from_data_range_impl <- function(filter, source, data_object, ...) {
+  column <- stats::na.omit(data_object[[filter@dataset]][[filter@variable]])
+  if (length(column) == 0L) return(NULL)
+  c(min(column), max(column))
+}
+
+S7::method(cb_domain_from_data, list(CbFilterRange, tblist_class)) <- domain_from_data_range_impl
+S7::method(cb_domain_from_data, list(CbFilterDateRange, tblist_class)) <- domain_from_data_range_impl
+S7::method(cb_domain_from_data, list(CbFilterDatetimeRange, tblist_class)) <- domain_from_data_range_impl
+
+S7::method(cb_domain_from_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, data_object, ...) {
+  variables <- names(filter@values)
+  dataset <- data_object[[filter@dataset]]
+  purrr::map(rlang::set_names(variables), ~ collapse::funique(stats::na.omit(dataset[[.x]])))
 }
 
 # -- Autofilter rules ---------------------------------------------------------

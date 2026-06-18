@@ -185,78 +185,100 @@ test_that("domain works for all filter types", {
   expect_null(f_query@domain)
 })
 
-# -- intersect_domain tests ---------------------------------------------------
+# -- cb_intersect_domain tests ------------------------------------------------
 
-test_that("intersect_domain returns NA when no domain and value is NA", {
+test_that("cb_intersect_domain returns NA when no domain and value is NA", {
   f <- filter(type = "discrete", id = "x", variable = "a", dataset = "d")
-  expect_identical(intersect_domain(f), NA)
+  expect_identical(cb_intersect_domain(f), NA)
 })
 
-test_that("intersect_domain returns value when no domain", {
+test_that("cb_intersect_domain returns value when no domain", {
   f <- filter(type = "discrete", id = "x", variable = "a", dataset = "d", value = c("a", "b"))
-  expect_identical(intersect_domain(f), c("a", "b"))
+  expect_identical(cb_intersect_domain(f), c("a", "b"))
 })
 
-test_that("intersect_domain returns domain when value is NA", {
+test_that("cb_intersect_domain returns domain when value is NA", {
   f <- filter(
     type = "discrete", id = "x", variable = "a", dataset = "d",
     domain = c("a", "b", "c")
   )
-  expect_identical(intersect_domain(f), c("a", "b", "c"))
+  expect_identical(cb_intersect_domain(f), c("a", "b", "c"))
 })
 
-test_that("intersect_domain intersects value with domain for discrete", {
+test_that("cb_intersect_domain intersects value with domain for discrete", {
   f <- filter(
     type = "discrete", id = "x", variable = "a", dataset = "d",
     value = c("a", "b", "z"), domain = c("a", "b", "c")
   )
-  expect_warning(result <- intersect_domain(f), "trimmed to domain")
+  expect_warning(result <- cb_intersect_domain(f), "trimmed to domain")
   expect_identical(result, c("a", "b"))
 })
 
-test_that("intersect_domain does not warn when value already within domain", {
+test_that("cb_intersect_domain does not warn when value already within domain", {
   f <- filter(
     type = "discrete", id = "x", variable = "a", dataset = "d",
     value = c("a", "b"), domain = c("a", "b", "c")
   )
-  expect_silent(result <- intersect_domain(f))
+  expect_silent(result <- cb_intersect_domain(f))
   expect_identical(result, c("a", "b"))
 })
 
-test_that("intersect_domain works for range types", {
+test_that("cb_intersect_domain works for range types", {
   f <- filter(
     type = "range", id = "x", variable = "a", dataset = "d",
     range = c(1, 100), domain = c(10, 50)
   )
-  expect_warning(result <- intersect_domain(f), "trimmed to domain")
+  expect_warning(result <- cb_intersect_domain(f), "trimmed to domain")
   expect_identical(result, c(10, 50))
 })
 
-test_that("intersect_domain returns domain when range is NA", {
+test_that("cb_intersect_domain returns domain when range is NA", {
   f <- filter(
     type = "range", id = "x", variable = "a", dataset = "d",
     domain = c(10, 50)
   )
-  expect_identical(intersect_domain(f), c(10, 50))
+  expect_identical(cb_intersect_domain(f), c(10, 50))
 })
 
-test_that("intersect_domain works for multi_discrete", {
+test_that("cb_intersect_domain works for multi_discrete", {
   f <- filter(
     type = "multi_discrete", id = "x", variables = c("a", "b"), dataset = "d",
     values = list(a = c("x", "z"), b = c("y")),
     domain = list(a = c("x", "y"), b = c("y", "w"))
   )
-  expect_warning(result <- intersect_domain(f), "trimmed to domain")
+  expect_warning(result <- cb_intersect_domain(f), "trimmed to domain")
   expect_identical(result, list(a = "x", b = "y"))
 })
 
-test_that("intersect_domain returns value as-is for query filters", {
+test_that("cb_intersect_domain returns value as-is for query filters", {
   qval <- queryBuilder::queryGroup(
     condition = "AND",
     queryBuilder::queryRule("col1", "equal", "A")
   )
   f <- filter(type = "query", id = "q", variables = "col1", dataset = "d", value = qval)
-  expect_identical(intersect_domain(f), qval)
+  expect_identical(cb_intersect_domain(f), qval)
+})
+
+test_that("cb_intersect_domain default method returns raw value for custom filter", {
+  CustomFilter <- S7::new_class("CustomFilter",
+    parent = CbFilter,
+    properties = list(
+      dataset = S7::class_character,
+      variable = S7::class_character,
+      value = S7::class_any
+    ),
+    constructor = function(id = .gen_id(), name = id, variable, value = NA,
+                           dataset, domain = NULL, ...) {
+      S7::new_object(S7::S7_object(),
+        type = "custom", id = id, name = name,
+        variable = variable, value = value, dataset = dataset,
+        active = TRUE, description = NULL, domain = domain,
+        extra = list(...), private = list(input_param = "value")
+      )
+    }
+  )
+  f <- CustomFilter(id = "c1", variable = "x", value = c("a", "b"), dataset = "d")
+  expect_identical(cb_intersect_domain(f), c("a", "b"))
 })
 
 # -- Domain filtering end-to-end tests ----------------------------------------
