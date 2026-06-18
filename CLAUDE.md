@@ -38,8 +38,22 @@ Filters use S7 classes with dual dispatch on (filter_class, source_class):
    - `cb_plot_filter_data(filter, source)` — plot filter data
    - `cb_get_filter_defaults(filter, source)` — get default parameter values
    - `cb_filter_to_expr(filter, source)` — generate reproducible code expression
+3. S7 generics dispatching on filter type only (extensible for custom filters):
+   - `cb_intersect_domain(filter)` — intersect filter value with its domain
+   - `cb_domain_from_cache(filter, cache)` — extract domain from cached statistics
+4. S7 dual-dispatch generic for domain extraction from data:
+   - `cb_domain_from_data(filter, source, data_object)` — extract domain from data
 
 Seven built-in filter types: `discrete`, `discrete_text`, `range`, `date_range`, `datetime_range`, `multi_discrete`, `query`. Custom filters can be registered via `register_filter_type()`.
+
+### Filter IDs
+
+Filter IDs are deterministic by default, generated from filter properties via `.default_filter_id()`:
+- Single-variable filters: `<dataset>-<variable>` (e.g., `iris-Species`)
+- `multi_discrete`: `<dataset>-<var1>-<var2>-md`
+- `query`: `<dataset>-<var1>-<var2>-q`
+
+Non-alphanumeric characters are stripped. For >3 variables, the ID is truncated to 3 variables + a 4-char hash suffix. Users can override with explicit `id =`. Cross-step filter matching (domain propagation) uses ID equality.
 
 ### Step Execution Pipeline
 
@@ -54,8 +68,13 @@ Seven built-in filter types: `discrete`, `discrete_text`, `range`, `date_range`,
 
 To support a new data backend, implement:
 - `set_source.{type}()` S3 method
-- Source-layer S3 methods (`.init_step`, `.pre_filtering`, `.collect_data`, `.get_stats`, etc.)
-- S7 methods for each filter type × source type combination (`cb_filter_data`, `cb_get_filter_stats`, etc.)
+- Source-layer S3 methods (`.init_step`, `.pre_filtering`, `.collect_data`, `.get_stats`, `.propagate_domains`, etc.)
+- S7 methods for each filter type × source type combination (`cb_filter_data`, `cb_get_filter_stats`, `cb_domain_from_data`, etc.)
+
+To define a custom filter type, implement S7 methods for:
+- `cb_intersect_domain(filter)` — how value intersects with domain (default: returns raw value)
+- `cb_domain_from_cache(filter, cache)` — domain extraction from cache (default: `NULL`)
+- `cb_domain_from_data(filter, source, data_object)` — domain extraction from data (default: `NULL`)
 
 The `tblist` implementation in `R/source_tblist.R` serves as the reference (60+ S7 method implementations). `tblist(..., .class = NULL)` accepts an optional `.class` parameter for adding custom subclasses, enabling S3 method overrides for specialized source types.
 
