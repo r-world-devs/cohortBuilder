@@ -1058,6 +1058,10 @@ shape.tblist <- function(source, field, subfield, ...) {
 
 # -- Domain propagation helpers ------------------------------------------------
 
+# Find the filter in `filters` that corresponds to `target_filter`. Filters are
+# matched by id: filter ids are deterministic (derived from dataset + variable
+# when not set explicitly), so the same logical filter keeps the same id across
+# steps and can be matched directly.
 find_matching_filter <- function(target_filter, filters) {
   filters[[target_filter@id]]
 }

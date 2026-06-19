@@ -109,7 +109,7 @@ CbFilterDiscrete <- S7::new_class("CbFilterDiscrete",
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
-    name <- name %||% id
+    name <- name %||% variable
     S7::new_object(S7::S7_object(),
       type = "discrete", id = id, name = name,
       variable = variable, value = value, dataset = dataset,
@@ -140,7 +140,7 @@ CbFilterDiscreteText <- S7::new_class("CbFilterDiscreteText",
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
-    name <- name %||% id
+    name <- name %||% variable
     S7::new_object(S7::S7_object(),
       type = "discrete_text", id = id, name = name,
       variable = variable, value = value, dataset = dataset,
@@ -172,7 +172,7 @@ CbFilterRange <- S7::new_class("CbFilterRange",
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
-    name <- name %||% id
+    name <- name %||% variable
     S7::new_object(S7::S7_object(),
       type = "range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
@@ -203,7 +203,7 @@ CbFilterDateRange <- S7::new_class("CbFilterDateRange",
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
-    name <- name %||% id
+    name <- name %||% variable
     S7::new_object(S7::S7_object(),
       type = "date_range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
@@ -234,7 +234,7 @@ CbFilterDatetimeRange <- S7::new_class("CbFilterDatetimeRange",
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
-    name <- name %||% id
+    name <- name %||% variable
     S7::new_object(S7::S7_object(),
       type = "datetime_range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
@@ -267,7 +267,7 @@ CbFilterMultiDiscrete <- S7::new_class("CbFilterMultiDiscrete",
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variables, suffix = "md")
-    name <- name %||% id
+    name <- name %||% .default_filter_name(variables, "multi_discrete")
     S7::new_object(S7::S7_object(),
       type = "multi_discrete", id = id, name = name,
       variables = variables, values = values, dataset = dataset,
@@ -300,7 +300,7 @@ CbFilterQuery <- S7::new_class("CbFilterQuery",
                          domain = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variables, suffix = "q")
-    name <- name %||% id
+    name <- name %||% .default_filter_name(variables, "query")
     S7::new_object(S7::S7_object(),
       type = "query", id = id, name = name,
       variables = variables, value = value, dataset = dataset,
@@ -401,6 +401,30 @@ cb_filter_to_expr <- S7::new_generic("cb_filter_to_expr", c("filter", "source"))
   }
   if (!is.null(suffix)) parts <- c(parts, suffix)
   paste(parts, collapse = "-")
+}
+
+#' Generate a default filter display name from its variables.
+#'
+#' Single-variable filters are named after their variable. Multi-variable
+#' filters get a summarised name listing the first two variables, the count of
+#' remaining variables, and the filter type, e.g.
+#' `"age sex + 2 vars multi_discrete"`.
+#'
+#' @param variables Character vector of variable names.
+#' @param type Filter type string (e.g. `"multi_discrete"`, `"query"`).
+#' @return A single character string suitable for use as a filter name.
+#' @keywords internal
+.default_filter_name <- function(variables, type) {
+  n <- length(variables)
+  if (n <= 2L) {
+    listed <- paste(variables, collapse = " ")
+  } else {
+    listed <- paste0(
+      paste(variables[1:2], collapse = " "),
+      " + ", n - 2L, " vars"
+    )
+  }
+  paste(listed, type)
 }
 
 #' Get filter parameters as a list

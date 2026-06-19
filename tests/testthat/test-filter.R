@@ -235,7 +235,8 @@ test_that(".default_filter_id hash is the same regardless of variable order", {
 test_that("filter() generates deterministic ID when id is omitted", {
   f <- filter("discrete", variable = "Species", dataset = "iris")
   expect_identical(f@id, "iris-Species")
-  expect_identical(f@name, "iris-Species")
+  # Single-variable filters default their name to the variable.
+  expect_identical(f@name, "Species")
 })
 
 test_that("filter() respects explicit id", {
@@ -249,9 +250,9 @@ test_that("filter() respects explicit name while generating id", {
   expect_identical(f@name, "My Filter")
 })
 
-test_that("filter() name defaults to explicit id", {
+test_that("filter() name defaults to the variable even with explicit id", {
   f <- filter("discrete", id = "my_id", variable = "Species", dataset = "iris")
-  expect_identical(f@name, "my_id")
+  expect_identical(f@name, "Species")
 })
 
 test_that("range filter gets deterministic ID", {
@@ -267,6 +268,59 @@ test_that("multi_discrete filter gets ID with md suffix", {
 test_that("query filter gets ID with q suffix", {
   f <- filter("query", variables = c("col1", "col2"), dataset = "data")
   expect_identical(f@id, "data-col1-col2-q")
+})
+
+# -- default filter names ------------------------------------------------------
+
+test_that("single-variable filters default name to the variable", {
+  expect_identical(
+    filter("range", variable = "Sepal.Width", dataset = "iris")@name,
+    "Sepal.Width"
+  )
+  expect_identical(
+    filter("discrete_text", variable = "Species", dataset = "iris")@name,
+    "Species"
+  )
+})
+
+test_that("multi-variable filters summarise variables and type in default name", {
+  expect_identical(
+    filter("multi_discrete", variables = "col1", values = NA, dataset = "d")@name,
+    "col1 multi_discrete"
+  )
+  expect_identical(
+    filter("multi_discrete", variables = c("col1", "col2"), values = NA,
+           dataset = "d")@name,
+    "col1 col2 multi_discrete"
+  )
+  expect_identical(
+    filter("multi_discrete", variables = c("col1", "col2", "col3"), values = NA,
+           dataset = "d")@name,
+    "col1 col2 + 1 vars multi_discrete"
+  )
+  expect_identical(
+    filter("query", variables = c("a", "b", "c", "d", "e"), dataset = "d")@name,
+    "a b + 3 vars query"
+  )
+})
+
+test_that("explicit name overrides default for multi-variable filters", {
+  f <- filter("multi_discrete", name = "Custom", variables = c("a", "b", "c"),
+              values = NA, dataset = "d")
+  expect_identical(f@name, "Custom")
+})
+
+test_that(".default_filter_name summarises by variable count", {
+  expect_identical(.default_filter_name("a", "query"), "a query")
+  expect_identical(.default_filter_name(c("a", "b"), "query"), "a b query")
+  expect_identical(
+    .default_filter_name(c("a", "b", "c"), "query"),
+    "a b + 1 vars query"
+  )
+  expect_identical(
+    .default_filter_name(c("a", "b", "c", "d"), "multi_discrete"),
+    "a b + 2 vars multi_discrete"
+  )
 })
 
 # -- cb_intersect_domain tests ------------------------------------------------
