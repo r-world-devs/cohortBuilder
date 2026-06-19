@@ -4,62 +4,66 @@
 \alias{Source}
 \title{R6 class representing a data source}
 \description{
+R6 class representing a data source
+
+R6 class representing a data source
+}
+\details{
 Source is an object storing information about data source such as source type,
 primary keys and relations between stored data.
 }
 \section{Public fields}{
-  \if{html}{\out{<div class="r6-fields">}}
-  \describe{
-    \item{\code{dtconn}}{Data connection object the Source if based on.}
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{dtconn}}{Data connection object the Source if based on.}
 
-    \item{\code{dtvalue}}{Evaluated data connection value used for computing stats.}
+\item{\code{dtvalue}}{Evaluated data connection value used for computing stats.}
 
-    \item{\code{meta_stats}}{Computed metadata statistics for available filters.}
+\item{\code{meta_stats}}{Computed metadata statistics for available filters.}
 
-    \item{\code{description}}{Source object description list.}
+\item{\code{description}}{Source object description list.}
 
-    \item{\code{attributes}}{Extra source parameters passed when source is defined.}
+\item{\code{attributes}}{Extra source parameters passed when source is defined.}
 
-    \item{\code{options}}{Extra configuration options.}
+\item{\code{options}}{Extra configuration options.}
 
-    \item{\code{binding_keys}}{Source data relations expressed as \link{binding-keys}.}
+\item{\code{binding_keys}}{Source data relations expressed as \link{binding-keys}.}
 
-    \item{\code{primary_keys}}{Source data primary keys expressed as \link{primary_keys}.}
+\item{\code{primary_keys}}{Source data primary keys expressed as \link{primary_keys}.}
 
-    \item{\code{source_code}}{An expression which allows to recreate basic source structure.}
-  }
-  \if{html}{\out{</div>}}
+\item{\code{source_code}}{An expression which allows to recreate basic source structure.}
+}
+\if{html}{\out{</div>}}
 }
 \section{Active bindings}{
-  \if{html}{\out{<div class="r6-active-bindings">}}
-  \describe{
-    \item{\code{available_filters}}{List of filter definitions available for the source.}
-  }
-  \if{html}{\out{</div>}}
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{available_filters}}{List of filter definitions available for the source.}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-  \itemize{
-    \item \href{#method-Source-initialize}{\code{Source$new()}}
-    \item \href{#method-Source-get}{\code{Source$get()}}
-    \item \href{#method-Source-get_steps}{\code{Source$get_steps()}}
-    \item \href{#method-Source-add_step}{\code{Source$add_step()}}
-    \item \href{#method-Source-rm_step}{\code{Source$rm_step()}}
-    \item \href{#method-Source-add_filter}{\code{Source$add_filter()}}
-    \item \href{#method-Source-rm_filter}{\code{Source$rm_filter()}}
-    \item \href{#method-Source-update_filter}{\code{Source$update_filter()}}
-    \item \href{#method-Source-calc_meta_stats}{\code{Source$calc_meta_stats()}}
-    \item \href{#method-Source-clone}{\code{Source$clone()}}
-  }
+\itemize{
+\item \href{#method-Source-new}{\code{Source$new()}}
+\item \href{#method-Source-get}{\code{Source$get()}}
+\item \href{#method-Source-get_steps}{\code{Source$get_steps()}}
+\item \href{#method-Source-add_step}{\code{Source$add_step()}}
+\item \href{#method-Source-rm_step}{\code{Source$rm_step()}}
+\item \href{#method-Source-add_filter}{\code{Source$add_filter()}}
+\item \href{#method-Source-rm_filter}{\code{Source$rm_filter()}}
+\item \href{#method-Source-update_filter}{\code{Source$update_filter()}}
+\item \href{#method-Source-calc_meta_stats}{\code{Source$calc_meta_stats()}}
+\item \href{#method-Source-clone}{\code{Source$clone()}}
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Source-initialize"></a>}}
-\if{latex}{\out{\hypertarget{method-Source-initialize}{}}}
-\subsection{\code{Source$new()}}{
-  Create a new `Source` object.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{Source$new(
+\if{html}{\out{<a id="method-Source-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-new}{}}}
+\subsection{Method \code{new()}}{
+Create a new `Source` object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$new(
   dtconn,
   ...,
   primary_keys = NULL,
@@ -68,191 +72,183 @@ primary keys and relations between stored data.
   description = NULL,
   available_filters = NULL,
   options = list(display_binding = TRUE)
-)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{dtconn}}{An object defining source data connection.}
-      \item{\code{...}}{Extra Source parameters. Stored within `attributes` field.}
-      \item{\code{primary_keys}}{Definition of data `primary_keys`, if appropriate. See \link{primary_keys}.}
-      \item{\code{binding_keys}}{Definition of relations between data, if appropriate. See \link{binding-keys}.}
-      \item{\code{source_code}}{A quote object that allows to recreate basic source structure.
-Used as a part of reproducible code output, see \link{code}.}
-      \item{\code{description}}{A named list storing the source objects description.
-Can be accessed with \link{description} Cohort method.}
-      \item{\code{available_filters}}{List of filter definitions available for the source.}
-      \item{\code{options}}{List of options affecting methods output. Currently supported only `display_binding`
-specifying whether reproducible code should include bindings definition.}
-    }
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Returns}{
-    A new `Source` object of class `Source` (and `dtconn` object class appended).
-  }
+)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dtconn}}{An object defining source data connection.}
+
+\item{\code{...}}{Extra Source parameters. Stored within `attributes` field.}
+
+\item{\code{primary_keys}}{Definition of data `primary_keys`, if appropriate. See \link{primary_keys}.}
+
+\item{\code{binding_keys}}{Definition of relations between data, if appropriate. See \link{binding-keys}.}
+
+\item{\code{source_code}}{A quote object that allows to recreate basic source structure.
+Used as a part of reproducible code output, see \link{code}.}
+
+\item{\code{description}}{A named list storing the source objects description.
+Can be accessed with \link{description} Cohort method.}
+
+\item{\code{available_filters}}{List of filter definitions available for the source.}
+
+\item{\code{options}}{List of options affecting methods output. Currently supported only `display_binding`
+specifying whether reproducible code should include bindings definition.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A new `Source` object of class `Source` (and `dtconn` object class appended).
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-get"></a>}}
 \if{latex}{\out{\hypertarget{method-Source-get}{}}}
-\subsection{\code{Source$get()}}{
-  Get selected `Source` object `attribute`.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{Source$get(param)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{param}}{Name of the attribute.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{get()}}{
+Get selected `Source` object `attribute`.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$get(param)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{param}}{Name of the attribute.}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-get_steps"></a>}}
 \if{latex}{\out{\hypertarget{method-Source-get_steps}{}}}
-\subsection{\code{Source$get_steps()}}{
-  Returns filtering steps definition, if defined for `Source`.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{Source$get_steps()}
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{get_steps()}}{
+Returns filtering steps definition, if defined for `Source`.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$get_steps()}\if{html}{\out{</div>}}
 }
 
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-add_step"></a>}}
 \if{latex}{\out{\hypertarget{method-Source-add_step}{}}}
-\subsection{\code{Source$add_step()}}{
-  Add filtering step definition.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{Source$add_step(step)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{step}}{Step definition created with \link{step}.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{add_step()}}{
+Add filtering step definition.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$add_step(step)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step}}{Step definition created with \link{step}.}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-rm_step"></a>}}
 \if{latex}{\out{\hypertarget{method-Source-rm_step}{}}}
-\subsection{\code{Source$rm_step()}}{
-  Remove filtering step definition.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{Source$rm_step(step_id)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{step_id}}{Id of the step to be removed.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{rm_step()}}{
+Remove filtering step definition.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$rm_step(step_id)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step_id}}{Id of the step to be removed.}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-add_filter"></a>}}
 \if{latex}{\out{\hypertarget{method-Source-add_filter}{}}}
-\subsection{\code{Source$add_filter()}}{
-  Add filter definition to selected step.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{Source$add_filter(filter, step_id)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{filter}}{Filter definition created with \link{filter}.}
-      \item{\code{step_id}}{Id of the step to include the filter to.
-If skipped the last step is used.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{add_filter()}}{
+Add filter definition to selected step.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$add_filter(filter, step_id)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{filter}}{Filter definition created with \link{filter}.}
+
+\item{\code{step_id}}{Id of the step to include the filter to.
+If skipped the last step is used.}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-rm_filter"></a>}}
 \if{latex}{\out{\hypertarget{method-Source-rm_filter}{}}}
-\subsection{\code{Source$rm_filter()}}{
-  Remove filter definition from selected step.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{Source$rm_filter(step_id, filter_id)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{step_id}}{Id of the step where filter is defined.}
-      \item{\code{filter_id}}{Id of the filter to be removed.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{rm_filter()}}{
+Remove filter definition from selected step.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$rm_filter(step_id, filter_id)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step_id}}{Id of the step where filter is defined.}
+
+\item{\code{filter_id}}{Id of the filter to be removed.}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-update_filter"></a>}}
 \if{latex}{\out{\hypertarget{method-Source-update_filter}{}}}
-\subsection{\code{Source$update_filter()}}{
-  Update filter definition.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{Source$update_filter(step_id, filter_id, ...)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{step_id}}{Id of the step where filter is defined.}
-      \item{\code{filter_id}}{Id of the filter to be updated.}
-      \item{\code{...}}{Parameters with its new values.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{update_filter()}}{
+Update filter definition.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$update_filter(step_id, filter_id, ...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step_id}}{Id of the step where filter is defined.}
+
+\item{\code{filter_id}}{Id of the filter to be updated.}
+
+\item{\code{...}}{Parameters with its new values.}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-calc_meta_stats"></a>}}
 \if{latex}{\out{\hypertarget{method-Source-calc_meta_stats}{}}}
-\subsection{\code{Source$calc_meta_stats()}}{
-  Calculate metadata statistics for available filters.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{Source$calc_meta_stats()}
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{calc_meta_stats()}}{
+Calculate metadata statistics for available filters.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$calc_meta_stats()}\if{html}{\out{</div>}}
 }
 
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Source-clone}{}}}
-\subsection{\code{Source$clone()}}{
-  The objects of this class are cloneable with this method.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{Source$clone(deep = FALSE)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{deep}}{Whether to make a deep clone.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$clone(deep = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
 }

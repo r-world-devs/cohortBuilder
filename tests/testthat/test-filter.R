@@ -444,3 +444,64 @@ test_that("cb_filter_to_expr uses domain as value when range is NA", {
   eval(expr)
   expect_true(all(data_object$iris$Sepal.Length >= 5 & data_object$iris$Sepal.Length <= 6))
 })
+
+# -- filter_domain() ----------------------------------------------------------
+
+test_that("filter_domain() returns the declared domain", {
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    domain = c("setosa", "versicolor")
+  )
+  expect_identical(filter_domain(f), c("setosa", "versicolor"))
+})
+
+test_that("filter_domain() returns NULL when no domain is set", {
+  f <- filter(type = "discrete", id = "sp", variable = "Species", dataset = "iris")
+  expect_null(filter_domain(f))
+})
+
+test_that("filter_domain() works for range filters", {
+  f <- filter(
+    type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
+    domain = c(5, 6)
+  )
+  expect_identical(filter_domain(f), c(5, 6))
+})
+
+# -- filter_effective_value() -------------------------------------------------
+
+test_that("filter_effective_value() intersects discrete value with domain", {
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    value = c("setosa", "versicolor", "virginica"),
+    domain = c("setosa", "versicolor")
+  )
+  expect_setequal(
+    suppressWarnings(filter_effective_value(f)),
+    c("setosa", "versicolor")
+  )
+})
+
+test_that("filter_effective_value() returns domain when value is NA", {
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    domain = c("setosa", "versicolor")
+  )
+  expect_identical(filter_effective_value(f), c("setosa", "versicolor"))
+})
+
+test_that("filter_effective_value() returns range domain when range is NA", {
+  f <- filter(
+    type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
+    domain = c(5, 6)
+  )
+  expect_identical(filter_effective_value(f), c(5, 6))
+})
+
+test_that("filter_effective_value() returns raw value when no domain", {
+  f <- filter(
+    type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+    value = c("setosa", "versicolor")
+  )
+  expect_identical(filter_effective_value(f), c("setosa", "versicolor"))
+})

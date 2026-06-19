@@ -426,6 +426,40 @@ get_filter_params <- function(filter, name) {
   all_props
 }
 
+#' Get a filter's domain
+#'
+#' Returns the declared domain (universe of valid values) attached to a filter,
+#' or `NULL` when no domain is set. This is a thin accessor over the `domain`
+#' property, intended for downstream consumers (e.g. GUIs) that render filter
+#' inputs from the domain without reaching into S7 internals.
+#'
+#' @param filter S7 filter object.
+#' @return The filter's domain, or `NULL` when unset. Structure depends on the
+#'   filter type (e.g. a character vector for discrete filters, a two-element
+#'   vector for range filters).
+#' @seealso [filter_effective_value()], [cb_intersect_domain()]
+#' @export
+filter_domain <- function(filter) {
+  filter@domain
+}
+
+#' Get a filter's effective value
+#'
+#' Returns the value that should be used to pre-select the filter input,
+#' accounting for the domain. This is the filter's value intersected with its
+#' domain; when the value is unset (`NA`) and a domain is present, the domain is
+#' returned as the effective value. Thin wrapper over [cb_intersect_domain()]
+#' for use by GUIs.
+#'
+#' @param filter S7 filter object.
+#' @return The effective value for the filter, suitable for pre-selecting an
+#'   input. Structure depends on the filter type.
+#' @seealso [filter_domain()], [cb_intersect_domain()]
+#' @export
+filter_effective_value <- function(filter) {
+  cb_intersect_domain(filter)
+}
+
 # -- Domain intersection -------------------------------------------------------
 
 intersect_domain_discrete <- function(value, domain) {
