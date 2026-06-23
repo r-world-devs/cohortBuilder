@@ -119,6 +119,13 @@ S7::method(cb_filter_data, list(CbFilterDiscrete, tblist_class)) <- function(fil
   value <- cb_intersect_domain(filter)
   keep_na <- filter@keep_na
 
+  # Coerce a factor value to character. `c(factor, NA)` would otherwise collapse
+  # the factor to its integer codes, making the `%in%` match against the column
+  # fail silently and drop every row.
+  if (is.factor(value)) {
+    value <- as.character(value)
+  }
+
   if (keep_na && !identical(value, NA)) {
     data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(!!sym(variable) %in% !!c(value, NA))
@@ -1115,7 +1122,12 @@ domain_from_filter <- function(target_filter, cohort, parent_id, source) {
 
 domain_from_data_discrete_impl <- function(filter, source, data_object, ...) {
   column <- data_object[[filter@dataset]][[filter@variable]]
-  collapse::funique(stats::na.omit(column))
+  # Return a character domain (not a factor). A factor domain breaks discrete
+  # filtering downstream: `c(factor_value, NA)` coerces the factor to integer
+  # codes, so `column %in% c(value, NA)` matches nothing and the step yields
+  # zero rows. `cache`-mode propagation already yields character domains, so
+  # this also keeps the two modes consistent.
+  as.character(collapse::funique(stats::na.omit(column)))
 }
 
 S7::method(cb_domain_from_data, list(CbFilterDiscrete, tblist_class)) <- domain_from_data_discrete_impl

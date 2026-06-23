@@ -1666,6 +1666,33 @@ test_that("propagate_domains = 'data' narrows discrete domain", {
   expect_false("virginica" %in% step2_filter@domain)
 })
 
+test_that("propagate_domains = 'data' keeps a factor column's post-data intact", {
+  # Regression: Species is a factor. Propagation used to store the narrowed
+  # domain as a factor, which made the downstream discrete filter match nothing
+  # (`c(factor, NA)` -> integer codes), collapsing post-stats to 0 / 0%.
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
+           value = c("setosa", "versicolor"))
+  )
+  step2 <- step(
+    filter("discrete", id = "sp2", variable = "Species", dataset = "iris",
+           domain = c("setosa", "versicolor", "virginica"))
+  )
+  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "data")
+  coh$run_flow()
+
+  # The propagated domain must be character, not a factor.
+  expect_type(coh$get_filter("2", "sp2")@domain, "character")
+
+  # Step 2 imposes no additional restriction, so its post-data must equal its
+  # pre-data (100 setosa + versicolor rows), not collapse to zero.
+  pre2 <- nrow(coh$get_data("2", state = "pre")$iris)
+  post2 <- nrow(coh$get_data("2", state = "post")$iris)
+  expect_equal(pre2, 100L)
+  expect_equal(post2, pre2)
+})
+
 test_that("propagate_domains = 'data' narrows range domain", {
   iris_source <- set_source(tblist(iris = iris))
   step1 <- step(

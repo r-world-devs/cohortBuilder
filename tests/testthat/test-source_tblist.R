@@ -110,6 +110,26 @@ test_that("filter_data in discrete filter works fine", {
   expect_false(anyNA(result$test_dataset$var1))
 })
 
+test_that("discrete filter handles a factor-valued effective value", {
+  # Regression: a factor-valued domain/value must not silently drop rows.
+  # `c(factor, NA)` coerces the factor to integer codes, so `column %in% value`
+  # would match nothing. This reproduces what domain propagation produced for a
+  # factor column in a downstream step (post-stats collapsing to 0 / 0%).
+  test_var <- factor(c("A", "B", "C", "B", "C"), levels = c("A", "B", "C"))
+  test_data <- list(test_dataset = data.frame(var1 = test_var))
+  source <- set_source(do.call(tblist, test_data))
+
+  filter_obj <- filter("discrete",
+    variable = "var1", dataset = "test_dataset", keep_na = TRUE,
+    # value carries the factor's levels, mimicking a propagated factor domain
+    value = factor(c("B", "C"), levels = c("A", "B", "C"))
+  )
+
+  result <- cb_filter_data(filter_obj, source, test_data)
+  expect_length(result$test_dataset$var1, sum(test_var %in% c("B", "C")))
+  expect_setequal(as.character(result$test_dataset$var1), c("B", "C"))
+})
+
 test_that("get_stats in discrete filter works fine", {
   test_var <- c("A", "B", NA, "C", "A", NA, "B")
 
