@@ -15,22 +15,30 @@
 \arguments{
 \item{source}{Source object.}
 
-\item{data_object}{Filtered data after binding.}
+\item{data_object}{Filtered data of the **parent** step (the input to the
+target step), used by `mode = "data"`.}
 
-\item{step_id}{Current step id.}
+\item{step_id}{Target step id whose domains should be recomputed.}
 
-\item{cohort}{Cohort object (for accessing next step's filters and cache).}
+\item{cohort}{Cohort object (for accessing the parent step's filters and
+cache).}
 
 \item{...}{Additional arguments.}
 
-\item{mode}{Propagation mode: `"filter"` (from current step's filter values,
-no data access), `"cache"` (from post-step cached stats), or `"data"`
-(scan filtered data directly).}
+\item{mode}{Propagation mode: `"filter"` (from upstream filter values, no data
+access), `"cache"` (from the parent's post-step cached stats), or `"data"`
+(scan the parent's filtered data directly).}
 }
 \description{
-Source-layer generic called after filtering, binding, and cache computation
-in `run_step()`. Override to implement dynamic domain narrowing.
+Source-layer generic that recomputes the domains of a **target step** from
+that step's parent (the previous step). Override to implement dynamic domain
+narrowing.
 }
 \details{
-The default is a no-op. Only called when `propagate_domains != "none"` in the Cohort.
+The default is a no-op. Only called when `propagate_domains != "none"` in the
+Cohort.
+
+Contract: `step_id = N` recomputes the domains of step `N`'s filters using
+step `N - 1` as the source of truth. It is a no-op when `N` has no parent
+(i.e. `N == "1"`) or when the target step is absent.
 }

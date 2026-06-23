@@ -1025,31 +1025,37 @@ shape.tblist <- function(source, field, subfield, ...) {
 #' @export
 .propagate_domains.tblist <- function(source, data_object, step_id, cohort, mode, ...) {
   if (is.null(cohort)) return(invisible(NULL))
-  next_id <- next_step(step_id)
-  next_step_obj <- cohort$get_step(next_id)
-  if (is.null(next_step_obj)) return(invisible(NULL))
+  target_id <- as.character(step_id)
+  parent_id <- prev_step(target_id)
+  # No parent (step "1" or below) -> nothing to narrow from.
+  if (as.integer(target_id) <= 1L) return(invisible(NULL))
 
-  current_filters <- cohort$get_step(step_id)$filters
+  target_step_obj <- cohort$get_step(target_id)
+  if (is.null(target_step_obj)) return(invisible(NULL))
 
-  for (filter_id in names(next_step_obj$filters)) {
-    filter_obj <- next_step_obj$filters[[filter_id]]
+  parent_step_obj <- cohort$get_step(parent_id)
+  if (is.null(parent_step_obj)) return(invisible(NULL))
+  parent_filters <- parent_step_obj$filters
+
+  for (filter_id in names(target_step_obj$filters)) {
+    filter_obj <- target_step_obj$filters[[filter_id]]
     if (is.null(filter_obj@domain)) next
 
     new_domain <- switch(mode,
-      filter = domain_from_filter(filter_obj, current_filters),
+      filter = domain_from_filter(filter_obj, cohort, parent_id, source),
       cache = {
-        matched <- find_matching_filter(filter_obj, current_filters)
+        matched <- find_matching_filter(filter_obj, parent_filters)
         if (is.null(matched)) NULL
         else cb_domain_from_cache(
           filter_obj,
-          cohort$get_cache(step_id, matched@id, state = "post", .recalc_when_missing = FALSE)
+          cohort$get_cache(parent_id, matched@id, state = "post", .recalc_when_missing = FALSE)
         )
       },
       data = cb_domain_from_data(filter_obj, source, data_object)
     )
 
     if (!is.null(new_domain)) {
-      cohort$update_filter(next_id, filter_id, domain = new_domain)
+      cohort$set_domain(target_id, filter_id, new_domain)
     }
   }
 
@@ -1066,12 +1072,43 @@ find_matching_filter <- function(target_filter, filters) {
   filters[[target_filter@id]]
 }
 
-domain_from_filter <- function(target_filter, current_filters) {
-  match <- find_matching_filter(target_filter, current_filters)
-  if (is.null(match)) return(NULL)
-  effective <- cb_intersect_domain(match)
-  if (identical(effective, NA)) return(NULL)
-  effective
+# "filter" mode: narrow the target filter's domain from the same logical filter
+# found in *previous* steps. Search from the parent step back toward step 1 and
+# intersect the effective domains found, so the target is restricted by the
+# filter wherever it was set upstream. When no previous step contains the filter,
+# fall back to the filter definition declared in `source$available_filters`
+# (its `@domain`). Purely value-/definition-based: no data access.
+domain_from_filter <- function(target_filter, cohort, parent_id, source) {
+  found_any <- FALSE
+  effective <- NULL
+  for (sid in steps_range("1", parent_id)) {
+    upstream_filters <- cohort$get_step(sid)$filters
+    match <- find_matching_filter(target_filter, upstream_filters)
+    if (is.null(match)) next
+    candidate <- cb_intersect_domain(match)
+    if (identical(candidate, NA) || is.null(candidate)) next
+    found_any <- TRUE
+    effective <- if (is.null(effective)) {
+      candidate
+    } else {
+      cb_intersect_domain_values(target_filter, effective, candidate)
+    }
+  }
+
+  if (found_any) {
+    return(effective)
+  }
+
+  # Fallback: declared domain from the source's available_filters definition.
+  available <- source$available_filters
+  if (!is.null(available)) {
+    declared <- available[[target_filter@id]]
+    if (!is.null(declared) && !is.null(declared@domain)) {
+      return(declared@domain)
+    }
+  }
+
+  NULL
 }
 
 # -- cb_domain_from_data: tblist methods ---------------------------------------

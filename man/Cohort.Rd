@@ -25,6 +25,7 @@ Cohort object is designed to make operations on source data possible.
 \item \href{#method-Cohort-add_source}{\code{Cohort$add_source()}}
 \item \href{#method-Cohort-update_source}{\code{Cohort$update_source()}}
 \item \href{#method-Cohort-get_source}{\code{Cohort$get_source()}}
+\item \href{#method-Cohort-get_propagate_domains_mode}{\code{Cohort$get_propagate_domains_mode()}}
 \item \href{#method-Cohort-add_step}{\code{Cohort$add_step()}}
 \item \href{#method-Cohort-copy_step}{\code{Cohort$copy_step()}}
 \item \href{#method-Cohort-remove_step}{\code{Cohort$remove_step()}}
@@ -54,6 +55,10 @@ Cohort object is designed to make operations on source data possible.
 \item \href{#method-Cohort-last_step_id}{\code{Cohort$last_step_id()}}
 \item \href{#method-Cohort-is_pending}{\code{Cohort$is_pending()}}
 \item \href{#method-Cohort-set_pending}{\code{Cohort$set_pending()}}
+\item \href{#method-Cohort-set_pending_cascade}{\code{Cohort$set_pending_cascade()}}
+\item \href{#method-Cohort-set_domain}{\code{Cohort$set_domain()}}
+\item \href{#method-Cohort-propagate_domains_to}{\code{Cohort$propagate_domains_to()}}
+\item \href{#method-Cohort-propagate_filter_domains}{\code{Cohort$propagate_filter_domains()}}
 \item \href{#method-Cohort-modify}{\code{Cohort$modify()}}
 \item \href{#method-Cohort-clone}{\code{Cohort$clone()}}
 }
@@ -157,6 +162,20 @@ See \link{hooks} for more details.}
 Return Source object attached to Cohort.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Cohort$get_source()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-get_propagate_domains_mode"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_propagate_domains_mode}{}}}
+\subsection{Method \code{get_propagate_domains_mode()}}{
+Return the configured domain propagation mode.
+
+One of `"none"`, `"filter"`, `"cache"` or `"data"`. Read-only; the mode is
+fixed at construction. UI layers can inspect it (e.g. to validate that a
+domain-based rendering strategy is compatible with the cohort).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_propagate_domains_mode()}\if{html}{\out{</div>}}
 }
 
 }
@@ -832,6 +851,107 @@ Mark step as pending or resolved.
 
 \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-set_pending_cascade"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-set_pending_cascade}{}}}
+\subsection{Method \code{set_pending_cascade()}}{
+Mark a step and all the steps after it as pending.
+
+A change to step `step_id`'s filters invalidates that step and every step
+downstream (each step's input is the previous step's output). Used by the
+filter/step mutating methods so the GUI greys all affected steps via the
+`post_set_pending_hook`.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$set_pending_cascade(step_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step_id}}{Id of the first step to mark pending.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-set_domain"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-set_domain}{}}}
+\subsection{Method \code{set_domain()}}{
+Silently set a filter's domain.
+
+Internal setter used by domain propagation (\link{dot-propagate_domains}).
+Writes `filter@domain` directly **without** firing the `update_filter`
+hooks and **without** triggering `run_flow`, which prevents the per-hop
+hook re-entry that would otherwise occur if domains were applied through
+`update_filter`. Does not itself trigger further propagation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$set_domain(step_id, filter_id, domain)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step_id}}{Id of the step where the filter is defined.}
+
+\item{\code{filter_id}}{Id of the filter whose domain should be set.}
+
+\item{\code{domain}}{New domain value to assign.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-propagate_domains_to"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-propagate_domains_to}{}}}
+\subsection{Method \code{propagate_domains_to()}}{
+Recompute a target step's domains from its parent and signal the change.
+
+Thin wrapper around \link{dot-propagate_domains} that runs propagation for
+`target_id` (computing its filters' domains from step `target_id - 1`) and
+then fires `post_propagate_domains_hook` so UI layers can refresh the
+affected step's inputs. No-op when propagation is disabled or the target
+step is absent / has no parent.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$propagate_domains_to(
+  target_id,
+  hook = get_hook("post_propagate_domains_hook")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{target_id}}{Id of the step whose domains should be recomputed.}
+
+\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+See \link{hooks} for more details.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-propagate_filter_domains"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-propagate_filter_domains}{}}}
+\subsection{Method \code{propagate_filter_domains()}}{
+Eagerly propagate `"filter"`-mode domains to a target step and all steps
+after it.
+
+`"filter"` mode needs no computed data, so domains can be (re)established
+immediately when the step structure changes. Because each step's domain
+depends on every previous step, this recomputes `from_target` and cascades
+downstream ascending. No-op unless the propagation mode is `"filter"`.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$propagate_filter_domains(from_target)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{from_target}}{Id of the first step to recompute.}
 }
 \if{html}{\out{</div>}}
 }

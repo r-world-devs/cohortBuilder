@@ -1338,17 +1338,20 @@ test_that("Add new step works fine", {
   expect_identical(get_state(coh, 2L)[[1L]]$filters[[1L]]$id, "actor_filter_two")
   expect_identical(get_state(coh, 2L)[[1L]]$filters[[2L]]$id, "film_filter_two")
 
-  # Add step without data calculations
+  # Add step without data calculations: the new step is seeded with the parent's
+  # post snapshot so it is renderable without a flow (and repeated adds work).
   add_step(coh, step_3)
 
   expect_length(get_state(coh), number_of_steps + 2L)
-  expect_null(get_data(coh))
+  # New step carries the parent's (step 2) post snapshot until it runs.
+  expect_identical(nrow(get_data(coh)$actor), 4L)
+  expect_true(coh$is_pending("3"))
   expect_identical(get_state(coh, 3L)[[1L]]$filters[[1L]]$id, "actor_filter_three")
 
-  # Add empty step (without filters)
+  # Add empty step (without filters): also seeded from parent, no crash.
   add_step(coh, step())
   expect_length(get_state(coh), number_of_steps + 3L)
-  expect_null(get_data(coh))
+  expect_identical(nrow(get_data(coh)$actor), 4L)
   expect_error(add_step(coh))
 })
 

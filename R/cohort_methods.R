@@ -90,6 +90,15 @@ Cohort <- R6::R6Class(
       private$source
     },
     #' @description
+    #' Return the configured domain propagation mode.
+    #'
+    #' One of `"none"`, `"filter"`, `"cache"` or `"data"`. Read-only; the mode is
+    #' fixed at construction. UI layers can inspect it (e.g. to validate that a
+    #' domain-based rendering strategy is compatible with the cohort).
+    get_propagate_domains_mode = function() {
+      private$propagate_domains_mode
+    },
+    #' @description
     #' Add filtering step definition
     #' @param step Step definition created with \link{step}.
     add_step = function(step, run_flow = FALSE,
@@ -108,6 +117,21 @@ Cohort <- R6::R6Class(
         purrr::map(assign_filters_to_step)
       names(private$steps[new_step_id]) <- new_step_id
       self$set_pending(new_step_id)
+      # Seed the new step's post data/cache from its parent's post snapshot so it
+      # is renderable without running the cohort (run_button mode / cache=FALSE).
+      # The snapshot equals the step's own input until its filters run; a later
+      # run_flow overwrites it. This also lets steps be added repeatedly without
+      # a flow (each added step then has a post snapshot for the next one's pre).
+      parent_id <- prev_step(new_step_id)
+      if (!is.null(private$data_objects[[parent_id]])) {
+        private$data_objects[[new_step_id]] <- private$data_objects[[parent_id]]
+      }
+      if (!is.null(private$cache[[parent_id]])) {
+        private$cache[[new_step_id]] <- private$cache[[parent_id]]
+      }
+      # "filter" mode: restrict the new (last) step's domain from its parent
+      # eagerly, so it carries a narrowed domain before any flow runs.
+      self$propagate_filter_domains(new_step_id)
 
       run_hooks(hook$post, self, private, new_step_id)
 
@@ -169,6 +193,9 @@ Cohort <- R6::R6Class(
       for (sid in names(private$steps)) {
         self$set_pending(sid)
       }
+      # "filter" mode: the step now occupying step_id has a new parent, so its
+      # domain (and those after it) must be recomputed eagerly.
+      self$propagate_filter_domains(step_id)
       if (!is.null(private$steps) && run_flow) {
         self$run_flow(min_step = step_id)
       }
@@ -197,7 +224,10 @@ Cohort <- R6::R6Class(
 
       private$steps[[step_id]]$filters[[filter@id]] <- assign_filter_step_id(filter, step_id)
       private$steps[[step_id]]$id <- step_id
-      self$set_pending(step_id)
+      # Adding a filter narrows this step and every downstream step.
+      self$set_pending_cascade(step_id)
+      # "filter" mode: this step's domain may now restrict downstream copies.
+      self$propagate_filter_domains(next_step(step_id))
 
       run_hooks(hook$post, self, private, step_id = step_id, filter = filter)
 
@@ -220,7 +250,10 @@ Cohort <- R6::R6Class(
       run_hooks(hook$pre, self, private, step_id = step_id, filter_id = filter_id)
 
       private$steps[[step_id]]$filters[[filter_id]] <- NULL
-      self$set_pending(step_id)
+      # Removing a filter widens this step and every downstream step.
+      self$set_pending_cascade(step_id)
+      # "filter" mode: downstream domains may need to widen accordingly.
+      self$propagate_filter_domains(next_step(step_id))
 
       run_hooks(hook$post, self, private, step_id = step_id, filter_id = filter_id)
 
@@ -289,7 +322,14 @@ Cohort <- R6::R6Class(
       }
       private$steps[[step_id]]$filters[[filter_id]] <- filter_obj
 
-      self$set_pending(step_id)
+      # A change to this step invalidates it and every downstream step.
+      self$set_pending_cascade(step_id)
+
+      # "filter" mode: eagerly recompute downstream domains from the new value
+      # (no data needed). Other modes recompute when run_flow reaches run_step.
+      if (!missing(active) || any_changed) {
+        self$propagate_filter_domains(next_step(step_id))
+      }
 
       run_hooks(
         hook$post, self, private, step_id = step_id, filter_id = filter_id,
@@ -361,7 +401,11 @@ Cohort <- R6::R6Class(
       }
 
       filters_state <- private$steps[step_id] |>
-        purrr::imap(~ list(step = .y, filters = get_filters_state(.x$filters))) |>
+        purrr::imap(~ list(
+          step = .y,
+          pending = isTRUE(.x$pending),
+          filters = get_filters_state(.x$filters)
+        )) |>
         unname()
 
       if (json) {
@@ -420,6 +464,14 @@ Cohort <- R6::R6Class(
             step_id = step_state$step
           )
         }
+      }
+      # Restore each step's saved pending flag (R9). When a state encodes pending
+      # steps (e.g. saved in run_button mode before running), they are restored
+      # as pending rather than silently treated as computed. Defaults to pending
+      # when the flag is absent (older states / safety).
+      for (step_state in state) {
+        pending <- if (is.null(step_state$pending)) TRUE else isTRUE(step_state$pending)
+        self$set_pending(step_state$step, pending = pending)
       }
       if (run_flow) {
         self$run_flow()
@@ -779,14 +831,12 @@ Cohort <- R6::R6Class(
         }
       }
 
-      if (private$propagate_domains_mode != "none") {
-        .propagate_domains(
-          source = private$source,
-          data_object = private$data_objects[[step_id]],
-          step_id = step_id,
-          cohort = self,
-          mode = private$propagate_domains_mode
-        )
+      # Data-dependent modes ("cache"/"data") need the parent's computed
+      # snapshot, so they propagate here after the step ran: recompute the next
+      # step from the step that just ran. "filter" mode propagates eagerly from
+      # the structure-changing methods instead (see update_filter/add_step/etc).
+      if (private$propagate_domains_mode %in% c("cache", "data")) {
+        self$propagate_domains_to(next_step(step_id))
       }
 
       self$set_pending(step_id, pending = FALSE)
@@ -963,6 +1013,99 @@ Cohort <- R6::R6Class(
       invisible(self)
     },
     #' @description
+    #' Mark a step and all the steps after it as pending.
+    #'
+    #' A change to step `step_id`'s filters invalidates that step and every step
+    #' downstream (each step's input is the previous step's output). Used by the
+    #' filter/step mutating methods so the GUI greys all affected steps via the
+    #' `post_set_pending_hook`.
+    #' @param step_id Id of the first step to mark pending.
+    set_pending_cascade = function(step_id) {
+      step_id <- as.character(step_id)
+      last_id <- self$last_step_id()
+      for (sid in steps_range(step_id, last_id)) {
+        self$set_pending(sid)
+      }
+      invisible(self)
+    },
+    #' @description
+    #' Silently set a filter's domain.
+    #'
+    #' Internal setter used by domain propagation (\link{dot-propagate_domains}).
+    #' Writes `filter@domain` directly **without** firing the `update_filter`
+    #' hooks and **without** triggering `run_flow`, which prevents the per-hop
+    #' hook re-entry that would otherwise occur if domains were applied through
+    #' `update_filter`. Does not itself trigger further propagation.
+    #' @param step_id Id of the step where the filter is defined.
+    #' @param filter_id Id of the filter whose domain should be set.
+    #' @param domain New domain value to assign.
+    set_domain = function(step_id, filter_id, domain) {
+      step_id <- as.character(step_id)
+      filter_id <- as.character(filter_id)
+      filter_obj <- private$steps[[step_id]]$filters[[filter_id]]
+      if (is.null(filter_obj)) {
+        return(invisible(self))
+      }
+      filter_obj@domain <- domain
+      private$steps[[step_id]]$filters[[filter_id]] <- filter_obj
+      invisible(self)
+    },
+    #' @description
+    #' Recompute a target step's domains from its parent and signal the change.
+    #'
+    #' Thin wrapper around \link{dot-propagate_domains} that runs propagation for
+    #' `target_id` (computing its filters' domains from step `target_id - 1`) and
+    #' then fires `post_propagate_domains_hook` so UI layers can refresh the
+    #' affected step's inputs. No-op when propagation is disabled or the target
+    #' step is absent / has no parent.
+    #' @param target_id Id of the step whose domains should be recomputed.
+    propagate_domains_to = function(target_id,
+                                    hook = get_hook("post_propagate_domains_hook")) {
+      if (private$propagate_domains_mode == "none") {
+        return(invisible(self))
+      }
+      target_id <- as.character(target_id)
+      if (as.integer(target_id) <= 1L) {
+        return(invisible(self))
+      }
+      if (is.null(self$get_step(target_id))) {
+        return(invisible(self))
+      }
+      parent_id <- prev_step(target_id)
+      .propagate_domains(
+        source = private$source,
+        data_object = private$data_objects[[parent_id]],
+        step_id = target_id,
+        cohort = self,
+        mode = private$propagate_domains_mode
+      )
+      run_hooks(hook, self, private, step_id = target_id)
+      invisible(self)
+    },
+    #' @description
+    #' Eagerly propagate `"filter"`-mode domains to a target step and all steps
+    #' after it.
+    #'
+    #' `"filter"` mode needs no computed data, so domains can be (re)established
+    #' immediately when the step structure changes. Because each step's domain
+    #' depends on every previous step, this recomputes `from_target` and cascades
+    #' downstream ascending. No-op unless the propagation mode is `"filter"`.
+    #' @param from_target Id of the first step to recompute.
+    propagate_filter_domains = function(from_target) {
+      if (private$propagate_domains_mode != "filter") {
+        return(invisible(self))
+      }
+      from_target <- as.character(from_target)
+      if (as.integer(from_target) < 2L) {
+        from_target <- "2"
+      }
+      last_id <- self$last_step_id()
+      for (sid in steps_range(from_target, last_id)) {
+        self$propagate_domains_to(sid)
+      }
+      invisible(self)
+    },
+    #' @description
     #' Helper method enabling to run non-standard operation on Cohort object.
     #' @param modifier Function of two arguments `self` and `private`.
     modify = function(modifier) {
@@ -991,6 +1134,9 @@ Cohort <- R6::R6Class(
       for (step_id in names(private$steps)) {
         self$set_pending(step_id)
       }
+      # "filter" mode establishes domains eagerly (no data needed), so steps
+      # carry narrowed domains immediately after construction.
+      self$propagate_filter_domains("2")
       initial_data <- .init_step(source)
       if (!is.null(initial_data)) {
         # important note: data objects and cache are indexed from 0, whereas steps and filters from 1

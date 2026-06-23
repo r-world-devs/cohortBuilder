@@ -568,6 +568,53 @@ intersect_domain <- function(filter) {
   cb_intersect_domain(filter)
 }
 
+#' Intersect two domain values for a filter type
+#'
+#' Combines two already-computed domain values (not value-vs-domain) into their
+#' intersection, dispatching on filter type. Used by `"filter"`-mode domain
+#' propagation when the same logical filter appears in more than one upstream
+#' step and its effective domains must be combined. Unlike
+#' [cb_intersect_domain()], this never emits trimming warnings.
+#'
+#' @param filter S7 filter object (used for type dispatch only).
+#' @param a,b Domain values to intersect. Either may be `NULL`.
+#' @return The intersected domain value, or `NULL`.
+#' @export
+cb_intersect_domain_values <- S7::new_generic("cb_intersect_domain_values", "filter")
+
+S7::method(cb_intersect_domain_values, CbFilter) <- function(filter, a, b) {
+  if (is.null(a)) return(b)
+  if (is.null(b)) return(a)
+  a
+}
+
+intersect_domain_values_discrete <- function(filter, a, b) {
+  if (is.null(a)) return(b)
+  if (is.null(b)) return(a)
+  intersect(a, b)
+}
+
+S7::method(cb_intersect_domain_values, CbFilterDiscrete) <- intersect_domain_values_discrete
+S7::method(cb_intersect_domain_values, CbFilterDiscreteText) <- intersect_domain_values_discrete
+
+intersect_domain_values_range <- function(filter, a, b) {
+  if (is.null(a)) return(b)
+  if (is.null(b)) return(a)
+  c(max(a[1L], b[1L]), min(a[2L], b[2L]))
+}
+
+S7::method(cb_intersect_domain_values, CbFilterRange) <- intersect_domain_values_range
+S7::method(cb_intersect_domain_values, CbFilterDateRange) <- intersect_domain_values_range
+S7::method(cb_intersect_domain_values, CbFilterDatetimeRange) <- intersect_domain_values_range
+
+S7::method(cb_intersect_domain_values, CbFilterMultiDiscrete) <- function(filter, a, b) {
+  if (is.null(a)) return(b)
+  if (is.null(b)) return(a)
+  purrr::imap(a, function(val, nm) {
+    if (nm %in% names(b)) intersect(val, b[[nm]]) else val
+  })
+}
+
 #' Extract domain from cached filter statistics
 #'
 #' Derives a domain (set of valid values) from previously computed cache
