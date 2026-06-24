@@ -17,7 +17,8 @@ Cohort <- R6::R6Class(
     #' @param propagate_domains Domain propagation mode between steps.
     #'     One of `"none"` (default, no propagation), `"filter"` (derive from
     #'     previous step filter values), `"cache"` (derive from cached statistics),
-    #'     or `"data"` (scan filtered data).
+    #'     or `"data"` (scan filtered data). `"cache"` requires `cache = TRUE`;
+    #'     use `"data"` for the cache-free equivalent.
     #' @return The object of class `Cohort`.
     initialize = function(source, ..., run_flow = FALSE, cache = TRUE,
                           propagate_domains = c("none", "filter", "cache", "data"),
@@ -26,8 +27,20 @@ Cohort <- R6::R6Class(
                             post = get_hook("post_cohort_hook")
                           )) {
       run_hooks(hook$pre, self, private)
+      propagate_domains <- match.arg(propagate_domains)
+      # "cache" propagation derives step domains from cached statistics, which are
+      # only computed when caching is enabled. Without a cache there is nothing to
+      # propagate from (domains would silently stay un-narrowed). Use
+      # propagate_domains = "data" for the cache-free equivalent.
+      if (propagate_domains == "cache" && !cache) {
+        stop(
+          "`propagate_domains = \"cache\"` requires `cache = TRUE`. ",
+          "Use `propagate_domains = \"data\"` for cache-free domain propagation.",
+          call. = FALSE
+        )
+      }
       private$cache_enabled <- cache
-      private$propagate_domains_mode <- match.arg(propagate_domains)
+      private$propagate_domains_mode <- propagate_domains
 
       if (!missing(source)) {
         private$init_source(source, ...)

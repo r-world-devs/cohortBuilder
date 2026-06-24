@@ -1880,6 +1880,23 @@ test_that("copy_step (duplicate filter id) keeps cache consistent", {
 
 # -- .propagate_domains tests -------------------------------------------------
 
+test_that("propagate_domains = 'cache' requires cache = TRUE", {
+  iris_source <- set_source(tblist(iris = iris))
+
+  # "cache" propagation reads cached statistics, which are not computed when
+  # caching is disabled, so the combination is rejected at construction.
+  expect_error(
+    Cohort$new(iris_source, propagate_domains = "cache", cache = FALSE),
+    regexp = "requires `cache = TRUE`"
+  )
+
+  # The valid combinations still construct without error.
+  expect_no_error(Cohort$new(iris_source, propagate_domains = "cache", cache = TRUE))
+  expect_no_error(Cohort$new(iris_source, propagate_domains = "data", cache = FALSE))
+  expect_no_error(Cohort$new(iris_source, propagate_domains = "filter", cache = FALSE))
+  expect_no_error(Cohort$new(iris_source, propagate_domains = "none", cache = FALSE))
+})
+
 test_that(".propagate_domains.default is a no-op", {
   iris_source <- set_source(tblist(iris = iris))
   result <- .propagate_domains(iris_source, iris_source$dtconn, "1", NULL, mode = "data")
@@ -2071,7 +2088,10 @@ test_that("propagate_domains = 'cache' narrows discrete domain from stats", {
   expect_false("virginica" %in% step2_filter@domain)
 })
 
-test_that("propagate_domains = 'cache' does nothing when cache disabled", {
+test_that("propagate_domains = 'cache' with cache disabled errors at construction", {
+  # Previously this combination silently produced no narrowing (the post-cache
+  # propagation reads from is never written when cache = FALSE). It is now
+  # rejected up front; "data" mode is the cache-free equivalent.
   iris_source <- set_source(tblist(iris = iris))
   step1 <- step(
     filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
@@ -2081,13 +2101,11 @@ test_that("propagate_domains = 'cache' does nothing when cache disabled", {
     filter("discrete", id = "sp2", variable = "Species", dataset = "iris",
            domain = c("setosa", "versicolor", "virginica"))
   )
-  coh <- Cohort$new(iris_source, step1, step2,
-                    cache = FALSE, propagate_domains = "cache")
-  coh$run_flow()
-
-  # No cache computed, so domain stays unchanged
-  step2_filter <- coh$get_filter("2", "sp2")
-  expect_identical(step2_filter@domain, c("setosa", "versicolor", "virginica"))
+  expect_error(
+    Cohort$new(iris_source, step1, step2,
+               cache = FALSE, propagate_domains = "cache"),
+    regexp = "requires `cache = TRUE`"
+  )
 })
 
 # -- mode = "filter" tests ----------------------------------------------------

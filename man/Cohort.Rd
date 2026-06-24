@@ -95,7 +95,8 @@ Set to `FALSE` to skip cache computation (useful for metadata-only operation).}
 \item{\code{propagate_domains}}{Domain propagation mode between steps.
 One of `"none"` (default, no propagation), `"filter"` (derive from
 previous step filter values), `"cache"` (derive from cached statistics),
-or `"data"` (scan filtered data).}
+or `"data"` (scan filtered data). `"cache"` requires `cache = TRUE`;
+use `"data"` for the cache-free equivalent.}
 
 \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
