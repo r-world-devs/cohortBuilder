@@ -737,7 +737,7 @@ Update filter or step cache.
 Caching is saving step and filter attached data statistics such as number of
 data rows, filter choices or frequencies.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_cache(step_id, filter_id, state = "post")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_cache(step_id, filter_id, state = "post", name = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -750,6 +750,11 @@ If `filter_id` is not missing, the parameter describes id of the step where filt
 
 \item{\code{state}}{Should caching be done on data before ("pre") or after ("post")
 filtering in specified step.}
+
+\item{\code{name}}{Optional name(s) of the individual filter statistics to
+(re)compute. When supplied (filter-level only), only those statistics are
+computed and merged into the stored entry, leaving any other cached
+statistics untouched. When missing, the full statistics set is computed.}
 }
 \if{html}{\out{</div>}}
 }
@@ -764,7 +769,8 @@ Return step of filter specific cache.
   step_id,
   filter_id,
   state = "post",
-  .recalc_when_missing = TRUE
+  .recalc_when_missing = TRUE,
+  name = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -780,6 +786,12 @@ If `filter_id` is not missing, the parameter describes id of the step where filt
 filtering in specified step.}
 
 \item{\code{.recalc_when_missing}}{Should the function compute cache automatically when the one is not computed yet?}
+
+\item{\code{name}}{Optional name of a single filter statistic to return (e.g.
+"choices", "n_data"). When supplied (filter-level only) the method
+returns just that statistic and, if recomputation is needed, computes
+only it instead of the whole statistics set. When missing, the full
+cached entry (a list of all statistics) is returned.}
 }
 \if{html}{\out{</div>}}
 }

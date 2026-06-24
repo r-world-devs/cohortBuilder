@@ -826,7 +826,14 @@ Cohort <- R6::R6Class(
       filter_ids <- names(self$get_step(step_id)$filters)
 
       if (private$cache_enabled) {
-        # todo make sure is_cached logic is correct
+        # The cache slot is shared: cache[N] is both step N's post and step
+        # N+1's pre. The step-level update_cache(state = "pre") overwrites the
+        # whole parent slot (.get_stats carries no $filters), so this guard also
+        # protects the parent's already-computed filter stats from being wiped
+        # during downstream/partial runs. add_step seeds cache[new] from its
+        # parent, but that copy is read as step new's *pre* (= cache[parent]),
+        # never as the value checked here, so it cannot make this guard skip a
+        # needed (re)computation.
         is_cached <- !is.null(self$get_cache(step_id, state = "pre", .recalc_when_missing = FALSE))
         if (!is_cached) {
           self$update_cache(step_id, state = "pre")
@@ -921,7 +928,11 @@ Cohort <- R6::R6Class(
     #' @param filter_id Id of the filter for which caching should be applied.
     #' @param state Should caching be done on data before ("pre") or after ("post")
     #'    filtering in specified step.
-    update_cache = function(step_id, filter_id, state = "post") {
+    #' @param name Optional name(s) of the individual filter statistics to
+    #'   (re)compute. When supplied (filter-level only), only those statistics are
+    #'   computed and merged into the stored entry, leaving any other cached
+    #'   statistics untouched. When missing, the full statistics set is computed.
+    update_cache = function(step_id, filter_id, state = "post", name = NULL) {
       cache_id <- step_id
       if (state == "pre") {
         cache_id <- prev_step(step_id)
@@ -938,7 +949,23 @@ Cohort <- R6::R6Class(
         filter <- self$get_filter(step_id, filter_id)
         prev_cache <- private$cache[[cache_id]]$filters[[filter_id]]
         cache_changed <- FALSE
-        private$cache[[cache_id]]$filters[[filter_id]] <- cb_get_filter_stats(filter, private$source, self$get_data(step_id, state, FALSE))
+        if (is.null(name)) {
+          # Compute the full statistics set for the filter.
+          new_stats <- cb_get_filter_stats(filter, private$source, self$get_data(step_id, state, FALSE))
+        } else {
+          # Compute only the requested statistic(s) and merge them into the
+          # existing entry so unrequested (already cached) stats are preserved.
+          computed <- cb_get_filter_stats(
+            filter, private$source, self$get_data(step_id, state, FALSE), name = name
+          )
+          if (length(name) == 1L) {
+            computed <- stats::setNames(list(computed), name)
+          }
+          new_stats <- utils::modifyList(
+            prev_cache %||% list(), computed
+          )
+        }
+        private$cache[[cache_id]]$filters[[filter_id]] <- new_stats
         if (!identical(prev_cache, private$cache[[cache_id]]$filters[[filter_id]])) {
           cache_changed <- TRUE
         }
@@ -953,7 +980,12 @@ Cohort <- R6::R6Class(
     #' @param state Should cache be returned on data before ("pre") or after ("post")
     #'    filtering in specified step.
     #' @param .recalc_when_missing Should the function compute cache automatically when the one is not computed yet?
-    get_cache = function(step_id, filter_id, state = "post", .recalc_when_missing = TRUE) {
+    #' @param name Optional name of a single filter statistic to return (e.g.
+    #'   "choices", "n_data"). When supplied (filter-level only) the method
+    #'   returns just that statistic and, if recomputation is needed, computes
+    #'   only it instead of the whole statistics set. When missing, the full
+    #'   cached entry (a list of all statistics) is returned.
+    get_cache = function(step_id, filter_id, state = "post", .recalc_when_missing = TRUE, name = NULL) {
       cache_id <- as.character(step_id)
       if (state == "pre") {
         cache_id <- prev_step(step_id)
@@ -963,9 +995,27 @@ Cohort <- R6::R6Class(
       } else {
         res <- private$cache[[cache_id]]$filters[[filter_id]]
       }
-      if (is.null(res) && .recalc_when_missing) {
-        self$update_cache(step_id, filter_id, state)
-        res <- self$get_cache(step_id, filter_id, state, FALSE)
+      # When caching is disabled, run_step does not refresh stored stats, so a
+      # value left in private$cache by an earlier lazy get_cache() is stale after
+      # the next run (e.g. post-stats computed before a run_button click stay at
+      # their pre-run values). Recompute on read in that case. Source stats
+      # (cache_id "0") are set once at init and never go stale, so keep them.
+      stale_when_disabled <- !private$cache_enabled && cache_id != "0"
+
+      # When a single statistic is requested, only its presence (and freshness)
+      # matters: this lets callers read one stat without computing the rest.
+      missing_value <- if (is.null(name) || missing(filter_id)) {
+        is.null(res)
+      } else {
+        is.null(res[[name]])
+      }
+
+      if ((missing_value || stale_when_disabled) && .recalc_when_missing) {
+        self$update_cache(step_id, filter_id, state, name = name)
+        res <- self$get_cache(step_id, filter_id, state, .recalc_when_missing = FALSE)
+      }
+      if (!is.null(name) && !missing(filter_id)) {
+        return(res[[name]])
       }
       return(res)
     },
