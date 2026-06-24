@@ -131,6 +131,8 @@ Cohort <- R6::R6Class(
       }
       # "filter" mode: restrict the new (last) step's domain from its parent
       # eagerly, so it carries a narrowed domain before any flow runs.
+      # "cache"/"data" modes propagate from inside run_step when the new step
+      # runs (it recomputes its own domain from its parent's snapshot).
       self$propagate_filter_domains(new_step_id)
 
       run_hooks(hook$post, self, private, new_step_id)
@@ -785,6 +787,18 @@ Cohort <- R6::R6Class(
       step_id <- as.character(step_id)
 
       run_hooks(hook$pre, self, private, step_id)
+
+      # Data-dependent modes ("cache"/"data") narrow this step's domains from the
+      # parent's already-computed snapshot. Do this *before* filtering, because a
+      # filter's domain feeds its own effective value (e.g. a range filter with
+      # range = NA filters by its domain bounds). Propagating here (step n from
+      # step n-1) also means a freshly added step narrows itself when it runs, so
+      # no separate add_step handling is needed. "filter" mode propagates eagerly
+      # from the structure-changing methods instead.
+      if (private$propagate_domains_mode %in% c("cache", "data")) {
+        self$propagate_domains_to(step_id)
+      }
+
       temp_data_object <- .pre_filtering(
         source = private$source,
         data_object = private$data_objects[[prev_step(step_id)]],
@@ -829,14 +843,6 @@ Cohort <- R6::R6Class(
             self$update_cache(step_id, filter_id, state = "post")
           }
         }
-      }
-
-      # Data-dependent modes ("cache"/"data") need the parent's computed
-      # snapshot, so they propagate here after the step ran: recompute the next
-      # step from the step that just ran. "filter" mode propagates eagerly from
-      # the structure-changing methods instead (see update_filter/add_step/etc).
-      if (private$propagate_domains_mode %in% c("cache", "data")) {
-        self$propagate_domains_to(next_step(step_id))
       }
 
       self$set_pending(step_id, pending = FALSE)

@@ -1738,6 +1738,61 @@ test_that("propagate_domains = 'data' does not affect last step", {
   expect_identical(step1_filter@domain, c("setosa", "versicolor", "virginica"))
 })
 
+test_that("propagate_domains = 'data' narrows a step added after a resolved parent", {
+  # Regression: adding a step to a parent that already filters must narrow the
+  # new step's domain immediately, not leave it at the parent's full domain.
+  # run_step narrows the step it runs from its parent's snapshot, so running the
+  # newly added step (run_flow(min_step = new_id)) narrows it from the resolved
+  # parent without any special add_step handling.
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp", variable = "Species", dataset = "iris",
+           value = c("setosa", "versicolor"),
+           domain = c("setosa", "versicolor", "virginica"))
+  )
+  coh <- Cohort$new(iris_source, step1, propagate_domains = "data")
+  coh$run_flow()
+
+  # Clone step 1 (the GUI add-step path). The new step must open narrowed.
+  coh$copy_step(run_flow = TRUE)
+
+  step2_filter <- coh$get_filter("2", "sp")
+  expect_setequal(step2_filter@domain, c("setosa", "versicolor"))
+  expect_false("virginica" %in% step2_filter@domain)
+
+  # The new step imposes no extra restriction, so its post-data equals its
+  # pre-data (the 100 rows the parent passed through), not zero.
+  pre2 <- nrow(coh$get_data("2", state = "pre")$iris)
+  post2 <- nrow(coh$get_data("2", state = "post")$iris)
+  expect_equal(pre2, 100L)
+  expect_equal(post2, pre2)
+})
+
+test_that("propagate_domains = 'data' defers narrowing when added step is not run", {
+  # With a pending parent (e.g. run-button mode, parent not yet run), adding a
+  # step without running it must NOT narrow: domains are recomputed only when the
+  # step runs. Running the flow then narrows it from the (now computed) parent.
+  iris_source <- set_source(tblist(iris = iris))
+  step1 <- step(
+    filter("discrete", id = "sp", variable = "Species", dataset = "iris",
+           value = c("setosa", "versicolor"),
+           domain = c("setosa", "versicolor", "virginica"))
+  )
+  coh <- Cohort$new(iris_source, step1, propagate_domains = "data")
+  # Do not run: step 1 stays pending.
+  coh$copy_step(run_flow = FALSE)
+
+  # Deferred: step 2 still carries the full domain while the parent is pending.
+  expect_setequal(
+    coh$get_filter("2", "sp")@domain,
+    c("setosa", "versicolor", "virginica")
+  )
+
+  # Running the flow then narrows it as usual.
+  coh$run_flow()
+  expect_setequal(coh$get_filter("2", "sp")@domain, c("setosa", "versicolor"))
+})
+
 # -- mode = "cache" tests -----------------------------------------------------
 
 test_that("propagate_domains = 'cache' narrows discrete domain from stats", {
