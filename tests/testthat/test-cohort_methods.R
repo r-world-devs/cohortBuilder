@@ -1016,7 +1016,8 @@ test_that("copy_step trigger data calculations works fine", {
 
   list_of_filters <- get_state(coh, coh$last_step_id())[[1L]]$filters
 
-  expect_null(get_data(coh))
+  # Un-run step mirrors its parent: data equals the full source until a flow runs.
+  expect_identical(nrow(get_data(coh, collect = TRUE)$iris), nrow(iris))
 
   coh$copy_step(run_flow = TRUE)
 
@@ -1059,7 +1060,8 @@ test_that("remove_step trigger data calculations works fine", {
     step(discrete_iris_two)
   )
 
-  expect_null(get_data(coh))
+  # Un-run step mirrors its parent: data equals the full source until a flow runs.
+  expect_identical(nrow(get_data(coh, collect = TRUE)$iris), nrow(iris))
 
   coh$remove_step(run_flow = TRUE)
 
@@ -1074,7 +1076,8 @@ test_that("add_filter trigger data calculations works fine", {
     step(discrete_iris_one)
   )
 
-  expect_null(get_data(coh))
+  # Un-run step mirrors its parent: data equals the full source until a flow runs.
+  expect_identical(nrow(get_data(coh, collect = TRUE)$iris), nrow(iris))
 
   coh$add_filter(range_iris_one, 1L, run_flow = TRUE)
 
@@ -1089,7 +1092,8 @@ test_that("remove_filter trigger data calculations works fine", {
     step(discrete_iris_one)
   )
 
-  expect_null(get_data(coh))
+  # Un-run step mirrors its parent: data equals the full source until a flow runs.
+  expect_identical(nrow(get_data(coh, collect = TRUE)$iris), nrow(iris))
 
   coh$remove_filter(1L, 1L, run_flow = TRUE)
 
@@ -1276,12 +1280,14 @@ test_that("update_filter trigger data calculations works fine", {
     step(discrete_iris_one)
   )
 
-  expect_null(get_data(coh))
+  # Un-run step mirrors its parent: data equals the full source until a flow runs.
+  expect_identical(nrow(get_data(coh, collect = TRUE)$iris), nrow(iris))
 
   #do not trigger data calculations without any changes
   coh$update_filter(1L, "species_filter", run_flow = TRUE)
 
-  expect_null(get_data(coh))
+  # A no-op update leaves the data unchanged (still the un-run source snapshot).
+  expect_identical(nrow(get_data(coh, collect = TRUE)$iris), nrow(iris))
 
   #trigger data calculations
   coh$update_filter(1L, "species_filter", active = FALSE, run_flow = TRUE)
@@ -1876,6 +1882,67 @@ test_that("copy_step (duplicate filter id) keeps cache consistent", {
   coh$run_flow()
 
   expect_gt(expect_cache_consistent(coh), 0L)
+})
+
+# -- un-run step mirrors its parent (construction + add_step seeding) ----------
+
+# Rule: a step that has not been run is treated as if it has no filters
+# configured, so its data and cache equal those of the previous step. This holds
+# both for steps created at construction (init_source seeds them) and steps added
+# later (add_step seeds them). It makes every step renderable without a run
+# (run_button mode / cache=FALSE) - the first added step behaves exactly like
+# subsequent ones, removing the inconsistency where the first rendered "no data"
+# while later steps rendered fine.
+
+test_that("initial step is seeded from source at construction (renderable, no run)", {
+  coh <- Cohort$new(
+    set_source(tblist(iris = iris)),
+    step(mk_species(c("setosa", "versicolor", "virginica")))
+  )
+
+  # The initial step's slot is seeded from the source at construction, so its
+  # data equals the full source and its pre-stats resolve - no run needed.
+  priv <- coh$.__enclos_env__$private
+  expect_false(is.null(priv$data_objects[["1"]]))
+  expect_identical(nrow(get_data(coh, collect = TRUE)$iris), nrow(iris))
+})
+
+test_that("add_step before any run seeds the new step from its parent", {
+  coh <- Cohort$new(
+    set_source(tblist(iris = iris)),
+    step(mk_species(c("setosa", "versicolor", "virginica")))
+  )
+
+  # Add a second step without any run_flow. Because the parent (initial) step was
+  # seeded at construction, the new step's pre-stats resolve to the un-run, full
+  # table - not NULL ("no data").
+  coh$add_step(step(mk_species(c("setosa", "versicolor", "virginica"))))
+  pre_choices <- coh$get_cache("2", "sp", state = "pre", name = "choices")
+  expect_identical(
+    pre_choices, list(setosa = 50L, versicolor = 50L, virginica = 50L)
+  )
+})
+
+test_that("initial and progressively added steps render identically (no run)", {
+  # With no flow ever run, every step - the initial one and each progressively
+  # added one - must be renderable (parent pre-stats present), with the same full
+  # table, since none have been filtered yet.
+  coh <- Cohort$new(
+    set_source(tblist(iris = iris)),
+    step(mk_species(c("setosa", "versicolor", "virginica")))
+  )
+  full <- list(setosa = 50L, versicolor = 50L, virginica = 50L)
+
+  for (i in 2:4) {
+    coh$add_step(step(mk_species(c("setosa", "versicolor", "virginica"))))
+    pre_choices <- coh$get_cache(
+      as.character(i), "sp", state = "pre", name = "choices"
+    )
+    expect_identical(
+      pre_choices, full,
+      info = sprintf("step %s parent pre-stats", i)
+    )
+  }
 })
 
 # -- .propagate_domains tests -------------------------------------------------

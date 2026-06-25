@@ -130,11 +130,13 @@ Cohort <- R6::R6Class(
         purrr::map(assign_filters_to_step)
       names(private$steps[new_step_id]) <- new_step_id
       self$set_pending(new_step_id)
-      # Seed the new step's post data/cache from its parent's post snapshot so it
-      # is renderable without running the cohort (run_button mode / cache=FALSE).
-      # The snapshot equals the step's own input until its filters run; a later
-      # run_flow overwrites it. This also lets steps be added repeatedly without
-      # a flow (each added step then has a post snapshot for the next one's pre).
+      # An un-run step is treated as if it has no filters configured: seed the
+      # new step's data/cache from its parent's snapshot so it is renderable
+      # without running the cohort (run_button mode / cache=FALSE). init_source()
+      # seeds the initial steps the same way, so every step's parent slot is
+      # populated and this single-level copy always finds a snapshot. The seeded
+      # snapshot equals the step's own input until its filters run; a later
+      # run_flow overwrites it.
       parent_id <- prev_step(new_step_id)
       if (!is.null(private$data_objects[[parent_id]])) {
         private$data_objects[[new_step_id]] <- private$data_objects[[parent_id]]
@@ -1212,6 +1214,25 @@ Cohort <- R6::R6Class(
         private$data_objects[["0"]] <- initial_data
       }
       private$cache[["0"]] <- private$source$meta_stats
+
+      # An un-run step is treated as if it has no filters configured: its data
+      # and cache equal those of the previous step (add_step() follows the same
+      # rule). Seed each initial step's slot from its parent here so steps
+      # created at construction are renderable without a run (run_button mode /
+      # cache=FALSE), exactly like steps added later. The seeded snapshot equals
+      # each step's own input until its filters run; a later run_flow overwrites
+      # it. Cache/data are indexed from 0 (slot "0" is the source), steps from 1.
+      for (step_id in names(private$steps)) {
+        parent_id <- prev_step(step_id)
+        if (is.null(private$data_objects[[step_id]]) &&
+            !is.null(private$data_objects[[parent_id]])) {
+          private$data_objects[[step_id]] <- private$data_objects[[parent_id]]
+        }
+        if (is.null(private$cache[[step_id]]) &&
+            !is.null(private$cache[[parent_id]])) {
+          private$cache[[step_id]] <- private$cache[[parent_id]]
+        }
+      }
 
       run_hooks(hook$post, self, private, ...)
     }
