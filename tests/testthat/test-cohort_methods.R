@@ -1641,6 +1641,119 @@ test_that("Computing cache on request works as expected", {
   expect_false(is.null(coh$get_cache("1", state = "pre", .recalc_when_missing = TRUE)))
 })
 
+# -- pending status in state round-trip (R9) ----------------------------------
+
+# get_state() records each step's pending flag and restore() replays it, so a
+# saved "needs to be run" status survives a save/restore cycle. This matters in
+# run_button mode, where a state can be saved before the user runs the flow.
+
+local({
+  mk_two_step <- function() {
+    Cohort$new(
+      set_source(tblist(iris = iris)),
+      step(filter(
+        type = "discrete", id = "sp", variable = "Species", dataset = "iris",
+        value = c("setosa", "versicolor"), active = TRUE
+      )),
+      step(filter(
+        type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
+        range = c(5, 7), active = TRUE
+      ))
+    )
+  }
+
+  test_that("get_state records pending flags (un-run vs run)", {
+    coh <- mk_two_step()
+    st <- coh$get_state(json = FALSE)
+    expect_true(st[[1L]]$pending)
+    expect_true(st[[2L]]$pending)
+
+    coh$run_flow()
+    st_run <- coh$get_state(json = FALSE)
+    expect_false(st_run[[1L]]$pending)
+    expect_false(st_run[[2L]]$pending)
+  })
+
+  test_that("restore replays resolved (non-pending) flags", {
+    ref <- mk_two_step()
+    ref$run_flow()
+    fresh <- mk_two_step()
+    fresh$restore(ref$get_state(json = FALSE), run_flow = FALSE)
+    expect_false(fresh$is_pending("1"))
+    expect_false(fresh$is_pending("2"))
+  })
+
+  test_that("restore replays pending flags saved before a run", {
+    pending_state <- mk_two_step()$get_state(json = FALSE)
+    fresh <- mk_two_step()
+    fresh$run_flow() # start fully resolved
+    fresh$restore(pending_state, run_flow = FALSE)
+    expect_true(fresh$is_pending("1"))
+    expect_true(fresh$is_pending("2"))
+  })
+
+  test_that("restore replays a mixed pending state", {
+    coh <- mk_two_step()
+    coh$run_flow()
+    coh$set_pending("2", pending = TRUE) # only step 2 pending
+    mixed <- coh$get_state(json = FALSE)
+    expect_false(mixed[[1L]]$pending)
+    expect_true(mixed[[2L]]$pending)
+
+    fresh <- mk_two_step()
+    fresh$restore(mixed, run_flow = FALSE)
+    expect_false(fresh$is_pending("1"))
+    expect_true(fresh$is_pending("2"))
+  })
+
+  test_that("pending status survives a JSON state round-trip", {
+    coh <- mk_two_step()
+    coh$run_flow()
+    coh$set_pending("2", pending = TRUE)
+    json <- coh$get_state(json = TRUE)
+
+    fresh <- mk_two_step()
+    fresh$restore(json, run_flow = FALSE)
+    expect_false(fresh$is_pending("1"))
+    expect_true(fresh$is_pending("2"))
+  })
+
+  test_that("legacy state without pending field defaults to pending", {
+    # Older saved states predate the pending flag; restoring them must mark steps
+    # pending (safe default) so the data is recomputed on the next run.
+    legacy <- mk_two_step()$get_state(json = FALSE)
+    legacy <- lapply(legacy, function(s) {
+      s$pending <- NULL
+      s
+    })
+    fresh <- mk_two_step()
+    fresh$run_flow() # start resolved
+    fresh$restore(legacy, run_flow = FALSE)
+    expect_true(fresh$is_pending("1"))
+    expect_true(fresh$is_pending("2"))
+  })
+
+  test_that("restore(run_flow = TRUE) reproduces the saved data regardless of pending", {
+    ref <- mk_two_step()
+    ref$run_flow()
+    ref_s1 <- nrow(ref$get_data("1", state = "post")$iris)
+    ref_s2 <- nrow(ref$get_data("2", state = "post")$iris)
+
+    # Resolved state.
+    f1 <- mk_two_step()
+    f1$restore(ref$get_state(json = FALSE), run_flow = TRUE)
+    expect_identical(nrow(f1$get_data("1", state = "post")$iris), ref_s1)
+    expect_identical(nrow(f1$get_data("2", state = "post")$iris), ref_s2)
+
+    # Pending state - run_flow still recomputes the same data.
+    f2 <- mk_two_step()
+    f2$restore(mk_two_step()$get_state(json = FALSE), run_flow = FALSE)
+    f2$run_flow()
+    expect_identical(nrow(f2$get_data("1", state = "post")$iris), ref_s1)
+    expect_identical(nrow(f2$get_data("2", state = "post")$iris), ref_s2)
+  })
+})
+
 # -- Cache control tests ------------------------------------------------------
 
 test_that("cache = FALSE skips update_cache in run_step", {
