@@ -484,6 +484,33 @@ filter_effective_value <- function(filter) {
   cb_intersect_domain(filter)
 }
 
+# -- discrete_text comma-separated helpers ------------------------------------
+
+# The discrete_text filter represents its value, choices and domain as a single
+# comma-separated string (e.g. "a, b, c") rather than a character vector. These
+# helpers convert between that string form and a character vector, so all the
+# discrete_text methods share one canonical splitting/joining rule. Splitting
+# trims surrounding whitespace around every value (not just the first), so
+# "a, b, c" yields c("a", "b", "c") and round-trips cleanly.
+
+# Split a comma-separated discrete_text string into a character vector.
+# `NA`/`NULL`/"" yield character(0). Whitespace around each value is trimmed and
+# empty pieces are dropped, so values are matched exactly.
+split_discrete_text <- function(x) {
+  if (is.null(x) || identical(x, NA) || identical(x, "")) {
+    return(character(0L))
+  }
+  pieces <- strsplit(as.character(x), split = ",", fixed = TRUE)[[1L]]
+  pieces <- trimws(pieces)
+  pieces[nzchar(pieces)]
+}
+
+# Join a character vector back into a canonical comma-separated string.
+# An empty vector yields "" (the discrete_text "nothing selected" value).
+join_discrete_text <- function(x) {
+  paste(x, collapse = ",")
+}
+
 # -- Domain intersection -------------------------------------------------------
 
 intersect_domain_discrete <- function(value, domain) {
@@ -494,6 +521,21 @@ intersect_domain_discrete <- function(value, domain) {
     warning("Filter value trimmed to domain.", call. = FALSE)
   }
   result
+}
+
+# discrete_text variant: value and domain are comma-separated strings. Intersect
+# them as sets of trimmed values and return a comma-separated string, so the
+# effective value stays in the same string form the filter expects.
+intersect_domain_discrete_text <- function(value, domain) {
+  if (is.null(domain)) return(value)
+  if (identical(value, NA)) return(domain)
+  value_vec <- split_discrete_text(value)
+  domain_vec <- split_discrete_text(domain)
+  result_vec <- intersect(value_vec, domain_vec)
+  if (!identical(sort(value_vec), sort(result_vec))) {
+    warning("Filter value trimmed to domain.", call. = FALSE)
+  }
+  join_discrete_text(result_vec)
 }
 
 intersect_domain_range <- function(value, domain) {
@@ -540,7 +582,7 @@ S7::method(cb_intersect_domain, CbFilterDiscrete) <- function(filter) {
 }
 
 S7::method(cb_intersect_domain, CbFilterDiscreteText) <- function(filter) {
-  intersect_domain_discrete(filter@value, filter@domain)
+  intersect_domain_discrete_text(filter@value, filter@domain)
 }
 
 S7::method(cb_intersect_domain, CbFilterRange) <- function(filter) {
@@ -595,7 +637,16 @@ intersect_domain_values_discrete <- function(filter, a, b) {
 }
 
 S7::method(cb_intersect_domain_values, CbFilterDiscrete) <- intersect_domain_values_discrete
-S7::method(cb_intersect_domain_values, CbFilterDiscreteText) <- intersect_domain_values_discrete
+
+# discrete_text domains are comma-separated strings; intersect them as sets of
+# trimmed values and return a comma-separated string.
+intersect_domain_values_discrete_text <- function(filter, a, b) {
+  if (is.null(a)) return(b)
+  if (is.null(b)) return(a)
+  join_discrete_text(intersect(split_discrete_text(a), split_discrete_text(b)))
+}
+
+S7::method(cb_intersect_domain_values, CbFilterDiscreteText) <- intersect_domain_values_discrete_text
 
 intersect_domain_values_range <- function(filter, a, b) {
   if (is.null(a)) return(b)
@@ -637,8 +688,12 @@ S7::method(cb_domain_from_cache, CbFilterDiscrete) <- function(filter, cache) {
 }
 
 S7::method(cb_domain_from_cache, CbFilterDiscreteText) <- function(filter, cache) {
+  # discrete_text caches `choices` as a single comma-separated string of the
+  # distinct observed values (see cb_get_filter_stats), not a named count
+  # vector. The domain is the same comma-separated string form as the filter's
+  # value, so it round-trips through cb_intersect_domain().
   if (is.null(cache$choices)) return(NULL)
-  names(purrr::keep(cache$choices, ~ .x > 0L))
+  join_discrete_text(split_discrete_text(cache$choices))
 }
 
 S7::method(cb_domain_from_cache, CbFilterRange) <- function(filter, cache) {

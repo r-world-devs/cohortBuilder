@@ -499,6 +499,137 @@ test_that("cb_filter_to_expr uses domain as value when range is NA", {
   expect_true(all(data_object$iris$Sepal.Length >= 5 & data_object$iris$Sepal.Length <= 6))
 })
 
+# -- discrete_text comma-separated value / domain -----------------------------
+
+# The discrete_text filter represents its value, choices and domain as a single
+# comma-separated string (e.g. "a, b, c"), unlike the plain discrete filter
+# which uses character vectors and named-count choices. These tests pin that the
+# domain handling stays in the comma-separated string form and round-trips.
+
+test_that("split_discrete_text trims whitespace around every value", {
+  expect_identical(split_discrete_text("a, b, c"), c("a", "b", "c"))
+  expect_identical(split_discrete_text("a,b,c"), c("a", "b", "c"))
+  expect_identical(split_discrete_text("  a ,  b  "), c("a", "b"))
+  expect_identical(split_discrete_text(NA), character(0L))
+  expect_identical(split_discrete_text(""), character(0L))
+  expect_identical(split_discrete_text(NULL), character(0L))
+})
+
+test_that("join_discrete_text produces a comma-separated string", {
+  expect_identical(join_discrete_text(c("a", "b", "c")), "a,b,c")
+  expect_identical(join_discrete_text(character(0L)), "")
+})
+
+test_that("cb_intersect_domain for discrete_text returns a comma string", {
+  f <- filter(
+    type = "discrete_text", id = "g", variable = "g", dataset = "d",
+    value = "a, b", domain = "a,b,c,d"
+  )
+  expect_identical(cb_intersect_domain(f), "a,b")
+})
+
+test_that("cb_intersect_domain for discrete_text returns domain when value is NA", {
+  f <- filter(
+    type = "discrete_text", id = "g", variable = "g", dataset = "d",
+    domain = "a,b,c"
+  )
+  expect_identical(cb_intersect_domain(f), "a,b,c")
+})
+
+test_that("cb_intersect_domain for discrete_text trims value to domain (with warning)", {
+  f <- filter(
+    type = "discrete_text", id = "g", variable = "g", dataset = "d",
+    value = "a, z", domain = "a,b,c"
+  )
+  expect_warning(result <- cb_intersect_domain(f), "trimmed to domain")
+  expect_identical(result, "a")
+})
+
+test_that("cb_intersect_domain for discrete_text is silent when value within domain", {
+  f <- filter(
+    type = "discrete_text", id = "g", variable = "g", dataset = "d",
+    value = "a, b", domain = "a,b,c"
+  )
+  expect_silent(result <- cb_intersect_domain(f))
+  expect_identical(result, "a,b")
+})
+
+test_that("cb_domain_from_cache for discrete_text reads comma-separated choices", {
+  f <- filter(type = "discrete_text", id = "g", variable = "g", dataset = "d")
+  expect_identical(
+    cb_domain_from_cache(f, list(choices = "a,b,c,d")), "a,b,c,d"
+  )
+  expect_null(cb_domain_from_cache(f, list(choices = NULL)))
+})
+
+test_that("cb_domain_from_data for discrete_text returns a comma-separated string", {
+  df <- data.frame(g = c("a", "b", "c", "d", "a"), stringsAsFactors = FALSE)
+  src <- set_source(tblist(d = df))
+  f <- filter(type = "discrete_text", id = "g", variable = "g", dataset = "d")
+  expect_identical(cb_domain_from_data(f, src, list(d = df)), "a,b,c,d")
+})
+
+test_that("cb_intersect_domain_values for discrete_text intersects two comma strings", {
+  f <- filter(type = "discrete_text", id = "g", variable = "g", dataset = "d")
+  expect_identical(
+    cb_intersect_domain_values(f, "a,b,c", "b,c,d"), "b,c"
+  )
+  expect_identical(cb_intersect_domain_values(f, NULL, "a,b"), "a,b")
+  expect_identical(cb_intersect_domain_values(f, "a,b", NULL), "a,b")
+})
+
+test_that("discrete_text filter with domain constrains results", {
+  df <- data.frame(g = c("a", "b", "c", "d", "a", "b"), stringsAsFactors = FALSE)
+  src <- set_source(tblist(d = df))
+  f <- filter(
+    type = "discrete_text", id = "g", variable = "g", dataset = "d",
+    value = "a, b, c", domain = "a,b"
+  )
+  coh <- Cohort$new(src, f)
+  suppressWarnings(coh$run_flow())
+  result <- coh$get_data(1L, state = "post")$d
+  expect_true(all(result$g %in% c("a", "b")))
+  expect_false("c" %in% result$g)
+})
+
+test_that("discrete_text filter splits 3+ space-separated values correctly", {
+  # Regression: sub(" ", "", x) only stripped the FIRST space, so the third
+  # value (" c") kept a leading space and matched nothing.
+  df <- data.frame(g = c("a", "b", "c", "d"), stringsAsFactors = FALSE)
+  src <- set_source(tblist(d = df))
+  f <- filter(
+    type = "discrete_text", id = "g", variable = "g", dataset = "d",
+    value = "a, b, c"
+  )
+  coh <- Cohort$new(src, f)
+  coh$run_flow()
+  result <- coh$get_data(1L, state = "post")$d
+  expect_setequal(unique(result$g), c("a", "b", "c"))
+})
+
+test_that("cache-mode propagation narrows a discrete_text domain", {
+  df <- data.frame(g = c("a", "b", "c", "d"), stringsAsFactors = FALSE)
+  src <- set_source(tblist(d = df))
+  coh <- Cohort$new(
+    src,
+    step(filter(
+      type = "discrete_text", id = "g", variable = "g", dataset = "d",
+      value = "a, b, c"
+    )),
+    step(filter(
+      type = "discrete_text", id = "g", variable = "g", dataset = "d",
+      domain = "a,b,c,d"
+    )),
+    propagate_domains = "cache"
+  )
+  coh$run_flow()
+  # Step 2's domain should be narrowed to the values surviving step 1 (a, b, c).
+  expect_identical(
+    sort(split_discrete_text(coh$get_filter("2", "g")@domain)),
+    c("a", "b", "c")
+  )
+})
+
 # -- filter_domain() ----------------------------------------------------------
 
 test_that("filter_domain() returns the declared domain", {

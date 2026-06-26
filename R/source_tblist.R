@@ -187,10 +187,7 @@ S7::method(cb_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function
   if (!identical(value, NA)) {
     data_object[[dataset]] <- data_object[[dataset]] |>
       dplyr::filter(
-        !!sym(variable) %in% !!strsplit(
-          sub(" ", "", value, fixed = TRUE),
-          split = ",", fixed = TRUE
-        )[[1L]]
+        !!sym(variable) %in% !!split_discrete_text(value)
       )
   }
   attr(data_object[[dataset]], "filtered") <- TRUE
@@ -704,7 +701,7 @@ S7::method(cb_filter_to_expr, list(CbFilterDiscreteText, tblist_class)) <- funct
   value <- cb_intersect_domain(filter)
 
   if (!identical(value, NA)) {
-    split_values <- strsplit(sub(" ", "", value, fixed = TRUE), split = ",", fixed = TRUE)[[1L]]
+    split_values <- split_discrete_text(value)
     rlang::expr({
       data_object[[!!dataset]] <- data_object[[!!dataset]] |>
         dplyr::filter(!!sym(variable) %in% !!split_values)
@@ -1131,7 +1128,15 @@ domain_from_data_discrete_impl <- function(filter, source, data_object, ...) {
 }
 
 S7::method(cb_domain_from_data, list(CbFilterDiscrete, tblist_class)) <- domain_from_data_discrete_impl
-S7::method(cb_domain_from_data, list(CbFilterDiscreteText, tblist_class)) <- domain_from_data_discrete_impl
+
+# discrete_text represents its value/choices/domain as a single comma-separated
+# string, so its data-derived domain must be that string form too (not the
+# character vector used by the plain discrete filter), to round-trip through
+# cb_intersect_domain() and match the `choices` stat.
+S7::method(cb_domain_from_data, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, data_object, ...) {
+  values <- domain_from_data_discrete_impl(filter, source, data_object, ...)
+  join_discrete_text(values)
+}
 
 domain_from_data_range_impl <- function(filter, source, data_object, ...) {
   column <- stats::na.omit(data_object[[filter@dataset]][[filter@variable]])
