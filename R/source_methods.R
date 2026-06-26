@@ -174,11 +174,11 @@ Source <- R6::R6Class(
     calc_meta_stats = function() {
       keep_meta_stats <- getOption("cb.source_filters_meta_stats", TRUE)
       if (!is.null(private$meta_filters) && keep_meta_stats) {
-        self$meta_stats <- .get_stats(self, self$dtvalue)
-        self$meta_stats$changed <- FALSE
+        # Mirror the cache slot layout: data stats under `$source`, filter stats
+        # under `$filters`. This object seeds cache slot "0" in init_source.
+        self$meta_stats <- list(source = .get_stats(self, self$dtvalue))
         for (filter_obj in self$available_filters) {
           self$meta_stats$filters[[filter_obj@id]] <- cb_get_filter_stats(filter_obj, self, self$dtvalue)
-          self$meta_stats$filters[[filter_obj@id]]$changed <- FALSE
         }
       }
       return(self$meta_stats)

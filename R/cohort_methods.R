@@ -567,7 +567,10 @@ Cohort <- R6::R6Class(
 
       attrition_count <- .get_attrition_count(
         source = self$get_source(),
-        data_stats = private$cache,
+        # Pass only the data-stats part of each slot. This keeps the
+        # .get_attrition_count() extension contract stable (it receives per-step
+        # data stats, not the raw cache that now also nests filter stats).
+        data_stats = purrr::map(private$cache, "source"),
         ...
       )
 
@@ -953,17 +956,17 @@ Cohort <- R6::R6Class(
         cache_id <- prev_step(step_id)
       }
       if (missing(filter_id)) {
-        prev_cache <- private$cache[[cache_id]]
-        cache_changed <- FALSE
-        private$cache[[cache_id]] <- .get_stats(private$source, self$get_data(step_id, state, FALSE))
-        if (!identical(prev_cache, private$cache[[cache_id]])) {
-          cache_changed <- TRUE
-        }
-        private$cache[[cache_id]]$changed <- cache_changed
+        # Data stats live in their own `$source` sub-object, separate from the
+        # filter stats in `$filters`. Writing here therefore no longer wipes any
+        # already-computed filter stats in the same slot, and lets get_cache()
+        # detect absent data stats unambiguously (presence of `$filters` alone no
+        # longer masks missing `$source`).
+        private$cache[[cache_id]]$source <- .get_stats(
+          private$source, self$get_data(step_id, state, FALSE)
+        )
       } else {
         filter <- self$get_filter(step_id, filter_id)
         prev_cache <- private$cache[[cache_id]]$filters[[filter_id]]
-        cache_changed <- FALSE
         if (is.null(name)) {
           # Compute the full statistics set for the filter.
           new_stats <- cb_get_filter_stats(filter, private$source, self$get_data(step_id, state, FALSE))
@@ -981,10 +984,6 @@ Cohort <- R6::R6Class(
           )
         }
         private$cache[[cache_id]]$filters[[filter_id]] <- new_stats
-        if (!identical(prev_cache, private$cache[[cache_id]]$filters[[filter_id]])) {
-          cache_changed <- TRUE
-        }
-        private$cache[[cache_id]]$filters[[filter_id]]$changed <- cache_changed
       }
     },
     #' @description
@@ -1006,7 +1005,12 @@ Cohort <- R6::R6Class(
         cache_id <- prev_step(step_id)
       }
       if (missing(filter_id)) {
-        res <- private$cache[[cache_id]]
+        # Data stats live under `$source`. Reading that sub-object (not the whole
+        # slot) means the presence check below is unaffected by any filter stats
+        # already stored in `$filters` of the same slot: a slot that only holds
+        # lazily-computed filter stats (e.g. run_button-pending) is correctly
+        # treated as missing its data stats and recomputed.
+        res <- private$cache[[cache_id]]$source
       } else {
         res <- private$cache[[cache_id]]$filters[[filter_id]]
       }

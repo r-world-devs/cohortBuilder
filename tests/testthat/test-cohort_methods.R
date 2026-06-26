@@ -730,6 +730,58 @@ test_that("Caching works fine", {
   expect_identical(coh$get_cache("1", "species_filter", state = "post")$n_missing, 0L)
 })
 
+test_that("cache separates data stats ($source) from filter stats ($filters)", {
+  # Data (source) statistics and filter statistics live in distinct sub-objects
+  # of a cache slot. This keeps a step-level update from wiping already-computed
+  # filter stats and lets get_cache() detect absent data stats unambiguously.
+  coh <- Cohort$new(
+    set_source(tblist(iris = iris)),
+    discrete_iris_one
+  )
+  coh$run_flow()
+
+  priv <- coh$.__enclos_env__$private
+  # Slot 1 (step 1 post) holds both kinds of stats, each under its own key.
+  expect_true(!is.null(priv$cache[["1"]]$source))
+  expect_true(!is.null(priv$cache[["1"]]$filters$species_filter))
+  # Data stats are nested per dataset under $source.
+  expect_identical(priv$cache[["1"]]$source$iris$n_rows, 100L)
+
+  # The dropped bookkeeping flag must not reappear in either sub-object.
+  expect_false("changed" %in% names(priv$cache[["1"]]$source))
+  expect_false("changed" %in% names(priv$cache[["1"]]$filters$species_filter))
+
+  # Step-level get_cache() returns the $source sub-object directly.
+  expect_identical(coh$get_cache("1", state = "pre")$iris$n_rows, 150L)
+  expect_identical(coh$get_cache("1", state = "post")$iris$n_rows, 100L)
+})
+
+test_that("get_cache recomputes data stats when only filter stats are cached", {
+  # Regression (run_button-pending): filter stats can be computed lazily before
+  # any run, leaving cache[[slot]]$filters populated but $source (data stats)
+  # absent. The step-level get_cache() must not treat the slot as complete just
+  # because $filters exists -- it must recompute the missing data stats instead
+  # of returning NULL (which surfaced as the "No data selected in previous step."
+  # placeholder in the UI).
+  coh <- Cohort$new(
+    set_source(tblist(iris = iris)),
+    discrete_iris_one,
+    cache = FALSE
+  )
+  priv <- coh$.__enclos_env__$private
+
+  # Lazily compute a single filter stat for step 1's pre snapshot. This creates
+  # slot "0" with $filters but no $source.
+  invisible(coh$get_cache("1", "species_filter", state = "pre", name = "n_data"))
+  expect_true(!is.null(priv$cache[["0"]]$filters))
+  expect_null(priv$cache[["0"]]$source)
+
+  # The step-level read recomputes the absent data stats rather than returning
+  # the (filter-only) slot as if data stats were present.
+  pre <- coh$get_cache("1", state = "pre", .recalc_when_missing = TRUE)
+  expect_identical(pre$iris$n_rows, 150L)
+})
+
 test_that("get_cache returns fresh post-stats after re-run when caching is disabled", {
   # Regression: with cache = FALSE, run_step does not refresh stored stats.
   # A post-stat read lazily before a re-run used to leave a stale value in
