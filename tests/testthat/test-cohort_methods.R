@@ -1216,7 +1216,11 @@ test_that("Restoring cohort configurations trigger data calculations works fine"
 
   coh$add_filter(range_iris_one, 2L)
   expect_false(identical(get_state(coh_2), get_state(coh)))
-  expect_null(get_data(coh))
+  # add_filter() seeds a newly created step's data slot from its parent's
+  # snapshot (matching add_step()/init_source()), so the un-run step exposes the
+  # parent data rather than NULL. The step is still pending until run.
+  expect_false(is.null(get_data(coh)))
+  expect_true(coh$is_pending("2"))
 
   restore(coh, pre_state, run_flow = TRUE)
 

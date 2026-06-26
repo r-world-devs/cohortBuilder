@@ -236,11 +236,35 @@ Cohort <- R6::R6Class(
         }
       }
       step_id <- as.character(step_id)
+      # Detect whether this call brings the step into existence (it has no
+      # filters yet). A brand-new step needs its data/cache slot seeded from its
+      # parent, the same way add_step()/init_source() seed steps created through
+      # those paths.
+      step_is_new <- is.null(private$steps[[step_id]]) ||
+        length(private$steps[[step_id]]$filters) == 0L
 
       run_hooks(hook$pre, self, private, step_id = step_id, filter = filter)
 
       private$steps[[step_id]]$filters[[filter@id]] <- assign_filter_step_id(filter, step_id)
       private$steps[[step_id]]$id <- step_id
+      # An un-run step is treated as if it has no filters configured: seed the
+      # new step's data/cache from its parent's snapshot so it is renderable
+      # without running the cohort (run_button mode / cache=FALSE). add_step()
+      # and init_source() seed steps the same way; add_filter() must too when it
+      # is the call that brings the step into existence. The seeded snapshot
+      # equals the step's own input until its filters run; a later run_flow
+      # overwrites it.
+      if (step_is_new) {
+        parent_id <- prev_step(step_id)
+        if (is.null(private$data_objects[[step_id]]) &&
+            !is.null(private$data_objects[[parent_id]])) {
+          private$data_objects[[step_id]] <- private$data_objects[[parent_id]]
+        }
+        if (is.null(private$cache[[step_id]]) &&
+            !is.null(private$cache[[parent_id]])) {
+          private$cache[[step_id]] <- private$cache[[parent_id]]
+        }
+      }
       # Adding a filter narrows this step and every downstream step.
       self$set_pending_cascade(step_id)
       # "filter" mode: this step's domain may now restrict downstream copies.
