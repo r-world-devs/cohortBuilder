@@ -10,7 +10,7 @@ dt_source <- set_source(
   description = list(
     iris = list(
       dataset_ = describe("dataset related to iris plants"),
-      Sepal.Length = describe("filter for the sepal length measurement", stats = c("never", "auto")),
+      Sepal.Length = describe("filter for the sepal length measurement"),
       Petal.Length = describe("filter for the petal length measurement"),
       Sepal.Width = describe("filter for the sepal width measurement"),
       Petal.Width = describe("filter for the petal width measurement"),

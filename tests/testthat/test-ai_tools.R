@@ -78,10 +78,15 @@ test_that("cb_tool_filters_meta fun returns valid JSON", {
   t <- cb_tool_filters_meta(coh)
   result <- t$fun()
   expect_type(result, "character")
-  parsed <- jsonlite::fromJSON(result)
-  expect_true("dataset" %in% names(parsed))
-  expect_true("filter" %in% names(parsed))
-  expect_true("description" %in% names(parsed))
+  parsed <- jsonlite::fromJSON(result, simplifyVector = FALSE)
+  expect_named(parsed, c("datasets", "filters"))
+  expect_true("iris" %in% names(parsed$datasets))
+  expect_true("Species" %in% names(parsed$filters))
+  species <- parsed$filters$Species
+  expect_identical(species$dataset, "iris")
+  expect_identical(species$type, "discrete")
+  expect_true(nzchar(species$description))
+  expect_identical(species$variables[[1L]]$name, "Species")
 })
 
 test_that("cb_tool_filters_meta handles missing available_filters", {

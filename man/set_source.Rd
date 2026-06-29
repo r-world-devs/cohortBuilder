@@ -39,6 +39,10 @@ When provided, used as a part of reproducible code output.}
 
 \item{description}{A named list storing the source objects description.
 Can be accessed with \link{description} Cohort method.}
+
+\item{compute_meta_stats}{Whether to pre-compute metadata statistics for the source
+`available_filters`. When `FALSE`, the computation is skipped and filter domains
+fall back to live computation. Defaults to the `cb.source_filters_meta_stats` option (`TRUE`).}
 }
 \value{
 R6 object of class inherited from `dtconn`.

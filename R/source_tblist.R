@@ -973,55 +973,87 @@ S7::method(cb_filter_to_expr, list(CbFilterQuery, tblist_class)) <- function(fil
   pipe_all_filters(code_data)
 }
 
+# Extract a plain description string from a `describe()` object (a list with a
+# `text` field), a bare character string, or `NULL`. Returns `NULL` when no
+# usable text is found.
+description_text <- function(x) {
+  if (is.null(x)) return(NULL)
+  if (is.list(x)) x <- x$text
+  if (is.null(x) || !is.character(x) || !nzchar(x)) return(NULL)
+  x
+}
+
+# Build the structured list of variables a filter operates on: one entry per
+# variable with its name and the description looked up from the source
+# description (`NA` when undescribed).
+build_filter_variables <- function(filter, source) {
+  vars <- filter_variables(filter)
+  dataset_desc <- source$description[[filter@dataset]]
+  purrr::map(vars, function(v) {
+    list(name = v, description = description_text(dataset_desc[[v]]) %||% NA_character_)
+  })
+}
+
+# Build a single human-readable description for a filter, combining the filter
+# name and the filter-level description (when set). The attached variables and
+# their descriptions are exposed separately in the `variables` field.
+build_filter_description <- function(filter) {
+  parts <- c(filter@name, description_text(filter@description))
+  paste(parts, collapse = ". ")
+}
+
+# Resolve a filter's domain: prefer the declared domain, otherwise derive it
+# from the cached meta stats (e.g. observed choices / min-max).
+filter_shape_domain <- function(filter, source) {
+  domain <- filter@domain
+  if (!is.null(domain)) return(domain)
+  cache <- source$meta_stats$filters[[filter@id]]
+  if (is.null(cache)) return(NULL)
+  cb_domain_from_cache(filter, cache)
+}
+
 #' @export
 shape.tblist <- function(source, field, subfield, ...) {
   description_obj <- source$description
-  if (missing(subfield)) {
-    subfield <- "dataset_"
-  }
+
+  # Description lookup mode: `shape(source, field[, subfield])` returns the
+  # description text for a dataset (default) or one of its fields. Used by the
+  # Cohort `show_help()` method.
   if (!missing(field)) {
+    if (missing(subfield)) {
+      subfield <- "dataset_"
+    }
     field_val <- description_obj[[field]]
     if (is.character(field_val)) {
       return(field_val)
     }
     return(field_val[[subfield]]$text)
   }
-  purrr::imap_dfr(
-    description_obj,
-    function(fields, dataset_name) {
-      purrr::imap_dfr(
-        fields,
-        function(field, field_name) {
-          stats_container <- source$meta_stats$filters
-          if (field_name == "dataset_") {
-            field_name <- NA
-          }
-          stats <- source$meta_stats$filters[[field_name]]
-          stats <- stats[names(stats) %in% c("min", "max", "choices")]
-          stats$type <- "range"
-          if ("choices" %in% names(stats)) {
-            stats$choices <- names(stats$choices)
-            stats$type <- "discrete"
-          }
-          domain_value <- NULL
-          available <- source$available_filters
-          if (!is.null(available) && !is.na(field_name)) {
-            match_idx <- purrr::detect_index(available, ~ .x@id == field_name)
-            if (match_idx > 0L) {
-              domain_value <- available[[match_idx]]@domain
-            }
-          }
-          if (is.null(domain_value)) {
-            domain_value <- field$domain
-          }
-          tibble::tibble(
-            dataset = dataset_name, filter = field_name, description = field,
-            domain = list(domain_value),
-            stats = list(stats)
-          )
-        }
+
+  # Metadata mode: return a structured list describing datasets and the
+  # available filters, intended for LLM tools and programmatic inspection.
+  dataset_names <- names(source$dtconn)
+  datasets <- purrr::map(
+    rlang::set_names(dataset_names),
+    ~ description_text(description_obj[[.x]][["dataset_"]]) %||% NA_character_
+  )
+
+  filters <- source$available_filters %||% list()
+  filters_shape <- filters |>
+    purrr::map(function(filter) {
+      list(
+        dataset = filter@dataset,
+        type = filter@type,
+        description = build_filter_description(filter),
+        variables = build_filter_variables(filter, source),
+        domain = filter_shape_domain(filter, source)
       )
-    }
+    }) |>
+    rlang::set_names(purrr::map_chr(filters, ~ .x@id))
+
+  list(
+    datasets = datasets,
+    filters = filters_shape
   )
 }
 

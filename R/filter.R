@@ -450,6 +450,23 @@ get_filter_params <- function(filter, name) {
   all_props
 }
 
+#' Get the variables a filter operates on
+#'
+#' Returns the column name(s) a filter is bound to, regardless of whether the
+#' filter stores them in a single-variable property (`variable`) or a
+#' multi-variable property (`variables`).
+#'
+#' @param filter S7 filter object.
+#' @return Character vector of variable (column) names. Empty when the filter
+#'   declares no variables.
+#' @export
+filter_variables <- function(filter) {
+  props <- S7::props(filter)
+  vars <- props$variables %||% props$variable
+  if (is.null(vars)) return(character(0L))
+  as.character(vars)
+}
+
 #' Get a filter's domain
 #'
 #' Returns the declared domain (universe of valid values) attached to a filter,
@@ -513,12 +530,23 @@ join_discrete_text <- function(x) {
 
 # -- Domain intersection -------------------------------------------------------
 
-intersect_domain_discrete <- function(value, domain) {
+# Identifies the filter in trimming warnings. `id` is the filter id (may be
+# missing/empty when the helpers are called without one).
+trim_label <- function(id = NULL) {
+  if (is.null(id) || !nzchar(id)) return("Filter value")
+  sprintf("Filter '%s' value", id)
+}
+
+intersect_domain_discrete <- function(value, domain, id = NULL) {
   if (is.null(domain)) return(value)
   if (identical(value, NA)) return(domain)
   result <- intersect(value, domain)
   if (!identical(sort(as.character(value)), sort(as.character(result)))) {
-    warning("Filter value trimmed to domain.", call. = FALSE)
+    dropped <- setdiff(as.character(value), as.character(result))
+    warning(sprintf(
+      "%s trimmed to domain: removed %s (not in domain).",
+      trim_label(id), paste(dropped, collapse = ", ")
+    ), call. = FALSE)
   }
   result
 }
@@ -526,36 +554,54 @@ intersect_domain_discrete <- function(value, domain) {
 # discrete_text variant: value and domain are comma-separated strings. Intersect
 # them as sets of trimmed values and return a comma-separated string, so the
 # effective value stays in the same string form the filter expects.
-intersect_domain_discrete_text <- function(value, domain) {
+intersect_domain_discrete_text <- function(value, domain, id = NULL) {
   if (is.null(domain)) return(value)
   if (identical(value, NA)) return(domain)
   value_vec <- split_discrete_text(value)
   domain_vec <- split_discrete_text(domain)
   result_vec <- intersect(value_vec, domain_vec)
   if (!identical(sort(value_vec), sort(result_vec))) {
-    warning("Filter value trimmed to domain.", call. = FALSE)
+    dropped <- setdiff(value_vec, result_vec)
+    warning(sprintf(
+      "%s trimmed to domain: removed %s (not in domain).",
+      trim_label(id), paste(dropped, collapse = ", ")
+    ), call. = FALSE)
   }
   join_discrete_text(result_vec)
 }
 
-intersect_domain_range <- function(value, domain) {
+intersect_domain_range <- function(value, domain, id = NULL) {
   if (is.null(domain)) return(value)
   if (identical(value, NA)) return(domain)
   result <- c(max(value[1L], domain[1L]), min(value[2L], domain[2L]))
   if (!identical(value, result)) {
-    warning("Filter value trimmed to domain.", call. = FALSE)
+    warning(sprintf(
+      "%s trimmed to domain: [%s, %s] narrowed to [%s, %s].",
+      trim_label(id),
+      format(value[1L]), format(value[2L]),
+      format(result[1L]), format(result[2L])
+    ), call. = FALSE)
   }
   result
 }
 
-intersect_domain_multi <- function(values, domain) {
+intersect_domain_multi <- function(values, domain, id = NULL) {
   if (is.null(domain)) return(values)
   if (identical(values, NA)) return(domain)
   result <- purrr::imap(values, function(val, nm) {
     if (nm %in% names(domain)) intersect(val, domain[[nm]]) else val
   })
   if (!identical(values, result)) {
-    warning("Filter value trimmed to domain.", call. = FALSE)
+    dropped <- purrr::imap_chr(values, function(val, nm) {
+      out <- setdiff(as.character(val), as.character(result[[nm]]))
+      if (length(out) == 0L) return(NA_character_)
+      sprintf("%s=%s", nm, paste(out, collapse = ", "))
+    })
+    dropped <- dropped[!is.na(dropped)]
+    warning(sprintf(
+      "%s trimmed to domain: removed %s (not in domain).",
+      trim_label(id), paste(dropped, collapse = "; ")
+    ), call. = FALSE)
   }
   result
 }
@@ -578,27 +624,27 @@ S7::method(cb_intersect_domain, CbFilter) <- function(filter) {
 }
 
 S7::method(cb_intersect_domain, CbFilterDiscrete) <- function(filter) {
-  intersect_domain_discrete(filter@value, filter@domain)
+  intersect_domain_discrete(filter@value, filter@domain, filter@id)
 }
 
 S7::method(cb_intersect_domain, CbFilterDiscreteText) <- function(filter) {
-  intersect_domain_discrete_text(filter@value, filter@domain)
+  intersect_domain_discrete_text(filter@value, filter@domain, filter@id)
 }
 
 S7::method(cb_intersect_domain, CbFilterRange) <- function(filter) {
-  intersect_domain_range(filter@range, filter@domain)
+  intersect_domain_range(filter@range, filter@domain, filter@id)
 }
 
 S7::method(cb_intersect_domain, CbFilterDateRange) <- function(filter) {
-  intersect_domain_range(filter@range, filter@domain)
+  intersect_domain_range(filter@range, filter@domain, filter@id)
 }
 
 S7::method(cb_intersect_domain, CbFilterDatetimeRange) <- function(filter) {
-  intersect_domain_range(filter@range, filter@domain)
+  intersect_domain_range(filter@range, filter@domain, filter@id)
 }
 
 S7::method(cb_intersect_domain, CbFilterMultiDiscrete) <- function(filter) {
-  intersect_domain_multi(filter@values, filter@domain)
+  intersect_domain_multi(filter@values, filter@domain, filter@id)
 }
 
 S7::method(cb_intersect_domain, CbFilterQuery) <- function(filter) {

@@ -59,22 +59,25 @@ cb_tool_filters_meta <- function(cohort) {
       return("No filters metadata available. Use autofilter(attach_as = 'meta') on the source first.")
     }
     filters_meta <- shape(source)
-    as.character(jsonlite::toJSON(filters_meta, auto_unbox = TRUE))
+    as.character(jsonlite::toJSON(filters_meta, auto_unbox = TRUE, na = "null", null = "null"))
   }
 
   cb_tool(
     fun = fun,
     name = "cb_get_filters_meta",
     description = paste(
-      "Returns information about available filters in JSON format.",
-      "The JSON is a set of objects, each describing either a dataset",
-      "(when the 'filter' field is NA) or a filter (otherwise).",
-      "The 'filter' field stores the filter id.",
-      "The 'dataset' field stores the dataset name the filter belongs to.",
-      "The 'description' field stores the filter's purpose.",
-      "The 'stats' field stores filter limits:",
-      "'choices' lists available options,",
-      "'range' provides the numerical bounds the filter operates within."
+      "Returns metadata about the datasets and available filters in JSON format.",
+      "The JSON has two top-level keys:",
+      "'datasets' - an object keyed by dataset name, mapping each dataset to its description (or null).",
+      "'filters' - an object keyed by filter id, where each value describes one filter with fields:",
+      "'dataset' (the dataset the filter belongs to),",
+      "'type' (the filter type, e.g. 'discrete', 'range', 'date_range'),",
+      "'description' (a human-readable summary combining the filter name, its purpose and its variables),",
+      "'variables' (an array of objects, each with 'name' and 'description', for the columns the filter covers),",
+      "'domain' (the set of valid values the filter accepts:",
+      "an array of allowed values for discrete-type filters,",
+      "or a two-element [min, max] array for range-type filters).",
+      "Use the filter id keys when referring to filters in other tools."
     )
   )
 }

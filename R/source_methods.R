@@ -17,17 +17,23 @@ Source <- R6::R6Class(
     #' @param description A named list storing the source objects description.
     #'   Can be accessed with \link{description} Cohort method.
     #' @param available_filters List of filter definitions available for the source.
+    #' @param compute_meta_stats Whether to pre-compute metadata statistics for `available_filters`.
+    #'   When `FALSE`, `meta_stats` are skipped (and filter domains fall back to live computation).
+    #'   Defaults to the `cb.source_filters_meta_stats` option (`TRUE`).
     #' @param options List of options affecting methods output. Currently supported only `display_binding`
     #'   specifying whether reproducible code should include bindings definition.
     #' @return A new `Source` object of class `Source` (and `dtconn` object class appended).
     initialize = function(
       dtconn, ..., primary_keys = NULL, binding_keys = NULL, source_code = NULL,
-      description = NULL, available_filters = NULL, options = list(display_binding = TRUE)
+      description = NULL, available_filters = NULL,
+      compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE),
+      options = list(display_binding = TRUE)
       ) {
 
       self$dtconn <- dtconn
       class(self) <- c(class(dtconn), class(self))
       self$dtvalue <- .init_step(self)
+      self$compute_meta_stats <- compute_meta_stats
       self$available_filters <- available_filters
       self$attributes <- list(...)
       self$source_code <- source_code
@@ -157,6 +163,8 @@ Source <- R6::R6Class(
     dtvalue = NULL,
     #' @field meta_stats Computed metadata statistics for available filters.
     meta_stats = NULL,
+    #' @field compute_meta_stats Whether metadata statistics for available filters are pre-computed.
+    compute_meta_stats = TRUE,
     #' @field description Source object description list.
     description = NULL,
     #' @field attributes Extra source parameters passed when source is defined.
@@ -172,8 +180,7 @@ Source <- R6::R6Class(
     #' @description
     #' Calculate metadata statistics for available filters.
     calc_meta_stats = function() {
-      keep_meta_stats <- getOption("cb.source_filters_meta_stats", TRUE)
-      if (!is.null(private$meta_filters) && keep_meta_stats) {
+      if (!is.null(private$meta_filters) && isTRUE(self$compute_meta_stats)) {
         # Mirror the cache slot layout: data stats under `$source`, filter stats
         # under `$filters`. This object seeds cache slot "0" in init_source.
         self$meta_stats <- list(source = .get_stats(self, self$dtvalue))
@@ -243,6 +250,9 @@ check_layer <- function(dtconn) {
 #'     When provided, used as a part of reproducible code output.
 #' @param description A named list storing the source objects description.
 #'     Can be accessed with \link{description} Cohort method.
+#' @param compute_meta_stats Whether to pre-compute metadata statistics for the source
+#'     `available_filters`. When `FALSE`, the computation is skipped and filter domains
+#'     fall back to live computation. Defaults to the `cb.source_filters_meta_stats` option (`TRUE`).
 #' @examples
 #' mtcars_source <- set_source(
 #'   tblist(mtcars = mtcars),

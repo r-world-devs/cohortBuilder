@@ -831,7 +831,7 @@ test_that("autofilter inherits domain from describe()", {
   expect_identical(species_filter@domain, custom_domain)
 })
 
-test_that("shape() returns domain column", {
+test_that("shape() returns datasets and filters lists", {
   custom_domain <- c("setosa", "versicolor")
   source <- set_source(
     tblist(iris = iris),
@@ -844,24 +844,68 @@ test_that("shape() returns domain column", {
   ) |> autofilter(attach_as = "meta")
 
   result <- shape(source)
-  expect_true("domain" %in% names(result))
-  species_row <- result[result$filter == "Species" & !is.na(result$filter), ]
-  expect_identical(species_row$domain[[1L]], custom_domain)
+  expect_named(result, c("datasets", "filters"))
+  expect_identical(result$datasets$iris, "iris data")
+  expect_true("Species" %in% names(result$filters))
+
+  species <- result$filters$Species
+  expect_identical(species$dataset, "iris")
+  expect_identical(species$type, "discrete")
+  expect_identical(species$domain, custom_domain)
+  expect_identical(species$description, "Species")
+  expect_identical(
+    species$variables,
+    list(list(name = "Species", description = "species"))
+  )
 })
 
-test_that("shape() domain falls back to description when no available_filters", {
-  custom_domain <- c("setosa", "versicolor")
+test_that("shape() filters is empty when no available_filters", {
   source <- set_source(
     tblist(iris = iris),
     description = list(
       iris = list(
         dataset_ = describe("iris data"),
-        Species = describe("species", domain = custom_domain)
+        Species = describe("species")
       )
     )
   )
 
   result <- shape(source)
-  species_row <- result[result$filter == "Species" & !is.na(result$filter), ]
-  expect_identical(species_row$domain[[1L]], custom_domain)
+  expect_named(result, c("datasets", "filters"))
+  expect_identical(result$datasets$iris, "iris data")
+  expect_length(result$filters, 0L)
+})
+
+test_that("shape() domain falls back to meta stats when filter domain is unset", {
+  source <- set_source(
+    tblist(iris = iris),
+    description = list(
+      iris = list(dataset_ = describe("iris data"))
+    )
+  ) |> autofilter(attach_as = "meta")
+
+  # Clear the declared domain to force the cache fallback path.
+  source$available_filters <- purrr::map(source$available_filters, function(f) {
+    f@domain <- NULL
+    f
+  })
+
+  result <- shape(source)
+  species <- result$filters$Species
+  expect_setequal(species$domain, as.character(unique(iris$Species)))
+})
+
+test_that("shape(source, field) still returns description text", {
+  source <- set_source(
+    tblist(iris = iris),
+    description = list(
+      iris = list(
+        dataset_ = describe("iris data"),
+        Species = describe("species text")
+      )
+    )
+  ) |> autofilter(attach_as = "meta")
+
+  expect_identical(shape(source, "iris"), "iris data")
+  expect_identical(shape(source, "iris", "Species"), "species text")
 })

@@ -4,324 +4,320 @@
 \alias{Cohort}
 \title{R6 class representing Cohort object.}
 \description{
-R6 class representing Cohort object.
-
-R6 class representing Cohort object.
-}
-\details{
 Cohort object is designed to make operations on source data possible.
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{attributes}}{List of Cohort attributes defined while creating a new Cohort object.}
-}
-\if{html}{\out{</div>}}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{attributes}}{List of Cohort attributes defined while creating a new Cohort object.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-Cohort-new}{\code{Cohort$new()}}
-\item \href{#method-Cohort-add_source}{\code{Cohort$add_source()}}
-\item \href{#method-Cohort-update_source}{\code{Cohort$update_source()}}
-\item \href{#method-Cohort-get_source}{\code{Cohort$get_source()}}
-\item \href{#method-Cohort-get_propagate_domains_mode}{\code{Cohort$get_propagate_domains_mode()}}
-\item \href{#method-Cohort-add_step}{\code{Cohort$add_step()}}
-\item \href{#method-Cohort-copy_step}{\code{Cohort$copy_step()}}
-\item \href{#method-Cohort-remove_step}{\code{Cohort$remove_step()}}
-\item \href{#method-Cohort-add_filter}{\code{Cohort$add_filter()}}
-\item \href{#method-Cohort-remove_filter}{\code{Cohort$remove_filter()}}
-\item \href{#method-Cohort-update_filter}{\code{Cohort$update_filter()}}
-\item \href{#method-Cohort-clear_filter}{\code{Cohort$clear_filter()}}
-\item \href{#method-Cohort-clear_step}{\code{Cohort$clear_step()}}
-\item \href{#method-Cohort-sum_up_state}{\code{Cohort$sum_up_state()}}
-\item \href{#method-Cohort-get_state}{\code{Cohort$get_state()}}
-\item \href{#method-Cohort-restore}{\code{Cohort$restore()}}
-\item \href{#method-Cohort-get_data}{\code{Cohort$get_data()}}
-\item \href{#method-Cohort-plot_data}{\code{Cohort$plot_data()}}
-\item \href{#method-Cohort-show_attrition}{\code{Cohort$show_attrition()}}
-\item \href{#method-Cohort-get_stats}{\code{Cohort$get_stats()}}
-\item \href{#method-Cohort-show_help}{\code{Cohort$show_help()}}
-\item \href{#method-Cohort-get_code}{\code{Cohort$get_code()}}
-\item \href{#method-Cohort-run_flow}{\code{Cohort$run_flow()}}
-\item \href{#method-Cohort-run_step}{\code{Cohort$run_step()}}
-\item \href{#method-Cohort-bind_data}{\code{Cohort$bind_data()}}
-\item \href{#method-Cohort-describe_state}{\code{Cohort$describe_state()}}
-\item \href{#method-Cohort-get_step}{\code{Cohort$get_step()}}
-\item \href{#method-Cohort-get_filter}{\code{Cohort$get_filter()}}
-\item \href{#method-Cohort-update_cache}{\code{Cohort$update_cache()}}
-\item \href{#method-Cohort-get_cache}{\code{Cohort$get_cache()}}
-\item \href{#method-Cohort-list_active_filters}{\code{Cohort$list_active_filters()}}
-\item \href{#method-Cohort-last_step_id}{\code{Cohort$last_step_id()}}
-\item \href{#method-Cohort-is_pending}{\code{Cohort$is_pending()}}
-\item \href{#method-Cohort-set_pending}{\code{Cohort$set_pending()}}
-\item \href{#method-Cohort-set_pending_cascade}{\code{Cohort$set_pending_cascade()}}
-\item \href{#method-Cohort-set_domain}{\code{Cohort$set_domain()}}
-\item \href{#method-Cohort-propagate_domains_to}{\code{Cohort$propagate_domains_to()}}
-\item \href{#method-Cohort-propagate_filter_domains}{\code{Cohort$propagate_filter_domains()}}
-\item \href{#method-Cohort-modify}{\code{Cohort$modify()}}
-\item \href{#method-Cohort-clone}{\code{Cohort$clone()}}
-}
+  \itemize{
+    \item \href{#method-Cohort-initialize}{\code{Cohort$new()}}
+    \item \href{#method-Cohort-add_source}{\code{Cohort$add_source()}}
+    \item \href{#method-Cohort-update_source}{\code{Cohort$update_source()}}
+    \item \href{#method-Cohort-get_source}{\code{Cohort$get_source()}}
+    \item \href{#method-Cohort-get_propagate_domains_mode}{\code{Cohort$get_propagate_domains_mode()}}
+    \item \href{#method-Cohort-add_step}{\code{Cohort$add_step()}}
+    \item \href{#method-Cohort-copy_step}{\code{Cohort$copy_step()}}
+    \item \href{#method-Cohort-remove_step}{\code{Cohort$remove_step()}}
+    \item \href{#method-Cohort-add_filter}{\code{Cohort$add_filter()}}
+    \item \href{#method-Cohort-remove_filter}{\code{Cohort$remove_filter()}}
+    \item \href{#method-Cohort-update_filter}{\code{Cohort$update_filter()}}
+    \item \href{#method-Cohort-clear_filter}{\code{Cohort$clear_filter()}}
+    \item \href{#method-Cohort-clear_step}{\code{Cohort$clear_step()}}
+    \item \href{#method-Cohort-sum_up_state}{\code{Cohort$sum_up_state()}}
+    \item \href{#method-Cohort-get_state}{\code{Cohort$get_state()}}
+    \item \href{#method-Cohort-restore}{\code{Cohort$restore()}}
+    \item \href{#method-Cohort-get_data}{\code{Cohort$get_data()}}
+    \item \href{#method-Cohort-plot_data}{\code{Cohort$plot_data()}}
+    \item \href{#method-Cohort-show_attrition}{\code{Cohort$show_attrition()}}
+    \item \href{#method-Cohort-get_stats}{\code{Cohort$get_stats()}}
+    \item \href{#method-Cohort-show_help}{\code{Cohort$show_help()}}
+    \item \href{#method-Cohort-get_code}{\code{Cohort$get_code()}}
+    \item \href{#method-Cohort-run_flow}{\code{Cohort$run_flow()}}
+    \item \href{#method-Cohort-run_step}{\code{Cohort$run_step()}}
+    \item \href{#method-Cohort-bind_data}{\code{Cohort$bind_data()}}
+    \item \href{#method-Cohort-describe_state}{\code{Cohort$describe_state()}}
+    \item \href{#method-Cohort-get_step}{\code{Cohort$get_step()}}
+    \item \href{#method-Cohort-get_filter}{\code{Cohort$get_filter()}}
+    \item \href{#method-Cohort-update_cache}{\code{Cohort$update_cache()}}
+    \item \href{#method-Cohort-get_cache}{\code{Cohort$get_cache()}}
+    \item \href{#method-Cohort-list_active_filters}{\code{Cohort$list_active_filters()}}
+    \item \href{#method-Cohort-last_step_id}{\code{Cohort$last_step_id()}}
+    \item \href{#method-Cohort-is_pending}{\code{Cohort$is_pending()}}
+    \item \href{#method-Cohort-set_pending}{\code{Cohort$set_pending()}}
+    \item \href{#method-Cohort-set_pending_cascade}{\code{Cohort$set_pending_cascade()}}
+    \item \href{#method-Cohort-set_domain}{\code{Cohort$set_domain()}}
+    \item \href{#method-Cohort-propagate_domains_to}{\code{Cohort$propagate_domains_to()}}
+    \item \href{#method-Cohort-propagate_filter_domains}{\code{Cohort$propagate_filter_domains()}}
+    \item \href{#method-Cohort-modify}{\code{Cohort$modify()}}
+    \item \href{#method-Cohort-clone}{\code{Cohort$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Cohort-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Cohort-new}{}}}
-\subsection{Method \code{new()}}{
-Create Cohort object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$new(
+\if{html}{\out{<a id="method-Cohort-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-initialize}{}}}
+\subsection{\code{Cohort$new()}}{
+  Create Cohort object.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$new(
   source,
   ...,
   run_flow = FALSE,
   cache = TRUE,
   propagate_domains = c("none", "filter", "cache", "data"),
   hook = list(pre = get_hook("pre_cohort_hook"), post = get_hook("post_cohort_hook"))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{source}}{Source object created with \link{set_source}.}
-
-\item{\code{...}}{Steps definition (optional). Can be also defined as a sequence of
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{source}}{Source object created with \link{set_source}.}
+      \item{\code{...}}{Steps definition (optional). Can be also defined as a sequence of
 filters - the filters will be added to the first step.}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-
-\item{\code{cache}}{If `TRUE` (default), filter statistics are cached after each step.
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{cache}}{If `TRUE` (default), filter statistics are cached after each step.
 Set to `FALSE` to skip cache computation (useful for metadata-only operation).}
-
-\item{\code{propagate_domains}}{Domain propagation mode between steps.
+      \item{\code{propagate_domains}}{Domain propagation mode between steps.
 One of `"none"` (default, no propagation), `"filter"` (derive from
 previous step filter values), `"cache"` (derive from cached statistics),
 or `"data"` (scan filtered data). `"cache"` requires `cache = TRUE`;
 use `"data"` for the cache-free equivalent.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The object of class `Cohort`.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The object of class `Cohort`.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-add_source"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-add_source}{}}}
-\subsection{Method \code{add_source()}}{
-Add Source to Cohort object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$add_source(source)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$add_source()}}{
+  Add Source to Cohort object.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$add_source(source)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{source}}{Source object created with \link{set_source}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{source}}{Source object created with \link{set_source}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-update_source"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-update_source}{}}}
-\subsection{Method \code{update_source()}}{
-Update Source in the Cohort object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_source(
+\subsection{\code{Cohort$update_source()}}{
+  Update Source in the Cohort object.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$update_source(
   source,
   keep_steps = !has_steps(source),
   run_flow = FALSE,
   hook = list(pre = get_hook("pre_update_source_hook"), post =
     get_hook("post_update_source_hook"))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{source}}{Source object created with \link{set_source}.}
-
-\item{\code{keep_steps}}{If `TRUE`, steps definition remains unchanged when updating source.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{source}}{Source object created with \link{set_source}.}
+      \item{\code{keep_steps}}{If `TRUE`, steps definition remains unchanged when updating source.
 If `FALSE` steps configuration is deleted.
 If vector of type integer, specified steps will remain.}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-get_source"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-get_source}{}}}
-\subsection{Method \code{get_source()}}{
-Return Source object attached to Cohort.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_source()}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$get_source()}}{
+  Return Source object attached to Cohort.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$get_source()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-get_propagate_domains_mode"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-get_propagate_domains_mode}{}}}
-\subsection{Method \code{get_propagate_domains_mode()}}{
-Return the configured domain propagation mode.
+\subsection{\code{Cohort$get_propagate_domains_mode()}}{
+  Return the configured domain propagation mode.
 
 One of `"none"`, `"filter"`, `"cache"` or `"data"`. Read-only; the mode is
 fixed at construction. UI layers can inspect it (e.g. to validate that a
 domain-based rendering strategy is compatible with the cohort).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_propagate_domains_mode()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$get_propagate_domains_mode()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-add_step"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-add_step}{}}}
-\subsection{Method \code{add_step()}}{
-Add filtering step definition
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$add_step(
+\subsection{\code{Cohort$add_step()}}{
+  Add filtering step definition
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$add_step(
   step,
   run_flow = FALSE,
   hook = list(pre = get_hook("pre_add_step_hook"), post = get_hook("post_add_step_hook"))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step}}{Step definition created with \link{step}.}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step}}{Step definition created with \link{step}.}
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-copy_step"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-copy_step}{}}}
-\subsection{Method \code{copy_step()}}{
-Copy selected step.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$copy_step(step_id, filters, run_flow = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step to be copied. If missing the last step is taken.
+\subsection{\code{Cohort$copy_step()}}{
+  Copy selected step.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$copy_step(step_id, filters, run_flow = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step to be copied. If missing the last step is taken.
 The copied step is added as the last one in the Cohort.}
+      \item{\code{filters}}{List of Source-evaluated filters to copy to new step.}
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
 
-\item{\code{filters}}{List of Source-evaluated filters to copy to new step.}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-remove_step"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-remove_step}{}}}
-\subsection{Method \code{remove_step()}}{
-Remove filtering step definition
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$remove_step(
+\subsection{\code{Cohort$remove_step()}}{
+  Remove filtering step definition
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$remove_step(
   step_id,
   run_flow = FALSE,
   hook = list(pre = get_hook("pre_rm_step_hook"), post = get_hook("post_rm_step_hook"))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step to remove.}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step to remove.}
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-add_filter"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-add_filter}{}}}
-\subsection{Method \code{add_filter()}}{
-Add filter definition
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$add_filter(
+\subsection{\code{Cohort$add_filter()}}{
+  Add filter definition
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$add_filter(
   filter,
   step_id,
   run_flow = FALSE,
   hook = list(pre = get_hook("pre_add_filter_hook"), post =
     get_hook("post_add_filter_hook"))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{filter}}{Filter definition created with \link{filter}.}
-
-\item{\code{step_id}}{Id of the step to add the filter to.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{filter}}{Filter definition created with \link{filter}.}
+      \item{\code{step_id}}{Id of the step to add the filter to.
 If missing, filter is added to the last step.}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-remove_filter"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-remove_filter}{}}}
-\subsection{Method \code{remove_filter()}}{
-Remove filter definition
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$remove_filter(
+\subsection{\code{Cohort$remove_filter()}}{
+  Remove filter definition
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$remove_filter(
   step_id,
   filter_id,
   run_flow = FALSE,
   hook = list(pre = get_hook("pre_rm_filter_hook"), post =
     get_hook("post_rm_filter_hook"))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step from which filter should be removed.}
-
-\item{\code{filter_id}}{Id of the filter to be removed.}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step from which filter should be removed.}
+      \item{\code{filter_id}}{Id of the filter to be removed.}
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-update_filter"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-update_filter}{}}}
-\subsection{Method \code{update_filter()}}{
-Update filter definition
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_filter(
+\subsection{\code{Cohort$update_filter()}}{
+  Update filter definition
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$update_filter(
   step_id,
   filter_id,
   ...,
@@ -330,677 +326,690 @@ Update filter definition
   hook = list(pre = get_hook("pre_update_filter_hook"), post =
     get_hook("post_update_filter_hook")),
   hook_args = list(pre = list(), post = list())
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step where filter is defined.}
-
-\item{\code{filter_id}}{Id of the filter to be updated.}
-
-\item{\code{...}}{Filter parameters that should be updated.}
-
-\item{\code{active}}{Mark filter as active (`TRUE`) or inactive (`FALSE`).}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step where filter is defined.}
+      \item{\code{filter_id}}{Id of the filter to be updated.}
+      \item{\code{...}}{Filter parameters that should be updated.}
+      \item{\code{active}}{Mark filter as active (`TRUE`) or inactive (`FALSE`).}
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+      \item{\code{hook_args}}{Named list of extra arguments passed to pre/post hooks.}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
 
-\item{\code{hook_args}}{Named list of extra arguments passed to pre/post hooks.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-clear_filter"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-clear_filter}{}}}
-\subsection{Method \code{clear_filter()}}{
-Reset filter to its default values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$clear_filter(step_id, filter_id, run_flow = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$clear_filter()}}{
+  Reset filter to its default values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$clear_filter(step_id, filter_id, run_flow = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step where filter is defined.}
+      \item{\code{filter_id}}{Id of the filter which should be cleared.}
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step where filter is defined.}
-
-\item{\code{filter_id}}{Id of the filter which should be cleared.}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-clear_step"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-clear_step}{}}}
-\subsection{Method \code{clear_step()}}{
-Reset all filters included in selected step.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$clear_step(step_id, run_flow = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$clear_step()}}{
+  Reset all filters included in selected step.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$clear_step(step_id, run_flow = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step where filters should be cleared.}
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step where filters should be cleared.}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-sum_up_state"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-sum_up_state}{}}}
-\subsection{Method \code{sum_up_state()}}{
-Sum up Cohort configuration - Source, steps definition and evaluated data.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$sum_up_state()}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$sum_up_state()}}{
+  Sum up Cohort configuration - Source, steps definition and evaluated data.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$sum_up_state()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-get_state"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-get_state}{}}}
-\subsection{Method \code{get_state()}}{
-Get Cohort configuration state.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_state(step_id, json = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{If provided, the selected step state is returned.}
-
-\item{\code{json}}{If TRUE, return state in JSON format.
+\subsection{\code{Cohort$get_state()}}{
+  Get Cohort configuration state.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$get_state(step_id, json = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{If provided, the selected step state is returned.}
+      \item{\code{json}}{If TRUE, return state in JSON format.
 Restore Cohort configuration.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-restore"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-restore}{}}}
-\subsection{Method \code{restore()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$restore(
+\subsection{\code{Cohort$restore()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$restore(
   state,
   modifier = function(prev_state, state) state,
   run_flow = FALSE,
   hook = list(pre = get_hook("pre_restore_hook"), post = get_hook("post_restore_hook"))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{state}}{List or JSON string containing steps and filters configuration.}
-
-\item{\code{modifier}}{Function two parameters combining the previous and provided state.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{state}}{List or JSON string containing steps and filters configuration.}
+      \item{\code{modifier}}{Function two parameters combining the previous and provided state.
 The returned state is then restored.}
-
-\item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+      \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-get_data"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-get_data}{}}}
-\subsection{Method \code{get_data()}}{
-Get step related data
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_data(step_id, state = "post", collect = TRUE)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$get_data()}}{
+  Get step related data
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$get_data(step_id, state = "post", collect = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step from which to source data.}
+      \item{\code{state}}{Return data before ("pre") or after ("post") step filtering?}
+      \item{\code{collect}}{Return raw data source (`FALSE`) object or collected (to R memory) data (`TRUE`).}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step from which to source data.}
-
-\item{\code{state}}{Return data before ("pre") or after ("post") step filtering?}
-
-\item{\code{collect}}{Return raw data source (`FALSE`) object or collected (to R memory) data (`TRUE`).}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-plot_data"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-plot_data}{}}}
-\subsection{Method \code{plot_data()}}{
-Plot filter specific data summary.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$plot_data(step_id, filter_id, ..., state = "post")}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$plot_data()}}{
+  Plot filter specific data summary.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$plot_data(step_id, filter_id, ..., state = "post")}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step where filter is defined.}
+      \item{\code{filter_id}}{Id of the filter for which the plot should be returned}
+      \item{\code{...}}{Another parameters passed to filter specific method.}
+      \item{\code{state}}{Generate plot on data before ("pre") or after ("post") step filtering?}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step where filter is defined.}
-
-\item{\code{filter_id}}{Id of the filter for which the plot should be returned}
-
-\item{\code{...}}{Another parameters passed to filter specific method.}
-
-\item{\code{state}}{Generate plot on data before ("pre") or after ("post") step filtering?}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-show_attrition"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-show_attrition}{}}}
-\subsection{Method \code{show_attrition()}}{
-Show attrition plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$show_attrition(..., percent = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$show_attrition()}}{
+  Show attrition plot.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$show_attrition(..., percent = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{Source specific parameters required to generate attrition.}
+      \item{\code{percent}}{Should attrition changes be presented with percentage values.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Source specific parameters required to generate attrition.}
-
-\item{\code{percent}}{Should attrition changes be presented with percentage values.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-get_stats"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-get_stats}{}}}
-\subsection{Method \code{get_stats()}}{
-Get Cohort related statistics.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_stats(step_id, filter_id, ..., state = "post")}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{When `filter_id` specified, `step_id` precises from which step the filter comes from.
+\subsection{\code{Cohort$get_stats()}}{
+  Get Cohort related statistics.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$get_stats(step_id, filter_id, ..., state = "post")}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{When `filter_id` specified, `step_id` precises from which step the filter comes from.
 Otherwise data from specified step is used to calculate required statistics.}
-
-\item{\code{filter_id}}{If not missing, filter related data statistics are returned.}
-
-\item{\code{...}}{Specific parameters passed to filter related method.}
-
-\item{\code{state}}{Should the stats be calculated on data before ("pre") or after ("post")
+      \item{\code{filter_id}}{If not missing, filter related data statistics are returned.}
+      \item{\code{...}}{Specific parameters passed to filter related method.}
+      \item{\code{state}}{Should the stats be calculated on data before ("pre") or after ("post")
 filtering in specified step.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-show_help"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-show_help}{}}}
-\subsection{Method \code{show_help()}}{
-Show source data or filter description
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$show_help(
+\subsection{\code{Cohort$show_help()}}{
+  Show source data or filter description
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$show_help(
   field,
   step_id,
   filter_id,
   modifier = getOption("cb_help_modifier", default = function(x) x)
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{field}}{Name of the source description field provided as `description` argument to \link{set_source}.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{field}}{Name of the source description field provided as `description` argument to \link{set_source}.
 If missing, `step_id` and `filter_id` are used to return filter description.}
-
-\item{\code{step_id}}{Id of the filter step to return description of.}
-
-\item{\code{filter_id}}{Id of the filter to return description of.}
-
-\item{\code{modifier}}{A function taking the description as argument.
+      \item{\code{step_id}}{Id of the filter step to return description of.}
+      \item{\code{filter_id}}{Id of the filter to return description of.}
+      \item{\code{modifier}}{A function taking the description as argument.
 The function can be used to modify its argument (convert to html, display in browser etc.).}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-get_code"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-get_code}{}}}
-\subsection{Method \code{get_code()}}{
-Return reproducible data filtering code.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_code(
+\subsection{\code{Cohort$get_code()}}{
+  Return reproducible data filtering code.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$get_code(
   include_source = TRUE,
   include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
   include_action = c("pre_filtering", "post_filtering", "run_binding"),
   modifier = .repro_code_tweak,
   mark_step = TRUE,
   ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{include_source}}{If `TRUE` source generating code will be included.}
-
-\item{\code{include_methods}}{Which methods definition should be included in the result.}
-
-\item{\code{include_action}}{Which action should be returned in the result.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{include_source}}{If `TRUE` source generating code will be included.}
+      \item{\code{include_methods}}{Which methods definition should be included in the result.}
+      \item{\code{include_action}}{Which action should be returned in the result.
 `pre_filtering`/`.post_filtering` - to include data transformation before/after filtering.
 s`run_binding` - data binding transformation.}
-
-\item{\code{modifier}}{A function taking data frame (storing reproducible code metadata) as
+      \item{\code{modifier}}{A function taking data frame (storing reproducible code metadata) as
 an argument, and returning data frame with `expr` column which is then
 combined into a single expression (final result of `get_code`).
 See \link{.repro_code_tweak}.}
+      \item{\code{mark_step}}{Include information which filtering step is performed.}
+      \item{\code{...}}{Other parameters passed to \link[formatR]{tidy_source}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
 
-\item{\code{mark_step}}{Include information which filtering step is performed.}
-
-\item{\code{...}}{Other parameters passed to \link[formatR]{tidy_source}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-run_flow"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-run_flow}{}}}
-\subsection{Method \code{run_flow()}}{
-Trigger data calculations sequentially.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$run_flow(
+\subsection{\code{Cohort$run_flow()}}{
+  Trigger data calculations sequentially.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$run_flow(
   min_step,
   hook = list(pre = get_hook("pre_run_flow_hook"), post = get_hook("post_run_flow_hook"))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{min_step}}{Step id starting from the calculation will be started.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{min_step}}{Step id starting from the calculation will be started.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-run_step"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-run_step}{}}}
-\subsection{Method \code{run_step()}}{
-Trigger data calculations for selected step.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$run_step(
+\subsection{\code{Cohort$run_step()}}{
+  Trigger data calculations for selected step.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$run_step(
   step_id,
   hook = list(pre = get_hook("pre_run_step_hook"), post = get_hook("post_run_step_hook"))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step for which to run data calculation.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step for which to run data calculation.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-bind_data"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-bind_data}{}}}
-\subsection{Method \code{bind_data()}}{
-Run data binding for selected step.
+\subsection{\code{Cohort$bind_data()}}{
+  Run data binding for selected step.
   See more at \link{binding-keys}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$bind_data(step_id)}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$bind_data(step_id)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step for which to bind the data.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step for which to bind the data.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-describe_state"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-describe_state}{}}}
-\subsection{Method \code{describe_state()}}{
-Print defined steps configuration.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$describe_state(to_string = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$describe_state()}}{
+  Print defined steps configuration.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$describe_state(to_string = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{to_string}}{If `TRUE`, return the output as a character string
+instead of printing it. Defaults to `FALSE`.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{to_string}}{If `TRUE`, return the output as a character string
-instead of printing it. Defaults to `FALSE`.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-get_step"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-get_step}{}}}
-\subsection{Method \code{get_step()}}{
-Get selected step configuration.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_step(step_id)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$get_step()}}{
+  Get selected step configuration.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$get_step(step_id)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step to be returned.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step to be returned.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-get_filter"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-get_filter}{}}}
-\subsection{Method \code{get_filter()}}{
-Get selected filter configuration.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_filter(step_id, filter_id, method = function(x) x)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$get_filter()}}{
+  Get selected filter configuration.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$get_filter(step_id, filter_id, method = function(x) x)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step where filter is defined.}
+      \item{\code{filter_id}}{If of the filter to be returned.}
+      \item{\code{method}}{Custom function taking filters list as argument.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step where filter is defined.}
-
-\item{\code{filter_id}}{If of the filter to be returned.}
-
-\item{\code{method}}{Custom function taking filters list as argument.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-update_cache"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-update_cache}{}}}
-\subsection{Method \code{update_cache()}}{
-Update filter or step cache.
+\subsection{\code{Cohort$update_cache()}}{
+  Update filter or step cache.
 Caching is saving step and filter attached data statistics such as number of
 data rows, filter choices or frequencies.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_cache(step_id, filter_id, state = "post", name = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step for which caching should be applied.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$update_cache(step_id, filter_id, state = "post", name = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step for which caching should be applied.
 If `filter_id` is not missing, the parameter describes id of the step where filter should be found.}
-
-\item{\code{filter_id}}{Id of the filter for which caching should be applied.}
-
-\item{\code{state}}{Should caching be done on data before ("pre") or after ("post")
+      \item{\code{filter_id}}{Id of the filter for which caching should be applied.}
+      \item{\code{state}}{Should caching be done on data before ("pre") or after ("post")
 filtering in specified step.}
-
-\item{\code{name}}{Optional name(s) of the individual filter statistics to
+      \item{\code{name}}{Optional name(s) of the individual filter statistics to
 (re)compute. When supplied (filter-level only), only those statistics are
 computed and merged into the stored entry, leaving any other cached
 statistics untouched. When missing, the full statistics set is computed.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-get_cache"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-get_cache}{}}}
-\subsection{Method \code{get_cache()}}{
-Return step of filter specific cache.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_cache(
+\subsection{\code{Cohort$get_cache()}}{
+  Return step of filter specific cache.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$get_cache(
   step_id,
   filter_id,
   state = "post",
   .recalc_when_missing = TRUE,
   name = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step for which cached data should be returned
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step for which cached data should be returned
 If `filter_id` is not missing, the parameter describes id of the step where filter should be found.}
-
-\item{\code{filter_id}}{Id of the filter for which cache data should be returned.}
-
-\item{\code{state}}{Should cache be returned on data before ("pre") or after ("post")
+      \item{\code{filter_id}}{Id of the filter for which cache data should be returned.}
+      \item{\code{state}}{Should cache be returned on data before ("pre") or after ("post")
 filtering in specified step.}
-
-\item{\code{.recalc_when_missing}}{Should the function compute cache automatically when the one is not computed yet?}
-
-\item{\code{name}}{Optional name of a single filter statistic to return (e.g.
+      \item{\code{.recalc_when_missing}}{Should the function compute cache automatically when the one is not computed yet?}
+      \item{\code{name}}{Optional name of a single filter statistic to return (e.g.
 "choices", "n_data"). When supplied (filter-level only) the method
 returns just that statistic and, if recomputation is needed, computes
 only it instead of the whole statistics set. When missing, the full
 cached entry (a list of all statistics) is returned.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-list_active_filters"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-list_active_filters}{}}}
-\subsection{Method \code{list_active_filters()}}{
-List active filters included in selected step.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$list_active_filters(step_id)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$list_active_filters()}}{
+  List active filters included in selected step.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$list_active_filters(step_id)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step where filters should be found.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step where filters should be found.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-last_step_id"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-last_step_id}{}}}
-\subsection{Method \code{last_step_id()}}{
-Return id of the last existing step in Cohort.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$last_step_id()}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$last_step_id()}}{
+  Return id of the last existing step in Cohort.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$last_step_id()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-is_pending"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-is_pending}{}}}
-\subsection{Method \code{is_pending()}}{
-Check if step is pending.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$is_pending(step_id)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$is_pending()}}{
+  Check if step is pending.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$is_pending(step_id)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step to be checked.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step to be checked.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-set_pending"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-set_pending}{}}}
-\subsection{Method \code{set_pending()}}{
-Mark step as pending or resolved.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$set_pending(
+\subsection{\code{Cohort$set_pending()}}{
+  Mark step as pending or resolved.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$set_pending(
   step_id,
   pending = TRUE,
   hook = list(pre = get_hook("pre_set_pending_hook"), post =
     get_hook("post_set_pending_hook"))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step.}
-
-\item{\code{pending}}{Logical; `TRUE` to mark pending, `FALSE` to resolve.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step.}
+      \item{\code{pending}}{Logical; `TRUE` to mark pending, `FALSE` to resolve.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-set_pending_cascade"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-set_pending_cascade}{}}}
-\subsection{Method \code{set_pending_cascade()}}{
-Mark a step and all the steps after it as pending.
+\subsection{\code{Cohort$set_pending_cascade()}}{
+  Mark a step and all the steps after it as pending.
 
 A change to step `step_id`'s filters invalidates that step and every step
 downstream (each step's input is the previous step's output). Used by the
 filter/step mutating methods so the GUI greys all affected steps via the
 `post_set_pending_hook`.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$set_pending_cascade(step_id)}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$set_pending_cascade(step_id)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the first step to mark pending.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the first step to mark pending.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-set_domain"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-set_domain}{}}}
-\subsection{Method \code{set_domain()}}{
-Silently set a filter's domain.
+\subsection{\code{Cohort$set_domain()}}{
+  Silently set a filter's domain.
 
 Internal setter used by domain propagation (\link{dot-propagate_domains}).
 Writes `filter@domain` directly **without** firing the `update_filter`
 hooks and **without** triggering `run_flow`, which prevents the per-hop
 hook re-entry that would otherwise occur if domains were applied through
 `update_filter`. Does not itself trigger further propagation.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$set_domain(step_id, filter_id, domain)}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$set_domain(step_id, filter_id, domain)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{step_id}}{Id of the step where the filter is defined.}
+      \item{\code{filter_id}}{Id of the filter whose domain should be set.}
+      \item{\code{domain}}{New domain value to assign.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_id}}{Id of the step where the filter is defined.}
-
-\item{\code{filter_id}}{Id of the filter whose domain should be set.}
-
-\item{\code{domain}}{New domain value to assign.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-propagate_domains_to"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-propagate_domains_to}{}}}
-\subsection{Method \code{propagate_domains_to()}}{
-Recompute a target step's domains from its parent and signal the change.
+\subsection{\code{Cohort$propagate_domains_to()}}{
+  Recompute a target step's domains from its parent and signal the change.
 
 Thin wrapper around \link{dot-propagate_domains} that runs propagation for
 `target_id` (computing its filters' domains from step `target_id - 1`) and
 then fires `post_propagate_domains_hook` so UI layers can refresh the
 affected step's inputs. No-op when propagation is disabled or the target
 step is absent / has no parent.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$propagate_domains_to(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$propagate_domains_to(
   target_id,
   hook = get_hook("post_propagate_domains_hook")
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{target_id}}{Id of the step whose domains should be recomputed.}
-
-\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{target_id}}{Id of the step whose domains should be recomputed.}
+      \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-propagate_filter_domains"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-propagate_filter_domains}{}}}
-\subsection{Method \code{propagate_filter_domains()}}{
-Eagerly propagate `"filter"`-mode domains to a target step and all steps
+\subsection{\code{Cohort$propagate_filter_domains()}}{
+  Eagerly propagate `"filter"`-mode domains to a target step and all steps
 after it.
 
 `"filter"` mode needs no computed data, so domains can be (re)established
 immediately when the step structure changes. Because each step's domain
 depends on every previous step, this recomputes `from_target` and cascades
 downstream ascending. No-op unless the propagation mode is `"filter"`.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$propagate_filter_domains(from_target)}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$propagate_filter_domains(from_target)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{from_target}}{Id of the first step to recompute.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{from_target}}{Id of the first step to recompute.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-modify"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-modify}{}}}
-\subsection{Method \code{modify()}}{
-Helper method enabling to run non-standard operation on Cohort object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$modify(modifier)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$modify()}}{
+  Helper method enabling to run non-standard operation on Cohort object.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$modify(modifier)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{modifier}}{Function of two arguments `self` and `private`.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{modifier}}{Function of two arguments `self` and `private`.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Cohort-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Cohort$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Cohort$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }
