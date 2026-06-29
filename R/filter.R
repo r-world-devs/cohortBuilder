@@ -712,50 +712,50 @@ S7::method(cb_intersect_domain_values, CbFilterMultiDiscrete) <- function(filter
   })
 }
 
-#' Extract domain from cached filter statistics
+#' Extract domain from stored filter statistics
 #'
-#' Derives a domain (set of valid values) from previously computed cache
+#' Derives a domain (set of valid values) from previously computed filter
 #' statistics. Custom filter types should implement an S7 method for this
 #' generic. The default method returns `NULL` (no domain).
 #'
 #' @param filter S7 filter object.
-#' @param cache List of cached statistics for the filter.
+#' @param stats List of stored statistics for the filter.
 #' @return Domain value appropriate for the filter type, or `NULL`.
 #' @export
-cb_domain_from_cache <- S7::new_generic("cb_domain_from_cache", "filter")
+cb_domain_from_stats <- S7::new_generic("cb_domain_from_stats", "filter")
 
-S7::method(cb_domain_from_cache, CbFilter) <- function(filter, cache) {
+S7::method(cb_domain_from_stats, CbFilter) <- function(filter, stats) {
   NULL
 }
 
-S7::method(cb_domain_from_cache, CbFilterDiscrete) <- function(filter, cache) {
-  if (is.null(cache$choices)) return(NULL)
-  names(purrr::keep(cache$choices, ~ .x > 0L))
+S7::method(cb_domain_from_stats, CbFilterDiscrete) <- function(filter, stats) {
+  if (is.null(stats$choices)) return(NULL)
+  names(purrr::keep(stats$choices, ~ .x > 0L))
 }
 
-S7::method(cb_domain_from_cache, CbFilterDiscreteText) <- function(filter, cache) {
-  # discrete_text caches `choices` as a single comma-separated string of the
+S7::method(cb_domain_from_stats, CbFilterDiscreteText) <- function(filter, stats) {
+  # discrete_text stores `choices` as a single comma-separated string of the
   # distinct observed values (see cb_get_filter_stats), not a named count
   # vector. The domain is the same comma-separated string form as the filter's
   # value, so it round-trips through cb_intersect_domain().
-  if (is.null(cache$choices)) return(NULL)
-  join_discrete_text(split_discrete_text(cache$choices))
+  if (is.null(stats$choices)) return(NULL)
+  join_discrete_text(split_discrete_text(stats$choices))
 }
 
-S7::method(cb_domain_from_cache, CbFilterRange) <- function(filter, cache) {
-  if (!is.null(cache$min) && !is.null(cache$max)) c(cache$min, cache$max) else NULL
+S7::method(cb_domain_from_stats, CbFilterRange) <- function(filter, stats) {
+  if (!is.null(stats$min) && !is.null(stats$max)) c(stats$min, stats$max) else NULL
 }
 
-S7::method(cb_domain_from_cache, CbFilterDateRange) <- function(filter, cache) {
-  if (!is.null(cache$min) && !is.null(cache$max)) c(cache$min, cache$max) else NULL
+S7::method(cb_domain_from_stats, CbFilterDateRange) <- function(filter, stats) {
+  if (!is.null(stats$min) && !is.null(stats$max)) c(stats$min, stats$max) else NULL
 }
 
-S7::method(cb_domain_from_cache, CbFilterDatetimeRange) <- function(filter, cache) {
-  if (!is.null(cache$min) && !is.null(cache$max)) c(cache$min, cache$max) else NULL
+S7::method(cb_domain_from_stats, CbFilterDatetimeRange) <- function(filter, stats) {
+  if (!is.null(stats$min) && !is.null(stats$max)) c(stats$min, stats$max) else NULL
 }
 
-S7::method(cb_domain_from_cache, CbFilterMultiDiscrete) <- function(filter, cache) {
-  if (!is.null(cache$choices)) purrr::map(cache$choices, names) else NULL
+S7::method(cb_domain_from_stats, CbFilterMultiDiscrete) <- function(filter, stats) {
+  if (!is.null(stats$choices)) purrr::map(stats$choices, names) else NULL
 }
 
 #' Extract domain from data

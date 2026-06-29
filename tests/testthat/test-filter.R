@@ -45,7 +45,7 @@ test_that("Discrete text filter works fine", {
   coh$run_flow()
   expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$iris$Species), c("setosa", "virginica"))
   expect_identical(
-    coh$get_cache("1", "species", state = "post")$choices,
+    coh$get_stats("1", "species", state = "post")$choices,
     "setosa,virginica"
   )
 })
@@ -71,19 +71,19 @@ test_that("Multi discrete filter works fine", {
   expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$md_data$col2), c("D"))
 
   expect_identical(
-    coh$get_cache("1", "mcols", state = "pre")$choices$col1,
+    coh$get_stats("1", "mcols", state = "pre")$choices$col1,
     as.list(table(md_data$col1))
   )
   expect_identical(
-    coh$get_cache("1", "mcols", state = "pre")$choices$col2,
+    coh$get_stats("1", "mcols", state = "pre")$choices$col2,
     as.list(table(md_data$col2))
   )
   expect_identical(
-    coh$get_cache("1", "mcols", state = "post")$choices$col1,
+    coh$get_stats("1", "mcols", state = "post")$choices$col1,
     as.list(table(c("A")))
   )
   expect_identical(
-    coh$get_cache("1", "mcols", state = "post")$choices$col2,
+    coh$get_stats("1", "mcols", state = "post")$choices$col2,
     as.list(table(c("D")))
   )
 
@@ -115,19 +115,19 @@ test_that("Query discrete filter works fine", {
   expect_setequal(collapse::funique(coh$get_data(1L, state = "post")$md_data$col2), c("D"))
 
   expect_identical(
-    coh$get_cache("1", "qcols", state = "pre")$specs$col1$values,
+    coh$get_stats("1", "qcols", state = "pre")$specs$col1$values,
     collapse::funique(md_data$col1)
   )
   expect_identical(
-    coh$get_cache("1", "qcols", state = "pre")$specs$col2$values,
+    coh$get_stats("1", "qcols", state = "pre")$specs$col2$values,
     collapse::funique(md_data$col2)
   )
   expect_identical(
-    coh$get_cache("1", "qcols", state = "post")$specs$col1$values,
+    coh$get_stats("1", "qcols", state = "post")$specs$col1$values,
     "A"
   )
   expect_identical(
-    coh$get_cache("1", "qcols", state = "post")$specs$col2$values,
+    coh$get_stats("1", "qcols", state = "post")$specs$col2$values,
     "D"
   )
 
@@ -554,12 +554,12 @@ test_that("cb_intersect_domain for discrete_text is silent when value within dom
   expect_identical(result, "a,b")
 })
 
-test_that("cb_domain_from_cache for discrete_text reads comma-separated choices", {
+test_that("cb_domain_from_stats for discrete_text reads comma-separated choices", {
   f <- filter(type = "discrete_text", id = "g", variable = "g", dataset = "d")
   expect_identical(
-    cb_domain_from_cache(f, list(choices = "a,b,c,d")), "a,b,c,d"
+    cb_domain_from_stats(f, list(choices = "a,b,c,d")), "a,b,c,d"
   )
-  expect_null(cb_domain_from_cache(f, list(choices = NULL)))
+  expect_null(cb_domain_from_stats(f, list(choices = NULL)))
 })
 
 test_that("cb_domain_from_data for discrete_text returns a comma-separated string", {
@@ -607,7 +607,7 @@ test_that("discrete_text filter splits 3+ space-separated values correctly", {
   expect_setequal(unique(result$g), c("a", "b", "c"))
 })
 
-test_that("cache-mode propagation narrows a discrete_text domain", {
+test_that("stats-mode propagation narrows a discrete_text domain", {
   df <- data.frame(g = c("a", "b", "c", "d"), stringsAsFactors = FALSE)
   src <- set_source(tblist(d = df))
   coh <- Cohort$new(
@@ -620,7 +620,7 @@ test_that("cache-mode propagation narrows a discrete_text domain", {
       type = "discrete_text", id = "g", variable = "g", dataset = "d",
       domain = "a,b,c,d"
     )),
-    propagate_domains = "cache"
+    propagate_domains = "stats"
   )
   coh$run_flow()
   # Step 2's domain should be narrowed to the values surviving step 1 (a, b, c).

@@ -181,8 +181,8 @@ Source <- R6::R6Class(
     #' Calculate metadata statistics for available filters.
     calc_meta_stats = function() {
       if (!is.null(private$meta_filters) && isTRUE(self$compute_meta_stats)) {
-        # Mirror the cache slot layout: data stats under `$source`, filter stats
-        # under `$filters`. This object seeds cache slot "0" in init_source.
+        # Mirror the stats slot layout: data stats under `$source`, filter stats
+        # under `$filters`. This object seeds stats slot "0" in init_source.
         self$meta_stats <- list(source = .get_stats(self, self$dtvalue))
         for (filter_obj in self$available_filters) {
           self$meta_stats$filters[[filter_obj@id]] <- cb_get_filter_stats(filter_obj, self, self$dtvalue)
@@ -431,9 +431,9 @@ NULL
 #'   target step), used by `mode = "data"`.
 #' @param step_id Target step id whose domains should be recomputed.
 #' @param cohort Cohort object (for accessing the parent step's filters and
-#'   cache).
+#'   stored statistics).
 #' @param mode Propagation mode: `"filter"` (from upstream filter values, no data
-#'   access), `"cache"` (from the parent's post-step cached stats), or `"data"`
+#'   access), `"stats"` (from the parent's post-step stored stats), or `"data"`
 #'   (scan the parent's filtered data directly).
 #' @param ... Additional arguments.
 #' @export

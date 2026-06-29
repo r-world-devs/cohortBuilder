@@ -40,7 +40,7 @@ Filters use S7 classes with dual dispatch on (filter_class, source_class):
    - `cb_filter_to_expr(filter, source)` — generate reproducible code expression
 3. S7 generics dispatching on filter type only (extensible for custom filters):
    - `cb_intersect_domain(filter)` — intersect filter value with its domain
-   - `cb_domain_from_cache(filter, cache)` — extract domain from cached statistics
+   - `cb_domain_from_stats(filter, stats)` — extract domain from stored statistics
 4. S7 dual-dispatch generic for domain extraction from data:
    - `cb_domain_from_data(filter, source, data_object)` — extract domain from data
 
@@ -62,7 +62,7 @@ Non-alphanumeric characters are stripped. For >3 variables, the ID is truncated 
 2. `cb_filter_data()` — apply each active filter
 3. `.post_filtering()` — source-specific postprocessing
 4. `.run_binding()` / `.post_binding()` — cascade filter results across related datasets via `binding_keys`
-5. `update_cache()` — compute and cache filter stats
+5. `update_stats()` — compute and store filter stats
 
 ### Extending to New Source Types
 
@@ -73,7 +73,7 @@ To support a new data backend, implement:
 
 To define a custom filter type, implement S7 methods for:
 - `cb_intersect_domain(filter)` — how value intersects with domain (default: returns raw value)
-- `cb_domain_from_cache(filter, cache)` — domain extraction from cache (default: `NULL`)
+- `cb_domain_from_stats(filter, stats)` — domain extraction from stored stats (default: `NULL`)
 - `cb_domain_from_data(filter, source, data_object)` — domain extraction from data (default: `NULL`)
 
 The `tblist` implementation in `R/source_tblist.R` serves as the reference (60+ S7 method implementations). `tblist(..., .class = NULL)` accepts an optional `.class` parameter for adding custom subclasses, enabling S3 method overrides for specialized source types.

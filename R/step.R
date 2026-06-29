@@ -157,7 +157,7 @@ print_step <- function(step, to_string = FALSE) {
 #' @export
 step <- function(...) {
   structure(
-    list(filters = list(...), cache = NULL),
+    list(filters = list(...)),
     class = "cb_step"
   )
 }

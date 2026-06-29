@@ -1003,13 +1003,13 @@ build_filter_description <- function(filter) {
 }
 
 # Resolve a filter's domain: prefer the declared domain, otherwise derive it
-# from the cached meta stats (e.g. observed choices / min-max).
+# from the stored meta stats (e.g. observed choices / min-max).
 filter_shape_domain <- function(filter, source) {
   domain <- filter@domain
   if (!is.null(domain)) return(domain)
-  cache <- source$meta_stats$filters[[filter@id]]
-  if (is.null(cache)) return(NULL)
-  cb_domain_from_cache(filter, cache)
+  stats <- source$meta_stats$filters[[filter@id]]
+  if (is.null(stats)) return(NULL)
+  cb_domain_from_stats(filter, stats)
 }
 
 #' @export
@@ -1079,12 +1079,12 @@ shape.tblist <- function(source, field, subfield, ...) {
 
     new_domain <- switch(mode,
       filter = domain_from_filter(filter_obj, cohort, parent_id, source),
-      cache = {
+      stats = {
         matched <- find_matching_filter(filter_obj, parent_filters)
         if (is.null(matched)) NULL
-        else cb_domain_from_cache(
+        else cb_domain_from_stats(
           filter_obj,
-          cohort$get_cache(parent_id, matched@id, state = "post", .recalc_when_missing = FALSE)
+          cohort$get_stats(parent_id, matched@id, state = "post", .recalc_when_missing = FALSE)
         )
       },
       data = cb_domain_from_data(filter_obj, source, data_object)
@@ -1154,7 +1154,7 @@ domain_from_data_discrete_impl <- function(filter, source, data_object, ...) {
   # Return a character domain (not a factor). A factor domain breaks discrete
   # filtering downstream: `c(factor_value, NA)` coerces the factor to integer
   # codes, so `column %in% c(value, NA)` matches nothing and the step yields
-  # zero rows. `cache`-mode propagation already yields character domains, so
+  # zero rows. `stats`-mode propagation already yields character domains, so
   # this also keeps the two modes consistent.
   as.character(collapse::funique(stats::na.omit(column)))
 }

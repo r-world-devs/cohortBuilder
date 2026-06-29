@@ -8,6 +8,10 @@
   `cb_plot_filter_data()`, `cb_get_filter_data()`, `cb_get_filter_defaults()`, `cb_filter_to_expr()`.
 * Removed `def_filter()`, `new_filter()`, and `.as_constructor()` — replaced by S7 constructors.
 * Switched from magrittr `%>%` to native pipe `|>`. Requires R >= 4.1.0.
+* Renamed the cohort statistics store and its API for clarity: the `Cohort$new()` `cache`
+  argument is now `compute_stats`, the `propagate_domains` mode `"cache"` is now `"stats"`,
+  and the `get_cache()`/`update_cache()` methods are now `get_stats()`/`update_stats()`.
+  The previous live-computation method `Cohort$get_stats()` (used by `stat()`) is now `calc_stats()`.
 
 ## New features
 
@@ -20,7 +24,7 @@
   (character/factor → discrete, numeric → range, Date → date_range, POSIXct → datetime_range).
   Supports `attach_as = "step"` (add as filtering step) or `attach_as = "meta"` (store as available filters).
 * New `.class` parameter in `tblist()` to prepend custom S3 classes for method dispatch customization.
-* Steps now track `pending` status — only pending steps trigger cache recalculation,
+* Steps now track `pending` status — only pending steps trigger statistics recalculation,
   improving performance for multi-step workflows.
 * `update_filter()` now supports pre/post hooks via `hook_args`.
 

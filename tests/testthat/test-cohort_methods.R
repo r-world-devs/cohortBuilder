@@ -681,10 +681,10 @@ test_that("Getting filter stats works fine", {
     ),
     discrete_iris_one
   )
-  expect_identical(coh$get_stats(1L, "species_filter", state = "pre")$choices, as.list(table(iris$Species)))
+  expect_identical(coh$calc_stats(1L, "species_filter", state = "pre")$choices, as.list(table(iris$Species)))
   coh$run_flow()
   expect_identical(
-    coh$get_stats(1L, "species_filter", state = "post")$choices,
+    coh$calc_stats(1L, "species_filter", state = "post")$choices,
     as.list(table(iris$Species[iris$Species %in% c("setosa", "virginica")]))
   )
 
@@ -719,21 +719,21 @@ test_that("Caching works fine", {
   )
 
   coh$run_flow()
-  expect_identical(coh$get_cache("1", "species_filter", state = "pre")$choices,
+  expect_identical(coh$get_stats("1", "species_filter", state = "pre")$choices,
                    list(setosa = 50L, versicolor = 50L, virginica = 50L))
-  expect_identical(coh$get_cache("1", "species_filter", state = "pre")$n_data, 150L)
-  expect_identical(coh$get_cache("1", "species_filter", state = "pre")$n_missing, 0L)
+  expect_identical(coh$get_stats("1", "species_filter", state = "pre")$n_data, 150L)
+  expect_identical(coh$get_stats("1", "species_filter", state = "pre")$n_missing, 0L)
 
-  expect_identical(coh$get_cache("1", "species_filter", state = "post")$choices,
+  expect_identical(coh$get_stats("1", "species_filter", state = "post")$choices,
                    list(setosa = 50L, versicolor = 0L, virginica = 50L))
-  expect_identical(coh$get_cache("1", "species_filter", state = "post")$n_data, 100L)
-  expect_identical(coh$get_cache("1", "species_filter", state = "post")$n_missing, 0L)
+  expect_identical(coh$get_stats("1", "species_filter", state = "post")$n_data, 100L)
+  expect_identical(coh$get_stats("1", "species_filter", state = "post")$n_missing, 0L)
 })
 
-test_that("cache separates data stats ($source) from filter stats ($filters)", {
+test_that("stored stats separate data stats ($source) from filter stats ($filters)", {
   # Data (source) statistics and filter statistics live in distinct sub-objects
   # of a cache slot. This keeps a step-level update from wiping already-computed
-  # filter stats and lets get_cache() detect absent data stats unambiguously.
+  # filter stats and lets get_stats() detect absent data stats unambiguously.
   coh <- Cohort$new(
     set_source(tblist(iris = iris)),
     discrete_iris_one
@@ -742,63 +742,63 @@ test_that("cache separates data stats ($source) from filter stats ($filters)", {
 
   priv <- coh$.__enclos_env__$private
   # Slot 1 (step 1 post) holds both kinds of stats, each under its own key.
-  expect_true(!is.null(priv$cache[["1"]]$source))
-  expect_true(!is.null(priv$cache[["1"]]$filters$species_filter))
+  expect_true(!is.null(priv$stats[["1"]]$source))
+  expect_true(!is.null(priv$stats[["1"]]$filters$species_filter))
   # Data stats are nested per dataset under $source.
-  expect_identical(priv$cache[["1"]]$source$iris$n_rows, 100L)
+  expect_identical(priv$stats[["1"]]$source$iris$n_rows, 100L)
 
   # The dropped bookkeeping flag must not reappear in either sub-object.
-  expect_false("changed" %in% names(priv$cache[["1"]]$source))
-  expect_false("changed" %in% names(priv$cache[["1"]]$filters$species_filter))
+  expect_false("changed" %in% names(priv$stats[["1"]]$source))
+  expect_false("changed" %in% names(priv$stats[["1"]]$filters$species_filter))
 
-  # Step-level get_cache() returns the $source sub-object directly.
-  expect_identical(coh$get_cache("1", state = "pre")$iris$n_rows, 150L)
-  expect_identical(coh$get_cache("1", state = "post")$iris$n_rows, 100L)
+  # Step-level get_stats() returns the $source sub-object directly.
+  expect_identical(coh$get_stats("1", state = "pre")$iris$n_rows, 150L)
+  expect_identical(coh$get_stats("1", state = "post")$iris$n_rows, 100L)
 })
 
-test_that("get_cache recomputes data stats when only filter stats are cached", {
+test_that("get_stats recomputes data stats when only filter stats are cached", {
   # Regression (run_button-pending): filter stats can be computed lazily before
   # any run, leaving cache[[slot]]$filters populated but $source (data stats)
-  # absent. The step-level get_cache() must not treat the slot as complete just
+  # absent. The step-level get_stats() must not treat the slot as complete just
   # because $filters exists -- it must recompute the missing data stats instead
   # of returning NULL (which surfaced as the "No data selected in previous step."
   # placeholder in the UI).
   coh <- Cohort$new(
     set_source(tblist(iris = iris)),
     discrete_iris_one,
-    cache = FALSE
+    compute_stats = FALSE
   )
   priv <- coh$.__enclos_env__$private
 
   # Lazily compute a single filter stat for step 1's pre snapshot. This creates
   # slot "0" with $filters but no $source.
-  invisible(coh$get_cache("1", "species_filter", state = "pre", name = "n_data"))
-  expect_true(!is.null(priv$cache[["0"]]$filters))
-  expect_null(priv$cache[["0"]]$source)
+  invisible(coh$get_stats("1", "species_filter", state = "pre", name = "n_data"))
+  expect_true(!is.null(priv$stats[["0"]]$filters))
+  expect_null(priv$stats[["0"]]$source)
 
   # The step-level read recomputes the absent data stats rather than returning
   # the (filter-only) slot as if data stats were present.
-  pre <- coh$get_cache("1", state = "pre", .recalc_when_missing = TRUE)
+  pre <- coh$get_stats("1", state = "pre", .recalc_when_missing = TRUE)
   expect_identical(pre$iris$n_rows, 150L)
 })
 
-test_that("get_cache returns fresh post-stats after re-run when caching is disabled", {
-  # Regression: with cache = FALSE, run_step does not refresh stored stats.
+test_that("get_stats returns fresh post-stats after re-run when caching is disabled", {
+  # Regression: with compute_stats = FALSE, run_step does not refresh stored stats.
   # A post-stat read lazily before a re-run used to leave a stale value in
-  # private$cache, so the next get_cache() returned pre-run numbers.
+  # private$stats, so the next get_stats() returned pre-run numbers.
   coh <- Cohort$new(
     set_source(
       tblist(iris = iris)
     ),
     discrete_iris_one,
-    cache = FALSE
+    compute_stats = FALSE
   )
 
   coh$run_flow()
 
   # Lazily populate the cache with the first run's post-stats.
   expect_identical(
-    coh$get_cache("1", "species_filter", state = "post")$choices,
+    coh$get_stats("1", "species_filter", state = "post")$choices,
     list(setosa = 50L, versicolor = 0L, virginica = 50L)
   )
 
@@ -807,14 +807,14 @@ test_that("get_cache returns fresh post-stats after re-run when caching is disab
   coh$run_flow()
 
   expect_identical(
-    coh$get_cache("1", "species_filter", state = "post")$choices,
+    coh$get_stats("1", "species_filter", state = "post")$choices,
     list(setosa = 50L, versicolor = 0L, virginica = 0L)
   )
-  expect_identical(coh$get_cache("1", "species_filter", state = "post")$n_data, 50L)
+  expect_identical(coh$get_stats("1", "species_filter", state = "post")$n_data, 50L)
 
   # Source stats (cache_id "0") must remain stable across re-runs.
   expect_identical(
-    coh$get_cache("1", "species_filter", state = "pre")$choices,
+    coh$get_stats("1", "species_filter", state = "pre")$choices,
     list(setosa = 50L, versicolor = 50L, virginica = 50L)
   )
 })
@@ -855,9 +855,9 @@ test_that("Bind keys work fine", {
     attr(coh$get_data("1", state = "post")$treatment, "filtered")
   )
 
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_data, 2L)
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_missing, 0L)
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$n_data, 2L)
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$n_missing, 0L)
 
   # directed relation graph (update != "all"), multi key with same names
   coh <- Cohort$new(
@@ -881,9 +881,9 @@ test_that("Bind keys work fine", {
     attr(coh$get_data("1", state = "post")$treatment, "filtered")
   )
 
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_data, 2L)
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_missing, 0L)
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$n_data, 2L)
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$n_missing, 0L)
 
   # directed relation graph (update != "all"), multi key with different names
   coh <- Cohort$new(
@@ -907,9 +907,9 @@ test_that("Bind keys work fine", {
     attr(coh$get_data("1", state = "post")$treatment, "filtered")
   )
 
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_data, 2L)
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_missing, 0L)
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$n_data, 2L)
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$n_missing, 0L)
 
   # cyclic relation graph, single key
   coh <- Cohort$new(
@@ -940,9 +940,9 @@ test_that("Bind keys work fine", {
     attr(coh$get_data("1", state = "post")$patients, "filtered")
   )
 
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_data, 2L)
-  expect_identical(coh$get_cache("1", "treatment", state = "post")$n_missing, 0L)
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$choices, list("A" = 1L, "B" = 1L))
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$n_data, 2L)
+  expect_identical(coh$get_stats("1", "treatment", state = "post")$n_missing, 0L)
 })
 
 test_that("Defining and accessing description works fine", {
@@ -1634,8 +1634,8 @@ test_that("Stats works fine", {
     run_flow = TRUE
   )
 
-  result_post <- coh$get_stats(1L, 2L)
-  result_pre <- coh$get_stats(1L, 2L, state = "pre")
+  result_post <- coh$calc_stats(1L, 2L)
+  result_pre <- coh$calc_stats(1L, 2L, state = "pre")
 
   expect_identical(result_post$n_data, nrow(coh$get_data(1L)$film))
   expect_identical(result_post$choices$G, sum(coh$get_data(1L)$film$rating == "G"))
@@ -1693,8 +1693,8 @@ test_that("Computing cache on request works as expected", {
     step_1,
     run_flow = FALSE
   )
-  expect_null(coh$get_cache("1", state = "pre", .recalc_when_missing = FALSE))
-  expect_false(is.null(coh$get_cache("1", state = "pre", .recalc_when_missing = TRUE)))
+  expect_null(coh$get_stats("1", state = "pre", .recalc_when_missing = FALSE))
+  expect_false(is.null(coh$get_stats("1", state = "pre", .recalc_when_missing = TRUE)))
 })
 
 # -- pending status in state round-trip (R9) ----------------------------------
@@ -1812,13 +1812,13 @@ local({
 
 # -- Cache control tests ------------------------------------------------------
 
-test_that("cache = FALSE skips update_cache in run_step", {
+test_that("compute_stats = FALSE skips update_stats in run_step", {
   iris_source <- set_source(tblist(iris = iris))
   f <- filter(
     type = "discrete", id = "sp", variable = "Species", dataset = "iris",
     value = "setosa", domain = c("setosa", "versicolor", "virginica")
   )
-  coh <- Cohort$new(iris_source, f, cache = FALSE)
+  coh <- Cohort$new(iris_source, f, compute_stats = FALSE)
   coh$run_flow()
 
   # Filtering still works
@@ -1826,10 +1826,10 @@ test_that("cache = FALSE skips update_cache in run_step", {
   expect_true(all(result$Species == "setosa"))
 
   # But no filter-level cache computed during run_step
-  expect_null(coh$get_cache("1", "sp", state = "post", .recalc_when_missing = FALSE))
+  expect_null(coh$get_stats("1", "sp", state = "post", .recalc_when_missing = FALSE))
 })
 
-test_that("cache = TRUE (default) computes cache normally", {
+test_that("compute_stats = TRUE (default) computes stats normally", {
   iris_source <- set_source(tblist(iris = iris))
   f <- filter(
     type = "discrete", id = "sp", variable = "Species", dataset = "iris",
@@ -1838,12 +1838,12 @@ test_that("cache = TRUE (default) computes cache normally", {
   coh <- Cohort$new(iris_source, f)
   coh$run_flow()
 
-  expect_false(is.null(coh$get_cache("1", "sp", state = "post", .recalc_when_missing = FALSE)))
+  expect_false(is.null(coh$get_stats("1", "sp", state = "post", .recalc_when_missing = FALSE)))
 })
 
-# -- get_cache(name=) single-statistic access --------------------------------
+# -- get_stats(name=) single-statistic access --------------------------------
 
-test_that("get_cache(name=) returns the bare statistic matching $accessor", {
+test_that("get_stats(name=) returns the bare statistic matching $accessor", {
   coh <- Cohort$new(
     set_source(tblist(iris = iris)),
     step(filter(
@@ -1854,16 +1854,16 @@ test_that("get_cache(name=) returns the bare statistic matching $accessor", {
   coh$run_flow()
 
   expect_identical(
-    coh$get_cache("1", "sp", state = "post", name = "choices"),
-    coh$get_cache("1", "sp", state = "post")$choices
+    coh$get_stats("1", "sp", state = "post", name = "choices"),
+    coh$get_stats("1", "sp", state = "post")$choices
   )
   expect_identical(
-    coh$get_cache("1", "sp", state = "post", name = "n_data"),
-    coh$get_cache("1", "sp", state = "post")$n_data
+    coh$get_stats("1", "sp", state = "post", name = "n_data"),
+    coh$get_stats("1", "sp", state = "post")$n_data
   )
 })
 
-test_that("get_cache(name=) computes only the requested statistic when missing", {
+test_that("get_stats(name=) computes only the requested statistic when missing", {
   coh <- Cohort$new(
     set_source(tblist(iris = iris)),
     step(filter(
@@ -1875,52 +1875,52 @@ test_that("get_cache(name=) computes only the requested statistic when missing",
 
   # Drop the stored entry, then request a single statistic.
   priv <- coh$.__enclos_env__$private
-  priv$cache[["1"]]$filters$sp <- NULL
+  priv$stats[["1"]]$filters$sp <- NULL
 
-  choices <- coh$get_cache("1", "sp", state = "post", name = "choices")
+  choices <- coh$get_stats("1", "sp", state = "post", name = "choices")
   expect_false(is.null(choices))
 
   # Only "choices" (plus the bookkeeping "changed") was computed; the other
   # statistics were not.
-  stored <- priv$cache[["1"]]$filters$sp
+  stored <- priv$stats[["1"]]$filters$sp
   expect_true("choices" %in% names(stored))
   expect_false("n_data" %in% names(stored))
   expect_false("n_missing" %in% names(stored))
 
   # Requesting another statistic adds it without recomputing the rest.
-  expect_identical(coh$get_cache("1", "sp", state = "post", name = "n_data"), 50L)
-  expect_true(all(c("choices", "n_data") %in% names(priv$cache[["1"]]$filters$sp)))
+  expect_identical(coh$get_stats("1", "sp", state = "post", name = "n_data"), 50L)
+  expect_true(all(c("choices", "n_data") %in% names(priv$stats[["1"]]$filters$sp)))
 })
 
-test_that("get_cache(name=) returns fresh values after re-run when cache disabled", {
+test_that("get_stats(name=) returns fresh values after re-run when cache disabled", {
   coh <- Cohort$new(
     set_source(tblist(iris = iris)),
     step(filter(
       type = "discrete", id = "sp", variable = "Species", dataset = "iris",
       value = c("setosa", "versicolor", "virginica")
     )),
-    cache = FALSE
+    compute_stats = FALSE
   )
   coh$run_flow()
 
   # Populate lazily, then narrow and re-run.
-  invisible(coh$get_cache("1", "sp", state = "post", name = "choices"))
+  invisible(coh$get_stats("1", "sp", state = "post", name = "choices"))
   coh$update_filter(1L, "sp", value = "setosa")
   coh$run_flow()
 
   # Both ordering of named reads must return fresh values.
-  expect_identical(coh$get_cache("1", "sp", state = "post", name = "n_data"), 50L)
+  expect_identical(coh$get_stats("1", "sp", state = "post", name = "n_data"), 50L)
   expect_identical(
-    coh$get_cache("1", "sp", state = "post", name = "choices"),
+    coh$get_stats("1", "sp", state = "post", name = "choices"),
     list(setosa = 50L, versicolor = 0L, virginica = 0L)
   )
 })
 
-# -- is_cached invariant after add_step copies parent cache -------------------
+# -- has_stats invariant after add_step copies parent cache -------------------
 
 # add_step() seeds the new step's slot from its parent (cache[new] <- cache[parent])
 # so the step is renderable without a run. The cache slot is shared: cache[N] is
-# both step N's post and step N+1's pre. run_step()'s is_cached guard must keep
+# both step N's post and step N+1's pre. run_step()'s has_stats guard must keep
 # each stored entry consistent with a direct (cache-free) recomputation, and must
 # never let the seeded copy wipe a parent's filter stats during a partial run.
 # These tests assert the stored cache always matches a fresh recomputation.
@@ -1940,13 +1940,13 @@ direct_filter_stats <- function(coh, step_id, filter_id, state) {
 
 # For every stored (non-NULL) filter-level cache entry, assert it equals a direct
 # recomputation. Returns the number of entries actually checked.
-expect_cache_consistent <- function(coh) {
+expect_stats_consistent <- function(coh) {
   priv <- coh$.__enclos_env__$private
   checked <- 0L
   for (sid in names(priv$steps)) {
     for (fid in names(priv$steps[[sid]]$filters)) {
       for (state in c("pre", "post")) {
-        stored <- coh$get_cache(sid, fid, state = state, .recalc_when_missing = FALSE)
+        stored <- coh$get_stats(sid, fid, state = state, .recalc_when_missing = FALSE)
         if (is.null(stored)) next
         direct <- direct_filter_stats(coh, sid, fid, state)
         stored <- stored[setdiff(names(stored), "changed")]
@@ -1968,7 +1968,7 @@ mk_species <- function(value) {
   )
 }
 
-test_that("is_cached keeps cache consistent across progressive add_step (single run_flow)", {
+test_that("has_stats keeps cache consistent across progressive add_step (single run_flow)", {
   coh <- Cohort$new(
     set_source(tblist(iris = iris)),
     step(mk_species(c("setosa", "versicolor", "virginica")))
@@ -1977,10 +1977,10 @@ test_that("is_cached keeps cache consistent across progressive add_step (single 
   coh$add_step(step(mk_species("setosa")))
   coh$run_flow()
 
-  expect_gt(expect_cache_consistent(coh), 0L)
+  expect_gt(expect_stats_consistent(coh), 0L)
 })
 
-test_that("is_cached keeps cache consistent when each add_step runs its own flow", {
+test_that("has_stats keeps cache consistent when each add_step runs its own flow", {
   coh <- Cohort$new(
     set_source(tblist(iris = iris)),
     step(mk_species(c("setosa", "versicolor", "virginica")))
@@ -1991,7 +1991,7 @@ test_that("is_cached keeps cache consistent when each add_step runs its own flow
   coh$add_step(step(mk_species("setosa")))
   coh$run_flow()
 
-  expect_gt(expect_cache_consistent(coh), 0L)
+  expect_gt(expect_stats_consistent(coh), 0L)
 })
 
 test_that("add_step + partial run_flow(min_step) does not corrupt parent cache", {
@@ -2006,15 +2006,15 @@ test_that("add_step + partial run_flow(min_step) does not corrupt parent cache",
   coh$add_step(step(mk_species("setosa")))
   coh$run_flow(min_step = 2L)
 
-  expect_cache_consistent(coh)
+  expect_stats_consistent(coh)
   # Parent (step 1) post must remain the full three-species table.
   expect_identical(
-    coh$get_cache("1", "sp", state = "post", .recalc_when_missing = FALSE)$choices,
+    coh$get_stats("1", "sp", state = "post", .recalc_when_missing = FALSE)$choices,
     list(setosa = 50L, versicolor = 50L, virginica = 50L)
   )
   # Step 2 post is narrowed to setosa only.
   expect_identical(
-    coh$get_cache("2", "sp", state = "post", .recalc_when_missing = FALSE)$choices,
+    coh$get_stats("2", "sp", state = "post", .recalc_when_missing = FALSE)$choices,
     list(setosa = 50L, versicolor = 0L, virginica = 0L)
   )
 })
@@ -2037,8 +2037,8 @@ test_that("partial run with a multi-filter parent keeps every parent filter cach
   # cache[1] is step 1's post and step 2's pre, so running step 2 adds step 2's
   # filter ("sp") pre-stats here. The invariant is that the destructive
   # step-level pre update must not wipe step 1's own filters "a" and "b".
-  expect_true(all(c("a", "b") %in% names(priv$cache[["1"]]$filters)))
-  expect_cache_consistent(coh)
+  expect_true(all(c("a", "b") %in% names(priv$stats[["1"]]$filters)))
+  expect_stats_consistent(coh)
 })
 
 test_that("copy_step (duplicate filter id) keeps cache consistent", {
@@ -2050,7 +2050,7 @@ test_that("copy_step (duplicate filter id) keeps cache consistent", {
   coh$copy_step(1L)
   coh$run_flow()
 
-  expect_gt(expect_cache_consistent(coh), 0L)
+  expect_gt(expect_stats_consistent(coh), 0L)
 })
 
 # -- un-run step mirrors its parent (construction + add_step seeding) ----------
@@ -2086,7 +2086,7 @@ test_that("add_step before any run seeds the new step from its parent", {
   # seeded at construction, the new step's pre-stats resolve to the un-run, full
   # table - not NULL ("no data").
   coh$add_step(step(mk_species(c("setosa", "versicolor", "virginica"))))
-  pre_choices <- coh$get_cache("2", "sp", state = "pre", name = "choices")
+  pre_choices <- coh$get_stats("2", "sp", state = "pre", name = "choices")
   expect_identical(
     pre_choices, list(setosa = 50L, versicolor = 50L, virginica = 50L)
   )
@@ -2104,7 +2104,7 @@ test_that("initial and progressively added steps render identically (no run)", {
 
   for (i in 2:4) {
     coh$add_step(step(mk_species(c("setosa", "versicolor", "virginica"))))
-    pre_choices <- coh$get_cache(
+    pre_choices <- coh$get_stats(
       as.character(i), "sp", state = "pre", name = "choices"
     )
     expect_identical(
@@ -2116,21 +2116,21 @@ test_that("initial and progressively added steps render identically (no run)", {
 
 # -- .propagate_domains tests -------------------------------------------------
 
-test_that("propagate_domains = 'cache' requires cache = TRUE", {
+test_that("propagate_domains = 'stats' requires compute_stats = TRUE", {
   iris_source <- set_source(tblist(iris = iris))
 
   # "cache" propagation reads cached statistics, which are not computed when
   # caching is disabled, so the combination is rejected at construction.
   expect_error(
-    Cohort$new(iris_source, propagate_domains = "cache", cache = FALSE),
-    regexp = "requires `cache = TRUE`"
+    Cohort$new(iris_source, propagate_domains = "stats", compute_stats = FALSE),
+    regexp = "requires `compute_stats = TRUE`"
   )
 
   # The valid combinations still construct without error.
-  expect_no_error(Cohort$new(iris_source, propagate_domains = "cache", cache = TRUE))
-  expect_no_error(Cohort$new(iris_source, propagate_domains = "data", cache = FALSE))
-  expect_no_error(Cohort$new(iris_source, propagate_domains = "filter", cache = FALSE))
-  expect_no_error(Cohort$new(iris_source, propagate_domains = "none", cache = FALSE))
+  expect_no_error(Cohort$new(iris_source, propagate_domains = "stats", compute_stats = TRUE))
+  expect_no_error(Cohort$new(iris_source, propagate_domains = "data", compute_stats = FALSE))
+  expect_no_error(Cohort$new(iris_source, propagate_domains = "filter", compute_stats = FALSE))
+  expect_no_error(Cohort$new(iris_source, propagate_domains = "none", compute_stats = FALSE))
 })
 
 test_that(".propagate_domains.default is a no-op", {
@@ -2304,9 +2304,9 @@ test_that("propagate_domains = 'data' defers narrowing when added step is not ru
   expect_setequal(coh$get_filter("2", "sp")@domain, c("setosa", "versicolor"))
 })
 
-# -- mode = "cache" tests -----------------------------------------------------
+# -- mode = "stats" tests -----------------------------------------------------
 
-test_that("propagate_domains = 'cache' narrows discrete domain from stats", {
+test_that("propagate_domains = 'stats' narrows discrete domain from stats", {
   iris_source <- set_source(tblist(iris = iris))
   step1 <- step(
     filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
@@ -2316,7 +2316,7 @@ test_that("propagate_domains = 'cache' narrows discrete domain from stats", {
     filter("discrete", id = "sp1", variable = "Species", dataset = "iris",
            domain = c("setosa", "versicolor", "virginica"))
   )
-  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "cache")
+  coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "stats")
   coh$run_flow()
 
   step2_filter <- coh$get_filter("2", "sp1")
@@ -2324,9 +2324,9 @@ test_that("propagate_domains = 'cache' narrows discrete domain from stats", {
   expect_false("virginica" %in% step2_filter@domain)
 })
 
-test_that("propagate_domains = 'cache' with cache disabled errors at construction", {
+test_that("propagate_domains = 'stats' with cache disabled errors at construction", {
   # Previously this combination silently produced no narrowing (the post-cache
-  # propagation reads from is never written when cache = FALSE). It is now
+  # propagation reads from is never written when compute_stats = FALSE). It is now
   # rejected up front; "data" mode is the cache-free equivalent.
   iris_source <- set_source(tblist(iris = iris))
   step1 <- step(
@@ -2339,8 +2339,8 @@ test_that("propagate_domains = 'cache' with cache disabled errors at constructio
   )
   expect_error(
     Cohort$new(iris_source, step1, step2,
-               cache = FALSE, propagate_domains = "cache"),
-    regexp = "requires `cache = TRUE`"
+               compute_stats = FALSE, propagate_domains = "stats"),
+    regexp = "requires `compute_stats = TRUE`"
   )
 })
 
@@ -2393,7 +2393,7 @@ test_that("propagate_domains = 'filter' works with cache disabled", {
            domain = c("setosa", "versicolor", "virginica"))
   )
   coh <- Cohort$new(iris_source, step1, step2,
-                    cache = FALSE, propagate_domains = "filter")
+                    compute_stats = FALSE, propagate_domains = "filter")
   coh$run_flow()
 
   # filter mode doesn't need cache

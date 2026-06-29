@@ -35,7 +35,7 @@ Cohort object is designed to make operations on source data possible.
     \item \href{#method-Cohort-get_data}{\code{Cohort$get_data()}}
     \item \href{#method-Cohort-plot_data}{\code{Cohort$plot_data()}}
     \item \href{#method-Cohort-show_attrition}{\code{Cohort$show_attrition()}}
-    \item \href{#method-Cohort-get_stats}{\code{Cohort$get_stats()}}
+    \item \href{#method-Cohort-calc_stats}{\code{Cohort$calc_stats()}}
     \item \href{#method-Cohort-show_help}{\code{Cohort$show_help()}}
     \item \href{#method-Cohort-get_code}{\code{Cohort$get_code()}}
     \item \href{#method-Cohort-run_flow}{\code{Cohort$run_flow()}}
@@ -44,8 +44,8 @@ Cohort object is designed to make operations on source data possible.
     \item \href{#method-Cohort-describe_state}{\code{Cohort$describe_state()}}
     \item \href{#method-Cohort-get_step}{\code{Cohort$get_step()}}
     \item \href{#method-Cohort-get_filter}{\code{Cohort$get_filter()}}
-    \item \href{#method-Cohort-update_cache}{\code{Cohort$update_cache()}}
-    \item \href{#method-Cohort-get_cache}{\code{Cohort$get_cache()}}
+    \item \href{#method-Cohort-update_stats}{\code{Cohort$update_stats()}}
+    \item \href{#method-Cohort-get_stats}{\code{Cohort$get_stats()}}
     \item \href{#method-Cohort-list_active_filters}{\code{Cohort$list_active_filters()}}
     \item \href{#method-Cohort-last_step_id}{\code{Cohort$last_step_id()}}
     \item \href{#method-Cohort-is_pending}{\code{Cohort$is_pending()}}
@@ -69,8 +69,8 @@ Cohort object is designed to make operations on source data possible.
   source,
   ...,
   run_flow = FALSE,
-  cache = TRUE,
-  propagate_domains = c("none", "filter", "cache", "data"),
+  compute_stats = TRUE,
+  propagate_domains = c("none", "filter", "stats", "data"),
   hook = list(pre = get_hook("pre_cohort_hook"), post = get_hook("post_cohort_hook"))
 )}
     \if{html}{\out{</div>}}
@@ -82,13 +82,14 @@ Cohort object is designed to make operations on source data possible.
       \item{\code{...}}{Steps definition (optional). Can be also defined as a sequence of
 filters - the filters will be added to the first step.}
       \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
-      \item{\code{cache}}{If `TRUE` (default), filter statistics are cached after each step.
-Set to `FALSE` to skip cache computation (useful for metadata-only operation).}
+      \item{\code{compute_stats}}{If `TRUE` (default), filter statistics are computed and stored
+after each step. Set to `FALSE` to skip stats computation (useful for metadata-only
+operation).}
       \item{\code{propagate_domains}}{Domain propagation mode between steps.
 One of `"none"` (default, no propagation), `"filter"` (derive from
-previous step filter values), `"cache"` (derive from cached statistics),
-or `"data"` (scan filtered data). `"cache"` requires `cache = TRUE`;
-use `"data"` for the cache-free equivalent.}
+previous step filter values), `"stats"` (derive from stored statistics),
+or `"data"` (scan filtered data). `"stats"` requires `compute_stats = TRUE`;
+use `"data"` for the stats-free equivalent.}
       \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
     }
@@ -167,7 +168,7 @@ See \link{hooks} for more details.}
 \subsection{\code{Cohort$get_propagate_domains_mode()}}{
   Return the configured domain propagation mode.
 
-One of `"none"`, `"filter"`, `"cache"` or `"data"`. Read-only; the mode is
+One of `"none"`, `"filter"`, `"stats"` or `"data"`. Read-only; the mode is
 fixed at construction. UI layers can inspect it (e.g. to validate that a
 domain-based rendering strategy is compatible with the cohort).
   \subsection{Usage}{
@@ -511,13 +512,13 @@ See \link{hooks} for more details.}
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Cohort-get_stats"></a>}}
-\if{latex}{\out{\hypertarget{method-Cohort-get_stats}{}}}
-\subsection{\code{Cohort$get_stats()}}{
+\if{html}{\out{<a id="method-Cohort-calc_stats"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-calc_stats}{}}}
+\subsection{\code{Cohort$calc_stats()}}{
   Get Cohort related statistics.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{Cohort$get_stats(step_id, filter_id, ..., state = "post")}
+    \preformatted{Cohort$calc_stats(step_id, filter_id, ..., state = "post")}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -728,28 +729,28 @@ instead of printing it. Defaults to `FALSE`.}
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Cohort-update_cache"></a>}}
-\if{latex}{\out{\hypertarget{method-Cohort-update_cache}{}}}
-\subsection{\code{Cohort$update_cache()}}{
-  Update filter or step cache.
-Caching is saving step and filter attached data statistics such as number of
+\if{html}{\out{<a id="method-Cohort-update_stats"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-update_stats}{}}}
+\subsection{\code{Cohort$update_stats()}}{
+  Update filter or step statistics.
+Computes and stores step and filter attached data statistics such as number of
 data rows, filter choices or frequencies.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{Cohort$update_cache(step_id, filter_id, state = "post", name = NULL)}
+    \preformatted{Cohort$update_stats(step_id, filter_id, state = "post", name = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{step_id}}{Id of the step for which caching should be applied.
+      \item{\code{step_id}}{Id of the step for which statistics should be computed.
 If `filter_id` is not missing, the parameter describes id of the step where filter should be found.}
-      \item{\code{filter_id}}{Id of the filter for which caching should be applied.}
-      \item{\code{state}}{Should caching be done on data before ("pre") or after ("post")
+      \item{\code{filter_id}}{Id of the filter for which statistics should be computed.}
+      \item{\code{state}}{Should statistics be computed on data before ("pre") or after ("post")
 filtering in specified step.}
       \item{\code{name}}{Optional name(s) of the individual filter statistics to
 (re)compute. When supplied (filter-level only), only those statistics are
-computed and merged into the stored entry, leaving any other cached
+computed and merged into the stored entry, leaving any other stored
 statistics untouched. When missing, the full statistics set is computed.}
     }
     \if{html}{\out{</div>}}
@@ -757,13 +758,13 @@ statistics untouched. When missing, the full statistics set is computed.}
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Cohort-get_cache"></a>}}
-\if{latex}{\out{\hypertarget{method-Cohort-get_cache}{}}}
-\subsection{\code{Cohort$get_cache()}}{
-  Return step of filter specific cache.
+\if{html}{\out{<a id="method-Cohort-get_stats"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_stats}{}}}
+\subsection{\code{Cohort$get_stats()}}{
+  Return step or filter specific statistics.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{Cohort$get_cache(
+    \preformatted{Cohort$get_stats(
   step_id,
   filter_id,
   state = "post",
@@ -775,17 +776,17 @@ statistics untouched. When missing, the full statistics set is computed.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{step_id}}{Id of the step for which cached data should be returned
+      \item{\code{step_id}}{Id of the step for which stored statistics should be returned
 If `filter_id` is not missing, the parameter describes id of the step where filter should be found.}
-      \item{\code{filter_id}}{Id of the filter for which cache data should be returned.}
-      \item{\code{state}}{Should cache be returned on data before ("pre") or after ("post")
+      \item{\code{filter_id}}{Id of the filter for which stored statistics should be returned.}
+      \item{\code{state}}{Should statistics be returned on data before ("pre") or after ("post")
 filtering in specified step.}
-      \item{\code{.recalc_when_missing}}{Should the function compute cache automatically when the one is not computed yet?}
+      \item{\code{.recalc_when_missing}}{Should the function compute statistics automatically when not computed yet?}
       \item{\code{name}}{Optional name of a single filter statistic to return (e.g.
 "choices", "n_data"). When supplied (filter-level only) the method
 returns just that statistic and, if recomputation is needed, computes
 only it instead of the whole statistics set. When missing, the full
-cached entry (a list of all statistics) is returned.}
+stored entry (a list of all statistics) is returned.}
     }
     \if{html}{\out{</div>}}
   }

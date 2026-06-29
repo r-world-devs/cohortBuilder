@@ -21,12 +21,12 @@ target step), used by `mode = "data"`.}
 \item{step_id}{Target step id whose domains should be recomputed.}
 
 \item{cohort}{Cohort object (for accessing the parent step's filters and
-cache).}
+stored statistics).}
 
 \item{...}{Additional arguments.}
 
 \item{mode}{Propagation mode: `"filter"` (from upstream filter values, no data
-access), `"cache"` (from the parent's post-step cached stats), or `"data"`
+access), `"stats"` (from the parent's post-step stored stats), or `"data"`
 (scan the parent's filtered data directly).}
 }
 \description{
