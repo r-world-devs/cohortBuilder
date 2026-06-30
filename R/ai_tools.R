@@ -95,12 +95,15 @@ cb_tool_filters_meta <- function(cohort) {
 cb_tool_add_filters <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
-  fun <- function(filter_ids, action = "new_step") {
+  fun <- function(filter_ids, action = "new_step", active = NULL) {
     print("cb_tool_add_filters")
     print(filter_ids)
     print(action)
 
     action <- match.arg(action, c("new_step", "edit_last"))
+    # active = NULL: inherit the available filter's active state (do not touch).
+    set_active <- !is.null(active) && !is.na(active) && nzchar(as.character(active))
+    active <- if (set_active) !identical(tolower(as.character(active)), "false") else NA
     filter_ids <- trimws(strsplit(filter_ids, ",")[[1L]])
     available <- cohort$get_source()$available_filters
 
@@ -117,42 +120,61 @@ cb_tool_add_filters <- function(cohort) {
       ))
     }
 
+    # Override the active state only when explicitly requested.
+    if (set_active) {
+      matching <- purrr::map(matching, function(f) {
+        f@active <- active
+        f
+      })
+    }
+
     matched_ids <- purrr::map_chr(matching, ~ .x@id)
     unknown <- setdiff(filter_ids, matched_ids)
 
-    # Guard against duplicate calls (e.g. LLM parallel tool invocations)
-    last_id <- cohort$last_step_id()
-    if (last_id != "0") {
-      existing_ids <- names(cohort$get_step(last_id)$filters)
-      if (all(matched_ids %in% existing_ids)) {
-        return(as.character(glue::glue(
-          "Filters already present in step {last_id}: {paste(matched_ids, collapse = ', ')}"
-        )))
-      }
-    }
-
+    skipped_ids <- character(0L)
     if (action == "new_step") {
       cohort$copy_step(filters = matching, run_flow = FALSE)
+      added_ids <- matched_ids
     } else {
       if (cohort$last_step_id() == "0") {
         cohort$add_step(step())
       }
       step_id <- cohort$last_step_id()
-      for (f in matching) {
+      existing_ids <- names(cohort$get_step(step_id)$filters)
+      # Skip filters already present in the target step; only add the new ones.
+      skipped_ids <- intersect(matched_ids, existing_ids)
+      to_add <- purrr::keep(matching, function(f) !f@id %in% existing_ids)
+      for (f in to_add) {
         state <- get_filter_params(f)
         cohort$add_filter(do.call(filter, state), step_id = step_id)
       }
+      added_ids <- purrr::map_chr(to_add, ~ .x@id)
     }
 
-    if (getOption("cb_tool_run_cohort", TRUE)) {
+    if (getOption("cb_tool_run_cohort", TRUE) && length(added_ids) > 0L) {
       run(cohort)
     }
 
-    msg <- glue::glue("Filters added ({action}): {paste(matched_ids, collapse = ', ')}")
-    if (length(unknown) > 0L) {
-      msg <- glue::glue("{msg}. Unknown filter ids ignored: {paste(unknown, collapse = ', ')}")
+    added_label <- if (set_active) glue::glue(", {if (active) 'active' else 'inactive'}") else ""
+    msg_parts <- character(0L)
+    if (length(added_ids) > 0L) {
+      msg_parts <- c(msg_parts, glue::glue(
+        "Filters added ({action}{added_label}): {paste(added_ids, collapse = ', ')}"
+      ))
     }
-    as.character(msg)
+    if (length(skipped_ids) > 0L) {
+      msg_parts <- c(msg_parts, glue::glue(
+        "Already present in step (skipped): {paste(skipped_ids, collapse = ', ')}. ",
+        "Use 'cb_set_filter_values' to change their values."
+      ))
+    }
+    if (length(unknown) > 0L) {
+      msg_parts <- c(msg_parts, glue::glue("Unknown filter ids ignored: {paste(unknown, collapse = ', ')}"))
+    }
+    if (length(msg_parts) == 0L) {
+      msg_parts <- "No filters added."
+    }
+    paste(as.character(msg_parts), collapse = " ")
   }
 
   cb_tool(
@@ -165,7 +187,13 @@ cb_tool_add_filters <- function(cohort) {
       "Available filter ids can be found using the 'cb_get_filters_meta' tool.",
       "Important: call this tool once with all desired filter ids.",
       "Use action='edit_last' when the user asks to add filters to the current/existing step.",
-      "Use action='new_step' (default) when the user wants a new filtering step."
+      "Use action='new_step' (default) when the user wants a new filtering step.",
+      "With action='edit_last', filters that already exist in the step are skipped",
+      "(use 'cb_set_filter_values' to change their values).",
+      "Only set 'active' when the user explicitly asks for the filters to be",
+      "active or inactive; otherwise omit it to keep each filter's default state.",
+      "Set active='false' to add the filters in a deactivated state",
+      "(e.g. when the user wants them present but not yet applied)."
     ),
     arguments = list(
       filter_ids = ellmer::type_string(
@@ -174,6 +202,14 @@ cb_tool_add_filters <- function(cohort) {
       action = ellmer::type_enum(
         "Whether to create a new step or add to the existing last step.",
         values = c("new_step", "edit_last")
+      ),
+      active = ellmer::type_enum(
+        paste(
+          "Optional. Only provide when the user explicitly asks for the filters to be",
+          "active ('true') or inactive ('false'). Omit to keep each filter's default state."
+        ),
+        values = c("true", "false"),
+        required = FALSE
       )
     )
   )
@@ -272,11 +308,14 @@ cb_tool_set_filter_values <- function(cohort) {
 cb_tool_apply_filters <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
-  fun <- function(filters, action = "new_step") {
+  fun <- function(filters, action = "new_step", active = NULL) {
     print("cb_tool_apply_filters")
     print(action)
 
     action <- match.arg(action, c("new_step", "edit_last"))
+    # active = NULL: inherit the available filter's active state (do not touch).
+    set_active <- !is.null(active) && !is.na(active) && nzchar(as.character(active))
+    active <- if (set_active) !identical(tolower(as.character(active)), "false") else NA
     filter_vals <- tryCatch(
       jsonlite::fromJSON(filters),
       error = function(e) NULL
@@ -303,8 +342,15 @@ cb_tool_apply_filters <- function(cohort) {
     matched_ids <- purrr::map_chr(matching, ~ .x@id)
     unknown <- setdiff(filter_ids, matched_ids)
 
+    # Override the active state of newly added filters only when requested.
+    if (set_active) {
+      matching <- purrr::map(matching, function(f) {
+        f@active <- active
+        f
+      })
+    }
+
     # Apply desired values directly to filter objects before adding
-    updated <- character(0L)
     for (i in seq_along(matching)) {
       fid <- matched_ids[[i]]
       vals <- filter_vals[[fid]]
@@ -318,22 +364,45 @@ cb_tool_apply_filters <- function(cohort) {
           matching[[i]]
         }
       )
-      updated <- c(updated, fid)
     }
 
     # Add filters to the cohort
+    added_ids <- character(0L)
+    updated_ids <- character(0L)
     if (action == "new_step") {
-      print("new step")
       cohort$add_step(do.call(step, matching))
+      added_ids <- matched_ids
+    } else if (cohort$last_step_id() == "0") {
+      cohort$add_step(do.call(step, matching))
+      added_ids <- matched_ids
     } else {
-      print("edit last step")
-      if (cohort$last_step_id() == "0") {
-        cohort$add_step(do.call(step, matching))
-      } else {
-        step_id <- cohort$last_step_id()
-        for (f in matching) {
-          state <- get_filter_params(f)
+      step_id <- cohort$last_step_id()
+      existing_ids <- names(cohort$get_step(step_id)$filters)
+      for (i in seq_along(matching)) {
+        fid <- matched_ids[[i]]
+        if (fid %in% existing_ids) {
+          # Filter already in the step: update its values in place rather than
+          # re-adding it (which would reset the existing filter).
+          vals <- filter_vals[[fid]]
+          if (is.null(vals) || length(vals) == 0L) next
+          ok <- tryCatch(
+            {
+              do.call(
+                cohort$update_filter,
+                c(list(step_id = step_id, filter_id = fid), vals)
+              )
+              TRUE
+            },
+            error = function(e) {
+              warning(glue::glue("Failed to update filter '{fid}': {conditionMessage(e)}"))
+              FALSE
+            }
+          )
+          if (isTRUE(ok)) updated_ids <- c(updated_ids, fid)
+        } else {
+          state <- get_filter_params(matching[[i]])
           cohort$add_filter(do.call(filter, state), step_id = step_id)
+          added_ids <- c(added_ids, fid)
         }
       }
     }
@@ -342,14 +411,25 @@ cb_tool_apply_filters <- function(cohort) {
       run(cohort)
     }
 
-    msg <- glue::glue("Filters applied ({action}): {paste(matched_ids, collapse = ', ')}")
-    if (length(updated) > 0L) {
-      msg <- glue::glue("{msg}. Values set for: {paste(updated, collapse = ', ')}")
+    added_label <- if (set_active) glue::glue(", {if (active) 'active' else 'inactive'}") else ""
+    msg_parts <- character(0L)
+    if (length(added_ids) > 0L) {
+      msg_parts <- c(msg_parts, glue::glue(
+        "Filters applied ({action}{added_label}): {paste(added_ids, collapse = ', ')}"
+      ))
+    }
+    if (length(updated_ids) > 0L) {
+      msg_parts <- c(msg_parts, glue::glue(
+        "Updated values for existing filters: {paste(updated_ids, collapse = ', ')}"
+      ))
     }
     if (length(unknown) > 0L) {
-      msg <- glue::glue("{msg}. Unknown filter ids ignored: {paste(unknown, collapse = ', ')}")
+      msg_parts <- c(msg_parts, glue::glue("Unknown filter ids ignored: {paste(unknown, collapse = ', ')}"))
     }
-    as.character(msg)
+    if (length(msg_parts) == 0L) {
+      msg_parts <- "No filters applied."
+    }
+    paste(as.character(msg_parts), collapse = " ")
   }
 
   cb_tool(
@@ -357,13 +437,19 @@ cb_tool_apply_filters <- function(cohort) {
     name = "cb_apply_filters",
     description = paste(
       "Adds NEW filters to the cohort and sets their values in a single operation.",
-      "IMPORTANT: Only use this tool for filters that are NOT yet in the cohort.",
+      "Prefer this tool for filters that are NOT yet in the cohort.",
       "Call 'cb_describe_state' first to check what filters already exist.",
-      "If the filter already exists in a step, use 'cb_set_filter_values' instead.",
+      "With action='edit_last', any filter that already exists in the step has its",
+      "values updated in place instead of being re-added; you may also use",
+      "'cb_set_filter_values' to change values of existing filters.",
       "Available filter ids and their domains can be found using 'cb_get_filters_meta' (stats field).",
       "Include all new filters in a single call - do not call this tool multiple times.",
       "Use action='edit_last' when the user asks to add filters to the current/existing step.",
-      "Use action='new_step' (default) when the user wants a new filtering step."
+      "Use action='new_step' (default) when the user wants a new filtering step.",
+      "Only set 'active' when the user explicitly asks for the filters to be",
+      "active or inactive; otherwise omit it to keep each filter's default state.",
+      "Set active='false' to add the new filters in a deactivated state",
+      "(applies to newly added filters; existing filters keep their current state)."
     ),
     arguments = list(
       filters = ellmer::type_string(paste(
@@ -376,6 +462,14 @@ cb_tool_apply_filters <- function(cohort) {
       action = ellmer::type_enum(
         "Whether to create a new step or add to the existing last step.",
         values = c("new_step", "edit_last")
+      ),
+      active = ellmer::type_enum(
+        paste(
+          "Optional. Only provide when the user explicitly asks for the filters to be",
+          "active ('true') or inactive ('false'). Omit to keep each filter's default state."
+        ),
+        values = c("true", "false"),
+        required = FALSE
       )
     )
   )

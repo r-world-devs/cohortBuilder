@@ -138,6 +138,73 @@ test_that("cb_tool_add_filters with edit_last adds to existing step", {
   expect_true("hp" %in% names(filters))
 })
 
+test_that("cb_tool_add_filters skips filters already present in the step", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  t <- cb_tool_add_filters(coh)
+
+  t$fun("Species", action = "new_step")
+  result <- t$fun("Species", action = "edit_last")
+
+  expect_true(grepl("Already present in step \\(skipped\\)", result))
+  expect_true(grepl("Species", result))
+  # No duplicate added: still a single Species filter.
+  expect_identical(sum(names(coh$get_step("1")$filters) == "Species"), 1L)
+})
+
+test_that("cb_tool_apply_filters updates values of existing filters in place", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  t <- cb_tool_apply_filters(coh)
+
+  t$fun('{"Species":{"value":["setosa"]}}', action = "new_step")
+  result <- t$fun('{"Species":{"value":["versicolor"]}}', action = "edit_last")
+
+  expect_true(grepl("Updated values for existing filters", result))
+  # Value updated in place, filter not reset or duplicated.
+  filters <- coh$get_step(coh$last_step_id())$filters
+  expect_identical(filters[["Species"]]@value, "versicolor")
+  expect_identical(sum(names(filters) == "Species"), 1L)
+})
+
+test_that("cb_tool_add_filters can add filters as inactive", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  t <- cb_tool_add_filters(coh)
+
+  result <- t$fun("Species", action = "new_step", active = "false")
+  expect_true(grepl("inactive", result))
+  expect_false(coh$get_step("1")$filters[["Species"]]@active)
+})
+
+test_that("cb_tool_add_filters inherits active state when active is omitted", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  # Force the available Species filter to be inactive by default.
+  src <- coh$get_source()
+  src$available_filters <- purrr::map(src$available_filters, function(f) {
+    if (f@id == "Species") f@active <- FALSE
+    f
+  })
+  t <- cb_tool_add_filters(coh)
+
+  result <- t$fun("Species", action = "new_step")
+  expect_false(grepl("active|inactive", result))
+  expect_false(coh$get_step("1")$filters[["Species"]]@active)
+})
+
+test_that("cb_tool_apply_filters can add filters as inactive", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  t <- cb_tool_apply_filters(coh)
+
+  result <- t$fun('{"Species":{"value":["setosa"]}}', action = "new_step", active = "false")
+  expect_true(grepl("inactive", result))
+  flt <- coh$get_step(coh$last_step_id())$filters[["Species"]]
+  expect_false(flt@active)
+  expect_identical(flt@value, "setosa")
+})
+
 test_that("cb_tool_add_filters reports unknown filter ids", {
   skip_if_not_installed("ellmer")
   coh <- make_test_cohort()
