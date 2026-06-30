@@ -11,11 +11,8 @@ cb_get_filter_defaults(filter, source, ...)
 
 \item{source}{Source object.}
 
-\item{...}{Additional arguments.}
-
-\item{data_object}{Data object.}
-
-\item{cache_object}{Cached statistics object.}
+\item{...}{Additional arguments. Methods receive a `data_object` and a
+`cache_object` (cached statistics) here.}
 }
 \value{
 Named list of default parameter values.

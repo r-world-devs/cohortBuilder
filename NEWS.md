@@ -1,4 +1,4 @@
-# cohortBuilder (development version)
+# cohortBuilder 1.0.0
 
 ## Breaking changes
 
@@ -27,6 +27,19 @@
 * Steps now track `pending` status — only pending steps trigger statistics recalculation,
   improving performance for multi-step workflows.
 * `update_filter()` now supports pre/post hooks via `hook_args`.
+* New `Cohort$new()` `propagate_domains` argument controls how filter domains are narrowed
+  between steps: `"none"` (default), `"filter"` (from previous step filter values),
+  `"stats"` (from stored statistics; requires `compute_stats = TRUE`), or `"data"`
+  (scan filtered data; the stats-free equivalent). Backed by the `.propagate_domains()`
+  source method and the S7 generics `cb_intersect_domain()`, `cb_intersect_domain_values()`,
+  `cb_domain_from_stats()`, and `cb_domain_from_data()`. Filter values are now intersected
+  against their domain (with trimming warnings) before filtering.
+* `set_source()` gains a `compute_meta_stats` argument (default from the
+  `cb.source_filters_meta_stats` option) controlling whether metadata statistics for
+  `available_filters` are pre-computed; when `FALSE`, filter domains fall back to live
+  computation. Sources also accept an `available_filters` definition directly.
+* Filter ids are now deterministic by default (derived from dataset and variable names),
+  enabling cross-step filter matching for domain propagation. Override with explicit `id =`.
 
 ## AI/LLM integration
 
@@ -40,6 +53,12 @@
 * Use `collapse` for binding operations (joins), with `verbose` option for diagnostics.
 * Reorganized `breaks` argument for date_range filter plots.
 * Extensive test coverage improvements including vdiffr snapshot tests for all filter plot types.
+* `cohort()` now exposes the `compute_stats` and `propagate_domains` arguments, and
+  `add_filter()`/`rm_filter()` now expose and forward the `hook` argument (previously these
+  were silently ignored).
+* Comprehensive roxygen documentation added across exported and internal functions, plus a new
+  `source-intelligence` vignette covering `describe()`, `autofilter()`, `shape()`, and the
+  AI/LLM tools.
 
 # cohortBuilder 0.4.0
 

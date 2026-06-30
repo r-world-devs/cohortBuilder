@@ -349,7 +349,7 @@ Examples:
 - `cohortBuilder`
 
 ```{r, eval = FALSE}
-get_attrition_label.tblist <- function(source, step_id, step_filters, dataset, ...) {
+.get_attrition_label.tblist <- function(source, step_id, step_filters, dataset, ...) {
   pkey <- source$primary_keys
   binding_keys <- source$binding_keys
   if (step_id == "0") {

@@ -14,7 +14,7 @@ get_state(x, step_id, json = FALSE)
 \item{json}{If TRUE, return state in JSON format.}
 }
 \value{
-List object of character string being the list convertion to JSON format.
+List object of character string being the list conversion to JSON format.
 }
 \description{
 Get Cohort configuration state.

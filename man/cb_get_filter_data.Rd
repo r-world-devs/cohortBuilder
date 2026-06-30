@@ -11,9 +11,7 @@ cb_get_filter_data(filter, source, ...)
 
 \item{source}{Source object.}
 
-\item{...}{Additional arguments.}
-
-\item{data_object}{Data object.}
+\item{...}{Additional arguments. Methods receive a `data_object` here.}
 }
 \value{
 Filter-related data subset.

@@ -207,12 +207,26 @@ Source <- R6::R6Class(
   )
 )
 
+#' Find the position of a filter by id within a list of filters
+#'
+#' @param filters A list of filter objects.
+#' @param filter_id The filter id to locate.
+#' @return The integer index/indices of matching filters.
+#' @noRd
 match_filter_id <- function(filters, filter_id) {
   filters_ids <- filters |>
     purrr::map_chr(~ .x@id)
   which(filters_ids == filter_id)
 }
 
+#' Verify a source-type extension exists for a data connection
+#'
+#' Checks that a `set_source` method is registered for the connection's class
+#' (`tblist` is always supported), erroring otherwise.
+#'
+#' @param dtconn A data connection object.
+#' @return Invisibly `TRUE`; errors when no extension is found.
+#' @noRd
 check_layer <- function(dtconn) {
 
   if (inherits(dtconn, "tblist")) {
@@ -250,6 +264,8 @@ check_layer <- function(dtconn) {
 #'     When provided, used as a part of reproducible code output.
 #' @param description A named list storing the source objects description.
 #'     Can be accessed with \link{description} Cohort method.
+#' @param available_filters List of filter definitions available for the source.
+#'     See \link{autofilter} for generating them automatically.
 #' @param compute_meta_stats Whether to pre-compute metadata statistics for the source
 #'     `available_filters`. When `FALSE`, the computation is skipped and filter domains
 #'     fall back to live computation. Defaults to the `cb.source_filters_meta_stats` option (`TRUE`).
@@ -264,7 +280,8 @@ check_layer <- function(dtconn) {
 #' @returns R6 object of class inherited from `dtconn`.
 #' @export
 set_source <- function(dtconn, ..., primary_keys = NULL, binding_keys = NULL,
-                       source_code = NULL, description = NULL) {
+                       source_code = NULL, description = NULL, available_filters = NULL,
+                       compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE)) {
 
   check_layer(dtconn)
   attr(dtconn, "call") <- rlang::call_match()$dtconn
@@ -305,7 +322,7 @@ set_source <- function(dtconn, ..., primary_keys = NULL, binding_keys = NULL,
 #'   argument of \link{code} function. Aims to modify reproducible code into the final format.}
 #' }
 #' Except from the above methods, you may extend the existing or new source with providing
-#' custom filtering methods. See \link{creating-filters}.
+#' custom filtering methods. See `vignette("custom-filters")`.
 #' In order to see more details about how to implement custom source check `vignette("custom-extensions")`.
 #'
 #' @name source-layer
@@ -497,11 +514,32 @@ describe <- function(description, ...) {
   )
 }
 
+#' Describe the structure of a source
+#'
+#' `shape()` is an S3 generic that summarizes a source for programmatic or
+#' LLM-based inspection. Called with only a `source`, it returns a structured
+#' list `list(datasets, filters)` where `datasets` maps each dataset name to its
+#' description text and `filters` is keyed by filter id (each entry describing
+#' the filter's `dataset`, `type`, `description`, `variables`, and `domain`).
+#'
+#' Called with a `field` (and optional `subfield`), it instead performs a
+#' description-text lookup, returning the description stored for that
+#' dataset/variable. This form is used internally by the Cohort `show_help()`
+#' method.
+#'
+#' @param source A `Source` object.
+#' @param field Optional dataset (or description) name to look up.
+#' @param subfield Optional variable name within `field` to look up.
+#' @param ... Extra arguments passed to methods.
+#' @return Either a `list(datasets, filters)` metadata structure or, when
+#'   `field` is supplied, the description text for the requested entry.
+#' @seealso [describe()], [autofilter()]
 #' @export
 shape <- function(source, ...) {
   UseMethod("shape", source)
 }
 
+#' @rdname shape
 #' @export
 shape.default <- function(source, field, subfield, ...) {
   if (missing(subfield)) {
@@ -521,30 +559,14 @@ shape.default <- function(source, field, subfield, ...) {
 #'    By default in \code{step}.
 #' @param ... Extra arguments passed to a specific method.
 #' @return Source object having step configuration attached.
-#' @seealso \link{source-gui-layer}
 #'
 #' @examples
 #' library(cohortBuilder)
-#' library(shinyCohortBuilder)
 #'
 #' iris_source <- set_source(tblist(iris = iris)) |>
 #'   autofilter()
 #' iris_cohort <- cohort(iris_source)
 #' sum_up(iris_cohort)
-#'
-#' if (interactive()) {
-#'   library(shiny)
-#'
-#'   ui <- fluidPage(
-#'     cb_ui("mycoh")
-#'   )
-#'
-#'   server <- function(input, output, session) {
-#'     cb_server("mycoh", cohort = iris_cohort)
-#'   }
-#'
-#'   shinyApp(ui, server)
-#' }
 #' @export
 autofilter <- function(source, attach_as = c("step", "meta"), ...) {
   UseMethod("autofilter", source)

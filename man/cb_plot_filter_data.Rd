@@ -11,9 +11,8 @@ cb_plot_filter_data(filter, source, ...)
 
 \item{source}{Source object.}
 
-\item{...}{Additional arguments passed to plotting functions.}
-
-\item{data_object}{Data object to plot.}
+\item{...}{Additional arguments passed to plotting functions. Methods receive
+a `data_object` (the data to plot) here.}
 }
 \value{
 Plot side effect.

@@ -892,7 +892,7 @@ test_that("shape() domain falls back to meta stats when filter domain is unset",
 
   result <- shape(source)
   species <- result$filters$Species
-  expect_setequal(species$domain, as.character(unique(iris$Species)))
+  expect_setequal(species$domain, as.character(collapse::funique(iris$Species)))
 })
 
 test_that("shape(source, field) still returns description text", {

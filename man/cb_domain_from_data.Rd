@@ -11,9 +11,8 @@ cb_domain_from_data(filter, source, ...)
 
 \item{source}{Source object.}
 
-\item{...}{Additional arguments.}
-
-\item{data_object}{Data object to extract domain from.}
+\item{...}{Additional arguments. Methods receive a `data_object` (the data to
+extract the domain from) here.}
 }
 \value{
 Domain value appropriate for the filter type, or `NULL`.

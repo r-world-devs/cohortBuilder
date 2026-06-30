@@ -8,7 +8,15 @@
 \usage{
 add_filter(x, filter, step_id, ...)
 
-\method{add_filter}{Cohort}(x, filter, step_id, run_flow = FALSE, ...)
+\method{add_filter}{Cohort}(
+  x,
+  filter,
+  step_id,
+  run_flow = FALSE,
+  hook = list(pre = get_hook("pre_add_filter_hook"), post =
+    get_hook("post_add_filter_hook")),
+  ...
+)
 
 \method{add_filter}{Source}(x, filter, step_id, ...)
 }
@@ -23,6 +31,9 @@ If missing, filter is added to the last step.}
 \item{...}{Other parameters passed to specific S3 method.}
 
 \item{run_flow}{If `TRUE`, data flow is run after the filter is added.}
+
+\item{hook}{List of hooks describing methods to run before/after the filter is added.
+See \link{hooks} for more details.}
 }
 \value{
 Method dependent object (i.e. `Cohort` or `Source`) having filter added in selected step.

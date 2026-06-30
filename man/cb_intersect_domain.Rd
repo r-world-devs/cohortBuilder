@@ -8,6 +8,8 @@ cb_intersect_domain(filter, ...)
 }
 \arguments{
 \item{filter}{S7 filter object.}
+
+\item{...}{Additional arguments passed to methods.}
 }
 \value{
 The effective value for filtering.

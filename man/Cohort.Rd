@@ -899,7 +899,7 @@ filter/step mutating methods so the GUI greys all affected steps via the
 \subsection{\code{Cohort$set_domain()}}{
   Silently set a filter's domain.
 
-Internal setter used by domain propagation (\link{dot-propagate_domains}).
+Internal setter used by domain propagation (\link{.propagate_domains}).
 Writes `filter@domain` directly **without** firing the `update_filter`
 hooks and **without** triggering `run_flow`, which prevents the per-hop
 hook re-entry that would otherwise occur if domains were applied through
@@ -926,7 +926,7 @@ hook re-entry that would otherwise occur if domains were applied through
 \subsection{\code{Cohort$propagate_domains_to()}}{
   Recompute a target step's domains from its parent and signal the change.
 
-Thin wrapper around \link{dot-propagate_domains} that runs propagation for
+Thin wrapper around \link{.propagate_domains} that runs propagation for
 `target_id` (computing its filters' domains from step `target_id - 1`) and
 then fires `post_propagate_domains_hook` so UI layers can refresh the
 affected step's inputs. No-op when propagation is disabled or the target

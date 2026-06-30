@@ -1131,7 +1131,7 @@ Cohort <- R6::R6Class(
     #' @description
     #' Silently set a filter's domain.
     #'
-    #' Internal setter used by domain propagation (\link{dot-propagate_domains}).
+    #' Internal setter used by domain propagation (\link{.propagate_domains}).
     #' Writes `filter@domain` directly **without** firing the `update_filter`
     #' hooks and **without** triggering `run_flow`, which prevents the per-hop
     #' hook re-entry that would otherwise occur if domains were applied through
@@ -1153,7 +1153,7 @@ Cohort <- R6::R6Class(
     #' @description
     #' Recompute a target step's domains from its parent and signal the change.
     #'
-    #' Thin wrapper around \link{dot-propagate_domains} that runs propagation for
+    #' Thin wrapper around \link{.propagate_domains} that runs propagation for
     #' `target_id` (computing its filters' domains from step `target_id - 1`) and
     #' then fires `post_propagate_domains_hook` so UI layers can refresh the
     #' affected step's inputs. No-op when propagation is disabled or the target
@@ -1273,6 +1273,13 @@ Cohort <- R6::R6Class(
 #' Cohort object is designed to make operations on source data possible.
 #' @param source Source object created with \link{set_source}.
 #' @param run_flow If `TRUE`, data flow is run after the operation is completed.
+#' @param compute_stats If `TRUE` (default), filter and step statistics are
+#'     computed and stored after each step. Set to `FALSE` for metadata-only
+#'     operation.
+#' @param propagate_domains Domain propagation mode between steps: `"none"`
+#'     (default), `"filter"` (from previous step filter values), `"stats"`
+#'     (from stored statistics; requires `compute_stats = TRUE`), or `"data"`
+#'     (scan filtered data; the stats-free equivalent).
 #' @param hook List of hooks describing methods before/after the Cohort is created.
 #'     See \link{hooks} for more details.
 #' @param ... Steps definition (optional). Can be also defined as a sequence of
@@ -1281,12 +1288,17 @@ Cohort <- R6::R6Class(
 #'
 #' @name create-cohort
 #' @export
-cohort <- function(source, ..., run_flow = FALSE,
+cohort <- function(source, ..., run_flow = FALSE, compute_stats = TRUE,
+                   propagate_domains = c("none", "filter", "stats", "data"),
                    hook = list(
                      pre = get_hook("pre_cohort_hook"),
                      post = get_hook("post_cohort_hook")
                    )) {
-  Cohort$new(source, ..., run_flow = run_flow, hook = hook)
+  Cohort$new(
+    source, ...,
+    run_flow = run_flow, compute_stats = compute_stats,
+    propagate_domains = propagate_domains, hook = hook
+  )
 }
 
 #' @title Managing the Cohort object
@@ -1413,9 +1425,15 @@ add_filter <- function(x, filter, step_id, ...) {
 
 #' @rdname add_filter
 #' @param run_flow If `TRUE`, data flow is run after the filter is added.
+#' @param hook List of hooks describing methods to run before/after the filter is added.
+#'     See \link{hooks} for more details.
 #' @export
-add_filter.Cohort <- function(x, filter, step_id, run_flow = FALSE, ...) {
-  x$add_filter(filter, step_id, run_flow)
+add_filter.Cohort <- function(x, filter, step_id, run_flow = FALSE,
+                              hook = list(
+                                pre = get_hook("pre_add_filter_hook"),
+                                post = get_hook("post_add_filter_hook")
+                              ), ...) {
+  x$add_filter(filter, step_id, run_flow = run_flow, hook = hook)
   return(invisible(x))
 }
 
@@ -1435,9 +1453,15 @@ rm_filter <- function(x, step_id, filter_id, ...) {
 
 #' @rdname rm_filter
 #' @param run_flow If `TRUE`, data flow is run after the filter is removed.
+#' @param hook List of hooks describing methods to run before/after the filter is removed.
+#'     See \link{hooks} for more details.
 #' @export
-rm_filter.Cohort <- function(x, step_id, filter_id, run_flow = FALSE, ...) {
-  x$remove_filter(step_id, filter_id, run_flow)
+rm_filter.Cohort <- function(x, step_id, filter_id, run_flow = FALSE,
+                             hook = list(
+                               pre = get_hook("pre_rm_filter_hook"),
+                               post = get_hook("post_rm_filter_hook")
+                             ), ...) {
+  x$remove_filter(step_id, filter_id, run_flow = run_flow, hook = hook)
   return(invisible(x))
 }
 
@@ -1599,7 +1623,7 @@ sum_up <- function(x, to_string = FALSE) {
 #' @param x Cohort object.
 #' @param step_id If provided, the selected step state is returned.
 #' @param json If TRUE, return state in JSON format.
-#' @return List object of character string being the list convertion to JSON format.
+#' @return List object of character string being the list conversion to JSON format.
 #'
 #' @seealso \link{cohort-methods}
 #' @export

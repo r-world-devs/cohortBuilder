@@ -8,7 +8,15 @@
 \usage{
 rm_filter(x, step_id, filter_id, ...)
 
-\method{rm_filter}{Cohort}(x, step_id, filter_id, run_flow = FALSE, ...)
+\method{rm_filter}{Cohort}(
+  x,
+  step_id,
+  filter_id,
+  run_flow = FALSE,
+  hook = list(pre = get_hook("pre_rm_filter_hook"), post =
+    get_hook("post_rm_filter_hook")),
+  ...
+)
 
 \method{rm_filter}{Source}(x, step_id, filter_id, ...)
 }
@@ -22,6 +30,9 @@ rm_filter(x, step_id, filter_id, ...)
 \item{...}{Other parameters passed to specific S3 method.}
 
 \item{run_flow}{If `TRUE`, data flow is run after the filter is removed.}
+
+\item{hook}{List of hooks describing methods to run before/after the filter is removed.
+See \link{hooks} for more details.}
 }
 \value{
 Method dependent object (i.e. `Cohort` or `Source`) having selected filter removed.

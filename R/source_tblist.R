@@ -80,10 +80,12 @@ as.tblist.list <- function(x, names, ..., .class = NULL) {
 #' @rdname set_source
 #' @export
 set_source.tblist <- function(dtconn, primary_keys = NULL, binding_keys = NULL,
-                              source_code = NULL, description = NULL, ...) {
+                              source_code = NULL, description = NULL, available_filters = NULL,
+                              compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE), ...) {
   Source$new(
     dtconn, primary_keys = primary_keys, binding_keys = binding_keys,
     source_code = source_code, description = description,
+    available_filters = available_filters, compute_meta_stats = compute_meta_stats,
     ...
   )
 }
@@ -225,6 +227,17 @@ S7::method(cb_get_filter_defaults, list(CbFilterDiscreteText, tblist_class)) <- 
 
 # -- Shared helpers for range-based filters -----------------------------------
 
+#' Bin a numeric variable into frequency counts
+#'
+#' Cuts a numeric column into intervals (step from `extra_params$step`, default
+#' `1`) and counts observations per bin, returning lower/upper bounds.
+#'
+#' @param data_object Named list of tibbles.
+#' @param dataset Dataset name.
+#' @param variable Numeric column name.
+#' @param extra_params Filter extras; may carry `step`.
+#' @return A data frame with `level`, `count`, `l_bound`, `u_bound`.
+#' @noRd
 get_range_frequencies <- function(data_object, dataset, variable, extra_params) {
   step <- 1L
   if (length(stats::na.omit(data_object[[dataset]][[variable]])) == 0L) {
@@ -280,6 +293,15 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
     )
 }
 
+#' Apply a range/date/datetime filter to a tblist data object
+#'
+#' Shared implementation for range-type filters: keeps rows within the
+#' (domain-intersected) range, honoring `keep_na`.
+#'
+#' @param filter S7 range-type filter.
+#' @param data_object Named list of tibbles.
+#' @return The filtered `data_object` with a `filtered` attribute set.
+#' @noRd
 range_filter_data_impl <- function(filter, data_object) {
   dataset <- filter@dataset
   variable <- filter@variable
@@ -305,6 +327,12 @@ range_filter_data_impl <- function(filter, data_object) {
   data_object
 }
 
+#' Default range from cached frequency bounds
+#'
+#' @param filter S7 range-type filter (unused).
+#' @param cache_object Cached stats with `frequencies` bounds.
+#' @return A list with `range = c(min, max)`.
+#' @noRd
 range_get_defaults_impl <- function(filter, cache_object) {
   list(
     range = c(
@@ -362,6 +390,17 @@ S7::method(cb_get_filter_defaults, list(CbFilterRange, tblist_class)) <- functio
 
 # -- Date range frequencies helper --------------------------------------------
 
+#' Bin a date variable into frequency counts
+#'
+#' Like [get_range_frequencies()] but for `Date` columns, using `seq.Date()`
+#' with step from `extra_params$step` (default `"day"`).
+#'
+#' @param data_object Named list of tibbles.
+#' @param dataset Dataset name.
+#' @param variable Date column name.
+#' @param extra_params Filter extras; may carry `step`.
+#' @return A data frame with `level`, `count`, `l_bound`, `u_bound`.
+#' @noRd
 get_date_range_frequencies <- function(data_object, dataset, variable, extra_params) {
   step <- "day"
   if (length(stats::na.omit(data_object[[dataset]][[variable]])) == 0L) {
@@ -460,16 +499,35 @@ S7::method(cb_get_filter_defaults, list(CbFilterDateRange, tblist_class)) <- fun
 
 # -- Datetime helpers ---------------------------------------------------------
 
+#' Build named choice labels with counts for a vector
+#'
+#' @param vec A vector of observed values.
+#' @return A named character vector: values named `"<value> (<count>)"`.
+#' @noRd
 col_choices <- function(vec) {
   counts <- table(vec)
   stats::setNames(names(counts), paste(names(counts), glue::glue("({counts})")))
 }
 
+#' Convert a named stats vector to a single-column data frame
+#'
+#' @param vec_stats A named numeric vector.
+#' @param name Name to give the resulting column.
+#' @return A one-column data frame with row names from `vec_stats`.
+#' @noRd
 group_stats <- function(vec_stats, name) {
   data.frame(val = as.vector(vec_stats), row.names = names(vec_stats)) |>
     stats::setNames(name)
 }
 
+#' Pick a datetime binning step keeping bin count manageable
+#'
+#' Chooses the smallest unit (mins..years) yielding at most ~200 bins across the
+#' time span.
+#'
+#' @param min_date,max_date Range endpoints (datetimes).
+#' @return A named integer (seconds per chosen unit).
+#' @noRd
 calculate_datetime_step <- function(min_date, max_date) {
   steps <- c(
     "mins" = 60L, "hours" = 3600L, "days" = 86400L,
@@ -973,9 +1031,14 @@ S7::method(cb_filter_to_expr, list(CbFilterQuery, tblist_class)) <- function(fil
   pipe_all_filters(code_data)
 }
 
-# Extract a plain description string from a `describe()` object (a list with a
-# `text` field), a bare character string, or `NULL`. Returns `NULL` when no
-# usable text is found.
+#' Extract plain description text from a describe object or string
+#'
+#' Pulls the `text` from a `describe()` object (a list with a `text` field), a
+#' bare character string, or `NULL`. Returns `NULL` when no usable text exists.
+#'
+#' @param x A `describe()` object, character string, or `NULL`.
+#' @return A description string, or `NULL`.
+#' @noRd
 description_text <- function(x) {
   if (is.null(x)) return(NULL)
   if (is.list(x)) x <- x$text
@@ -983,9 +1046,15 @@ description_text <- function(x) {
   x
 }
 
-# Build the structured list of variables a filter operates on: one entry per
-# variable with its name and the description looked up from the source
-# description (`NA` when undescribed).
+#' Build a filter's variable list with descriptions
+#'
+#' One entry per variable the filter operates on, each with its name and the
+#' description looked up from the source description (`NA` when undescribed).
+#'
+#' @param filter S7 filter object.
+#' @param source Source object.
+#' @return A list of `list(name, description)` entries.
+#' @noRd
 build_filter_variables <- function(filter, source) {
   vars <- filter_variables(filter)
   dataset_desc <- source$description[[filter@dataset]]
@@ -994,16 +1063,28 @@ build_filter_variables <- function(filter, source) {
   })
 }
 
-# Build a single human-readable description for a filter, combining the filter
-# name and the filter-level description (when set). The attached variables and
-# their descriptions are exposed separately in the `variables` field.
+#' Build a human-readable filter description
+#'
+#' Combines the filter name and the filter-level description (when set).
+#' Variable descriptions are exposed separately in the `variables` field.
+#'
+#' @param filter S7 filter object.
+#' @return A single description string.
+#' @noRd
 build_filter_description <- function(filter) {
   parts <- c(filter@name, description_text(filter@description))
   paste(parts, collapse = ". ")
 }
 
-# Resolve a filter's domain: prefer the declared domain, otherwise derive it
-# from the stored meta stats (e.g. observed choices / min-max).
+#' Resolve a filter's domain for `shape()`
+#'
+#' Prefers the declared `@domain`, otherwise derives it from stored meta stats
+#' (e.g. observed choices / min-max).
+#'
+#' @param filter S7 filter object.
+#' @param source Source object.
+#' @return The filter domain, or `NULL`.
+#' @noRd
 filter_shape_domain <- function(filter, source) {
   domain <- filter@domain
   if (!is.null(domain)) return(domain)
@@ -1012,6 +1093,7 @@ filter_shape_domain <- function(filter, source) {
   cb_domain_from_stats(filter, stats)
 }
 
+#' @rdname shape
 #' @export
 shape.tblist <- function(source, field, subfield, ...) {
   description_obj <- source$description
@@ -1100,20 +1182,35 @@ shape.tblist <- function(source, field, subfield, ...) {
 
 # -- Domain propagation helpers ------------------------------------------------
 
-# Find the filter in `filters` that corresponds to `target_filter`. Filters are
-# matched by id: filter ids are deterministic (derived from dataset + variable
-# when not set explicitly), so the same logical filter keeps the same id across
-# steps and can be matched directly.
+#' Find the filter matching a target filter by id
+#'
+#' Filter ids are deterministic (derived from dataset + variable when not set
+#' explicitly), so the same logical filter keeps the same id across steps and
+#' can be matched directly.
+#'
+#' @param target_filter The filter to match.
+#' @param filters Named list of filters to search.
+#' @return The matching filter, or `NULL`.
+#' @noRd
 find_matching_filter <- function(target_filter, filters) {
   filters[[target_filter@id]]
 }
 
-# "filter" mode: narrow the target filter's domain from the same logical filter
-# found in *previous* steps. Search from the parent step back toward step 1 and
-# intersect the effective domains found, so the target is restricted by the
-# filter wherever it was set upstream. When no previous step contains the filter,
-# fall back to the filter definition declared in `source$available_filters`
-# (its `@domain`). Purely value-/definition-based: no data access.
+#' Compute a `"filter"`-mode propagated domain
+#'
+#' Narrows the target filter's domain from the same logical filter found in
+#' *previous* steps. Searches from the parent step back toward step 1 and
+#' intersects the effective domains found, so the target is restricted by the
+#' filter wherever it was set upstream. When no previous step contains the
+#' filter, falls back to the definition declared in `source$available_filters`
+#' (its `@domain`). Purely value-/definition-based: no data access.
+#'
+#' @param target_filter The filter whose domain is being narrowed.
+#' @param cohort The Cohort object.
+#' @param parent_id Id of the parent (previous) step.
+#' @param source Source object (for the fallback definition).
+#' @return The propagated domain, or `NULL`.
+#' @noRd
 domain_from_filter <- function(target_filter, cohort, parent_id, source) {
   found_any <- FALSE
   effective <- NULL
@@ -1149,6 +1246,18 @@ domain_from_filter <- function(target_filter, cohort, parent_id, source) {
 
 # -- cb_domain_from_data: tblist methods ---------------------------------------
 
+#' Data-derived domain for a discrete filter (tblist)
+#'
+#' Returns the distinct non-`NA` observed values as a *character* domain (not a
+#' factor): a factor domain breaks discrete filtering downstream, and this keeps
+#' the result consistent with `stats`-mode propagation.
+#'
+#' @param filter S7 discrete filter.
+#' @param source Source object.
+#' @param data_object Named list of tibbles.
+#' @param ... Unused.
+#' @return A character vector of observed values.
+#' @noRd
 domain_from_data_discrete_impl <- function(filter, source, data_object, ...) {
   column <- data_object[[filter@dataset]][[filter@variable]]
   # Return a character domain (not a factor). A factor domain breaks discrete
@@ -1170,6 +1279,14 @@ S7::method(cb_domain_from_data, list(CbFilterDiscreteText, tblist_class)) <- fun
   join_discrete_text(values)
 }
 
+#' Data-derived domain for a range-type filter (tblist)
+#'
+#' @param filter S7 range/date/datetime filter.
+#' @param source Source object.
+#' @param data_object Named list of tibbles.
+#' @param ... Unused.
+#' @return A length-2 `c(min, max)` range, or `NULL` when no data.
+#' @noRd
 domain_from_data_range_impl <- function(filter, source, data_object, ...) {
   column <- stats::na.omit(data_object[[filter@dataset]][[filter@variable]])
   if (length(column) == 0L) return(NULL)
@@ -1188,6 +1305,17 @@ S7::method(cb_domain_from_data, list(CbFilterMultiDiscrete, tblist_class)) <- fu
 
 # -- Autofilter rules ---------------------------------------------------------
 
+#' Autofilter rule for character columns
+#'
+#' Produces a `discrete` filter spec (or `discrete_text` when every value is
+#' unique); uses the `"vs"` GUI input above 3 distinct values.
+#'
+#' @param column The data column.
+#' @param name Variable/filter name.
+#' @param dataset_name Owning dataset name.
+#' @param field_description Optional field description (may carry `domain`).
+#' @return A named list of `filter()` arguments.
+#' @noRd
 rule_character <- function(column, name, dataset_name, field_description = NULL) {
   type <- "discrete"
   gui_input <- NULL
@@ -1207,6 +1335,17 @@ rule_character <- function(column, name, dataset_name, field_description = NULL)
   )
 }
 
+#' Autofilter rule for factor columns
+#'
+#' Produces a `discrete` filter spec (or `discrete_text` when every value is
+#' unique) using the factor's levels as domain.
+#'
+#' @param column The data column.
+#' @param name Variable/filter name.
+#' @param dataset_name Owning dataset name.
+#' @param field_description Optional field description (may carry `domain`).
+#' @return A named list of `filter()` arguments.
+#' @noRd
 rule_factor <- function(column, name, dataset_name, field_description = NULL) {
   type <- "discrete"
   gui_input <- NULL
@@ -1226,6 +1365,16 @@ rule_factor <- function(column, name, dataset_name, field_description = NULL) {
   )
 }
 
+#' Autofilter rule for numeric columns
+#'
+#' Produces a `range` filter spec with domain `c(min, max)`.
+#'
+#' @param column The data column.
+#' @param name Variable/filter name.
+#' @param dataset_name Owning dataset name.
+#' @param field_description Optional field description (may carry `domain`).
+#' @return A named list of `filter()` arguments.
+#' @noRd
 rule_numeric <- function(column, name, dataset_name, field_description = NULL) {
   domain <- field_description$domain %||% c(min(column, na.rm = TRUE), max(column, na.rm = TRUE))
   list(
@@ -1234,8 +1383,21 @@ rule_numeric <- function(column, name, dataset_name, field_description = NULL) {
     domain = domain
   )
 }
+
+#' Autofilter rule for integer columns (alias of [rule_numeric()])
+#' @noRd
 rule_integer <- rule_numeric
 
+#' Autofilter rule for Date columns
+#'
+#' Produces a `date_range` filter spec with domain `c(min, max)`.
+#'
+#' @param column The data column.
+#' @param name Variable/filter name.
+#' @param dataset_name Owning dataset name.
+#' @param field_description Optional field description (may carry `domain`).
+#' @return A named list of `filter()` arguments.
+#' @noRd
 rule_Date <- function(column, name, dataset_name, field_description = NULL) {
   domain <- field_description$domain %||% c(min(column, na.rm = TRUE), max(column, na.rm = TRUE))
   list(
@@ -1245,6 +1407,16 @@ rule_Date <- function(column, name, dataset_name, field_description = NULL) {
   )
 }
 
+#' Autofilter rule for POSIXct columns
+#'
+#' Produces a `datetime_range` filter spec with domain `c(min, max)`.
+#'
+#' @param column The data column.
+#' @param name Variable/filter name.
+#' @param dataset_name Owning dataset name.
+#' @param field_description Optional field description (may carry `domain`).
+#' @return A named list of `filter()` arguments.
+#' @noRd
 rule_POSIXct <- function(column, name, dataset_name, field_description = NULL) {
   domain <- field_description$domain %||% c(min(column, na.rm = TRUE), max(column, na.rm = TRUE))
   list(
@@ -1254,6 +1426,16 @@ rule_POSIXct <- function(column, name, dataset_name, field_description = NULL) {
   )
 }
 
+#' Dispatch to the autofilter rule for a column's class
+#'
+#' Calls `rule_<class>()` based on the column's first class.
+#'
+#' @param column The data column.
+#' @param name Variable/filter name.
+#' @param dataset_name Owning dataset name.
+#' @param field_description Optional field description.
+#' @return A named list of `filter()` arguments.
+#' @noRd
 filter_rule <- function(column, name, dataset_name, field_description = NULL) {
   rule_method <- paste0("rule_", class(column)[[1]])
   do.call(
@@ -1263,6 +1445,13 @@ filter_rule <- function(column, name, dataset_name, field_description = NULL) {
   )
 }
 
+#' Build autofilter rules for every column of a dataset
+#'
+#' @param dataset A single dataset (tibble/data frame).
+#' @param dataset_name The dataset's name.
+#' @param description Optional per-field descriptions.
+#' @return A list of `filter()` argument lists, one per column.
+#' @noRd
 filter_rules <- function(dataset, dataset_name, description = NULL) {
   dataset |>
     purrr::imap(~ filter_rule(.x, .y, dataset_name = dataset_name,

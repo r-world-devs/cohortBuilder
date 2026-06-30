@@ -11,9 +11,8 @@ cb_get_filter_stats(filter, source, ...)
 
 \item{source}{Source object.}
 
-\item{...}{Additional arguments.}
-
-\item{data_object}{Data object to compute statistics from.}
+\item{...}{Additional arguments. Methods receive a `data_object` (the data to
+compute statistics from) here.}
 }
 \value{
 List of statistics.

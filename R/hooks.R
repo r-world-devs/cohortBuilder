@@ -96,6 +96,16 @@ get_hook <- function(name) {
   getOption(name, default = function(...) {})
 }
 
+#' Execute one or several hooks
+#'
+#' Runs a single hook function or a list of hook functions, optionally forwarding
+#' `hook_args`.
+#'
+#' @param hooks A hook function or list of hook functions.
+#' @param ... Arguments passed to each hook.
+#' @param hook_args Optional list passed to hooks as the `hook_args` argument.
+#' @return The result of a single hook, or `invisible(TRUE)` for a list.
+#' @noRd
 run_hooks <- function(hooks, ..., hook_args = list()) {
   # if no hook_args the run with defaults
   if (length(hook_args) == 0) {

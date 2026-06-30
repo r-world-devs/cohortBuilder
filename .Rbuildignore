@@ -15,3 +15,7 @@ meta_data.yaml
 ^\.github$
 ^\.lintr
 dev/*
+^\.claude$
+^CLAUDE\.md$
+^domains_revised\.md$
+^todo$

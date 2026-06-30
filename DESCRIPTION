@@ -1,7 +1,7 @@
 Package: cohortBuilder
 Type: Package
 Title: Data Source Agnostic Filtering Tools
-Version: 0.4.0.9000
+Version: 1.0.0
 Authors@R: 
     c(person('Krystian', 'Igras', 
              email = 'krystian8207@gmail.com', 
@@ -14,6 +14,7 @@ Description: Common API for filtering data stored in different data models.
     Works standalone or with 'shinyCohortBuilder' as the GUI for interactive Shiny apps.
 License: MIT + file LICENSE
 Encoding: UTF-8
+Language: en-US
 LazyData: true
 Imports:
     R6,

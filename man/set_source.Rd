@@ -11,7 +11,9 @@ set_source(
   primary_keys = NULL,
   binding_keys = NULL,
   source_code = NULL,
-  description = NULL
+  description = NULL,
+  available_filters = NULL,
+  compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE)
 )
 
 \method{set_source}{tblist}(
@@ -20,6 +22,8 @@ set_source(
   binding_keys = NULL,
   source_code = NULL,
   description = NULL,
+  available_filters = NULL,
+  compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE),
   ...
 )
 }
@@ -39,6 +43,9 @@ When provided, used as a part of reproducible code output.}
 
 \item{description}{A named list storing the source objects description.
 Can be accessed with \link{description} Cohort method.}
+
+\item{available_filters}{List of filter definitions available for the source.
+See \link{autofilter} for generating them automatically.}
 
 \item{compute_meta_stats}{Whether to pre-compute metadata statistics for the source
 `available_filters`. When `FALSE`, the computation is skipped and filter domains

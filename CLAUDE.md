@@ -23,9 +23,15 @@ lintr::lint_package()            # Lint (config in .lintr)
 
 ### Two R6 Classes
 
-**Source** (`R/source_methods.R`) — Wraps a data connection (`dtconn`) with metadata: primary keys, binding keys, available filters, and computed stats. Defines S3 generics for source-type-specific operations (`.init_step()`, `.pre_filtering()`, `.post_filtering()`, `.collect_data()`, `.get_stats()`, `.run_binding()`, etc.).
+**Source** (`R/source_methods.R`) — Wraps a data connection (`dtconn`) with metadata: primary keys, binding keys, available filters, and computed stats. Defines S3 generics for source-type-specific operations (`.init_step()`, `.pre_filtering()`, `.post_filtering()`, `.collect_data()`, `.get_stats()`, `.run_binding()`, etc.). The `compute_meta_stats` argument (default from option `cb.source_filters_meta_stats`, `TRUE`) controls whether metadata statistics for `available_filters` are pre-computed into `meta_stats`; when `FALSE`, filter domains fall back to live computation.
 
 **Cohort** (`R/cohort_methods.R`) — Orchestrates the filtering workflow. Manages steps (ordered filter groups), executes the data pipeline via `run_flow()`, and provides state serialization (`get_state()`/`restore()`), reproducible code generation (`get_code()`), and statistics/attrition reporting. Supports pre/post hooks for most operations (including `update_filter`).
+
+Key `Cohort$new()` arguments:
+- `compute_stats` (default `TRUE`) — compute and store filter/step statistics after each step. Set `FALSE` for metadata-only operation.
+- `propagate_domains` — domain propagation mode between steps: `"none"` (default), `"filter"` (from previous step filter values), `"stats"` (from stored statistics; requires `compute_stats = TRUE`), or `"data"` (scan filtered data; the stats-free equivalent).
+
+The per-step statistics store (`private$stats`) is keyed by step id; slot `N` is both step N's post-filtering stats and step N+1's pre-filtering stats, and nests data stats under `$source` and filter stats under `$filters`. Methods: `get_stats()`/`update_stats()` read/write the store; `calc_stats()` computes stats live (used by `stat()`).
 
 ### Filter System (S7 Dual Dispatch)
 
@@ -82,12 +88,12 @@ The `tblist` implementation in `R/source_tblist.R` serves as the reference (60+ 
 
 - `describe(text, ...)` — Creates a description object (text + extra fields) for datasets/filters
 - `autofilter(source, attach_as)` — S3 generic; auto-generates filters from data types using filter rules (`rule_character`, `rule_factor`, `rule_numeric`, etc.). `attach_as = "step"` adds filters as a step; `attach_as = "meta"` stores them in `source$available_filters`
-- `shape(source)` — S3 generic; returns a tibble of filter metadata (dataset, filter id, description, stats/domain)
+- `shape(source)` — S3 generic; returns a structured list `list(datasets, filters)` for programmatic/LLM inspection. `datasets` maps dataset name → description text; `filters` is keyed by filter id, each entry being `list(dataset, type, description, variables, domain)` (domain falls back to `cb_domain_from_stats` on `meta_stats` when `filter@domain` is `NULL`). Called with a `field`/`subfield` (`shape(source, field, subfield)`) instead returns description text lookup (used by `Cohort$show_help()`)
 - `description(cohort, ...)` — Retrieves descriptions; supports custom modifier via `cb_help_modifier` option
 
 ### Pending Step System
 
-Cohort methods `set_pending(step_id)` and `is_pending(step_id)` track whether a step needs recalculation. Steps are marked pending when filters are added/updated/removed, and resolved after `run_step()`. This optimizes caching by skipping stat recomputation for unchanged steps.
+Cohort methods `set_pending(step_id)` and `is_pending(step_id)` track whether a step needs recalculation. Steps are marked pending when filters are added/updated/removed, and resolved after `run_step()`. This optimizes performance by skipping statistics recomputation for unchanged steps.
 
 ### AI/LLM Tool Integration (`R/ai_tools.R`)
 

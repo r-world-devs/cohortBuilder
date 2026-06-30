@@ -9,7 +9,8 @@ cb_intersect_domain_values(filter, ...)
 \arguments{
 \item{filter}{S7 filter object (used for type dispatch only).}
 
-\item{a, b}{Domain values to intersect. Either may be `NULL`.}
+\item{...}{Additional arguments. Methods receive two domain values `a` and
+`b` to intersect (either may be `NULL`).}
 }
 \value{
 The intersected domain value, or `NULL`.

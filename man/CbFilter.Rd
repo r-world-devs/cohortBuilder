@@ -35,6 +35,9 @@ domain is provided, the domain serves as the effective value.}
 \item{step_id}{Step identifier (set when filter is attached to a step).}
 
 \item{extra}{Named list of extra parameters.}
+
+\item{private}{Named list of internal parameters, not intended to be set
+directly by users.}
 }
 \description{
 Base class for all cohortBuilder filters

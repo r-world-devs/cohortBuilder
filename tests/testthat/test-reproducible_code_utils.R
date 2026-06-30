@@ -231,7 +231,7 @@ test_that("pipe_all_filters combines filtering rows into single piped expression
   f2 <- filter(
     type = "range", id = "sl", name = "Sepal.Length",
     variable = "Sepal.Length", dataset = "iris",
-    range = c(5, 7)
+    range = c(5L, 7L)
   )
   te1 <- type_expr(
     action = "filtering", step = "1",
@@ -258,7 +258,7 @@ test_that("pipe_all_filters combines filtering rows into single piped expression
   eval(filtering_rows$expr[[1L]])
   expect_true(all(data_object[["iris"]]$Species %in% c("setosa", "virginica", NA)))
   expect_true(all(
-    (data_object[["iris"]]$Sepal.Length <= 7 & data_object[["iris"]]$Sepal.Length >= 5) |
+    (data_object[["iris"]]$Sepal.Length <= 7L & data_object[["iris"]]$Sepal.Length >= 5L) |
       is.na(data_object[["iris"]]$Sepal.Length)
   ))
 })

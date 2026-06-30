@@ -87,6 +87,7 @@ To create a custom filter you need to:
 CbFilterLogical <- S7::new_class("CbFilterLogical",
   parent = CbFilter,
   properties = list(
+    dataset = S7::class_character,
     variable = S7::class_character,
     value = S7::class_any,
     keep_na = S7::class_logical
@@ -94,8 +95,8 @@ CbFilterLogical <- S7::new_class("CbFilterLogical",
   constructor = function(id = NULL, name = NULL, variable, value = NA,
                          dataset, keep_na = TRUE, description = NULL,
                          active = getOption("cb_active_filter", default = TRUE), ...) {
-    id <- id %||% .default_filter_id(dataset, variable)
-    name <- name %||% variable
+    if (is.null(id)) id <- paste(dataset, variable, sep = "-")
+    if (is.null(name)) name <- variable
     S7::new_object(S7::S7_object(),
       type = "logical", id = id, name = name, input_param = "value",
       variable = variable, value = value, dataset = dataset,
@@ -174,11 +175,11 @@ S7::method(cb_get_filter_stats, list(CbFilterLogical, tblist_class)) <- function
   }
   stats <- list(
     choices = if ("choices" %in% name) data_object[[dataset]][[variable]] |>
-      stats::na.omit() |>table() |>as.list(),
+      stats::na.omit() |> table() |> as.list(),
     n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
-      stats::na.omit() |>length(),
+      stats::na.omit() |> length(),
     n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
-      is.na() |>sum()
+      is.na() |> sum()
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -193,7 +194,7 @@ S7::method(cb_plot_filter_data, list(CbFilterLogical, tblist_class)) <- function
   dataset <- filter@dataset
   variable <- filter@variable
   if (nrow(data_object[[dataset]])) {
-    data_object[[dataset]][[variable]] |>table() |>prop.table() |>graphics::barplot(...)
+    data_object[[dataset]][[variable]] |> table() |> prop.table() |> graphics::barplot(...)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
   }
@@ -264,7 +265,7 @@ Let's verify the filtering worked:
 
 ```{r}
 nrow(get_data(coh)$iris)
-unique(get_data(coh)$iris$is_setosa)
+collapse::funique(get_data(coh)$iris$is_setosa)
 ```
 
 We can also check statistics and reproducible code:

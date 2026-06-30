@@ -9,7 +9,8 @@ cb_domain_from_stats(filter, ...)
 \arguments{
 \item{filter}{S7 filter object.}
 
-\item{stats}{List of stored statistics for the filter.}
+\item{...}{Additional arguments. Methods receive `stats`, the list of stored
+statistics for the filter.}
 }
 \value{
 Domain value appropriate for the filter type, or `NULL`.

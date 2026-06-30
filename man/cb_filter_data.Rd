@@ -11,9 +11,8 @@ cb_filter_data(filter, source, ...)
 
 \item{source}{Source object.}
 
-\item{...}{Additional arguments.}
-
-\item{data_object}{Data object to filter.}
+\item{...}{Additional arguments. Methods receive a `data_object` (the data to
+filter) here.}
 }
 \value{
 Filtered data object.

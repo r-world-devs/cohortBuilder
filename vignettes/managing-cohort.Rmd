@@ -233,3 +233,78 @@ sum_up(my_cohort)
 update_source(my_cohort, source_two)
 sum_up(my_cohort)
 ```
+
+## Statistics and domain propagation
+
+Two `cohort()` arguments control how much work the cohort does behind the
+scenes and how filter domains evolve across steps.
+
+### `compute_stats`
+
+By default (`compute_stats = TRUE`) the cohort computes and stores filter and
+data statistics after each step. These power `stat()`, `attrition()`, and the
+GUI summaries.
+
+If you only need the filtered data (for example in a headless / batch context),
+set `compute_stats = FALSE` to skip statistics computation:
+
+```{r}
+librarian_source <- set_source(as.tblist(librarian))
+
+fast_cohort <- librarian_source |>
+  cohort(
+    filter(
+      "discrete",
+      id = "author", dataset = "books",
+      variable = "author", value = "Dan Brown"
+    ),
+    compute_stats = FALSE,
+    run_flow = TRUE
+  )
+
+get_data(fast_cohort)$books
+```
+
+### `propagate_domains`
+
+In multi-step filtering, a later step's filter may still advertise its full
+domain even though earlier steps have already narrowed the data. The
+`propagate_domains` argument controls whether (and how) a filter's domain is
+restricted based on upstream steps:
+
+- `"none"` (default) - domains are left untouched,
+- `"filter"` - narrow from the previous step's filter values,
+- `"stats"` - narrow from stored statistics (requires `compute_stats = TRUE`),
+- `"data"` - narrow by scanning the filtered data (the stats-free equivalent).
+
+Domain propagation only adjusts filters that already declare an initial
+`domain`. Below, step 1 keeps only Dan Brown's books, so step 2's `genre`
+filter domain narrows to the genres that actually remain:
+
+```{r}
+all_genres <- sort(collapse::funique(librarian$books$genre))
+
+propagated_cohort <- librarian_source |>
+  cohort(
+    step(
+      filter(
+        "discrete",
+        id = "author", dataset = "books",
+        variable = "author", value = "Dan Brown"
+      )
+    ),
+    step(
+      filter(
+        "discrete",
+        id = "genre", dataset = "books",
+        variable = "genre", domain = all_genres
+      )
+    ),
+    propagate_domains = "data",
+    run_flow = TRUE
+  )
+
+# Full domain vs. domain after step 1 narrowing
+all_genres
+propagated_cohort$get_step("2")$filters[["genre"]]@domain
+```

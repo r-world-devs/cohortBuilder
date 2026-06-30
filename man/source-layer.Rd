@@ -128,6 +128,6 @@ should be defined:
   argument of \link{code} function. Aims to modify reproducible code into the final format.}
 }
 Except from the above methods, you may extend the existing or new source with providing
-custom filtering methods. See \link{creating-filters}.
+custom filtering methods. See `vignette("custom-filters")`.
 In order to see more details about how to implement custom source check `vignette("custom-extensions")`.
 }

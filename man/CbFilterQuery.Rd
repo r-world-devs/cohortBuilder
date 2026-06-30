@@ -32,6 +32,9 @@ CbFilterQuery(
 
 \item{description}{Optional description.}
 
+\item{domain}{Optional filter domain (the set of allowed values). `NULL`
+means the domain is derived from the data.}
+
 \item{active}{If `FALSE`, filter is skipped.}
 
 \item{...}{Extra parameters.}

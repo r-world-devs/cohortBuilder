@@ -1,6 +1,14 @@
 static_params <- c("type", "id", "name")
 
-# S3 class registration for S7 dispatch
+#' S7 class wrapper for the `tblist` source
+#'
+#' S7 representation of the built-in `tblist` source class, used as the source
+#' side of S7 dual dispatch when registering filter methods (e.g.
+#' `S7::method(cb_filter_data, list(CbFilterDiscrete, tblist_class))`). See
+#' `vignette("custom-filters")`.
+#'
+#' @format An S7 S3-class wrapper created with [S7::new_S3_class()].
+#' @export
 tblist_class <- S7::new_S3_class("tblist")
 
 # -- Filter Type Registry -----------------------------------------------------
@@ -63,6 +71,8 @@ register_filter_type <- function(type, constructor) {
 #'   domain is provided, the domain serves as the effective value.
 #' @param step_id Step identifier (set when filter is attached to a step).
 #' @param extra Named list of extra parameters.
+#' @param private Named list of internal parameters, not intended to be set
+#'   directly by users.
 #'
 #' @export
 CbFilter <- S7::new_class("CbFilter",
@@ -91,6 +101,8 @@ CbFilter <- S7::new_class("CbFilter",
 #' @param dataset Dataset name.
 #' @param keep_na If `TRUE`, NA values are retained.
 #' @param description Optional description.
+#' @param domain Optional filter domain (the set of allowed values). `NULL`
+#'   means the domain is derived from the data.
 #' @param active If `FALSE`, filter is skipped.
 #' @param ... Extra parameters.
 #'
@@ -317,8 +329,8 @@ CbFilterQuery <- S7::new_class("CbFilterQuery",
 #'
 #' @param filter S7 filter object.
 #' @param source Source object.
-#' @param data_object Data object to filter.
-#' @param ... Additional arguments.
+#' @param ... Additional arguments. Methods receive a `data_object` (the data to
+#'   filter) here.
 #' @return Filtered data object.
 #' @export
 cb_filter_data <- S7::new_generic("cb_filter_data", c("filter", "source"))
@@ -327,8 +339,8 @@ cb_filter_data <- S7::new_generic("cb_filter_data", c("filter", "source"))
 #'
 #' @param filter S7 filter object.
 #' @param source Source object.
-#' @param data_object Data object to compute statistics from.
-#' @param ... Additional arguments.
+#' @param ... Additional arguments. Methods receive a `data_object` (the data to
+#'   compute statistics from) here.
 #' @return List of statistics.
 #' @export
 cb_get_filter_stats <- S7::new_generic("cb_get_filter_stats", c("filter", "source"))
@@ -337,8 +349,8 @@ cb_get_filter_stats <- S7::new_generic("cb_get_filter_stats", c("filter", "sourc
 #'
 #' @param filter S7 filter object.
 #' @param source Source object.
-#' @param data_object Data object to plot.
-#' @param ... Additional arguments passed to plotting functions.
+#' @param ... Additional arguments passed to plotting functions. Methods receive
+#'   a `data_object` (the data to plot) here.
 #' @return Plot side effect.
 #' @export
 cb_plot_filter_data <- S7::new_generic("cb_plot_filter_data", c("filter", "source"))
@@ -347,8 +359,7 @@ cb_plot_filter_data <- S7::new_generic("cb_plot_filter_data", c("filter", "sourc
 #'
 #' @param filter S7 filter object.
 #' @param source Source object.
-#' @param data_object Data object.
-#' @param ... Additional arguments.
+#' @param ... Additional arguments. Methods receive a `data_object` here.
 #' @return Filter-related data subset.
 #' @export
 cb_get_filter_data <- S7::new_generic("cb_get_filter_data", c("filter", "source"))
@@ -357,9 +368,8 @@ cb_get_filter_data <- S7::new_generic("cb_get_filter_data", c("filter", "source"
 #'
 #' @param filter S7 filter object.
 #' @param source Source object.
-#' @param data_object Data object.
-#' @param cache_object Cached statistics object.
-#' @param ... Additional arguments.
+#' @param ... Additional arguments. Methods receive a `data_object` and a
+#'   `cache_object` (cached statistics) here.
 #' @return Named list of default parameter values.
 #' @export
 cb_get_filter_defaults <- S7::new_generic("cb_get_filter_defaults", c("filter", "source"))
@@ -395,7 +405,7 @@ cb_filter_to_expr <- S7::new_generic("cb_filter_to_expr", c("filter", "source"))
 #' @keywords internal
 .default_filter_id <- function(dataset, variables, suffix = NULL) {
   sanitize <- function(x) gsub("[^[:alnum:]]", "", x)
-  parts <- sanitize(c(dataset, head(variables, 3L)))
+  parts <- sanitize(c(dataset, utils::head(variables, 3L)))
   if (length(variables) > 3L) {
     parts <- c(parts, substring(rlang::hash(sort(variables)), 1L, 4L))
   }
@@ -510,9 +520,14 @@ filter_effective_value <- function(filter) {
 # trims surrounding whitespace around every value (not just the first), so
 # "a, b, c" yields c("a", "b", "c") and round-trips cleanly.
 
-# Split a comma-separated discrete_text string into a character vector.
-# `NA`/`NULL`/"" yield character(0). Whitespace around each value is trimmed and
-# empty pieces are dropped, so values are matched exactly.
+#' Split a comma-separated discrete_text string into a character vector
+#'
+#' `NA`/`NULL`/`""` yield `character(0)`. Whitespace around each value is trimmed
+#' and empty pieces are dropped, so values are matched exactly.
+#'
+#' @param x A comma-separated string (or `NA`/`NULL`).
+#' @return A character vector of trimmed, non-empty values.
+#' @noRd
 split_discrete_text <- function(x) {
   if (is.null(x) || identical(x, NA) || identical(x, "")) {
     return(character(0L))
@@ -522,21 +537,38 @@ split_discrete_text <- function(x) {
   pieces[nzchar(pieces)]
 }
 
-# Join a character vector back into a canonical comma-separated string.
-# An empty vector yields "" (the discrete_text "nothing selected" value).
+#' Join a character vector into a canonical comma-separated string
+#'
+#' An empty vector yields `""` (the discrete_text "nothing selected" value).
+#'
+#' @param x A character vector.
+#' @return A single comma-separated string.
+#' @noRd
 join_discrete_text <- function(x) {
   paste(x, collapse = ",")
 }
 
 # -- Domain intersection -------------------------------------------------------
 
-# Identifies the filter in trimming warnings. `id` is the filter id (may be
-# missing/empty when the helpers are called without one).
+#' Label identifying a filter in domain-trimming warnings
+#'
+#' @param id The filter id (may be `NULL`/empty).
+#' @return A label string like `"Filter 'x' value"` or `"Filter value"`.
+#' @noRd
 trim_label <- function(id = NULL) {
   if (is.null(id) || !nzchar(id)) return("Filter value")
   sprintf("Filter '%s' value", id)
 }
 
+#' Intersect a discrete filter value with its domain
+#'
+#' Keeps only values present in `domain`, warning about any dropped values.
+#'
+#' @param value Selected values.
+#' @param domain Allowed values (`NULL` to skip intersection).
+#' @param id Filter id used in the warning label.
+#' @return The intersected value (or `domain` when `value` is `NA`).
+#' @noRd
 intersect_domain_discrete <- function(value, domain, id = NULL) {
   if (is.null(domain)) return(value)
   if (identical(value, NA)) return(domain)
@@ -551,9 +583,17 @@ intersect_domain_discrete <- function(value, domain, id = NULL) {
   result
 }
 
-# discrete_text variant: value and domain are comma-separated strings. Intersect
-# them as sets of trimmed values and return a comma-separated string, so the
-# effective value stays in the same string form the filter expects.
+#' Intersect a discrete_text filter value with its domain
+#'
+#' `value` and `domain` are comma-separated strings. Intersects them as sets of
+#' trimmed values and returns a comma-separated string, so the effective value
+#' stays in the same string form the filter expects.
+#'
+#' @param value Comma-separated selected values.
+#' @param domain Comma-separated allowed values (`NULL` to skip).
+#' @param id Filter id used in the warning label.
+#' @return A comma-separated intersected value.
+#' @noRd
 intersect_domain_discrete_text <- function(value, domain, id = NULL) {
   if (is.null(domain)) return(value)
   if (identical(value, NA)) return(domain)
@@ -570,6 +610,16 @@ intersect_domain_discrete_text <- function(value, domain, id = NULL) {
   join_discrete_text(result_vec)
 }
 
+#' Intersect a range filter value with its domain
+#'
+#' Narrows the `[min, max]` range to fit within the domain bounds, warning if
+#' the range is narrowed.
+#'
+#' @param value Length-2 range `c(min, max)`.
+#' @param domain Length-2 allowed range (`NULL` to skip).
+#' @param id Filter id used in the warning label.
+#' @return The narrowed range (or `domain` when `value` is `NA`).
+#' @noRd
 intersect_domain_range <- function(value, domain, id = NULL) {
   if (is.null(domain)) return(value)
   if (identical(value, NA)) return(domain)
@@ -585,6 +635,16 @@ intersect_domain_range <- function(value, domain, id = NULL) {
   result
 }
 
+#' Intersect a multi_discrete filter value with its domain
+#'
+#' Intersects each named per-variable value vector with the matching domain
+#' entry, warning about any dropped values.
+#'
+#' @param values Named list of selected value vectors.
+#' @param domain Named list of allowed value vectors (`NULL` to skip).
+#' @param id Filter id used in the warning label.
+#' @return The intersected named list (or `domain` when `values` is `NA`).
+#' @noRd
 intersect_domain_multi <- function(values, domain, id = NULL) {
   if (is.null(domain)) return(values)
   if (identical(values, NA)) return(domain)
@@ -615,6 +675,7 @@ intersect_domain_multi <- function(values, domain, id = NULL) {
 #' The default method returns the raw value with no domain logic.
 #'
 #' @param filter S7 filter object.
+#' @param ... Additional arguments passed to methods.
 #' @return The effective value for filtering.
 #' @export
 cb_intersect_domain <- S7::new_generic("cb_intersect_domain", "filter")
@@ -665,7 +726,8 @@ intersect_domain <- function(filter) {
 #' [cb_intersect_domain()], this never emits trimming warnings.
 #'
 #' @param filter S7 filter object (used for type dispatch only).
-#' @param a,b Domain values to intersect. Either may be `NULL`.
+#' @param ... Additional arguments. Methods receive two domain values `a` and
+#'   `b` to intersect (either may be `NULL`).
 #' @return The intersected domain value, or `NULL`.
 #' @export
 cb_intersect_domain_values <- S7::new_generic("cb_intersect_domain_values", "filter")
@@ -676,6 +738,12 @@ S7::method(cb_intersect_domain_values, CbFilter) <- function(filter, a, b) {
   a
 }
 
+#' Intersect two discrete domain values
+#'
+#' @param filter S7 filter object (dispatch only).
+#' @param a,b Domain value vectors; either may be `NULL`.
+#' @return The intersected vector, or `NULL`.
+#' @noRd
 intersect_domain_values_discrete <- function(filter, a, b) {
   if (is.null(a)) return(b)
   if (is.null(b)) return(a)
@@ -684,8 +752,15 @@ intersect_domain_values_discrete <- function(filter, a, b) {
 
 S7::method(cb_intersect_domain_values, CbFilterDiscrete) <- intersect_domain_values_discrete
 
-# discrete_text domains are comma-separated strings; intersect them as sets of
-# trimmed values and return a comma-separated string.
+#' Intersect two discrete_text domain values
+#'
+#' Domains are comma-separated strings; intersects them as sets of trimmed
+#' values and returns a comma-separated string.
+#'
+#' @param filter S7 filter object (dispatch only).
+#' @param a,b Comma-separated domain strings; either may be `NULL`.
+#' @return A comma-separated intersected string, or `NULL`.
+#' @noRd
 intersect_domain_values_discrete_text <- function(filter, a, b) {
   if (is.null(a)) return(b)
   if (is.null(b)) return(a)
@@ -694,6 +769,12 @@ intersect_domain_values_discrete_text <- function(filter, a, b) {
 
 S7::method(cb_intersect_domain_values, CbFilterDiscreteText) <- intersect_domain_values_discrete_text
 
+#' Intersect two range domain values
+#'
+#' @param filter S7 filter object (dispatch only).
+#' @param a,b Length-2 ranges `c(min, max)`; either may be `NULL`.
+#' @return The overlapping range, or `NULL`.
+#' @noRd
 intersect_domain_values_range <- function(filter, a, b) {
   if (is.null(a)) return(b)
   if (is.null(b)) return(a)
@@ -719,7 +800,8 @@ S7::method(cb_intersect_domain_values, CbFilterMultiDiscrete) <- function(filter
 #' generic. The default method returns `NULL` (no domain).
 #'
 #' @param filter S7 filter object.
-#' @param stats List of stored statistics for the filter.
+#' @param ... Additional arguments. Methods receive `stats`, the list of stored
+#'   statistics for the filter.
 #' @return Domain value appropriate for the filter type, or `NULL`.
 #' @export
 cb_domain_from_stats <- S7::new_generic("cb_domain_from_stats", "filter")
@@ -767,8 +849,8 @@ S7::method(cb_domain_from_stats, CbFilterMultiDiscrete) <- function(filter, stat
 #'
 #' @param filter S7 filter object.
 #' @param source Source object.
-#' @param data_object Data object to extract domain from.
-#' @param ... Additional arguments.
+#' @param ... Additional arguments. Methods receive a `data_object` (the data to
+#'   extract the domain from) here.
 #' @return Domain value appropriate for the filter type, or `NULL`.
 #' @export
 cb_domain_from_data <- S7::new_generic("cb_domain_from_data", c("filter", "source"))
@@ -777,6 +859,12 @@ S7::method(cb_domain_from_data, list(CbFilter, S7::class_any)) <- function(filte
   NULL
 }
 
+#' Tag a filter object with its step id
+#'
+#' @param filter_obj An S7 filter object.
+#' @param step_id The step id to assign.
+#' @return The filter object with `@step_id` set.
+#' @noRd
 assign_filter_step_id <- function(filter_obj, step_id) {
   filter_obj@step_id <- step_id
   filter_obj
