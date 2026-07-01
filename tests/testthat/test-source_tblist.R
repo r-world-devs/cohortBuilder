@@ -985,3 +985,184 @@ test_that("shape(source, field) still returns description text", {
   expect_identical(shape(source, "iris"), "iris data")
   expect_identical(shape(source, "iris", "Species"), "species text")
 })
+
+# -- cb_filter_to_expr --------------------------------------------------------
+
+expr_src <- set_source(
+  tblist(
+    d = data.frame(
+      x = 1L:5L,
+      g = letters[1L:5L],
+      dt = as.Date("2020-01-01") + 0L:4L,
+      ts = as.POSIXct("2020-01-01", tz = "UTC") + 0L:4L,
+      stringsAsFactors = FALSE
+    )
+  )
+)
+
+test_that("cb_filter_to_expr handles discrete filters and keep_na branches", {
+  keep_na <- cb_filter_to_expr(
+    filter("discrete", id = "a", dataset = "d", variable = "g", value = "a", keep_na = TRUE),
+    expr_src
+  )
+  expect_true(rlang::is_call(keep_na))
+  expect_true(grepl("%in%", deparse(keep_na)[[2L]] %||% deparse(keep_na), fixed = TRUE) ||
+                any(grepl("%in%", deparse(keep_na), fixed = TRUE)))
+
+  drop_na <- cb_filter_to_expr(
+    filter("discrete", id = "a", dataset = "d", variable = "g", value = NA, keep_na = FALSE),
+    expr_src
+  )
+  expect_true(any(grepl("is.na", deparse(drop_na), fixed = TRUE)))
+
+  no_na <- cb_filter_to_expr(
+    filter("discrete", id = "a", dataset = "d", variable = "g", value = "a", keep_na = FALSE),
+    expr_src
+  )
+  expect_true(rlang::is_call(no_na))
+
+  # keep_na = TRUE with no value selected is a no-op (NULL).
+  expect_null(
+    cb_filter_to_expr(
+      filter("discrete", id = "a", dataset = "d", variable = "g", value = NA, keep_na = TRUE),
+      expr_src
+    )
+  )
+})
+
+test_that("cb_filter_to_expr handles discrete_text filters", {
+  e <- cb_filter_to_expr(
+    filter("discrete_text", id = "a", dataset = "d", variable = "g", value = "a,b"),
+    expr_src
+  )
+  expect_true(rlang::is_call(e))
+
+  expect_null(
+    cb_filter_to_expr(
+      filter("discrete_text", id = "a", dataset = "d", variable = "g", value = NA),
+      expr_src
+    )
+  )
+})
+
+test_that("cb_filter_to_expr handles range, date_range and datetime_range filters", {
+  for (spec in list(
+    list(type = "range", var = "x", range = c(1L, 3L)),
+    list(type = "date_range", var = "dt", range = as.Date(c("2020-01-01", "2020-01-03"))),
+    list(type = "datetime_range", var = "ts",
+         range = as.POSIXct(c("2020-01-01", "2020-01-03"), tz = "UTC"))
+  )) {
+    keep_na <- cb_filter_to_expr(
+      filter(spec$type, id = "a", dataset = "d", variable = spec$var, range = spec$range, keep_na = TRUE),
+      expr_src
+    )
+    expect_true(any(grepl("is.na", deparse(keep_na), fixed = TRUE)))
+
+    no_na <- cb_filter_to_expr(
+      filter(spec$type, id = "a", dataset = "d", variable = spec$var, range = spec$range, keep_na = FALSE),
+      expr_src
+    )
+    expect_true(rlang::is_call(no_na))
+
+    drop_na <- cb_filter_to_expr(
+      filter(spec$type, id = "a", dataset = "d", variable = spec$var,
+             range = NA, keep_na = FALSE),
+      expr_src
+    )
+    expect_true(any(grepl("is.na", deparse(drop_na), fixed = TRUE)))
+  }
+})
+
+test_that("cb_filter_to_expr handles multi_discrete filters", {
+  combined <- cb_filter_to_expr(
+    filter("multi_discrete", id = "a", dataset = "d", variables = "g",
+           values = list(g = "a"), keep_na = FALSE),
+    expr_src
+  )
+  expect_true(rlang::is_call(combined))
+
+  all_na_drop <- cb_filter_to_expr(
+    filter("multi_discrete", id = "a", dataset = "d", variables = "g",
+           values = list(g = NA), keep_na = FALSE),
+    expr_src
+  )
+  expect_true(any(grepl("is.na", deparse(all_na_drop), fixed = TRUE)))
+
+  # All variables unset and keep_na = TRUE is a no-op.
+  expect_null(
+    cb_filter_to_expr(
+      filter("multi_discrete", id = "a", dataset = "d", variables = "g",
+             values = list(g = NA), keep_na = TRUE),
+      expr_src
+    )
+  )
+})
+
+test_that("cb_filter_to_expr handles query filters", {
+  qval <- queryBuilder::queryGroup(
+    condition = "AND",
+    queryBuilder::queryRule("g", "equal", "a")
+  )
+  e <- cb_filter_to_expr(
+    filter("query", id = "q", dataset = "d", variables = "g", value = qval),
+    expr_src
+  )
+  expect_true(rlang::is_call(e))
+
+  expect_null(
+    cb_filter_to_expr(
+      filter("query", id = "q", dataset = "d", variables = "g", value = NA),
+      expr_src
+    )
+  )
+})
+
+# -- Query filter plotting ----------------------------------------------------
+
+test_that("cb_plot_filter_data works for query filters", {
+  df <- data.frame(col1 = c("A", "B", "A"), val = c(1L, 2L, 3L), stringsAsFactors = FALSE)
+  source <- set_source(tblist(d = df))
+  qf <- filter(
+    "query", id = "q", dataset = "d", variables = "col1",
+    value = queryBuilder::queryGroup(
+      condition = "AND", queryBuilder::queryRule("col1", "equal", "A")
+    )
+  )
+
+  tmp <- tempfile(fileext = ".pdf")
+  grDevices::pdf(tmp)
+  on.exit({
+    grDevices::dev.off()
+    unlink(tmp)
+  })
+
+  expect_no_error(cb_plot_filter_data(qf, source, list(d = df)))
+  # Empty data goes through the "No data" branch.
+  expect_no_error(cb_plot_filter_data(qf, source, list(d = df[0L, ])))
+})
+
+# -- autofilter rules for temporal columns ------------------------------------
+
+test_that("rule_Date and rule_POSIXct produce filter specifications", {
+  date_rule <- rule_Date(as.Date(c("2020-01-01", "2020-02-01")), "dt", "d")
+  expect_type(date_rule, "list")
+  expect_identical(date_rule$type, "date_range")
+
+  datetime_rule <- rule_POSIXct(
+    as.POSIXct(c("2020-01-01", "2020-02-01"), tz = "UTC"), "ts", "d"
+  )
+  expect_type(datetime_rule, "list")
+  expect_identical(datetime_rule$type, "datetime_range")
+})
+
+test_that("autofilter generates date and datetime filters from data", {
+  df <- data.frame(
+    dt = as.Date("2020-01-01") + 0L:4L,
+    ts = as.POSIXct("2020-01-01", tz = "UTC") + 0L:4L
+  )
+  source <- set_source(tblist(d = df)) |>
+    autofilter(attach_as = "meta")
+  types <- purrr::map_chr(source$available_filters, ~ .x@type)
+  expect_true("date_range" %in% types)
+  expect_true("datetime_range" %in% types)
+})

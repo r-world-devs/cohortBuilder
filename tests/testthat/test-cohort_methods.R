@@ -2438,3 +2438,165 @@ test_that("propagate_domains = 'filter' uses domain as value when filter is unse
   step2_filter <- coh$get_filter("2", "iris-Species")
   expect_identical(step2_filter@domain, c("setosa", "versicolor"))
 })
+
+# -- Attrition ----------------------------------------------------------------
+
+test_that("attrition plot is generated for a tblist source", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one),
+    step(range_iris_one),
+    run_flow = TRUE
+  )
+
+  p <- attrition(coh, dataset = "iris")
+  expect_s3_class(p, "ggplot")
+
+  # percent = TRUE exercises the percentage-label branch.
+  p_percent <- attrition(coh, dataset = "iris", percent = TRUE)
+  expect_s3_class(p_percent, "ggplot")
+})
+
+test_that("attrition requires a dataset for tblist sources", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one),
+    run_flow = TRUE
+  )
+
+  expect_error(attrition(coh), regexp = "is required to print attrition")
+})
+
+test_that("attrition reflects binding keys in step labels", {
+  coh <- Cohort$new(
+    sakila_source,
+    step_1,
+    run_flow = TRUE
+  )
+
+  p <- attrition(coh, dataset = "film")
+  expect_s3_class(p, "ggplot")
+  # Labels include the initial dataset and the filtering step.
+  expect_true(any(grepl("Step: 1", p$data$label, fixed = TRUE)))
+})
+
+test_that(".get_attrition_label.default handles source with and without primary keys", {
+  source_no_pkey <- set_source(tblist(iris = iris))
+  expect_identical(
+    .get_attrition_label.default(source_no_pkey, step_id = "0", step_filters = NULL),
+    "Initial dataset"
+  )
+
+  source_pkey <- set_source(
+    tblist(patients = data.frame(id = 1L:2L, age = 50L:51L)),
+    primary_keys = primary_keys(data_key("patients", "id"))
+  )
+  label <- .get_attrition_label.default(source_pkey, step_id = "0", step_filters = NULL)
+  expect_true(grepl("primary key: id", label, fixed = TRUE))
+})
+
+test_that("get_attrition_filter_label formats vector and list values", {
+  vector_label <- get_attrition_filter_label("Age", "range", c(1L, 10L))
+  expect_true(grepl("range = [1, 10]", vector_label, fixed = TRUE))
+
+  list_label <- get_attrition_filter_label(
+    "Vars", "values", list(a = c("x", "y"), b = "z")
+  )
+  expect_true(grepl("Vars", list_label, fixed = TRUE))
+  expect_true(grepl("x,y", list_label, fixed = TRUE))
+})
+
+# -- Describe state / sum_up --------------------------------------------------
+
+test_that("describe_state prints steps and filters", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one),
+    step(range_iris_one)
+  )
+
+  # to_string returns the rendered configuration lines.
+  out <- sum_up(coh, to_string = TRUE)
+  expect_type(out, "character")
+  expect_true(any(grepl(">> Step ID: 1", out, fixed = TRUE)))
+  expect_true(any(grepl(">> Step ID: 2", out, fixed = TRUE)))
+  expect_true(any(grepl("Filter ID: species_filter", out, fixed = TRUE)))
+  expect_true(any(grepl("Filter ID: sepal_l", out, fixed = TRUE)))
+
+  # Printing to console produces output.
+  expect_output(sum_up(coh), ">> Step ID: 1")
+})
+
+test_that("describe_state reports empty configuration", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    )
+  )
+
+  expect_identical(sum_up(coh, to_string = TRUE), "No steps configuration found.")
+  expect_output(sum_up(coh), "No steps configuration found.")
+})
+
+test_that("describe_state marks pending steps", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one)
+  )
+
+  out <- sum_up(coh, to_string = TRUE)
+  expect_true(any(grepl("[pending]", out, fixed = TRUE)))
+})
+
+# -- Clear filter / clear step ------------------------------------------------
+
+test_that("clear_filter resets a filter to its default value", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one),
+    run_flow = TRUE
+  )
+
+  expect_identical(coh$get_filter("1", "species_filter")@value, c("setosa", "virginica"))
+
+  coh$clear_filter("1", "species_filter", run_flow = TRUE)
+
+  # Reset restores the full domain of choices (i.e. no narrowing).
+  expect_setequal(
+    coh$get_filter("1", "species_filter")@value,
+    c("setosa", "versicolor", "virginica")
+  )
+  expect_setequal(
+    collapse::funique(coh$get_data(1L, state = "post")$iris$Species),
+    c("setosa", "versicolor", "virginica")
+  )
+})
+
+test_that("clear_step resets every filter in the step", {
+  coh <- Cohort$new(
+    set_source(
+      tblist(iris = iris)
+    ),
+    step(discrete_iris_one, range_iris_one),
+    run_flow = TRUE
+  )
+
+  coh$clear_step("1", run_flow = TRUE)
+
+  expect_setequal(
+    coh$get_filter("1", "species_filter")@value,
+    c("setosa", "versicolor", "virginica")
+  )
+  # After clearing, all rows are retained.
+  expect_identical(nrow(coh$get_data(1L, state = "post")$iris), nrow(iris))
+})

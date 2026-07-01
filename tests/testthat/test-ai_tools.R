@@ -305,3 +305,213 @@ test_that("cb_register_tools registers all twelve tools", {
   cb_register_tools(chat, coh)
   expect_length(chat$tools, 12L)
 })
+
+# -- cb_tool_describe_state ----------------------------------------------------
+
+test_that("cb_tool_describe_state reports empty and populated cohorts", {
+  coh <- make_test_cohort()
+  t <- cb_tool_describe_state(coh)
+  expect_identical(t$name, "cb_describe_state")
+  expect_identical(t$fun(), "No steps configured in the cohort.")
+
+  coh$add_step(step(
+    filter("discrete", id = "iris-Species", dataset = "iris", variable = "Species")
+  ))
+  out <- t$fun()
+  expect_true(grepl("Step ID: 1", out, fixed = TRUE))
+  expect_true(grepl("iris-Species", out, fixed = TRUE))
+})
+
+# -- cb_tool_get_data_summary --------------------------------------------------
+
+test_that("cb_tool_get_data_summary returns row counts per step", {
+  coh <- make_test_cohort()
+  t <- cb_tool_get_data_summary(coh)
+
+  # No steps yet.
+  expect_true(grepl("No steps configured", t$fun(), fixed = TRUE))
+
+  coh$add_step(step(
+    filter("discrete", id = "iris-Species", dataset = "iris",
+           variable = "Species", value = "setosa")
+  ), run_flow = TRUE)
+
+  out <- t$fun()
+  expect_true(grepl("Initial data:", out, fixed = TRUE))
+  expect_true(grepl("iris: 150 rows", out, fixed = TRUE))
+  expect_true(grepl("After step 1:", out, fixed = TRUE))
+  expect_true(grepl("iris: 50 rows", out, fixed = TRUE))
+})
+
+test_that("cb_tool_get_data_summary asks to run when steps are pending", {
+  coh <- make_test_cohort()
+  coh$add_step(step(
+    filter("discrete", id = "iris-Species", dataset = "iris", variable = "Species")
+  ))
+  # Step added without running -> pending.
+  out <- cb_tool_get_data_summary(coh)$fun()
+  expect_true(grepl("pending", out, fixed = TRUE))
+})
+
+# -- cb_tool_toggle_filters ----------------------------------------------------
+
+test_that("cb_tool_toggle_filters activates and deactivates filters", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  coh$add_step(step(
+    filter("discrete", id = "iris-Species", dataset = "iris", variable = "Species")
+  ))
+  t <- cb_tool_toggle_filters(coh)
+
+  out <- t$fun("iris-Species", active = "false")
+  expect_true(grepl("Deactivated", out, fixed = TRUE))
+  expect_false(coh$get_filter("1", "iris-Species")@active)
+
+  out <- t$fun("iris-Species", active = "true")
+  expect_true(grepl("Activated", out, fixed = TRUE))
+  expect_true(coh$get_filter("1", "iris-Species")@active)
+})
+
+test_that("cb_tool_toggle_filters validates inputs and step selection", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  t <- cb_tool_toggle_filters(coh)
+
+  # Invalid active value.
+  expect_true(grepl("Invalid 'active'", t$fun("iris-Species", active = "maybe"), fixed = TRUE))
+  # No steps.
+  expect_true(grepl("No steps configured", t$fun("iris-Species", active = "true"), fixed = TRUE))
+
+  # Multiple steps require an explicit step_id.
+  coh$add_step(step(filter("discrete", id = "iris-Species", dataset = "iris", variable = "Species")))
+  coh$add_step(step(filter("discrete", id = "mtcars-hp", dataset = "mtcars", variable = "hp")))
+  expect_true(grepl("Multiple steps exist", t$fun("iris-Species", active = "true"), fixed = TRUE))
+
+  # Unknown step / unknown filter.
+  expect_true(grepl("not found", t$fun("iris-Species", active = "true", step_id = "9"), fixed = TRUE))
+  expect_true(grepl("No matching filters", t$fun("nope", active = "true", step_id = "1"), fixed = TRUE))
+})
+
+# -- cb_tool_clear_filters -----------------------------------------------------
+
+test_that("cb_tool_clear_filters resets all or selected filters", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  coh$add_step(step(
+    filter("discrete", id = "iris-Species", dataset = "iris",
+           variable = "Species", value = "setosa")
+  ), run_flow = TRUE)
+  t <- cb_tool_clear_filters(coh)
+
+  # Clear all filters in the (single) step.
+  expect_true(grepl("reset to defaults", t$fun(), fixed = TRUE))
+
+  # Reset a specific filter by id.
+  coh$update_filter("1", "iris-Species", value = "setosa", run_flow = TRUE)
+  out <- t$fun("iris-Species")
+  expect_true(grepl("Reset filters", out, fixed = TRUE))
+})
+
+test_that("cb_tool_clear_filters handles empty, multi-step and unknown cases", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  t <- cb_tool_clear_filters(coh)
+
+  expect_true(grepl("No steps configured", t$fun(), fixed = TRUE))
+
+  coh$add_step(step(filter("discrete", id = "iris-Species", dataset = "iris", variable = "Species")))
+  coh$add_step(step(filter("discrete", id = "mtcars-hp", dataset = "mtcars", variable = "hp")))
+  expect_true(grepl("Multiple steps exist", t$fun(), fixed = TRUE))
+  expect_true(grepl("not found", t$fun(step_id = "9"), fixed = TRUE))
+  expect_true(grepl("No matching filters", t$fun("nope", step_id = "1"), fixed = TRUE))
+})
+
+# -- cb_tool_remove_filters ----------------------------------------------------
+
+test_that("cb_tool_remove_filters removes filters from a step", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  coh$add_step(step(
+    filter("discrete", id = "iris-Species", dataset = "iris", variable = "Species"),
+    filter("range", id = "iris-SepalLength", dataset = "iris", variable = "Sepal.Length")
+  ), run_flow = TRUE)
+  t <- cb_tool_remove_filters(coh)
+
+  out <- t$fun("iris-Species")
+  expect_true(grepl("Removed filters", out, fixed = TRUE))
+  expect_false("iris-Species" %in% names(coh$get_step("1")$filters))
+})
+
+test_that("cb_tool_remove_filters handles empty, multi-step and unknown cases", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  t <- cb_tool_remove_filters(coh)
+
+  expect_true(grepl("No steps configured", t$fun("iris-Species"), fixed = TRUE))
+
+  coh$add_step(step(filter("discrete", id = "iris-Species", dataset = "iris", variable = "Species")))
+  coh$add_step(step(filter("discrete", id = "mtcars-hp", dataset = "mtcars", variable = "hp")))
+  expect_true(grepl("Multiple steps exist", t$fun("iris-Species"), fixed = TRUE))
+  expect_true(grepl("not found", t$fun("iris-Species", step_id = "9"), fixed = TRUE))
+  expect_true(grepl("No matching filters", t$fun("nope", step_id = "1"), fixed = TRUE))
+})
+
+# -- cb_tool_remove_step -------------------------------------------------------
+
+test_that("cb_tool_remove_step removes the last step", {
+  coh <- make_test_cohort()
+  t <- cb_tool_remove_step(coh)
+
+  expect_identical(t$fun(), "No steps to remove.")
+
+  coh$add_step(step(filter("discrete", id = "iris-Species", dataset = "iris", variable = "Species")))
+  coh$add_step(step(filter("discrete", id = "mtcars-hp", dataset = "mtcars", variable = "hp")))
+  out <- t$fun()
+  expect_true(grepl("Removed step 2", out, fixed = TRUE))
+  expect_true(grepl("mtcars-hp", out, fixed = TRUE))
+  expect_identical(length(coh$get_step()), 1L)
+})
+
+# -- cb_tool_get_code ----------------------------------------------------------
+
+test_that("cb_tool_get_code returns code or a helpful message", {
+  coh <- make_test_cohort()
+  t <- cb_tool_get_code(coh)
+  expect_identical(t$name, "cb_get_code")
+
+  expect_true(grepl("No steps configured", t$fun(), fixed = TRUE))
+
+  coh$add_step(step(
+    filter("discrete", id = "iris-Species", dataset = "iris",
+           variable = "Species", value = "setosa")
+  ), run_flow = TRUE)
+  out <- t$fun()
+  expect_type(out, "character")
+  expect_true(nzchar(out))
+})
+
+# -- cb_tool_run ---------------------------------------------------------------
+
+test_that("cb_tool_run reports auto-run when enabled", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  t <- cb_tool_run(coh)
+  withr::with_options(list(cb_tool_run_cohort = TRUE), {
+    expect_true(grepl("run automatically", t$fun(), fixed = TRUE))
+  })
+})
+
+test_that("cb_tool_run executes the pipeline when auto-run is disabled", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  coh$add_step(step(
+    filter("discrete", id = "iris-Species", dataset = "iris",
+           variable = "Species", value = "setosa")
+  ))
+  t <- cb_tool_run(coh)
+  withr::with_options(list(cb_tool_run_cohort = FALSE), {
+    expect_identical(t$fun(), "Cohort pipeline executed for all steps.")
+    expect_true(grepl("executed", t$fun(step_id = "1"), fixed = TRUE))
+    expect_true(grepl("not found", t$fun(step_id = "9"), fixed = TRUE))
+  })
+})
