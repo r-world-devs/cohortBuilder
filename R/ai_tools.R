@@ -1,3 +1,40 @@
+# -- Tool logging ---------------------------------------------------------------
+
+#' Log an AI tool invocation
+#'
+#' Emits an informative message describing which tool was invoked and, when
+#' supplied, the arguments it received. Output is only produced when the
+#' \code{cb_tool_verbose} option is \code{TRUE} (default \code{FALSE}), so the
+#' tools stay silent during normal use and in tests. Messages are sent via
+#' \code{\link[base]{message}()} so they route to stderr and can be captured or
+#' suppressed independently of the tool's return value.
+#'
+#' @param tool Name of the invoked tool (its registered LLM-facing name).
+#' @param ... Optional named values to report (e.g. \code{filter_ids = ...}).
+#' @return Invisibly \code{NULL}.
+#' @noRd
+cb_tool_log <- function(tool, ...) {
+  if (!isTRUE(getOption("cb_tool_verbose", FALSE))) {
+    return(invisible(NULL))
+  }
+  args <- list(...)
+  detail <- ""
+  if (length(args) > 0L) {
+    formatted <- args |>
+      purrr::imap_chr(function(value, name) {
+        rendered <- if (is.null(value) || length(value) == 0L) {
+          "<none>"
+        } else {
+          toString(format(value))
+        }
+        paste0(name, " = ", rendered)
+      })
+    detail <- paste0(" (", paste(formatted, collapse = "; "), ")")
+  }
+  message("[cohortBuilder AI tool] ", tool, detail)
+  invisible(NULL)
+}
+
 # -- cb_tool S3 class -----------------------------------------------------------
 
 #' Create a cohortBuilder tool definition
@@ -52,7 +89,7 @@ print.cb_tool <- function(x, ...) {
 #' @export
 cb_tool_filters_meta <- function(cohort) {
   fun <- function() {
-    print("cb_tool_filters_meta")
+    cb_tool_log("cb_get_filters_meta")
 
     source <- cohort$get_source()
     if (is.null(source$available_filters) || length(source$available_filters) == 0L) {
@@ -96,9 +133,7 @@ cb_tool_add_filters <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
   fun <- function(filter_ids, action = "new_step", active = NULL) {
-    print("cb_tool_add_filters")
-    print(filter_ids)
-    print(action)
+    cb_tool_log("cb_add_filters", filter_ids = filter_ids, action = action, active = active)
 
     action <- match.arg(action, c("new_step", "edit_last"))
     # active = NULL: inherit the available filter's active state (do not touch).
@@ -228,8 +263,7 @@ cb_tool_set_filter_values <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
   fun <- function(filter_values) {
-    print("cb_tool_set_filter_values")
-    print(filter_values)
+    cb_tool_log("cb_set_filter_values", filter_values = filter_values)
 
     filter_vals <- tryCatch(
       jsonlite::fromJSON(filter_values),
@@ -309,8 +343,7 @@ cb_tool_apply_filters <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
   fun <- function(filters, action = "new_step", active = NULL) {
-    print("cb_tool_apply_filters")
-    print(action)
+    cb_tool_log("cb_apply_filters", filters = filters, action = action, active = active)
 
     action <- match.arg(action, c("new_step", "edit_last"))
     # active = NULL: inherit the available filter's active state (do not touch).
@@ -489,7 +522,7 @@ cb_tool_apply_filters <- function(cohort) {
 #' @export
 cb_tool_describe_state <- function(cohort) {
   fun <- function() {
-    print("cb_tool_describe_state")
+    cb_tool_log("cb_describe_state")
 
     steps <- cohort$get_step()
     if (length(steps) == 0L) {
@@ -529,9 +562,7 @@ cb_tool_toggle_filters <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
   fun <- function(filter_ids, active, step_id = NULL) {
-    print("cb_tool_toggle_filters")
-    print(filter_ids)
-    print(active)
+    cb_tool_log("cb_toggle_filters", filter_ids = filter_ids, active = active, step_id = step_id)
 
     active <- as.logical(active)
     if (is.na(active)) {
@@ -629,7 +660,7 @@ cb_tool_run <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
   fun <- function(step_id = NULL) {
-    print("cb_tool_run")
+    cb_tool_log("cb_run", step_id = step_id)
 
     if (getOption("cb_tool_run_cohort", TRUE)) {
       return(paste(
@@ -685,8 +716,7 @@ cb_tool_remove_filters <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
   fun <- function(filter_ids, step_id = NULL) {
-    print("cb_tool_remove_filters")
-    print(filter_ids)
+    cb_tool_log("cb_remove_filters", filter_ids = filter_ids, step_id = step_id)
 
     filter_ids <- trimws(strsplit(filter_ids, ",", fixed = TRUE)[[1L]])
     steps <- cohort$get_step()
@@ -771,7 +801,7 @@ cb_tool_remove_filters <- function(cohort) {
 #' @export
 cb_tool_get_data_summary <- function(cohort) {
   fun <- function() {
-    print("cb_tool_get_data_summary")
+    cb_tool_log("cb_get_data_summary")
 
     steps <- cohort$get_step()
     if (length(steps) == 0L) {
@@ -840,8 +870,7 @@ cb_tool_clear_filters <- function(cohort) {
   rlang::check_installed("ellmer", reason = "to create cohort AI tools")
 
   fun <- function(filter_ids = NULL, step_id = NULL) {
-    print("cb_tool_clear_filters")
-    print(filter_ids)
+    cb_tool_log("cb_clear_filters", filter_ids = filter_ids, step_id = step_id)
 
     steps <- cohort$get_step()
     if (length(steps) == 0L) {
@@ -937,7 +966,7 @@ cb_tool_clear_filters <- function(cohort) {
 #' @export
 cb_tool_get_code <- function(cohort) {
   fun <- function() {
-    print("cb_tool_get_code")
+    cb_tool_log("cb_get_code")
 
     steps <- cohort$get_step()
     if (length(steps) == 0L) {
@@ -981,7 +1010,7 @@ cb_tool_get_code <- function(cohort) {
 #' @export
 cb_tool_remove_step <- function(cohort) {
   fun <- function() {
-    print("cb_tool_remove_step")
+    cb_tool_log("cb_remove_step")
 
     steps <- cohort$get_step()
     if (length(steps) == 0L) {

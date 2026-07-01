@@ -469,7 +469,7 @@ test_that("cb_tool_remove_step removes the last step", {
   out <- t$fun()
   expect_true(grepl("Removed step 2", out, fixed = TRUE))
   expect_true(grepl("mtcars-hp", out, fixed = TRUE))
-  expect_identical(length(coh$get_step()), 1L)
+  expect_length(coh$get_step(), 1L)
 })
 
 # -- cb_tool_get_code ----------------------------------------------------------
@@ -513,5 +513,43 @@ test_that("cb_tool_run executes the pipeline when auto-run is disabled", {
     expect_identical(t$fun(), "Cohort pipeline executed for all steps.")
     expect_true(grepl("executed", t$fun(step_id = "1"), fixed = TRUE))
     expect_true(grepl("not found", t$fun(step_id = "9"), fixed = TRUE))
+  })
+})
+
+# -- Tool logging (cb_tool_verbose) --------------------------------------------
+
+test_that("tools are silent unless cb_tool_verbose is TRUE", {
+  coh <- make_test_cohort()
+  t <- cb_tool_describe_state(coh)
+
+  withr::with_options(list(cb_tool_verbose = FALSE), {
+    expect_silent(t$fun())
+  })
+})
+
+test_that("cb_tool_verbose emits an informative message with arguments", {
+  skip_if_not_installed("ellmer")
+  coh <- make_test_cohort()
+  coh$add_step(step(
+    filter("discrete", id = "iris-Species", dataset = "iris", variable = "Species")
+  ))
+  t <- cb_tool_toggle_filters(coh)
+
+  withr::with_options(list(cb_tool_verbose = TRUE), {
+    expect_message(
+      t$fun("iris-Species", active = "false"),
+      "cb_toggle_filters"
+    )
+    # Argument values are included in the log line.
+    expect_message(
+      t$fun("iris-Species", active = "true"),
+      "iris-Species"
+    )
+  })
+})
+
+test_that("cb_tool_log renders absent arguments as <none>", {
+  withr::with_options(list(cb_tool_verbose = TRUE), {
+    expect_message(cb_tool_log("cb_test", step_id = NULL), "step_id = <none>", fixed = TRUE)
   })
 })

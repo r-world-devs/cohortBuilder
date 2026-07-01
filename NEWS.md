@@ -47,6 +47,9 @@
 * Built-in tools: `cb_tool_filters_meta()`, `cb_tool_add_filters()`, `cb_tool_set_filter_values()`,
   `cb_tool_apply_filters()` (combined add + set values).
 * `cb_register_tool()` and `cb_register_tools()` register tools with an `ellmer` chat object.
+* AI tool invocations can be traced by setting `options(cb_tool_verbose = TRUE)`, which logs the
+  invoked tool and its arguments via `message()`. Logging is off by default (replaces earlier
+  unconditional `print()` debug output).
 
 ## Improvements
 

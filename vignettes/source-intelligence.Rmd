@@ -181,4 +181,10 @@ By default the cohort runs automatically after each tool modifies it. Set
 `options(cb_tool_run_cohort = FALSE)` to require an explicit `cb_run` call
 instead.
 
+To trace which tools the LLM invokes (and with which arguments), set
+`options(cb_tool_verbose = TRUE)`. Each call then emits an informative
+`message()` such as
+`[cohortBuilder AI tool] cb_apply_filters (filters = ...; action = new_step)`.
+Logging is off by default, so tools stay silent during normal use.
+
 **Note.** The AI tools require the suggested `ellmer` package.
