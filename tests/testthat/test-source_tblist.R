@@ -325,6 +325,34 @@ test_that("get_range_frequencies with empty data works fine", {
   expect_identical(ncol(result), 4L)
 })
 
+test_that("get_range_frequencies caps breaks for wide numeric ranges", {
+  # Regression: a fixed step of 1 over a very wide span (e.g. a population
+  # column spanning 0..1e12) made seq(min, max, by = 1) request a trillion-
+  # element vector and error with "'by' argument is much too small". The break
+  # count must instead be capped by widening the step.
+  wide <- list(t = data.frame(v = c(0, 5e5, 1e12)))
+  result <- expect_no_error(
+    get_range_frequencies(wide, "t", "v", extra_params = NULL)
+  )
+  expect_lte(nrow(result), getOption("cb_range_stats_max_breaks", 1000L) + 1L)
+  # The full data span is preserved and every observation is counted.
+  expect_identical(result$l_bound[1], 0)
+  expect_identical(rev(result$u_bound)[1], 1e12)
+  expect_identical(sum(result$count), 3L)
+
+  # An explicit step is still honoured verbatim.
+  stepped <- get_range_frequencies(wide, "t", "v", extra_params = list(step = 1e11))
+  expect_equal(stepped$l_bound[2] - stepped$l_bound[1], 1e11)
+})
+
+test_that("get_range_frequencies keeps step 1 for small integer ranges", {
+  # Backward compatibility: narrow ranges must be unaffected by the cap.
+  small <- list(t = data.frame(v = c(7L, 24L, 42L, 91L)))
+  result <- get_range_frequencies(small, "t", "v", extra_params = NULL)
+  expect_equal(result$l_bound[2] - result$l_bound[1], 1)
+  expect_identical(sum(result$count), 4L)
+})
+
 test_that("filter_data in range filter works fine", {
   test_var <- c(42L, 7L, 89L, NA, 16L, 73L, 58L, 91L, 35L, NA, 24L, 67L)
 
@@ -505,6 +533,21 @@ test_that("get_date_range_frequencies works fine", {
   expect_type(result, "list")
   expect_s3_class(result$l_bound, "Date")
   expect_s3_class(result$u_bound, "Date")
+})
+
+test_that("get_date_range_frequencies caps breaks for wide date ranges", {
+  # A daily step over a multi-millennium span would create an unusably large
+  # (and potentially erroring) number of breaks. The break count must be capped
+  # by widening the step, mirroring the numeric case.
+  wide <- list(
+    t = data.frame(v = as.Date(c("0001-01-01", "2024-01-01", "5000-01-01")))
+  )
+  result <- expect_no_error(
+    get_date_range_frequencies(wide, "t", "v", extra_params = NULL)
+  )
+  expect_lte(nrow(result), getOption("cb_range_stats_max_breaks", 1000L) + 1L)
+  expect_s3_class(result$l_bound, "Date")
+  expect_identical(sum(result$count), 3L)
 })
 
 test_that("filter_data in date range filter works fine", {

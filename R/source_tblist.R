@@ -238,7 +238,7 @@ S7::method(cb_get_filter_defaults, list(CbFilterDiscreteText, tblist_class)) <- 
 #' @param extra_params Filter extras; may carry `step`.
 #' @return A data frame with `level`, `count`, `l_bound`, `u_bound`.
 #' @noRd
-get_range_frequencies <- function(data_object, dataset, variable, extra_params) {
+get_range_frequencies <- function(data_object, dataset, variable, extra_params = NULL) {
   step <- 1L
   if (length(stats::na.omit(data_object[[dataset]][[variable]])) == 0L) {
     return(
@@ -263,6 +263,17 @@ get_range_frequencies <- function(data_object, dataset, variable, extra_params) 
 
   if (!is.null(extra_params$step)) {
     step <- extra_params$step
+  } else {
+    # The default step of 1 builds one break per unit, which explodes for
+    # wide-range columns: seq(0, 1e12, by = 1) requests a trillion-element
+    # vector and errors with "'by' argument is much too small". The histogram
+    # feedback only ever renders ~30 bars, so cap the break count and widen the
+    # step to suit the data span when the caller has not asked for a specific
+    # step. Small integer-like ranges keep step 1 as before.
+    max_breaks <- getOption("cb_range_stats_max_breaks", 1000L)
+    if ((max_val - min_val) / step > max_breaks) {
+      step <- (max_val - min_val) / max_breaks
+    }
   }
   breaks <- seq(min_val, max_val, by = step)
   if (rev(breaks)[1L] != max_val) {
@@ -426,6 +437,17 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
 
   if (!is.null(extra_params$step)) {
     step <- extra_params$step
+  } else {
+    # As in get_range_frequencies(): a daily step over a very wide date span
+    # produces an unusably large (and potentially erroring) number of breaks,
+    # while the feedback histogram only renders ~30 bars. Cap the break count by
+    # widening the step (in days) when the caller has not asked for a specific
+    # one. Narrow spans keep the daily step as before.
+    max_breaks <- getOption("cb_range_stats_max_breaks", 1000L)
+    n_days <- as.numeric(max_val - min_val, units = "days")
+    if (n_days > max_breaks) {
+      step <- ceiling(n_days / max_breaks)
+    }
   }
   breaks <- seq.Date(min_val, max_val, by = step)
   if (rev(breaks)[1L] != max_val) {
