@@ -116,7 +116,7 @@ result <- shape(meta_source)
 result$datasets
 
 # One filter entry
-str(result$filters$Species)
+str(result$filters$`iris-Species`)
 ```
 
 When a filter's own `@domain` is unset, `shape()` falls back to the domain
