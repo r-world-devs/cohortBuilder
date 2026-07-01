@@ -95,7 +95,7 @@ instead of scanning the data:
 
 ```{r}
 species_filter <- purrr::detect(
-  meta_source$available_filters, ~ .x@id == "Species"
+  meta_source$available_filters, ~ .x@id == "iris-Species"
 )
 species_filter@domain
 ```

@@ -34,7 +34,6 @@ Suggests:
     queryBuilder,
     vdiffr,
     testthat (>= 3.0.0),
-    shiny,
     knitr,
     rmarkdown,
     ellmer (>= 0.3.0)
