@@ -33,7 +33,7 @@ With `cohortBuilder` you can share the cohort easier with useful
 methods:
 
 - `code` - to get reproducible cohort creation code,
-- `get_state` - to get cohort state (e.g. in JSON) that can be then
+- `get_state` - to get cohort state (e.g. in JSON) that can be then
   easily restored with `restore`.
 
 Or modify the cohort configuration with:
@@ -79,7 +79,7 @@ librarian_source <- set_source(
   as.tblist(librarian)
 )
 
-coh <- librarian_source %>% 
+coh <- librarian_source |> 
   cohort(
     filter(
       "discrete", id = "author", dataset = "books", 
@@ -93,7 +93,7 @@ coh <- librarian_source %>%
       "date_range", id = "registered", dataset = "borrowers", 
       variable = "registered", range = c(as.Date("2010-01-01"), Inf)
     ) 
-  ) %>% 
+  ) |> 
   run()
 
 get_data(coh)
@@ -153,7 +153,7 @@ get_data(coh)
 ```
 
 ``` r
-coh <- librarian_source %>% 
+coh <- librarian_source |> 
   cohort() %->% 
   step(
     filter(
@@ -170,7 +170,7 @@ coh <- librarian_source %>%
       "range", id = "copies", dataset = "books", 
       variable = "copies", range = c(5, 10)
     )
-  ) %>% 
+  ) |> 
   run()
 ```
 
