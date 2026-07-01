@@ -525,14 +525,18 @@ filter_effective_value <- function(filter) {
 #' `NA`/`NULL`/`""` yield `character(0)`. Whitespace around each value is trimmed
 #' and empty pieces are dropped, so values are matched exactly.
 #'
-#' @param x A comma-separated string (or `NA`/`NULL`).
+#' The canonical input is a single comma-separated string. A length > 1 character
+#' vector (each element itself possibly comma-separated) is also accepted and
+#' fully split, rather than silently keeping only the first element.
+#'
+#' @param x A comma-separated string (or a character vector, `NA`/`NULL`).
 #' @return A character vector of trimmed, non-empty values.
 #' @noRd
 split_discrete_text <- function(x) {
   if (is.null(x) || identical(x, NA) || identical(x, "")) {
     return(character(0L))
   }
-  pieces <- strsplit(as.character(x), split = ",", fixed = TRUE)[[1L]]
+  pieces <- unlist(strsplit(as.character(x), split = ",", fixed = TRUE))
   pieces <- trimws(pieces)
   pieces[nzchar(pieces)]
 }

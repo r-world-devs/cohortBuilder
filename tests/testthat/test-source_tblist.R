@@ -816,6 +816,39 @@ test_that("autofilter populates domain from data", {
   expect_identical(sl_filter@domain, c(min(iris$Sepal.Length), max(iris$Sepal.Length)))
 })
 
+test_that("autofilter builds discrete_text domain as a comma-separated string", {
+  # A column whose values are all unique becomes a discrete_text filter. Its
+  # domain must be the single comma-separated string the discrete_text contract
+  # expects, not the raw character vector, so cb_intersect_domain() round-trips
+  # correctly. Regression: a vector domain made split_discrete_text() keep only
+  # the first value, filtering the data down to a single row.
+  df <- data.frame(
+    spec_id = paste("spec", 1:10),
+    x = 1:10,
+    stringsAsFactors = FALSE
+  )
+  source <- set_source(tblist(t = df)) |>
+    autofilter(attach_as = "meta")
+  specid <- purrr::detect(source$available_filters, ~ .x@id == "t-specid")
+
+  expect_s3_class(specid, "cohortBuilder::CbFilterDiscreteText")
+  expect_length(specid@domain, 1L)
+  expect_identical(specid@domain, paste(df$spec_id, collapse = ","))
+
+  # value = NA means "no filtering": all rows must be kept, not just the first.
+  coh <- cohort(source = source)
+  coh$copy_step(filters = list(specid), run_flow = TRUE)
+  expect_identical(nrow(coh$get_data(state = "post")$t), nrow(df))
+
+  # Selecting several values keeps exactly those rows.
+  coh$update_filter(
+    coh$last_step_id(), specid@id,
+    value = "spec 2, spec 7", run_flow = TRUE
+  )
+  kept <- coh$get_data(state = "post")$t
+  expect_setequal(kept$spec_id, c("spec 2", "spec 7"))
+})
+
 test_that("autofilter inherits domain from describe()", {
   custom_domain <- c("setosa", "versicolor")
   source <- set_source(

@@ -1329,6 +1329,14 @@ rule_character <- function(column, name, dataset_name, field_description = NULL)
     gui_input <- "vs"
   }
   domain <- field_description$domain %||% collapse::funique(column)
+  # discrete_text represents value/choices/domain as a single comma-separated
+  # string (see cb_domain_from_data). Autofilter derives the domain as a vector,
+  # so join it here; otherwise cb_intersect_domain() returns the vector unchanged
+  # and split_discrete_text() (strsplit(...)[[1L]]) silently keeps only its first
+  # element, filtering the data down to a single value.
+  if (identical(type, "discrete_text")) {
+    domain <- join_discrete_text(domain)
+  }
   drop_nulls(
     list(
       type = type, name = name, variable = name,
@@ -1359,6 +1367,14 @@ rule_factor <- function(column, name, dataset_name, field_description = NULL) {
     gui_input <- "vs"
   }
   domain <- field_description$domain %||% levels(column)
+  # discrete_text represents value/choices/domain as a single comma-separated
+  # string (see cb_domain_from_data). Autofilter derives the domain as a vector,
+  # so join it here; otherwise cb_intersect_domain() returns the vector unchanged
+  # and split_discrete_text() (strsplit(...)[[1L]]) silently keeps only its first
+  # element, filtering the data down to a single value.
+  if (identical(type, "discrete_text")) {
+    domain <- join_discrete_text(domain)
+  }
   drop_nulls(
     list(
       type = type, name = name, variable = name,

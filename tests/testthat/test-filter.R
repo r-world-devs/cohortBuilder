@@ -515,6 +515,21 @@ test_that("split_discrete_text trims whitespace around every value", {
   expect_identical(split_discrete_text(NULL), character(0L))
 })
 
+test_that("split_discrete_text splits a character vector fully, not just [[1]]", {
+  # Regression: strsplit(x, ",")[[1L]] dropped every element but the first when
+  # given a vector (e.g. a vector-form domain), collapsing the filter to a single
+  # value. A vector of already-split values must round-trip unchanged.
+  expect_identical(
+    split_discrete_text(c("spec 1", "spec 2", "spec 3")),
+    c("spec 1", "spec 2", "spec 3")
+  )
+  # Each element may itself be comma-separated.
+  expect_identical(
+    split_discrete_text(c("a, b", "c")),
+    c("a", "b", "c")
+  )
+})
+
 test_that("join_discrete_text produces a comma-separated string", {
   expect_identical(join_discrete_text(c("a", "b", "c")), "a,b,c")
   expect_identical(join_discrete_text(character(0L)), "")
