@@ -33,7 +33,7 @@
   (scan filtered data; the stats-free equivalent). Backed by the `.propagate_domains()`
   source method and the S7 generics `cb_intersect_domain()`, `cb_intersect_domain_values()`,
   `cb_domain_from_stats()`, and `cb_domain_from_data()`. Filter values are now intersected
-  against their domain (with trimming warnings) before filtering.
+  against their domain (with trimming messages) before filtering.
 * `set_source()` gains a `compute_meta_stats` argument (default from the
   `cb.source_filters_meta_stats` option) controlling whether metadata statistics for
   `available_filters` are pre-computed; when `FALSE`, filter domains fall back to live

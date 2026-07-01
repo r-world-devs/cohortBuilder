@@ -330,26 +330,26 @@ test_that("get_range_frequencies caps breaks for wide numeric ranges", {
   # column spanning 0..1e12) made seq(min, max, by = 1) request a trillion-
   # element vector and error with "'by' argument is much too small". The break
   # count must instead be capped by widening the step.
-  wide <- list(t = data.frame(v = c(0, 5e5, 1e12)))
+  wide <- list(t = data.frame(v = c(0L, 5e5L, 1e12)))
   result <- expect_no_error(
     get_range_frequencies(wide, "t", "v", extra_params = NULL)
   )
   expect_lte(nrow(result), getOption("cb_range_stats_max_breaks", 1000L) + 1L)
   # The full data span is preserved and every observation is counted.
-  expect_identical(result$l_bound[1], 0)
-  expect_identical(rev(result$u_bound)[1], 1e12)
+  expect_identical(result$l_bound[1L], 0.0)
+  expect_identical(rev(result$u_bound)[1L], 1e12)
   expect_identical(sum(result$count), 3L)
 
   # An explicit step is still honoured verbatim.
   stepped <- get_range_frequencies(wide, "t", "v", extra_params = list(step = 1e11))
-  expect_equal(stepped$l_bound[2] - stepped$l_bound[1], 1e11)
+  expect_identical(stepped$l_bound[2L] - stepped$l_bound[1L], 1e11)
 })
 
 test_that("get_range_frequencies keeps step 1 for small integer ranges", {
   # Backward compatibility: narrow ranges must be unaffected by the cap.
   small <- list(t = data.frame(v = c(7L, 24L, 42L, 91L)))
   result <- get_range_frequencies(small, "t", "v", extra_params = NULL)
-  expect_equal(result$l_bound[2] - result$l_bound[1], 1)
+  expect_identical(result$l_bound[2L] - result$l_bound[1L], 1.0)
   expect_identical(sum(result$count), 4L)
 })
 
@@ -866,8 +866,8 @@ test_that("autofilter builds discrete_text domain as a comma-separated string", 
   # correctly. Regression: a vector domain made split_discrete_text() keep only
   # the first value, filtering the data down to a single row.
   df <- data.frame(
-    spec_id = paste("spec", 1:10),
-    x = 1:10,
+    spec_id = paste("spec", 1L:10L),
+    x = 1L:10L,
     stringsAsFactors = FALSE
   )
   source <- set_source(tblist(t = df)) |>

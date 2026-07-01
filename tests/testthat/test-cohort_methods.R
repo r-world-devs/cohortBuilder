@@ -742,8 +742,8 @@ test_that("stored stats separate data stats ($source) from filter stats ($filter
 
   priv <- coh$.__enclos_env__$private
   # Slot 1 (step 1 post) holds both kinds of stats, each under its own key.
-  expect_true(!is.null(priv$stats[["1"]]$source))
-  expect_true(!is.null(priv$stats[["1"]]$filters$species_filter))
+  expect_false(is.null(priv$stats[["1"]]$source))
+  expect_false(is.null(priv$stats[["1"]]$filters$species_filter))
   # Data stats are nested per dataset under $source.
   expect_identical(priv$stats[["1"]]$source$iris$n_rows, 100L)
 
@@ -773,7 +773,7 @@ test_that("get_stats recomputes data stats when only filter stats are cached", {
   # Lazily compute a single filter stat for step 1's pre snapshot. This creates
   # slot "0" with $filters but no $source.
   invisible(coh$get_stats("1", "species_filter", state = "pre", name = "n_data"))
-  expect_true(!is.null(priv$stats[["0"]]$filters))
+  expect_false(is.null(priv$stats[["0"]]$filters))
   expect_null(priv$stats[["0"]]$source)
 
   # The step-level read recomputes the absent data stats rather than returning
@@ -1713,7 +1713,7 @@ local({
       )),
       step(filter(
         type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
-        range = c(5, 7), active = TRUE
+        range = c(5L, 7L), active = TRUE
       ))
     )
   }
@@ -2026,7 +2026,7 @@ test_that("partial run with a multi-filter parent keeps every parent filter cach
   )
   fb <- filter(
     type = "range", id = "b", name = "Sepal.Length", variable = "Sepal.Length",
-    dataset = "iris", range = c(4, 8)
+    dataset = "iris", range = c(4L, 8L)
   )
   coh <- Cohort$new(set_source(tblist(iris = iris)), step(fa, fb))
   coh$run_flow()
@@ -2102,7 +2102,7 @@ test_that("initial and progressively added steps render identically (no run)", {
   )
   full <- list(setosa = 50L, versicolor = 50L, virginica = 50L)
 
-  for (i in 2:4) {
+  for (i in 2L:4L) {
     coh$add_step(step(mk_species(c("setosa", "versicolor", "virginica"))))
     pre_choices <- coh$get_stats(
       as.character(i), "sp", state = "pre", name = "choices"
@@ -2200,26 +2200,26 @@ test_that("propagate_domains = 'data' keeps a factor column's post-data intact",
   # pre-data (100 setosa + versicolor rows), not collapse to zero.
   pre2 <- nrow(coh$get_data("2", state = "pre")$iris)
   post2 <- nrow(coh$get_data("2", state = "post")$iris)
-  expect_equal(pre2, 100L)
-  expect_equal(post2, pre2)
+  expect_identical(pre2, 100L)
+  expect_identical(post2, pre2)
 })
 
 test_that("propagate_domains = 'data' narrows range domain", {
   iris_source <- set_source(tblist(iris = iris))
   step1 <- step(
     filter("range", id = "sl1", variable = "Sepal.Length", dataset = "iris",
-           range = c(5, 6))
+           range = c(5L, 6L))
   )
   step2 <- step(
     filter("range", id = "sl2", variable = "Sepal.Length", dataset = "iris",
-           domain = c(4, 8))
+           domain = c(4L, 8L))
   )
   coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "data")
   coh$run_flow()
 
   step2_filter <- coh$get_filter("2", "sl2")
-  expect_true(step2_filter@domain[1L] >= 5)
-  expect_true(step2_filter@domain[2L] <= 6)
+  expect_gte(step2_filter@domain[1L], 5L)
+  expect_lte(step2_filter@domain[2L], 6L)
 })
 
 test_that("propagate_domains = 'data' skips filters without domain", {
@@ -2275,8 +2275,8 @@ test_that("propagate_domains = 'data' narrows a step added after a resolved pare
   # pre-data (the 100 rows the parent passed through), not zero.
   pre2 <- nrow(coh$get_data("2", state = "pre")$iris)
   post2 <- nrow(coh$get_data("2", state = "post")$iris)
-  expect_equal(pre2, 100L)
-  expect_equal(post2, pre2)
+  expect_identical(pre2, 100L)
+  expect_identical(post2, pre2)
 })
 
 test_that("propagate_domains = 'data' defers narrowing when added step is not run", {
@@ -2369,17 +2369,17 @@ test_that("propagate_domains = 'filter' works with range filters", {
   iris_source <- set_source(tblist(iris = iris))
   step1 <- step(
     filter("range", variable = "Sepal.Length", dataset = "iris",
-           range = c(5, 6))
+           range = c(5L, 6L))
   )
   step2 <- step(
     filter("range", variable = "Sepal.Length", dataset = "iris",
-           domain = c(4, 8))
+           domain = c(4L, 8L))
   )
   coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "filter")
   coh$run_flow()
 
   step2_filter <- coh$get_filter("2", "iris-SepalLength")
-  expect_identical(step2_filter@domain, c(5, 6))
+  expect_identical(step2_filter@domain, c(5L, 6L))
 })
 
 test_that("propagate_domains = 'filter' works with cache disabled", {
@@ -2411,14 +2411,14 @@ test_that("propagate_domains = 'filter' skips when no matching filter in current
   )
   step2 <- step(
     filter("range", variable = "Sepal.Length", dataset = "iris",
-           domain = c(4, 8))
+           domain = c(4L, 8L))
   )
   coh <- Cohort$new(iris_source, step1, step2, propagate_domains = "filter")
   coh$run_flow()
 
   # No matching filter for Sepal.Length in step 1 — domain unchanged
   step2_filter <- coh$get_filter("2", "iris-SepalLength")
-  expect_identical(step2_filter@domain, c(4, 8))
+  expect_identical(step2_filter@domain, c(4L, 8L))
 })
 
 test_that("propagate_domains = 'filter' uses domain as value when filter is unset", {

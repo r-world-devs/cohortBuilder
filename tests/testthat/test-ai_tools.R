@@ -58,9 +58,9 @@ test_that("print.cb_tool produces expected output", {
     arguments = list(x = "a", y = "b")
   )
   out <- capture.output(print(t))
-  expect_true(any(grepl("my_tool", out)))
-  expect_true(any(grepl("Does something useful", out)))
-  expect_true(any(grepl("x, y", out)))
+  expect_true(any(grepl("my_tool", out, fixed = TRUE)))
+  expect_true(any(grepl("Does something useful", out, fixed = TRUE)))
+  expect_true(any(grepl("x, y", out, fixed = TRUE)))
 })
 
 # -- cb_tool_filters_meta ------------------------------------------------------
@@ -94,7 +94,7 @@ test_that("cb_tool_filters_meta handles missing available_filters", {
   coh <- cohort(source = source)
   t <- cb_tool_filters_meta(coh)
   result <- t$fun()
-  expect_true(grepl("No filters metadata", result))
+  expect_true(grepl("No filters metadata", result, fixed = TRUE))
 })
 
 # -- cb_tool_add_filters -------------------------------------------------------
@@ -115,8 +115,8 @@ test_that("cb_tool_add_filters with new_step creates a step", {
   t <- cb_tool_add_filters(coh)
 
   result <- t$fun("iris-Species, mtcars-hp", action = "new_step")
-  expect_true(grepl("iris-Species", result))
-  expect_true(grepl("mtcars-hp", result))
+  expect_true(grepl("iris-Species", result, fixed = TRUE))
+  expect_true(grepl("mtcars-hp", result, fixed = TRUE))
   expect_identical(coh$last_step_id(), "1")
 })
 
@@ -131,7 +131,7 @@ test_that("cb_tool_add_filters with edit_last adds to existing step", {
 
   t <- cb_tool_add_filters(coh)
   result <- t$fun("mtcars-hp", action = "edit_last")
-  expect_true(grepl("mtcars-hp", result))
+  expect_true(grepl("mtcars-hp", result, fixed = TRUE))
   # Still step 1, filter was added to it
   expect_identical(coh$last_step_id(), "1")
   filters <- coh$get_step("1")$filters
@@ -146,8 +146,8 @@ test_that("cb_tool_add_filters skips filters already present in the step", {
   t$fun("iris-Species", action = "new_step")
   result <- t$fun("iris-Species", action = "edit_last")
 
-  expect_true(grepl("Already present in step \\(skipped\\)", result))
-  expect_true(grepl("iris-Species", result))
+  expect_true(grepl("Already present in step (skipped)", result, fixed = TRUE))
+  expect_true(grepl("iris-Species", result, fixed = TRUE))
   # No duplicate added: still a single Species filter.
   expect_identical(sum(names(coh$get_step("1")$filters) == "iris-Species"), 1L)
 })
@@ -160,7 +160,7 @@ test_that("cb_tool_apply_filters updates values of existing filters in place", {
   t$fun('{"iris-Species":{"value":["setosa"]}}', action = "new_step")
   result <- t$fun('{"iris-Species":{"value":["versicolor"]}}', action = "edit_last")
 
-  expect_true(grepl("Updated values for existing filters", result))
+  expect_true(grepl("Updated values for existing filters", result, fixed = TRUE))
   # Value updated in place, filter not reset or duplicated.
   filters <- coh$get_step(coh$last_step_id())$filters
   expect_identical(filters[["iris-Species"]]@value, "versicolor")
@@ -173,7 +173,7 @@ test_that("cb_tool_add_filters can add filters as inactive", {
   t <- cb_tool_add_filters(coh)
 
   result <- t$fun("iris-Species", action = "new_step", active = "false")
-  expect_true(grepl("inactive", result))
+  expect_true(grepl("inactive", result, fixed = TRUE))
   expect_false(coh$get_step("1")$filters[["iris-Species"]]@active)
 })
 
@@ -189,7 +189,7 @@ test_that("cb_tool_add_filters inherits active state when active is omitted", {
   t <- cb_tool_add_filters(coh)
 
   result <- t$fun("iris-Species", action = "new_step")
-  expect_false(grepl("active|inactive", result))
+  expect_false(grepl("active|inactive", result, fixed = TRUE))
   expect_false(coh$get_step("1")$filters[["iris-Species"]]@active)
 })
 
@@ -199,7 +199,7 @@ test_that("cb_tool_apply_filters can add filters as inactive", {
   t <- cb_tool_apply_filters(coh)
 
   result <- t$fun('{"iris-Species":{"value":["setosa"]}}', action = "new_step", active = "false")
-  expect_true(grepl("inactive", result))
+  expect_true(grepl("inactive", result, fixed = TRUE))
   flt <- coh$get_step(coh$last_step_id())$filters[["iris-Species"]]
   expect_false(flt@active)
   expect_identical(flt@value, "setosa")
@@ -210,8 +210,8 @@ test_that("cb_tool_add_filters reports unknown filter ids", {
   coh <- make_test_cohort()
   t <- cb_tool_add_filters(coh)
   result <- t$fun("iris-Species, nonexistent_filter")
-  expect_true(grepl("Unknown filter ids ignored", result))
-  expect_true(grepl("nonexistent_filter", result))
+  expect_true(grepl("Unknown filter ids ignored", result, fixed = TRUE))
+  expect_true(grepl("nonexistent_filter", result, fixed = TRUE))
 })
 
 test_that("cb_tool_add_filters handles all unknown ids", {
@@ -219,7 +219,7 @@ test_that("cb_tool_add_filters handles all unknown ids", {
   coh <- make_test_cohort()
   t <- cb_tool_add_filters(coh)
   result <- t$fun("fake_one, fake_two")
-  expect_true(grepl("No filters found matching", result))
+  expect_true(grepl("No filters found matching", result, fixed = TRUE))
 })
 
 test_that("cb_tool_add_filters handles no available_filters", {
@@ -228,7 +228,7 @@ test_that("cb_tool_add_filters handles no available_filters", {
   coh <- cohort(source = source)
   t <- cb_tool_add_filters(coh)
   result <- t$fun("Species")
-  expect_true(grepl("No available filters", result))
+  expect_true(grepl("No available filters", result, fixed = TRUE))
 })
 
 # -- cb_tool_set_filter_values -------------------------------------------------
@@ -267,7 +267,7 @@ test_that("cb_tool_set_filter_values handles invalid JSON", {
 
   t <- cb_tool_set_filter_values(coh)
   result <- t$fun("not valid json{{{")
-  expect_true(grepl("Invalid JSON", result))
+  expect_true(grepl("Invalid JSON", result, fixed = TRUE))
 })
 
 test_that("cb_tool_set_filter_values handles no steps", {
@@ -275,7 +275,7 @@ test_that("cb_tool_set_filter_values handles no steps", {
   coh <- make_test_cohort()
   t <- cb_tool_set_filter_values(coh)
   result <- t$fun('{"Species": {"value": ["setosa"]}}')
-  expect_true(grepl("No steps", result))
+  expect_true(grepl("No steps", result, fixed = TRUE))
 })
 
 # -- Registration functions ----------------------------------------------------
@@ -286,7 +286,7 @@ test_that("cb_register_tool registers tool with chat", {
   chat <- MockChat$new()
   t <- cb_tool_filters_meta(coh)
   expect_invisible(cb_register_tool(chat, t))
-  expect_identical(length(chat$tools), 1L)
+  expect_length(chat$tools, 1L)
 })
 
 test_that("cb_register_tool rejects non-cb_tool", {
@@ -303,5 +303,5 @@ test_that("cb_register_tools registers all twelve tools", {
   coh <- make_test_cohort()
   chat <- MockChat$new()
   cb_register_tools(chat, coh)
-  expect_identical(length(chat$tools), 12L)
+  expect_length(chat$tools, 12L)
 })

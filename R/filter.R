@@ -430,7 +430,7 @@ cb_filter_to_expr <- S7::new_generic("cb_filter_to_expr", c("filter", "source"))
     listed <- paste(variables, collapse = " ")
   } else {
     listed <- paste0(
-      paste(variables[1:2], collapse = " "),
+      paste(variables[1L:2L], collapse = " "),
       " + ", n - 2L, " vars"
     )
   }
@@ -554,7 +554,7 @@ join_discrete_text <- function(x) {
 
 # -- Domain intersection -------------------------------------------------------
 
-#' Label identifying a filter in domain-trimming warnings
+#' Label identifying a filter in domain-trimming messages
 #'
 #' @param id The filter id (may be `NULL`/empty).
 #' @return A label string like `"Filter 'x' value"` or `"Filter value"`.
@@ -566,11 +566,11 @@ trim_label <- function(id = NULL) {
 
 #' Intersect a discrete filter value with its domain
 #'
-#' Keeps only values present in `domain`, warning about any dropped values.
+#' Keeps only values present in `domain`, emitting a message about any dropped values.
 #'
 #' @param value Selected values.
 #' @param domain Allowed values (`NULL` to skip intersection).
-#' @param id Filter id used in the warning label.
+#' @param id Filter id used in the message label.
 #' @return The intersected value (or `domain` when `value` is `NA`).
 #' @noRd
 intersect_domain_discrete <- function(value, domain, id = NULL) {
@@ -579,10 +579,10 @@ intersect_domain_discrete <- function(value, domain, id = NULL) {
   result <- intersect(value, domain)
   if (!identical(sort(as.character(value)), sort(as.character(result)))) {
     dropped <- setdiff(as.character(value), as.character(result))
-    warning(sprintf(
+    message(sprintf(
       "%s trimmed to domain: removed %s (not in domain).",
-      trim_label(id), paste(dropped, collapse = ", ")
-    ), call. = FALSE)
+      trim_label(id), toString(dropped)
+    ))
   }
   result
 }
@@ -595,7 +595,7 @@ intersect_domain_discrete <- function(value, domain, id = NULL) {
 #'
 #' @param value Comma-separated selected values.
 #' @param domain Comma-separated allowed values (`NULL` to skip).
-#' @param id Filter id used in the warning label.
+#' @param id Filter id used in the message label.
 #' @return A comma-separated intersected value.
 #' @noRd
 intersect_domain_discrete_text <- function(value, domain, id = NULL) {
@@ -606,22 +606,22 @@ intersect_domain_discrete_text <- function(value, domain, id = NULL) {
   result_vec <- intersect(value_vec, domain_vec)
   if (!identical(sort(value_vec), sort(result_vec))) {
     dropped <- setdiff(value_vec, result_vec)
-    warning(sprintf(
+    message(sprintf(
       "%s trimmed to domain: removed %s (not in domain).",
-      trim_label(id), paste(dropped, collapse = ", ")
-    ), call. = FALSE)
+      trim_label(id), toString(dropped)
+    ))
   }
   join_discrete_text(result_vec)
 }
 
 #' Intersect a range filter value with its domain
 #'
-#' Narrows the `[min, max]` range to fit within the domain bounds, warning if
+#' Narrows the `[min, max]` range to fit within the domain bounds, emitting a message if
 #' the range is narrowed.
 #'
 #' @param value Length-2 range `c(min, max)`.
 #' @param domain Length-2 allowed range (`NULL` to skip).
-#' @param id Filter id used in the warning label.
+#' @param id Filter id used in the message label.
 #' @return The narrowed range (or `domain` when `value` is `NA`).
 #' @noRd
 intersect_domain_range <- function(value, domain, id = NULL) {
@@ -629,12 +629,12 @@ intersect_domain_range <- function(value, domain, id = NULL) {
   if (identical(value, NA)) return(domain)
   result <- c(max(value[1L], domain[1L]), min(value[2L], domain[2L]))
   if (!identical(value, result)) {
-    warning(sprintf(
+    message(sprintf(
       "%s trimmed to domain: [%s, %s] narrowed to [%s, %s].",
       trim_label(id),
       format(value[1L]), format(value[2L]),
       format(result[1L]), format(result[2L])
-    ), call. = FALSE)
+    ))
   }
   result
 }
@@ -642,11 +642,11 @@ intersect_domain_range <- function(value, domain, id = NULL) {
 #' Intersect a multi_discrete filter value with its domain
 #'
 #' Intersects each named per-variable value vector with the matching domain
-#' entry, warning about any dropped values.
+#' entry, emitting a message about any dropped values.
 #'
 #' @param values Named list of selected value vectors.
 #' @param domain Named list of allowed value vectors (`NULL` to skip).
-#' @param id Filter id used in the warning label.
+#' @param id Filter id used in the message label.
 #' @return The intersected named list (or `domain` when `values` is `NA`).
 #' @noRd
 intersect_domain_multi <- function(values, domain, id = NULL) {
@@ -659,13 +659,13 @@ intersect_domain_multi <- function(values, domain, id = NULL) {
     dropped <- purrr::imap_chr(values, function(val, nm) {
       out <- setdiff(as.character(val), as.character(result[[nm]]))
       if (length(out) == 0L) return(NA_character_)
-      sprintf("%s=%s", nm, paste(out, collapse = ", "))
+      sprintf("%s=%s", nm, toString(out))
     })
     dropped <- dropped[!is.na(dropped)]
-    warning(sprintf(
+    message(sprintf(
       "%s trimmed to domain: removed %s (not in domain).",
       trim_label(id), paste(dropped, collapse = "; ")
-    ), call. = FALSE)
+    ))
   }
   result
 }
@@ -727,7 +727,7 @@ intersect_domain <- function(filter) {
 #' intersection, dispatching on filter type. Used by `"filter"`-mode domain
 #' propagation when the same logical filter appears in more than one upstream
 #' step and its effective domains must be combined. Unlike
-#' [cb_intersect_domain()], this never emits trimming warnings.
+#' [cb_intersect_domain()], this never emits trimming messages.
 #'
 #' @param filter S7 filter object (used for type dispatch only).
 #' @param ... Additional arguments. Methods receive two domain values `a` and
@@ -748,13 +748,13 @@ S7::method(cb_intersect_domain_values, CbFilter) <- function(filter, a, b) {
 #' @param a,b Domain value vectors; either may be `NULL`.
 #' @return The intersected vector, or `NULL`.
 #' @noRd
-intersect_domain_values_discrete <- function(filter, a, b) {
+combine_domains_discrete <- function(filter, a, b) {
   if (is.null(a)) return(b)
   if (is.null(b)) return(a)
   intersect(a, b)
 }
 
-S7::method(cb_intersect_domain_values, CbFilterDiscrete) <- intersect_domain_values_discrete
+S7::method(cb_intersect_domain_values, CbFilterDiscrete) <- combine_domains_discrete
 
 #' Intersect two discrete_text domain values
 #'
@@ -765,13 +765,13 @@ S7::method(cb_intersect_domain_values, CbFilterDiscrete) <- intersect_domain_val
 #' @param a,b Comma-separated domain strings; either may be `NULL`.
 #' @return A comma-separated intersected string, or `NULL`.
 #' @noRd
-intersect_domain_values_discrete_text <- function(filter, a, b) {
+combine_domains_discrete_text <- function(filter, a, b) {
   if (is.null(a)) return(b)
   if (is.null(b)) return(a)
   join_discrete_text(intersect(split_discrete_text(a), split_discrete_text(b)))
 }
 
-S7::method(cb_intersect_domain_values, CbFilterDiscreteText) <- intersect_domain_values_discrete_text
+S7::method(cb_intersect_domain_values, CbFilterDiscreteText) <- combine_domains_discrete_text
 
 #' Intersect two range domain values
 #'
@@ -929,7 +929,7 @@ filter <- function(type, ...) {
   }
   stop(
     "No applicable .print_filter method for class: ",
-    paste(class(filter), collapse = ", "),
+    toString(class(filter)),
     call. = FALSE
   )
 }

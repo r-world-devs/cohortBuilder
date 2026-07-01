@@ -258,11 +258,11 @@ Cohort <- R6::R6Class(
       if (step_is_new) {
         parent_id <- prev_step(step_id)
         if (is.null(private$data_objects[[step_id]]) &&
-            !is.null(private$data_objects[[parent_id]])) {
+              !is.null(private$data_objects[[parent_id]])) {
           private$data_objects[[step_id]] <- private$data_objects[[parent_id]]
         }
         if (is.null(private$stats[[step_id]]) &&
-            !is.null(private$stats[[parent_id]])) {
+              !is.null(private$stats[[parent_id]])) {
           private$stats[[step_id]] <- private$stats[[parent_id]]
         }
       }
@@ -647,8 +647,8 @@ Cohort <- R6::R6Class(
     #' @param modifier A function taking the description as argument.
     #'     The function can be used to modify its argument (convert to html, display in browser etc.).
     show_help = function(
-    field, step_id, filter_id,
-    modifier = getOption("cb_help_modifier", default = function(x) x)
+      field, step_id, filter_id,
+      modifier = getOption("cb_help_modifier", default = function(x) x)
     ) {
       description <- NULL
       if (!missing(field)) {
@@ -1254,11 +1254,11 @@ Cohort <- R6::R6Class(
       for (step_id in names(private$steps)) {
         parent_id <- prev_step(step_id)
         if (is.null(private$data_objects[[step_id]]) &&
-            !is.null(private$data_objects[[parent_id]])) {
+              !is.null(private$data_objects[[parent_id]])) {
           private$data_objects[[step_id]] <- private$data_objects[[parent_id]]
         }
         if (is.null(private$stats[[step_id]]) &&
-            !is.null(private$stats[[parent_id]])) {
+              !is.null(private$stats[[parent_id]])) {
           private$stats[[step_id]] <- private$stats[[parent_id]]
         }
       }

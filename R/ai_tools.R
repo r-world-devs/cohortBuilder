@@ -34,7 +34,7 @@ print.cb_tool <- function(x, ...) {
   cat("cohortBuilder tool:", x$name, "\n")
   cat("Description:", trimws(x$description), "\n")
   if (length(x$arguments) > 0L) {
-    cat("Arguments:", paste(names(x$arguments), collapse = ", "), "\n")
+    cat("Arguments:", toString(names(x$arguments)), "\n")
   }
   invisible(x)
 }
@@ -104,7 +104,7 @@ cb_tool_add_filters <- function(cohort) {
     # active = NULL: inherit the available filter's active state (do not touch).
     set_active <- !is.null(active) && !is.na(active) && nzchar(as.character(active))
     active <- if (set_active) !identical(tolower(as.character(active)), "false") else NA
-    filter_ids <- trimws(strsplit(filter_ids, ",")[[1L]])
+    filter_ids <- trimws(strsplit(filter_ids, ",", fixed = TRUE)[[1L]])
     available <- cohort$get_source()$available_filters
 
     if (is.null(available) || length(available) == 0L) {
@@ -538,7 +538,7 @@ cb_tool_toggle_filters <- function(cohort) {
       return("Invalid 'active' value. Must be 'true' or 'false'.")
     }
 
-    filter_ids <- trimws(strsplit(filter_ids, ",")[[1L]])
+    filter_ids <- trimws(strsplit(filter_ids, ",", fixed = TRUE)[[1L]])
     steps <- cohort$get_step()
     if (length(steps) == 0L) {
       return("No steps configured in the cohort.")
@@ -688,7 +688,7 @@ cb_tool_remove_filters <- function(cohort) {
     print("cb_tool_remove_filters")
     print(filter_ids)
 
-    filter_ids <- trimws(strsplit(filter_ids, ",")[[1L]])
+    filter_ids <- trimws(strsplit(filter_ids, ",", fixed = TRUE)[[1L]])
     steps <- cohort$get_step()
     if (length(steps) == 0L) {
       return("No steps configured in the cohort.")
@@ -875,7 +875,7 @@ cb_tool_clear_filters <- function(cohort) {
       )))
     }
 
-    filter_ids <- trimws(strsplit(filter_ids, ",")[[1L]])
+    filter_ids <- trimws(strsplit(filter_ids, ",", fixed = TRUE)[[1L]])
     existing_ids <- names(step$filters)
     matched <- intersect(filter_ids, existing_ids)
     unknown <- setdiff(filter_ids, existing_ids)

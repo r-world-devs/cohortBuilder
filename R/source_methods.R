@@ -28,7 +28,7 @@ Source <- R6::R6Class(
       description = NULL, available_filters = NULL,
       compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE),
       options = list(display_binding = TRUE)
-      ) {
+    ) {
 
       self$dtconn <- dtconn
       class(self) <- c(class(dtconn), class(self))
@@ -580,5 +580,3 @@ autofilter <- function(source, attach_as = c("step", "meta"), ...) {
 autofilter.default <- function(source, ...) {
   return(source)
 }
-
-

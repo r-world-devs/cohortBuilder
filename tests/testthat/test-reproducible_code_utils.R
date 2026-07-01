@@ -134,7 +134,7 @@ test_that("exclude_first_pipe handles bare symbols without error", {
 })
 
 test_that("exclude_first_pipe removes first arg from function call", {
-  # dplyr::filter(data, condition) -> dplyr::filter(condition)
+  # Drops the leading data argument so the call becomes pipe-ready.
   expr <- quote(dplyr::filter(data, x > 1L))
   result <- exclude_first_pipe(expr, quote(data))
   expect_identical(result, quote(dplyr::filter(x > 1L)))
@@ -149,7 +149,7 @@ test_that("exclude_first_pipe leaves call unchanged when first arg doesn't match
 # -- exclude_reassignment -----------------------------------------------------
 
 test_that("exclude_reassignment strips assignment from braced function call expr", {
-  # { data[["x"]] <- dplyr::filter(data[["x"]], cond) }
+  # Input is a braced block assigning a dplyr::filter() call to data[["x"]].
   expr <- quote({
     data[["x"]] <- dplyr::filter(data[["x"]], cond)
   })
@@ -222,6 +222,11 @@ test_that("pipe_filtering returns single expression unchanged", {
 # -- pipe_all_filters (integration) -------------------------------------------
 
 test_that("pipe_all_filters combines filtering rows into single piped expression", {
+  # cb_filter_to_expr() captures code blocks via rlang::expr({ ... }). Under covr
+  # instrumentation the captured block gains a leading covr:::count() call, which
+  # breaks pipe_filtering()'s assumption that the first statement is the
+  # assignment. This affects only the instrumented build, not real usage.
+  skip_on_covr()
   iris_source <- set_source(tblist(iris = iris))
   f1 <- filter(
     type = "discrete", id = "sp", name = "Species",

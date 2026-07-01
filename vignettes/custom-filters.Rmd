@@ -167,19 +167,19 @@ Note:
 #### get_stats -- data statistics
 
 ```{r}
-S7::method(cb_get_filter_stats, list(CbFilterLogical, tblist_class)) <- function(filter, source, data_object, name, ...) {
+S7::method(cb_get_filter_stats, list(CbFilterLogical, tblist_class)) <- function(
+  filter, source, data_object, name, ...
+) {
   dataset <- filter@dataset
   variable <- filter@variable
   if (missing(name)) {
     name <- c("n_data", "choices", "n_missing")
   }
+  column <- data_object[[dataset]][[variable]]
   stats <- list(
-    choices = if ("choices" %in% name) data_object[[dataset]][[variable]] |>
-      stats::na.omit() |> table() |> as.list(),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
-      stats::na.omit() |> length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
-      is.na() |> sum()
+    choices = if ("choices" %in% name) as.list(table(stats::na.omit(column))),
+    n_data = if ("n_data" %in% name) length(stats::na.omit(column)),
+    n_missing = if ("n_missing" %in% name) sum(is.na(column))
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -212,7 +212,9 @@ S7::method(cb_get_filter_data, list(CbFilterLogical, tblist_class)) <- function(
 #### get_defaults -- default parameter values
 
 ```{r}
-S7::method(cb_get_filter_defaults, list(CbFilterLogical, tblist_class)) <- function(filter, source, data_object, cache_object, ...) {
+S7::method(cb_get_filter_defaults, list(CbFilterLogical, tblist_class)) <- function(
+  filter, source, data_object, cache_object, ...
+) {
   list(value = names(cache_object$choices))
 }
 ```

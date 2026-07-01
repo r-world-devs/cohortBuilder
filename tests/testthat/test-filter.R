@@ -161,9 +161,9 @@ test_that("domain appears in get_filter_params output", {
 test_that("domain works for all filter types", {
   f_range <- filter(
     type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
-    domain = c(4, 8)
+    domain = c(4L, 8L)
   )
-  expect_identical(f_range@domain, c(4, 8))
+  expect_identical(f_range@domain, c(4L, 8L))
 
   f_date <- filter(
     type = "date_range", id = "d", variable = "date", dataset = "d",
@@ -205,7 +205,7 @@ test_that(".default_filter_id handles suffix", {
 test_that(".default_filter_id truncates to 3 vars + hash for >3 variables", {
   vars <- c("alpha", "beta", "gamma", "delta", "epsilon")
   result <- .default_filter_id("ds", vars, suffix = "md")
-  parts <- strsplit(result, "-")[[1L]]
+  parts <- strsplit(result, "-", fixed = TRUE)[[1L]]
   expect_identical(parts[1L], "ds")
   expect_identical(parts[2L], "alpha")
   expect_identical(parts[3L], "beta")
@@ -225,8 +225,8 @@ test_that(".default_filter_id hash is the same regardless of variable order", {
   id1 <- .default_filter_id("ds", c("a", "b", "c", "d"), suffix = "md")
   id2 <- .default_filter_id("ds", c("d", "c", "b", "a"), suffix = "md")
   # First 3 vars differ by input order, but the hash portion is identical
-  hash1 <- strsplit(id1, "-")[[1L]][5L]
-  hash2 <- strsplit(id2, "-")[[1L]][5L]
+  hash1 <- strsplit(id1, "-", fixed = TRUE)[[1L]][5L]
+  hash2 <- strsplit(id2, "-", fixed = TRUE)[[1L]][5L]
   expect_identical(hash1, hash2)
 })
 
@@ -348,7 +348,7 @@ test_that("cb_intersect_domain intersects value with domain for discrete", {
     type = "discrete", id = "x", variable = "a", dataset = "d",
     value = c("a", "b", "z"), domain = c("a", "b", "c")
   )
-  expect_warning(result <- cb_intersect_domain(f), "trimmed to domain")
+  expect_message(result <- cb_intersect_domain(f), "trimmed to domain")
   expect_identical(result, c("a", "b"))
 })
 
@@ -364,18 +364,18 @@ test_that("cb_intersect_domain does not warn when value already within domain", 
 test_that("cb_intersect_domain works for range types", {
   f <- filter(
     type = "range", id = "x", variable = "a", dataset = "d",
-    range = c(1, 100), domain = c(10, 50)
+    range = c(1L, 100L), domain = c(10L, 50L)
   )
-  expect_warning(result <- cb_intersect_domain(f), "trimmed to domain")
-  expect_identical(result, c(10, 50))
+  expect_message(result <- cb_intersect_domain(f), "trimmed to domain")
+  expect_identical(result, c(10L, 50L))
 })
 
 test_that("cb_intersect_domain returns domain when range is NA", {
   f <- filter(
     type = "range", id = "x", variable = "a", dataset = "d",
-    domain = c(10, 50)
+    domain = c(10L, 50L)
   )
-  expect_identical(cb_intersect_domain(f), c(10, 50))
+  expect_identical(cb_intersect_domain(f), c(10L, 50L))
 })
 
 test_that("cb_intersect_domain works for multi_discrete", {
@@ -384,7 +384,7 @@ test_that("cb_intersect_domain works for multi_discrete", {
     values = list(a = c("x", "z"), b = c("y")),
     domain = list(a = c("x", "y"), b = c("y", "w"))
   )
-  expect_warning(result <- cb_intersect_domain(f), "trimmed to domain")
+  expect_message(result <- cb_intersect_domain(f), "trimmed to domain")
   expect_identical(result, list(a = "x", b = "y"))
 })
 
@@ -429,7 +429,7 @@ test_that("Discrete filter with domain constrains results", {
     domain = c("setosa", "versicolor")
   )
   coh <- Cohort$new(iris_source, f)
-  suppressWarnings(coh$run_flow())
+  suppressMessages(coh$run_flow())
   result <- coh$get_data(1L, state = "post")$iris
   expect_true(all(result$Species %in% c("setosa", "versicolor")))
 })
@@ -438,12 +438,12 @@ test_that("Range filter with domain constrains results", {
   iris_source <- set_source(tblist(iris = iris))
   f <- filter(
     type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
-    range = c(1, 10), domain = c(5, 6)
+    range = c(1L, 10L), domain = c(5L, 6L)
   )
   coh <- Cohort$new(iris_source, f)
-  suppressWarnings(coh$run_flow())
+  suppressMessages(coh$run_flow())
   result <- coh$get_data(1L, state = "post")$iris
-  expect_true(all(result$Sepal.Length >= 5 & result$Sepal.Length <= 6))
+  expect_true(all(result$Sepal.Length >= 5L & result$Sepal.Length <= 6L))
 })
 
 test_that("update_filter can change domain", {
@@ -480,7 +480,7 @@ test_that("cb_filter_to_expr uses domain-intersected value for discrete filter",
     value = c("setosa", "versicolor", "virginica"),
     domain = c("setosa", "versicolor")
   )
-  expr <- suppressWarnings(cb_filter_to_expr(f, iris_source))
+  expr <- suppressMessages(cb_filter_to_expr(f, iris_source))
   # Evaluate the generated code to verify it uses the intersected value
   data_object <- iris_source$dtconn
   eval(expr)
@@ -491,12 +491,12 @@ test_that("cb_filter_to_expr uses domain as value when range is NA", {
   iris_source <- set_source(tblist(iris = iris))
   f <- filter(
     type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
-    domain = c(5, 6)
+    domain = c(5L, 6L)
   )
   expr <- cb_filter_to_expr(f, iris_source)
   data_object <- iris_source$dtconn
   eval(expr)
-  expect_true(all(data_object$iris$Sepal.Length >= 5 & data_object$iris$Sepal.Length <= 6))
+  expect_true(all(data_object$iris$Sepal.Length >= 5L & data_object$iris$Sepal.Length <= 6L))
 })
 
 # -- discrete_text comma-separated value / domain -----------------------------
@@ -556,7 +556,7 @@ test_that("cb_intersect_domain for discrete_text trims value to domain (with war
     type = "discrete_text", id = "g", variable = "g", dataset = "d",
     value = "a, z", domain = "a,b,c"
   )
-  expect_warning(result <- cb_intersect_domain(f), "trimmed to domain")
+  expect_message(result <- cb_intersect_domain(f), "trimmed to domain")
   expect_identical(result, "a")
 })
 
@@ -601,7 +601,7 @@ test_that("discrete_text filter with domain constrains results", {
     value = "a, b, c", domain = "a,b"
   )
   coh <- Cohort$new(src, f)
-  suppressWarnings(coh$run_flow())
+  suppressMessages(coh$run_flow())
   result <- coh$get_data(1L, state = "post")$d
   expect_true(all(result$g %in% c("a", "b")))
   expect_false("c" %in% result$g)
@@ -619,7 +619,7 @@ test_that("discrete_text filter splits 3+ space-separated values correctly", {
   coh <- Cohort$new(src, f)
   coh$run_flow()
   result <- coh$get_data(1L, state = "post")$d
-  expect_setequal(unique(result$g), c("a", "b", "c"))
+  expect_setequal(collapse::funique(result$g), c("a", "b", "c"))
 })
 
 test_that("stats-mode propagation narrows a discrete_text domain", {
@@ -663,9 +663,9 @@ test_that("filter_domain() returns NULL when no domain is set", {
 test_that("filter_domain() works for range filters", {
   f <- filter(
     type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
-    domain = c(5, 6)
+    domain = c(5L, 6L)
   )
-  expect_identical(filter_domain(f), c(5, 6))
+  expect_identical(filter_domain(f), c(5L, 6L))
 })
 
 # -- filter_effective_value() -------------------------------------------------
@@ -677,7 +677,7 @@ test_that("filter_effective_value() intersects discrete value with domain", {
     domain = c("setosa", "versicolor")
   )
   expect_setequal(
-    suppressWarnings(filter_effective_value(f)),
+    suppressMessages(filter_effective_value(f)),
     c("setosa", "versicolor")
   )
 })
@@ -693,9 +693,9 @@ test_that("filter_effective_value() returns domain when value is NA", {
 test_that("filter_effective_value() returns range domain when range is NA", {
   f <- filter(
     type = "range", id = "sl", variable = "Sepal.Length", dataset = "iris",
-    domain = c(5, 6)
+    domain = c(5L, 6L)
   )
-  expect_identical(filter_effective_value(f), c(5, 6))
+  expect_identical(filter_effective_value(f), c(5L, 6L))
 })
 
 test_that("filter_effective_value() returns raw value when no domain", {

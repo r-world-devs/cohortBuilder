@@ -108,7 +108,7 @@ get_hook <- function(name) {
 #' @noRd
 run_hooks <- function(hooks, ..., hook_args = list()) {
   # if no hook_args the run with defaults
-  if (length(hook_args) == 0) {
+  if (length(hook_args) == 0L) {
     if (is.function(hooks)) {
       return(hooks(...))
     }

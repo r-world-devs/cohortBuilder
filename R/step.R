@@ -158,7 +158,10 @@ steps_range <- function(from, to) {
 #' @noRd
 readjust_step <- function(step, new_id) {
   step$id <- new_id
-  step$filters <- purrr::modify(step$filters, function(f) { f@step_id <- new_id; f })
+  step$filters <- purrr::modify(step$filters, function(f) {
+    f@step_id <- new_id
+    f
+  })
 
   return(step)
 }

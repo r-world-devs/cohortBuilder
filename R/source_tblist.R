@@ -144,19 +144,19 @@ S7::method(cb_filter_data, list(CbFilterDiscrete, tblist_class)) <- function(fil
   data_object
 }
 
-S7::method(cb_get_filter_stats, list(CbFilterDiscrete, tblist_class)) <- function(filter, source, data_object, name, ...) {
+S7::method(cb_get_filter_stats, list(CbFilterDiscrete, tblist_class)) <- function(
+  filter, source, data_object, name, ...
+) {
   dataset <- filter@dataset
   variable <- filter@variable
   if (missing(name)) {
     name <- c("n_data", "choices", "n_missing")
   }
+  column <- data_object[[dataset]][[variable]]
   stats <- list(
-    choices = if ("choices" %in% name) data_object[[dataset]][[variable]] |>
-      stats::na.omit() |> table() |> as.list(),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
-      stats::na.omit() |> length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
-      is.na() |> sum()
+    choices = if ("choices" %in% name) as.list(table(stats::na.omit(column))),
+    n_data = if ("n_data" %in% name) length(stats::na.omit(column)),
+    n_missing = if ("n_missing" %in% name) sum(is.na(column))
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
@@ -175,13 +175,17 @@ S7::method(cb_get_filter_data, list(CbFilterDiscrete, tblist_class)) <- function
   data_object[[filter@dataset]][[filter@variable]]
 }
 
-S7::method(cb_get_filter_defaults, list(CbFilterDiscrete, tblist_class)) <- function(filter, source, data_object, cache_object, ...) {
+S7::method(cb_get_filter_defaults, list(CbFilterDiscrete, tblist_class)) <- function(
+  filter, source, data_object, cache_object, ...
+) {
   list(value = names(cache_object$choices))
 }
 
 # -- S7 method implementations: CbFilterDiscreteText x tblist -----------------
 
-S7::method(cb_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   dataset <- filter@dataset
   variable <- filter@variable
   value <- cb_intersect_domain(filter)
@@ -196,32 +200,38 @@ S7::method(cb_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function
   data_object
 }
 
-S7::method(cb_get_filter_stats, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, data_object, name, ...) {
+S7::method(cb_get_filter_stats, list(CbFilterDiscreteText, tblist_class)) <- function(
+  filter, source, data_object, name, ...
+) {
   dataset <- filter@dataset
   variable <- filter@variable
   if (missing(name)) {
     name <- c("n_data", "choices", "n_missing")
   }
+  column <- data_object[[dataset]][[variable]]
   stats <- list(
-    choices = if ("choices" %in% name) data_object[[dataset]][[variable]] |>
-      collapse::funique() |> paste(collapse = ","),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
-      stats::na.omit() |> collapse::funique() |> length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
-      is.na() |> sum()
+    choices = if ("choices" %in% name) paste(collapse::funique(column), collapse = ","),
+    n_data = if ("n_data" %in% name) length(collapse::funique(stats::na.omit(column))),
+    n_missing = if ("n_missing" %in% name) sum(is.na(column))
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
 
-S7::method(cb_plot_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_plot_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   invisible(NULL)
 }
 
-S7::method(cb_get_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_get_filter_data, list(CbFilterDiscreteText, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   data_object[[filter@dataset]][[filter@variable]]
 }
 
-S7::method(cb_get_filter_defaults, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, data_object, cache_object, ...) {
+S7::method(cb_get_filter_defaults, list(CbFilterDiscreteText, tblist_class)) <- function(
+  filter, source, data_object, cache_object, ...
+) {
   list(value = cache_object$choices)
 }
 
@@ -373,29 +383,33 @@ S7::method(cb_get_filter_stats, list(CbFilterRange, tblist_class)) <- function(f
     },
     min = if ("min" %in% name) min(data_object[[dataset]][[variable]], na.rm = TRUE),
     max = if ("max" %in% name) max(data_object[[dataset]][[variable]], na.rm = TRUE),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
-      stats::na.omit() |> length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
-      is.na() |> sum()
+    n_data = if ("n_data" %in% name) length(stats::na.omit(data_object[[dataset]][[variable]])),
+    n_missing = if ("n_missing" %in% name) sum(is.na(data_object[[dataset]][[variable]]))
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
 
-S7::method(cb_plot_filter_data, list(CbFilterRange, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_plot_filter_data, list(CbFilterRange, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   dataset <- filter@dataset
   variable <- filter@variable
   if (nrow(data_object[[dataset]])) {
-    data_object[[dataset]][[variable]] |> graphics::hist(...)
+    graphics::hist(data_object[[dataset]][[variable]], ...)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
   }
 }
 
-S7::method(cb_get_filter_data, list(CbFilterRange, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_get_filter_data, list(CbFilterRange, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   data_object[[filter@dataset]][[filter@variable]]
 }
 
-S7::method(cb_get_filter_defaults, list(CbFilterRange, tblist_class)) <- function(filter, source, data_object, cache_object, ...) {
+S7::method(cb_get_filter_defaults, list(CbFilterRange, tblist_class)) <- function(
+  filter, source, data_object, cache_object, ...
+) {
   range_get_defaults_impl(filter, cache_object)
 }
 
@@ -475,11 +489,15 @@ get_date_range_frequencies <- function(data_object, dataset, variable, extra_par
 
 # -- S7 method implementations: CbFilterDateRange x tblist --------------------
 
-S7::method(cb_filter_data, list(CbFilterDateRange, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_filter_data, list(CbFilterDateRange, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   range_filter_data_impl(filter, data_object)
 }
 
-S7::method(cb_get_filter_stats, list(CbFilterDateRange, tblist_class)) <- function(filter, source, data_object, name, ...) {
+S7::method(cb_get_filter_stats, list(CbFilterDateRange, tblist_class)) <- function(
+  filter, source, data_object, name, ...
+) {
   dataset <- filter@dataset
   variable <- filter@variable
   if (missing(name)) {
@@ -493,29 +511,33 @@ S7::method(cb_get_filter_stats, list(CbFilterDateRange, tblist_class)) <- functi
     },
     min = if ("min" %in% name) min(data_object[[dataset]][[variable]], na.rm = TRUE),
     max = if ("max" %in% name) max(data_object[[dataset]][[variable]], na.rm = TRUE),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
-      stats::na.omit() |> length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
-      is.na() |> sum()
+    n_data = if ("n_data" %in% name) length(stats::na.omit(data_object[[dataset]][[variable]])),
+    n_missing = if ("n_missing" %in% name) sum(is.na(data_object[[dataset]][[variable]]))
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
 
-S7::method(cb_plot_filter_data, list(CbFilterDateRange, tblist_class)) <- function(filter, source, data_object, ..., breaks) {
+S7::method(cb_plot_filter_data, list(CbFilterDateRange, tblist_class)) <- function(
+  filter, source, data_object, ..., breaks
+) {
   dataset <- filter@dataset
   variable <- filter@variable
   if (nrow(data_object[[dataset]])) {
-    data_object[[dataset]][[variable]] |> graphics::hist(..., breaks = breaks)
+    graphics::hist(data_object[[dataset]][[variable]], ..., breaks = breaks)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
   }
 }
 
-S7::method(cb_get_filter_data, list(CbFilterDateRange, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_get_filter_data, list(CbFilterDateRange, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   data_object[[filter@dataset]][[filter@variable]]
 }
 
-S7::method(cb_get_filter_defaults, list(CbFilterDateRange, tblist_class)) <- function(filter, source, data_object, cache_object, ...) {
+S7::method(cb_get_filter_defaults, list(CbFilterDateRange, tblist_class)) <- function(
+  filter, source, data_object, cache_object, ...
+) {
   range_get_defaults_impl(filter, cache_object)
 }
 
@@ -564,11 +586,15 @@ calculate_datetime_step <- function(min_date, max_date) {
 
 # -- S7 method implementations: CbFilterDatetimeRange x tblist ----------------
 
-S7::method(cb_filter_data, list(CbFilterDatetimeRange, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_filter_data, list(CbFilterDatetimeRange, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   range_filter_data_impl(filter, data_object)
 }
 
-S7::method(cb_get_filter_stats, list(CbFilterDatetimeRange, tblist_class)) <- function(filter, source, data_object, name, ...) {
+S7::method(cb_get_filter_stats, list(CbFilterDatetimeRange, tblist_class)) <- function(
+  filter, source, data_object, name, ...
+) {
   dataset <- filter@dataset
   variable <- filter@variable
   if (missing(name)) {
@@ -581,7 +607,7 @@ S7::method(cb_get_filter_stats, list(CbFilterDatetimeRange, tblist_class)) <- fu
   if (is.null(extra_params$step) && !identical(length(data_object[[dataset]][[variable]]), 0L)) {
     min_val <- min(data_object[[dataset]][[variable]], na.rm = TRUE)
     max_val <- max(data_object[[dataset]][[variable]], na.rm = TRUE)
-    extra_params$step <- calculate_datetime_step(min_val, max_val) |> unname()
+    extra_params$step <- unname(calculate_datetime_step(min_val, max_val))
   }
 
   stats <- list(
@@ -590,41 +616,47 @@ S7::method(cb_get_filter_stats, list(CbFilterDatetimeRange, tblist_class)) <- fu
     },
     min = if ("min" %in% name) min(data_object[[dataset]][[variable]], na.rm = TRUE),
     max = if ("max" %in% name) max(data_object[[dataset]][[variable]], na.rm = TRUE),
-    n_data = if ("n_data" %in% name) data_object[[dataset]][[variable]] |>
-      stats::na.omit() |> length(),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] |>
-      is.na() |> sum()
+    n_data = if ("n_data" %in% name) length(stats::na.omit(data_object[[dataset]][[variable]])),
+    n_missing = if ("n_missing" %in% name) sum(is.na(data_object[[dataset]][[variable]]))
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
 
-S7::method(cb_plot_filter_data, list(CbFilterDatetimeRange, tblist_class)) <- function(filter, source, data_object, ..., breaks = NULL) {
+S7::method(cb_plot_filter_data, list(CbFilterDatetimeRange, tblist_class)) <- function(
+  filter, source, data_object, ..., breaks = NULL
+) {
   dataset <- filter@dataset
   variable <- filter@variable
   if (nrow(data_object[[dataset]])) {
     if (is.null(breaks)) {
-      breaks <- calculate_datetime_step(
+      breaks <- names(calculate_datetime_step(
         min(data_object[[dataset]][[variable]], na.rm = TRUE),
         max(data_object[[dataset]][[variable]], na.rm = TRUE)
-      ) |> names()
+      ))
     }
-    data_object[[dataset]][[variable]] |> graphics::hist(..., breaks = breaks)
+    graphics::hist(data_object[[dataset]][[variable]], ..., breaks = breaks)
   } else {
     graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
   }
 }
 
-S7::method(cb_get_filter_data, list(CbFilterDatetimeRange, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_get_filter_data, list(CbFilterDatetimeRange, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   data_object[[filter@dataset]][[filter@variable]]
 }
 
-S7::method(cb_get_filter_defaults, list(CbFilterDatetimeRange, tblist_class)) <- function(filter, source, data_object, cache_object, ...) {
+S7::method(cb_get_filter_defaults, list(CbFilterDatetimeRange, tblist_class)) <- function(
+  filter, source, data_object, cache_object, ...
+) {
   range_get_defaults_impl(filter, cache_object)
 }
 
 # -- S7 method implementations: CbFilterMultiDiscrete x tblist ----------------
 
-S7::method(cb_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   dataset <- filter@dataset
   values <- cb_intersect_domain(filter)
   keep_na <- filter@keep_na
@@ -651,23 +683,26 @@ S7::method(cb_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- functio
   data_object
 }
 
-S7::method(cb_get_filter_stats, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, data_object, name, ...) {
+S7::method(cb_get_filter_stats, list(CbFilterMultiDiscrete, tblist_class)) <- function(
+  filter, source, data_object, name, ...
+) {
   dataset <- filter@dataset
   variables <- unlist(filter@variables)
   if (missing(name)) {
     name <- c("n_data", "choices", "n_missing")
   }
+  columns <- data_object[[dataset]][variables]
   stats <- list(
-    choices = if ("choices" %in% name) data_object[[dataset]][variables] |>
-      purrr::map(~ as.list(table(.))),
-    n_data = if ("n_data" %in% name) nrow(data_object[[dataset]][variables]),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][variables] |>
-      is.na() |> colSums() |> as.list()
+    choices = if ("choices" %in% name) purrr::map(columns, ~ as.list(table(.))),
+    n_data = if ("n_data" %in% name) nrow(columns),
+    n_missing = if ("n_missing" %in% name) as.list(colSums(is.na(columns)))
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
 
-S7::method(cb_plot_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_plot_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   dataset <- filter@dataset
   variables <- unlist(filter@variables)
   if (nrow(data_object[[dataset]])) {
@@ -681,17 +716,23 @@ S7::method(cb_plot_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- fu
   }
 }
 
-S7::method(cb_get_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_get_filter_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   data_object[[filter@dataset]][, filter@variables]
 }
 
-S7::method(cb_get_filter_defaults, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, data_object, cache_object, ...) {
+S7::method(cb_get_filter_defaults, list(CbFilterMultiDiscrete, tblist_class)) <- function(
+  filter, source, data_object, cache_object, ...
+) {
   list(values = names(cache_object$choices))
 }
 
 # -- S7 method implementations: CbFilterQuery x tblist ------------------------
 
-S7::method(cb_filter_data, list(CbFilterQuery, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_filter_data, list(CbFilterQuery, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   dataset <- filter@dataset
   value <- filter@value
   keep_na <- filter@keep_na
@@ -708,24 +749,27 @@ S7::method(cb_filter_data, list(CbFilterQuery, tblist_class)) <- function(filter
   data_object
 }
 
-S7::method(cb_get_filter_stats, list(CbFilterQuery, tblist_class)) <- function(filter, source, data_object, name, ...) {
+S7::method(cb_get_filter_stats, list(CbFilterQuery, tblist_class)) <- function(
+  filter, source, data_object, name, ...
+) {
   dataset <- filter@dataset
   variables <- unlist(filter@variables)
   if (missing(name)) {
     name <- c("n_data", "specs", "n_missing")
   }
   stat_from_column <- base::get("stat_from_column", envir = asNamespace("queryBuilder"), inherits = FALSE)
+  columns <- data_object[[dataset]][variables]
   stats <- list(
-    specs = if ("specs" %in% name) data_object[[dataset]][variables] |>
-      purrr::imap(stat_from_column),
-    n_data = if ("n_data" %in% name) nrow(data_object[[dataset]][variables]),
-    n_missing = if ("n_missing" %in% name) data_object[[dataset]][variables] |>
-      is.na() |> colSums() |> as.list()
+    specs = if ("specs" %in% name) purrr::imap(columns, stat_from_column),
+    n_data = if ("n_data" %in% name) nrow(columns),
+    n_missing = if ("n_missing" %in% name) as.list(colSums(is.na(columns)))
   )
   if (length(name) == 1L) stats[[name]] else stats[name]
 }
 
-S7::method(cb_plot_filter_data, list(CbFilterQuery, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_plot_filter_data, list(CbFilterQuery, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   dataset <- filter@dataset
   variables <- filter@variables
   if (nrow(data_object[[dataset]])) {
@@ -739,11 +783,15 @@ S7::method(cb_plot_filter_data, list(CbFilterQuery, tblist_class)) <- function(f
   }
 }
 
-S7::method(cb_get_filter_data, list(CbFilterQuery, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_get_filter_data, list(CbFilterQuery, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   data_object[[filter@dataset]][, filter@variables, drop = FALSE]
 }
 
-S7::method(cb_get_filter_defaults, list(CbFilterQuery, tblist_class)) <- function(filter, source, data_object, cache_object, ...) {
+S7::method(cb_get_filter_defaults, list(CbFilterQuery, tblist_class)) <- function(
+  filter, source, data_object, cache_object, ...
+) {
   list(value = names(cache_object$choices))
 }
 
@@ -1299,7 +1347,9 @@ S7::method(cb_domain_from_data, list(CbFilterDiscrete, tblist_class)) <- domain_
 # string, so its data-derived domain must be that string form too (not the
 # character vector used by the plain discrete filter), to round-trip through
 # cb_intersect_domain() and match the `choices` stat.
-S7::method(cb_domain_from_data, list(CbFilterDiscreteText, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_domain_from_data, list(CbFilterDiscreteText, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   values <- domain_from_data_discrete_impl(filter, source, data_object, ...)
   join_discrete_text(values)
 }
@@ -1322,7 +1372,9 @@ S7::method(cb_domain_from_data, list(CbFilterRange, tblist_class)) <- domain_fro
 S7::method(cb_domain_from_data, list(CbFilterDateRange, tblist_class)) <- domain_from_data_range_impl
 S7::method(cb_domain_from_data, list(CbFilterDatetimeRange, tblist_class)) <- domain_from_data_range_impl
 
-S7::method(cb_domain_from_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(filter, source, data_object, ...) {
+S7::method(cb_domain_from_data, list(CbFilterMultiDiscrete, tblist_class)) <- function(
+  filter, source, data_object, ...
+) {
   variables <- names(filter@values)
   dataset <- data_object[[filter@dataset]]
   purrr::map(rlang::set_names(variables), ~ collapse::funique(stats::na.omit(dataset[[.x]])))
@@ -1344,10 +1396,10 @@ S7::method(cb_domain_from_data, list(CbFilterMultiDiscrete, tblist_class)) <- fu
 rule_character <- function(column, name, dataset_name, field_description = NULL) {
   type <- "discrete"
   gui_input <- NULL
-  n_unique <- length(unique(column))
+  n_unique <- length(collapse::funique(column))
   if (n_unique == length(column)) {
     type <- "discrete_text"
-  } else if (length(unique(column)) > 3) {
+  } else if (n_unique > 3L) {
     gui_input <- "vs"
   }
   domain <- field_description$domain %||% collapse::funique(column)
@@ -1385,7 +1437,7 @@ rule_factor <- function(column, name, dataset_name, field_description = NULL) {
   n_levels <- length(levels(column))
   if (n_levels == length(column)) {
     type <- "discrete_text"
-  } else if (length(unique(column)) > 3) {
+  } else if (length(collapse::funique(column)) > 3L) {
     gui_input <- "vs"
   }
   domain <- field_description$domain %||% levels(column)
@@ -1478,7 +1530,7 @@ rule_POSIXct <- function(column, name, dataset_name, field_description = NULL) {
 #' @return A named list of `filter()` arguments.
 #' @noRd
 filter_rule <- function(column, name, dataset_name, field_description = NULL) {
-  rule_method <- paste0("rule_", class(column)[[1]])
+  rule_method <- paste0("rule_", class(column)[[1L]])
   do.call(
     rule_method,
     list(column = column, name = name, dataset_name = dataset_name,
