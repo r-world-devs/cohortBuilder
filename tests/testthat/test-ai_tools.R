@@ -81,8 +81,8 @@ test_that("cb_tool_filters_meta fun returns valid JSON", {
   parsed <- jsonlite::fromJSON(result, simplifyVector = FALSE)
   expect_named(parsed, c("datasets", "filters"))
   expect_true("iris" %in% names(parsed$datasets))
-  expect_true("Species" %in% names(parsed$filters))
-  species <- parsed$filters$Species
+  expect_true("iris-Species" %in% names(parsed$filters))
+  species <- parsed$filters[["iris-Species"]]
   expect_identical(species$dataset, "iris")
   expect_identical(species$type, "discrete")
   expect_true(nzchar(species$description))
@@ -114,9 +114,9 @@ test_that("cb_tool_add_filters with new_step creates a step", {
   coh <- make_test_cohort()
   t <- cb_tool_add_filters(coh)
 
-  result <- t$fun("Species, hp", action = "new_step")
-  expect_true(grepl("Species", result))
-  expect_true(grepl("hp", result))
+  result <- t$fun("iris-Species, mtcars-hp", action = "new_step")
+  expect_true(grepl("iris-Species", result))
+  expect_true(grepl("mtcars-hp", result))
   expect_identical(coh$last_step_id(), "1")
 })
 
@@ -130,12 +130,12 @@ test_that("cb_tool_add_filters with edit_last adds to existing step", {
   expect_identical(coh$last_step_id(), "1")
 
   t <- cb_tool_add_filters(coh)
-  result <- t$fun("hp", action = "edit_last")
-  expect_true(grepl("hp", result))
+  result <- t$fun("mtcars-hp", action = "edit_last")
+  expect_true(grepl("mtcars-hp", result))
   # Still step 1, filter was added to it
   expect_identical(coh$last_step_id(), "1")
   filters <- coh$get_step("1")$filters
-  expect_true("hp" %in% names(filters))
+  expect_true("mtcars-hp" %in% names(filters))
 })
 
 test_that("cb_tool_add_filters skips filters already present in the step", {
@@ -143,13 +143,13 @@ test_that("cb_tool_add_filters skips filters already present in the step", {
   coh <- make_test_cohort()
   t <- cb_tool_add_filters(coh)
 
-  t$fun("Species", action = "new_step")
-  result <- t$fun("Species", action = "edit_last")
+  t$fun("iris-Species", action = "new_step")
+  result <- t$fun("iris-Species", action = "edit_last")
 
   expect_true(grepl("Already present in step \\(skipped\\)", result))
-  expect_true(grepl("Species", result))
+  expect_true(grepl("iris-Species", result))
   # No duplicate added: still a single Species filter.
-  expect_identical(sum(names(coh$get_step("1")$filters) == "Species"), 1L)
+  expect_identical(sum(names(coh$get_step("1")$filters) == "iris-Species"), 1L)
 })
 
 test_that("cb_tool_apply_filters updates values of existing filters in place", {
@@ -157,14 +157,14 @@ test_that("cb_tool_apply_filters updates values of existing filters in place", {
   coh <- make_test_cohort()
   t <- cb_tool_apply_filters(coh)
 
-  t$fun('{"Species":{"value":["setosa"]}}', action = "new_step")
-  result <- t$fun('{"Species":{"value":["versicolor"]}}', action = "edit_last")
+  t$fun('{"iris-Species":{"value":["setosa"]}}', action = "new_step")
+  result <- t$fun('{"iris-Species":{"value":["versicolor"]}}', action = "edit_last")
 
   expect_true(grepl("Updated values for existing filters", result))
   # Value updated in place, filter not reset or duplicated.
   filters <- coh$get_step(coh$last_step_id())$filters
-  expect_identical(filters[["Species"]]@value, "versicolor")
-  expect_identical(sum(names(filters) == "Species"), 1L)
+  expect_identical(filters[["iris-Species"]]@value, "versicolor")
+  expect_identical(sum(names(filters) == "iris-Species"), 1L)
 })
 
 test_that("cb_tool_add_filters can add filters as inactive", {
@@ -172,9 +172,9 @@ test_that("cb_tool_add_filters can add filters as inactive", {
   coh <- make_test_cohort()
   t <- cb_tool_add_filters(coh)
 
-  result <- t$fun("Species", action = "new_step", active = "false")
+  result <- t$fun("iris-Species", action = "new_step", active = "false")
   expect_true(grepl("inactive", result))
-  expect_false(coh$get_step("1")$filters[["Species"]]@active)
+  expect_false(coh$get_step("1")$filters[["iris-Species"]]@active)
 })
 
 test_that("cb_tool_add_filters inherits active state when active is omitted", {
@@ -183,14 +183,14 @@ test_that("cb_tool_add_filters inherits active state when active is omitted", {
   # Force the available Species filter to be inactive by default.
   src <- coh$get_source()
   src$available_filters <- purrr::map(src$available_filters, function(f) {
-    if (f@id == "Species") f@active <- FALSE
+    if (f@id == "iris-Species") f@active <- FALSE
     f
   })
   t <- cb_tool_add_filters(coh)
 
-  result <- t$fun("Species", action = "new_step")
+  result <- t$fun("iris-Species", action = "new_step")
   expect_false(grepl("active|inactive", result))
-  expect_false(coh$get_step("1")$filters[["Species"]]@active)
+  expect_false(coh$get_step("1")$filters[["iris-Species"]]@active)
 })
 
 test_that("cb_tool_apply_filters can add filters as inactive", {
@@ -198,9 +198,9 @@ test_that("cb_tool_apply_filters can add filters as inactive", {
   coh <- make_test_cohort()
   t <- cb_tool_apply_filters(coh)
 
-  result <- t$fun('{"Species":{"value":["setosa"]}}', action = "new_step", active = "false")
+  result <- t$fun('{"iris-Species":{"value":["setosa"]}}', action = "new_step", active = "false")
   expect_true(grepl("inactive", result))
-  flt <- coh$get_step(coh$last_step_id())$filters[["Species"]]
+  flt <- coh$get_step(coh$last_step_id())$filters[["iris-Species"]]
   expect_false(flt@active)
   expect_identical(flt@value, "setosa")
 })
@@ -209,7 +209,7 @@ test_that("cb_tool_add_filters reports unknown filter ids", {
   skip_if_not_installed("ellmer")
   coh <- make_test_cohort()
   t <- cb_tool_add_filters(coh)
-  result <- t$fun("Species, nonexistent_filter")
+  result <- t$fun("iris-Species, nonexistent_filter")
   expect_true(grepl("Unknown filter ids ignored", result))
   expect_true(grepl("nonexistent_filter", result))
 })

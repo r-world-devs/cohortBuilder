@@ -530,6 +530,9 @@ describe <- function(description, ...) {
 #' @param source A `Source` object.
 #' @param field Optional dataset (or description) name to look up.
 #' @param subfield Optional variable name within `field` to look up.
+#' @param domains When `TRUE` (default), each filter entry includes a `domain`
+#'   field (its set of valid values). Set to `FALSE` to omit domains, e.g. when
+#'   only descriptive metadata is needed and computing domains would be wasteful.
 #' @param ... Extra arguments passed to methods.
 #' @return Either a `list(datasets, filters)` metadata structure or, when
 #'   `field` is supplied, the description text for the requested entry.

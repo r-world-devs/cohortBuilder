@@ -808,11 +808,11 @@ test_that("autofilter populates domain from data", {
   source <- set_source(tblist(iris = iris)) |>
     autofilter(attach_as = "meta")
   filters <- source$available_filters
-  species_filter <- purrr::detect(filters, ~ .x@id == "Species")
+  species_filter <- purrr::detect(filters, ~ .x@id == "iris-Species")
   expect_false(is.null(species_filter@domain))
   expect_true(all(c("setosa", "versicolor", "virginica") %in% species_filter@domain))
 
-  sl_filter <- purrr::detect(filters, ~ .x@id == "Sepal.Length")
+  sl_filter <- purrr::detect(filters, ~ .x@id == "iris-SepalLength")
   expect_identical(sl_filter@domain, c(min(iris$Sepal.Length), max(iris$Sepal.Length)))
 })
 
@@ -827,7 +827,7 @@ test_that("autofilter inherits domain from describe()", {
     )
   ) |> autofilter(attach_as = "meta")
 
-  species_filter <- purrr::detect(source$available_filters, ~ .x@id == "Species")
+  species_filter <- purrr::detect(source$available_filters, ~ .x@id == "iris-Species")
   expect_identical(species_filter@domain, custom_domain)
 })
 
@@ -846,9 +846,9 @@ test_that("shape() returns datasets and filters lists", {
   result <- shape(source)
   expect_named(result, c("datasets", "filters"))
   expect_identical(result$datasets$iris, "iris data")
-  expect_true("Species" %in% names(result$filters))
+  expect_true("iris-Species" %in% names(result$filters))
 
-  species <- result$filters$Species
+  species <- result$filters[["iris-Species"]]
   expect_identical(species$dataset, "iris")
   expect_identical(species$type, "discrete")
   expect_identical(species$domain, custom_domain)
@@ -891,7 +891,7 @@ test_that("shape() domain falls back to meta stats when filter domain is unset",
   })
 
   result <- shape(source)
-  species <- result$filters$Species
+  species <- result$filters[["iris-Species"]]
   expect_setequal(species$domain, as.character(collapse::funique(iris$Species)))
 })
 

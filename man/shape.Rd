@@ -10,7 +10,7 @@ shape(source, ...)
 
 \method{shape}{default}(source, field, subfield, ...)
 
-\method{shape}{tblist}(source, field, subfield, ...)
+\method{shape}{tblist}(source, field, subfield, domains = TRUE, ...)
 }
 \arguments{
 \item{source}{A `Source` object.}
@@ -20,6 +20,10 @@ shape(source, ...)
 \item{field}{Optional dataset (or description) name to look up.}
 
 \item{subfield}{Optional variable name within `field` to look up.}
+
+\item{domains}{When `TRUE` (default), each filter entry includes a `domain`
+field (its set of valid values). Set to `FALSE` to omit domains, e.g. when
+only descriptive metadata is needed and computing domains would be wasteful.}
 }
 \value{
 Either a `list(datasets, filters)` metadata structure or, when

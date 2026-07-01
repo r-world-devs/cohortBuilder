@@ -1095,7 +1095,7 @@ filter_shape_domain <- function(filter, source) {
 
 #' @rdname shape
 #' @export
-shape.tblist <- function(source, field, subfield, ...) {
+shape.tblist <- function(source, field, subfield, domains = TRUE, ...) {
   description_obj <- source$description
 
   # Description lookup mode: `shape(source, field[, subfield])` returns the
@@ -1123,13 +1123,16 @@ shape.tblist <- function(source, field, subfield, ...) {
   filters <- source$available_filters %||% list()
   filters_shape <- filters |>
     purrr::map(function(filter) {
-      list(
+      entry <- list(
         dataset = filter@dataset,
         type = filter@type,
         description = build_filter_description(filter),
-        variables = build_filter_variables(filter, source),
-        domain = filter_shape_domain(filter, source)
+        variables = build_filter_variables(filter, source)
       )
+      if (isTRUE(domains)) {
+        entry$domain <- filter_shape_domain(filter, source)
+      }
+      entry
     }) |>
     rlang::set_names(purrr::map_chr(filters, ~ .x@id))
 
@@ -1328,7 +1331,7 @@ rule_character <- function(column, name, dataset_name, field_description = NULL)
   domain <- field_description$domain %||% collapse::funique(column)
   drop_nulls(
     list(
-      type = type, id = name, name = name, variable = name,
+      type = type, name = name, variable = name,
       dataset = dataset_name, value = NA, keep_na = TRUE,
       domain = domain, gui_input = gui_input
     )
@@ -1358,7 +1361,7 @@ rule_factor <- function(column, name, dataset_name, field_description = NULL) {
   domain <- field_description$domain %||% levels(column)
   drop_nulls(
     list(
-      type = type, id = name, name = name, variable = name,
+      type = type, name = name, variable = name,
       dataset = dataset_name, value = NA, keep_na = TRUE,
       domain = domain, gui_input = gui_input
     )
@@ -1378,7 +1381,7 @@ rule_factor <- function(column, name, dataset_name, field_description = NULL) {
 rule_numeric <- function(column, name, dataset_name, field_description = NULL) {
   domain <- field_description$domain %||% c(min(column, na.rm = TRUE), max(column, na.rm = TRUE))
   list(
-    type = "range", id = name, name = name, variable = name,
+    type = "range", name = name, variable = name,
     dataset = dataset_name, range = NA, keep_na = TRUE,
     domain = domain
   )
@@ -1401,7 +1404,7 @@ rule_integer <- rule_numeric
 rule_Date <- function(column, name, dataset_name, field_description = NULL) {
   domain <- field_description$domain %||% c(min(column, na.rm = TRUE), max(column, na.rm = TRUE))
   list(
-    type = "date_range", id = name, name = name, variable = name,
+    type = "date_range", name = name, variable = name,
     dataset = dataset_name, range = NA, keep_na = TRUE,
     domain = domain
   )
@@ -1420,7 +1423,7 @@ rule_Date <- function(column, name, dataset_name, field_description = NULL) {
 rule_POSIXct <- function(column, name, dataset_name, field_description = NULL) {
   domain <- field_description$domain %||% c(min(column, na.rm = TRUE), max(column, na.rm = TRUE))
   list(
-    type = "datetime_range", id = name, name = name, variable = name,
+    type = "datetime_range", name = name, variable = name,
     dataset = dataset_name, range = NA, keep_na = TRUE,
     domain = domain
   )
