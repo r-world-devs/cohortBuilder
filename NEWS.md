@@ -18,6 +18,10 @@
 * Custom filter types can now be registered via `register_filter_type()`, enabling extensions
   without modifying core package code.
 * New `describe()` helper to attach metadata (descriptions) to datasets and filters.
+  `describe()` also accepts a `label` argument; when set on a variable, `autofilter()`
+  reuses it as the generated filter's `name`.
+* `shape()` filter entries now include a `name` field, and the `description` field
+  combines the filter- and variable-level descriptions.
 * New `shape()` generic extracts structured filter/dataset metadata from a source,
   including statistics (min/max for range, choices for discrete).
 * New `autofilter()` generic auto-generates filters based on column types

@@ -925,14 +925,37 @@ test_that("shape() returns datasets and filters lists", {
   expect_true("iris-Species" %in% names(result$filters))
 
   species <- result$filters[["iris-Species"]]
+  expect_identical(species$name, "Species")
   expect_identical(species$dataset, "iris")
   expect_identical(species$type, "discrete")
   expect_identical(species$domain, custom_domain)
-  expect_identical(species$description, "Species")
+  # Description is built from the variable description (no filter-level text).
+  expect_identical(species$description, "species")
   expect_identical(
     species$variables,
     list(list(name = "Species", description = "species"))
   )
+})
+
+test_that("describe(label) fills the autofilter filter name", {
+  source <- set_source(
+    tblist(iris = iris),
+    description = list(
+      iris = list(
+        Species = describe("the species of iris", label = "Iris species")
+      )
+    )
+  ) |> autofilter(attach_as = "meta")
+
+  species_filter <- purrr::detect(source$available_filters, ~ .x@id == "iris-Species")
+  # Label becomes the display name; the underlying variable is unchanged.
+  expect_identical(species_filter@name, "Iris species")
+  expect_identical(species_filter@variable, "Species")
+
+  # shape() surfaces the label as `name` and keeps the description text.
+  species <- shape(source)$filters[["iris-Species"]]
+  expect_identical(species$name, "Iris species")
+  expect_identical(species$description, "the species of iris")
 })
 
 test_that("shape() filters is empty when no available_filters", {

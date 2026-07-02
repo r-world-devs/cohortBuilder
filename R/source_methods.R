@@ -504,13 +504,20 @@ update_filter.Source <- function(x, step_id, filter_id, ...) {
 #' Helper for building structured description entries used in source definition.
 #'
 #' @param description A single string describing the field.
+#' @param label Optional short, human-readable label for the field. When the
+#'   field describes a variable, [autofilter()] reuses the label to fill the
+#'   generated filter's `name`. `NULL` (default) leaves the name untouched.
 #' @param ... Additional named parameters to include in the description object.
-#' @return A named list with `text` and any extra parameters.
+#' @return A named list with `text`, an optional `label`, and any extra
+#'   parameters.
 #' @export
-describe <- function(description, ...) {
-  list(
-    text = description,
-    ...
+describe <- function(description, label = NULL, ...) {
+  drop_nulls(
+    list(
+      text = description,
+      label = label,
+      ...
+    )
   )
 }
 

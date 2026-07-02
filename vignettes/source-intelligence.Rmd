@@ -53,6 +53,28 @@ Extra named arguments to `describe()` (such as `domain` above) are stored
 alongside the text and can be picked up by other features - for example
 `autofilter()` uses a supplied `domain` instead of scanning the data.
 
+`describe()` also accepts a `label` - a short, human-readable name for the
+field. When the field describes a variable, `autofilter()` reuses the label as
+the generated filter's `name` (the underlying `variable` is unchanged), which
+is handy for giving filters friendlier names in a GUI:
+
+```{r}
+labelled_source <- set_source(
+  tblist(iris = iris),
+  description = list(
+    iris = list(
+      Species = describe("the species of iris", label = "Iris species")
+    )
+  )
+) |>
+  autofilter(attach_as = "meta")
+
+species_filter <- purrr::detect(
+  labelled_source$available_filters, ~ .x@id == "iris-Species"
+)
+species_filter@name
+```
+
 ## Generating filters automatically
 
 `autofilter()` analyses each column of the source and creates a filter suited
@@ -106,8 +128,11 @@ species_filter@domain
 source - ideal for programmatic inspection or passing to an LLM:
 
 - `datasets` maps each dataset name to its description text (or `NA`).
-- `filters` is keyed by filter id; each entry is a list with `dataset`, `type`,
-  `description`, `variables`, and `domain`.
+- `filters` is keyed by filter id; each entry is a list with `name`, `dataset`,
+  `type`, `description`, `variables`, and `domain`. The `description` combines
+  the filter-level description with the per-variable descriptions (single-
+  variable filters show the bare variable description; multi-variable filters
+  prefix each with its variable name).
 
 ```{r}
 result <- shape(meta_source)

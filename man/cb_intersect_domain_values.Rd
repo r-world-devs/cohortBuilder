@@ -20,5 +20,5 @@ Combines two already-computed domain values (not value-vs-domain) into their
 intersection, dispatching on filter type. Used by `"filter"`-mode domain
 propagation when the same logical filter appears in more than one upstream
 step and its effective domains must be combined. Unlike
-[cb_intersect_domain()], this never emits trimming warnings.
+[cb_intersect_domain()], this never emits trimming messages.
 }

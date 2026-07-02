@@ -4,15 +4,20 @@
 \alias{describe}
 \title{Create a description object}
 \usage{
-describe(description, ...)
+describe(description, label = NULL, ...)
 }
 \arguments{
 \item{description}{A single string describing the field.}
 
+\item{label}{Optional short, human-readable label for the field. When the
+field describes a variable, [autofilter()] reuses the label to fill the
+generated filter's `name`. `NULL` (default) leaves the name untouched.}
+
 \item{...}{Additional named parameters to include in the description object.}
 }
 \value{
-A named list with `text` and any extra parameters.
+A named list with `text`, an optional `label`, and any extra
+  parameters.
 }
 \description{
 Helper for building structured description entries used in source definition.

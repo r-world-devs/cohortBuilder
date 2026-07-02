@@ -1135,15 +1135,35 @@ build_filter_variables <- function(filter, source) {
 
 #' Build a human-readable filter description
 #'
-#' Combines the filter name and the filter-level description (when set).
-#' Variable descriptions are exposed separately in the `variables` field.
+#' Combines the filter-level description (from the filter's own `@description`)
+#' with the per-variable descriptions. The filter-level text (when present)
+#' comes first, followed by the variable descriptions: single-variable filters
+#' show the bare variable description, while multi-variable filters prefix each
+#' with its variable name. Empty parts are dropped, so a filter with only
+#' variable descriptions (the autofilter case) shows just those. Returns
+#' `NA_character_` when nothing usable exists.
 #'
 #' @param filter S7 filter object.
-#' @return A single description string.
+#' @param variables The filter's variable entries (as built by
+#'   [build_filter_variables()]): a list of `list(name, description)`.
+#' @return A single description string, or `NA_character_`.
 #' @noRd
-build_filter_description <- function(filter) {
-  parts <- c(filter@name, description_text(filter@description))
-  paste(parts, collapse = ". ")
+build_filter_description <- function(filter, variables = list()) {
+  filter_part <- description_text(filter@description) %||% NA_character_
+
+  multi <- length(variables) > 1L
+  var_parts <- purrr::map_chr(variables, function(v) {
+    desc <- description_text(v$description) %||% NA_character_
+    if (is.na(desc)) return(NA_character_)
+    if (multi) paste0(v$name, ": ", desc) else desc
+  })
+  var_parts <- var_parts[!is.na(var_parts)]
+  var_part <- if (length(var_parts)) paste(var_parts, collapse = "; ") else NA_character_
+
+  parts <- c(filter_part, var_part)
+  parts <- parts[!is.na(parts)]
+  if (!length(parts)) return(NA_character_)
+  paste(parts, collapse = " \u2014 ")
 }
 
 #' Resolve a filter's domain for `shape()`
@@ -1193,11 +1213,13 @@ shape.tblist <- function(source, field, subfield, domains = TRUE, ...) {
   filters <- source$available_filters %||% list()
   filters_shape <- filters |>
     purrr::map(function(filter) {
+      variables <- build_filter_variables(filter, source)
       entry <- list(
+        name = filter@name,
         dataset = filter@dataset,
         type = filter@type,
-        description = build_filter_description(filter),
-        variables = build_filter_variables(filter, source)
+        description = build_filter_description(filter, variables),
+        variables = variables
       )
       if (isTRUE(domains)) {
         entry$domain <- filter_shape_domain(filter, source)
@@ -1531,11 +1553,18 @@ rule_POSIXct <- function(column, name, dataset_name, field_description = NULL) {
 #' @noRd
 filter_rule <- function(column, name, dataset_name, field_description = NULL) {
   rule_method <- paste0("rule_", class(column)[[1L]])
-  do.call(
+  rule <- do.call(
     rule_method,
     list(column = column, name = name, dataset_name = dataset_name,
          field_description = field_description)
   )
+  # A `label` supplied via describe() becomes the filter's display name, while
+  # `variable` keeps the underlying column name set by the rule.
+  label <- field_description$label
+  if (!is.null(label)) {
+    rule$name <- label
+  }
+  rule
 }
 
 #' Build autofilter rules for every column of a dataset
