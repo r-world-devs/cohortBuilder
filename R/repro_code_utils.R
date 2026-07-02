@@ -1,26 +1,27 @@
+#' `substitute()` on a quoted expression
+#'
+#' Performs variable substitution on an already-quoted expression `x` using the
+#' bindings in `env` (a programmatic alternative to `substitute()`).
+#'
+#' @param x A quoted expression.
+#' @param env A named list of substitutions.
+#' @return The expression with substitutions applied.
+#' @noRd
 substitute_q <- function(x, env) {
   call <- substitute(substitute(y, env), list(y = x))
   eval(call)
 }
 
-pair_seq <- function(idxs) {
 
-  if (length(idxs) == 0L) {
-    return(integer(0L))
-  }
-
-  if (!identical(length(idxs) %% 2L, 0L)) {
-    stop("The lenght of idxs is not even number")
-  }
-
-  idxs <- sort(idxs)
-  sequence <- c()
-  for (idx in seq(1L, length(idxs), by = 2L)) {
-    sequence <- c(sequence, seq(idxs[idx], idxs[idx + 1L], by = 1L))
-  }
-  return(sequence)
-}
-
+#' Turn a source method's body into an inlined expression
+#'
+#' Captures a function's body, assigns its final value to `data_object`, and
+#' substitutes the function's closure/default arguments so it can be embedded in
+#' reproducible code.
+#'
+#' @param func A function (or `NULL`).
+#' @return A call expression, or an empty block when `func` is `NULL`.
+#' @noRd
 parse_func_expr <- function(func) {
 
   if (is.null(func)) {
@@ -37,6 +38,15 @@ parse_func_expr <- function(func) {
   )
 }
 
+#' Render a function definition as an assignment expression
+#'
+#' Produces `name <- function(...) {...}` from a function object, trimming any
+#' trailing namespace bytecode/environment lines.
+#'
+#' @param func A function (or `NULL`).
+#' @param name Name to assign the function to.
+#' @return An assignment call, or an empty block when `func` is `NULL`.
+#' @noRd
 func_to_expr <- function(func, name) {
   if (is.null(func)) {
     return(quote({}))
@@ -50,6 +60,15 @@ func_to_expr <- function(func, name) {
   )
 }
 
+#' Render an S3 method definition as an expression
+#'
+#' Looks up `name.namespace` and renders it as a function-assignment expression
+#' for inclusion in reproducible code.
+#'
+#' @param name Generic name (e.g. `".init_step"`).
+#' @param namespace Source-type suffix (e.g. `"tblist"`).
+#' @return An expression, or `NULL` when the method is not found.
+#' @noRd
 method_to_expr <- function(name, namespace) {
   method <- .get_method(paste0(name, ".", namespace))
   if (is.null(method)) {
@@ -66,6 +85,12 @@ method_to_expr <- function(name, namespace) {
   )
 }
 
+#' Build an assignment expression `name <- value`
+#'
+#' @param name Symbol/name to assign to.
+#' @param value Value expression.
+#' @return An assignment call.
+#' @noRd
 assign_expr <- function(name, value) {
   substitute(
     {value_name <- value_content},
@@ -76,43 +101,15 @@ assign_expr <- function(name, value) {
   )
 }
 
-parse_filter_expr <- function(filter) {
-  filter_env <- environment(filter$filter_data)
-  keep_na <- identical(filter_env$keep_na, TRUE)
-  selected_value <- filter_env[[filter$input_param]]
-  filter_expr <- utils::capture.output(filter$filter_data)
-  vars_env <- as.list(filter_env)
 
-  code_eval_idx <- sort(c(
-    pair_seq(grep("# code eval ", filter_expr, fixed = TRUE)),
-    grep("# code eval$", filter_expr)
-  ))
-  code_eval_expr <- parse(text = c("{", filter_expr[code_eval_idx], "}"))[[1L]]
-  rlang::eval_bare(code_eval_expr, filter_env)
-
-  keep_na_ind <- if (keep_na) "keep_na" else "!keep_na"
-  value_na_ind <- if (identical(selected_value, NA)) "value_na" else "!value_na"
-  expr_ind <- glue::glue(" {keep_na_ind} {value_na_ind} ")
-
-  expr_idx <- grep(expr_ind, filter_expr, fixed = TRUE)
-  code_include_idx <- grep("# code include ", filter_expr, fixed = TRUE)
-  sub_expr_idx <- pair_seq(c(expr_idx, code_include_idx))
-
-  sub_expr_idx <- sort(c(
-    sub_expr_idx,
-    grep("# code include$", filter_expr)
-  ))
-
-  if (length(sub_expr_idx) == 0L) {
-    return(str2lang("{}"))
-  }
-
-  filter_expr <- parse(text = c("{", filter_expr[sub_expr_idx], "}"))[[1L]]
-  sub_vars <- substitute_q(filter_expr, vars_env)
-  sub_syms <-   rlang::inject((!!rlang::expr)(!!sub_vars), filter_env)
-  return(sub_syms)
-}
-
+#' Merge several expressions into a single `{ }` block
+#'
+#' Flattens any top-level `{ }` blocks among the inputs so the result is one
+#' brace-wrapped sequence of statements.
+#'
+#' @param expressions_list A list of call expressions.
+#' @return A single `{ }` call combining all statements.
+#' @noRd
 combine_expressions <- function(expressions_list) {
   expressions_list <- lapply(expressions_list, function(x) {
     if (x[[1L]] == as.symbol("{")) {
@@ -125,6 +122,15 @@ combine_expressions <- function(expressions_list) {
   as.call(c(as.symbol("{"), expressions_list))
 }
 
+#' Build the source-construction expression for reproducible code
+#'
+#' Combines the source's `source_code` (or a default `list(dtconn = ...)`) with
+#' the source type's `.init_step` body.
+#'
+#' @param source_type Source type string (e.g. `"tblist"`).
+#' @param public,private Cohort R6 public/private environments.
+#' @return A `{ }` expression that reconstructs `source` and the step data.
+#' @noRd
 get_source_expr <- function(source_type, public, private) {
   source_expr <- if (!is.null(private$source$source_code)) {
     private$source$source_code
@@ -138,11 +144,22 @@ get_source_expr <- function(source_type, public, private) {
   return(combine_expressions(list(source_expr, init_step_expr)))
 }
 
-type_expr <- function(type, expr, step = NA, ...) {
+#' Wrap an expression with its reproducible-code metadata
+#'
+#' Builds a one-row tibble tagging an expression with its `action`, `step`, and
+#' any extra columns (e.g. `dataset`), used to assemble the final code.
+#'
+#' @param action Action label (e.g. `"filtering"`, `"pre_filtering"`).
+#' @param expr The expression to wrap.
+#' @param step Step id (or `NA`).
+#' @param ... Extra metadata columns.
+#' @return A list containing a single tibble row.
+#' @noRd
+type_expr <- function(action, expr, step = NA, ...) {
   args <- rlang::dots_list(...)
-  args <- args %>%
+  args <- args |>
     purrr::modify(list)
-  base_data <- tibble::tibble(type = type, expr = list(expr), step = step)
+  base_data <- tibble::tibble(action = action, expr = list(expr), step = step)
   if (!length(args)) {
     return(list(base_data))
   }
@@ -152,23 +169,49 @@ type_expr <- function(type, expr, step = NA, ...) {
   ))
 }
 
+#' Remove the first piped/argument occurrence of a sub-expression
+#'
+#' Strips `after` where it appears as the left operand of the first `|>` (or as
+#' the first call argument), used to splice consecutive filtering steps into one
+#' pipe chain.
+#'
+#' @param expr An expression to rewrite.
+#' @param after The sub-expression to drop.
+#' @return The rewritten expression.
+#' @noRd
 exclude_first_pipe <- function(expr, after) {
+  if (is.symbol(expr) || is.atomic(expr)) {
+    return(expr)
+  }
   if (expr[[1L]] == as.symbol("{")) {
-    if (identical(expr[[2L]][[2L]], after) && expr[[2L]][[1L]] == as.symbol("%>%")) {
+    if (identical(expr[[2L]][[2L]], after) && expr[[2L]][[1L]] == as.symbol("|>")) {
       expr[[2L]] <- expr[[2L]][[3L]]
     } else {
       expr[[2L]][[2L]] <- exclude_first_pipe(expr[[2L]][[2L]], after)
     }
-  } else {
-    if (identical(expr[[2L]], after) && expr[[1L]] == as.symbol("%>%")) {
+  } else if (expr[[1L]] == as.symbol("|>")) {
+    if (identical(expr[[2L]], after)) {
       expr <- expr[[3L]]
     } else {
       expr[[2L]] <- exclude_first_pipe(expr[[2L]], after)
     }
+  } else if (identical(expr[[2L]], after)) {
+    # Function call with `after` as first argument — remove it
+    expr[[2L]] <- NULL
   }
   return(expr)
 }
 
+#' Strip the leading `x <- ` from an expression
+#'
+#' Removes the reassignment on the first statement, optionally also dropping the
+#' first pipe of the right-hand side (`along_with = "both"`).
+#'
+#' @param expr An expression whose first statement is an assignment.
+#' @param along_with `"left"` to drop only the assignment, `"both"` to also drop
+#'   the first pipe of the value.
+#' @return The rewritten expression.
+#' @noRd
 exclude_reassignment <- function(expr, along_with = c("left", "both")) {
   along_with <- match.arg(along_with)
   if (expr[[1L]] == as.symbol("{")) {
@@ -195,6 +238,11 @@ exclude_reassignment <- function(expr, along_with = c("left", "both")) {
   return(expr)
 }
 
+#' Return the first statement of a `{ }` block
+#'
+#' @param expr An expression, possibly a brace block.
+#' @return The first statement (or `expr` itself when not a block).
+#' @noRd
 take_first_line <- function(expr) {
   if (expr[[1L]] == as.symbol("{")) {
     return(expr[[2L]])
@@ -202,15 +250,29 @@ take_first_line <- function(expr) {
   return(expr)
 }
 
+#' Insert the left operand as the first argument of the right call
+#'
+#' Reproduces native-pipe semantics (`x |> f(y)` parses to `f(x, y)`)
+#' programmatically.
+#'
+#' @param expr_l Left-hand expression.
+#' @param expr_r Right-hand call.
+#' @return The combined call.
+#' @noRd
 pipe_reassignment <- function(expr_l, expr_r) {
-  rlang::expr(!!expr1 %>% expr_r)
+  # Native pipe |> is syntactic: x |> f(y) parses to f(x, y).
+  # Reproduce this by inserting expr_l as the first argument of expr_r.
+  as.call(append(as.list(expr_r), list(expr_l), after = 1L))
 }
 
-nos <- rlang::expr({
-  a %>% sum()
-  b <- 1L
-})
-
+#' Chain per-filter expressions into a single pipe assignment
+#'
+#' Combines the filtering expressions for one dataset/step into one
+#' `dataset <- dataset |> ... |> ...` pipe chain.
+#'
+#' @param filtering_exprs A list of per-filter expressions.
+#' @return A list containing the single combined expression.
+#' @noRd
 pipe_filtering <- function(filtering_exprs) {
   n_exprs <- length(filtering_exprs)
   if (n_exprs <= 1L) {
@@ -219,21 +281,18 @@ pipe_filtering <- function(filtering_exprs) {
   if (n_exprs > 1L) {
     for (expr_id in seq_along(filtering_exprs)) {
       if (expr_id > 1L) {
-        filtering_exprs[[expr_id]] <- filtering_exprs[[expr_id]] %>%
+        filtering_exprs[[expr_id]] <- filtering_exprs[[expr_id]] |>
           exclude_reassignment(along_with = "both")
       }
       if (expr_id < n_exprs) {
-        filtering_exprs[[expr_id]] <- filtering_exprs[[expr_id]] %>%
+        filtering_exprs[[expr_id]] <- filtering_exprs[[expr_id]] |>
           take_first_line()
       }
       if (expr_id == 1L) {
         res_expr <- exclude_reassignment(filtering_exprs[[expr_id]], along_with = "left")
       } else {
         if (filtering_exprs[[expr_id]][[1L]] == as.symbol("{")) {
-          res_expr <- rlang::expr(
-            !!res_expr %>%
-              !!filtering_exprs[[expr_id]][[2L]]
-          )
+          res_expr <- pipe_reassignment(res_expr, filtering_exprs[[expr_id]][[2L]])
           for (i in setdiff(seq_along(filtering_exprs[[expr_id]]), 1L:2L)) {
             res_expr <- rlang::expr({
               !!res_expr
@@ -241,10 +300,7 @@ pipe_filtering <- function(filtering_exprs) {
             })
           }
         } else {
-          res_expr <- rlang::expr(
-            !!res_expr %>%
-              !!filtering_exprs[[expr_id]]
-          )
+          res_expr <- pipe_reassignment(res_expr, filtering_exprs[[expr_id]])
         }
       }
     }
@@ -259,6 +315,12 @@ pipe_filtering <- function(filtering_exprs) {
   return(list(res_expr))
 }
 
+#' Fall back to `x` when the first element of `y` is `NULL`
+#'
+#' @param x Default value.
+#' @param y Candidate value (a list).
+#' @return `x` when `y[[1]]` is `NULL`, otherwise `y`.
+#' @noRd
 if_null_default_list <- function(x, y) {
   if (is.null(y[[1L]])) {
     return(x)
@@ -266,6 +328,11 @@ if_null_default_list <- function(x, y) {
   return(y)
 }
 
+#' Unwrap a single-element list column, mapping `NULL` to `NA`
+#'
+#' @param x A length-one list.
+#' @return The unwrapped element, or `NA` when it is `NULL`.
+#' @noRd
 flatten_listcol <- function(x) {
   if (is.null(x[[1L]])) {
     return(NA)
@@ -273,28 +340,36 @@ flatten_listcol <- function(x) {
   return(x[[1L]])
 }
 
+#' Collapse all filtering expressions into per-group pipe chains
+#'
+#' Groups the expression tibble by action/step/dataset, pipes each filtering
+#' group via [pipe_filtering()], and returns the `action`/`expr` columns.
+#'
+#' @param expr_df A tibble of tagged expressions (see [type_expr()]).
+#' @return A tibble with `action` and combined `expr` columns.
+#' @noRd
 pipe_all_filters <- function(expr_df) {
 
   if (!"dataset" %in% colnames(expr_df)) {
-    expr_df <- expr_df %>% dplyr::mutate(dataset = NA)
+    expr_df <- expr_df |> dplyr::mutate(dataset = NA)
   }
 
-  expr_df <- expr_df %>% dplyr::mutate(dataset = purrr::map_chr(dataset, flatten_listcol))
-  filtering_expr_df <- expr_df %>% dplyr::filter(type == "filtering")
+  expr_df <- expr_df |> dplyr::mutate(dataset = purrr::map_chr(dataset, flatten_listcol))
+  filtering_expr_df <- expr_df |> dplyr::filter(action == "filtering")
 
   if (nrow(filtering_expr_df) == 0L) {
-    return(dplyr::select(expr_df, type, expr))
+    return(dplyr::select(expr_df, action, expr))
   }
 
-  expr_df %>% dplyr::left_join(
-    filtering_expr_df %>%
-      dplyr::group_by(type, step, dataset) %>%
-      dplyr::summarise(new_expr = pipe_filtering(expr)) %>%
+  expr_df |> dplyr::left_join(
+    filtering_expr_df |>
+      dplyr::group_by(action, step, dataset) |>
+      dplyr::summarise(new_expr = pipe_filtering(expr)) |>
       dplyr::ungroup(),
-    by = c("type", "step", "dataset")
-  ) %>%
-    dplyr::mutate(expr = purrr::map2(expr, new_expr, if_null_default_list)) %>%
-    dplyr::select(type, expr) %>%
+    by = c("action", "step", "dataset")
+  ) |>
+    dplyr::mutate(expr = purrr::map2(expr, new_expr, if_null_default_list)) |>
+    dplyr::select(action, expr) |>
     # collapse::funique not support nested tables with custom values
     dplyr::distinct()
 }

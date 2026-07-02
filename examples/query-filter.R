@@ -1,6 +1,5 @@
 library(queryBuilder)
 library(cohortBuilder)
-library(magrittr)
 
 my_query <- queryGroup(
   condition = "AND",
@@ -27,10 +26,10 @@ coh <- cohort(
       iris = iris, mtcars = mtcars
     )
   )
-) %>%
+) |>
   add_filter(
     filter("discrete", id = "species", dataset = "iris", variable = "Species", value = c("setosa", "versicolor"))
-  ) %>%
+  ) |>
   add_filter(
     filter(
       "query", id = "gen_query", dataset = "iris", variables = c("Sepal.Length", "Petal.Length", "Petal.Width"),
@@ -41,9 +40,9 @@ coh <- cohort(
 coh$sum_up_state()
 sum_up(coh)
 
-coh <- coh %>% run()
+coh <- coh |> run()
 
-coh %>% code(include_methods = NULL)
+coh |> code(include_methods = NULL)
 
 get_data(coh, 1, state = "post")
 

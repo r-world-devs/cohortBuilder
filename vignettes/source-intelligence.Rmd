@@ -1,0 +1,215 @@
+---
+title: "Source intelligence and AI tools"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Source intelligence and AI tools}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options("tibble.print_min" = 5L, "tibble.print_max" = 5L)
+library(cohortBuilder)
+```
+
+Beyond manually configuring filters, `cohortBuilder` can inspect a source and
+describe or build filters for you. These features are also the foundation for
+integrating a cohort with a Large Language Model (LLM), so an assistant can
+explore the data and apply filters on the user's behalf.
+
+This article covers four building blocks:
+
+- `describe()` - attach human-readable descriptions to datasets and variables,
+- `autofilter()` - auto-generate filters from the data structure,
+- `shape()` - return a structured summary of datasets and filters,
+- AI tools (`R/ai_tools.R`) - expose the cohort to an `ellmer` chat.
+
+## Describing a source
+
+`describe()` builds a small description object (its text plus any extra fields)
+that you attach to a source via the `description` argument of `set_source()`.
+
+The `description` is a nested list keyed by dataset name. Within each dataset,
+the special key `dataset_` describes the dataset itself, and any other key
+describes a variable of that dataset:
+
+```{r}
+iris_source <- set_source(
+  tblist(iris = iris),
+  description = list(
+    iris = list(
+      dataset_ = describe("Edgar Anderson's measurements of iris flowers."),
+      Species = describe("Iris species.", domain = c("setosa", "versicolor", "virginica"))
+    )
+  )
+)
+```
+
+Extra named arguments to `describe()` (such as `domain` above) are stored
+alongside the text and can be picked up by other features - for example
+`autofilter()` uses a supplied `domain` instead of scanning the data.
+
+`describe()` also accepts a `label` - a short, human-readable name for the
+field. When the field describes a variable, `autofilter()` reuses the label as
+the generated filter's `name` (the underlying `variable` is unchanged), which
+is handy for giving filters friendlier names in a GUI:
+
+```{r}
+labelled_source <- set_source(
+  tblist(iris = iris),
+  description = list(
+    iris = list(
+      Species = describe("the species of iris", label = "Iris species")
+    )
+  )
+) |>
+  autofilter(attach_as = "meta")
+
+species_filter <- purrr::detect(
+  labelled_source$available_filters, ~ .x@id == "iris-Species"
+)
+species_filter@name
+```
+
+## Generating filters automatically
+
+`autofilter()` analyses each column of the source and creates a filter suited
+to its type (using filter rules such as `rule_character`, `rule_factor`,
+`rule_numeric`, `rule_Date`, `rule_POSIXct`). The mapping is roughly:
+
+| Column type | Filter type |
+|-------------|-------------|
+| character / factor | `discrete` (or `discrete_text` when all values are unique) |
+| numeric / integer  | `range` |
+| Date               | `date_range` |
+| POSIXct            | `datetime_range` |
+
+The `attach_as` argument controls where the generated filters go.
+
+With `attach_as = "step"` (the default) the filters are added as a filtering
+step, so the cohort is immediately filterable:
+
+```{r}
+iris_cohort <- set_source(tblist(iris = iris)) |>
+  autofilter(attach_as = "step") |>
+  cohort()
+
+sum_up(iris_cohort)
+```
+
+With `attach_as = "meta"` the filters are stored in `source$available_filters`
+rather than applied. This is the "menu" of filters a GUI or an LLM can choose
+from, without forcing them onto the data:
+
+```{r}
+meta_source <- iris_source |>
+  autofilter(attach_as = "meta")
+
+length(meta_source$available_filters)
+```
+
+When a `domain` was provided via `describe()`, the generated filter inherits it
+instead of scanning the data:
+
+```{r}
+species_filter <- purrr::detect(
+  meta_source$available_filters, ~ .x@id == "iris-Species"
+)
+species_filter@domain
+```
+
+## Inspecting a source with `shape()`
+
+`shape(source)` returns a structured `list(datasets, filters)` describing the
+source - ideal for programmatic inspection or passing to an LLM:
+
+- `datasets` maps each dataset name to its description text (or `NA`).
+- `filters` is keyed by filter id; each entry is a list with `name`, `dataset`,
+  `type`, `description`, `variables`, and `domain`. The `description` combines
+  the filter-level description with the per-variable descriptions (single-
+  variable filters show the bare variable description; multi-variable filters
+  prefix each with its variable name).
+
+```{r}
+result <- shape(meta_source)
+
+# Dataset descriptions
+result$datasets
+
+# One filter entry
+str(result$filters$`iris-Species`)
+```
+
+When a filter's own `@domain` is unset, `shape()` falls back to the domain
+stored in the source's metadata statistics, so the `domain` field is populated
+whenever possible.
+
+**Note.** Called with a `field` (and optional `subfield`),
+`shape(source, field, subfield)` instead performs a description-text lookup -
+this is the form used internally by `Cohort$show_help()`.
+
+## Connecting a cohort to an LLM
+
+The functions in `R/ai_tools.R` wrap cohort operations as tools an
+[`ellmer`](https://ellmer.tidyverse.org/) chat can call. Each tool is a
+`cb_tool` object (a function plus a name, description, and argument schema).
+
+The built-in tool factories each take a cohort and return a `cb_tool`:
+
+| Tool factory | Purpose |
+|--------------|---------|
+| `cb_tool_filters_meta()` | Return available-filter metadata (via `shape()`) as JSON |
+| `cb_tool_describe_state()` | Describe current steps, filters, and pending state |
+| `cb_tool_get_data_summary()` | Report row counts per dataset and step |
+| `cb_tool_get_code()` | Return reproducible filtering code |
+| `cb_tool_add_filters()` | Add filters (no values) to a new or existing step |
+| `cb_tool_set_filter_values()` | Set values on existing filters |
+| `cb_tool_apply_filters()` | Add filters and set their values in one call |
+| `cb_tool_toggle_filters()` | Activate / deactivate filters |
+| `cb_tool_clear_filters()` | Reset filters to their defaults |
+| `cb_tool_remove_filters()` | Remove filters from a step |
+| `cb_tool_remove_step()` | Remove the last step |
+| `cb_tool_run()` | Run the pipeline (when auto-run is disabled) |
+
+A `cb_tool` prints its name, description, and arguments:
+
+```{r}
+coh <- cohort(meta_source)
+tool <- cb_tool_filters_meta(coh)
+print(tool)
+```
+
+For LLM-driven filtering to work, the source must expose a menu of filters via
+`autofilter(attach_as = "meta")` so the assistant knows what it can apply.
+
+To register tools with an `ellmer` chat, use `cb_register_tool()` for a single
+tool or `cb_register_tools()` to register all of them at once:
+
+```{r, eval = FALSE}
+library(ellmer)
+
+source <- set_source(tblist(iris = iris)) |>
+  autofilter(attach_as = "meta")
+coh <- cohort(source)
+
+chat <- chat_openai()
+chat |> cb_register_tools(coh)
+
+chat$chat("Filter the data to setosa flowers with sepal length over 5")
+```
+
+By default the cohort runs automatically after each tool modifies it. Set
+`options(cb_tool_run_cohort = FALSE)` to require an explicit `cb_run` call
+instead.
+
+To trace which tools the LLM invokes (and with which arguments), set
+`options(cb_tool_verbose = TRUE)`. Each call then emits an informative
+`message()` such as
+`[cohortBuilder AI tool] cb_apply_filters (filters = ...; action = new_step)`.
+Logging is off by default, so tools stay silent during normal use.
+
+**Note.** The AI tools require the suggested `ellmer` package.

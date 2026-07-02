@@ -80,7 +80,7 @@ test_that("Registering steps and filters works for various filter-step combinati
   expect_identical(step_filter_state(two_steps), list("1" = 2L, "2" = 1L))
 
   #?? here
-  filter_in_source <- patients_source$clone() %>%
+  filter_in_source <- patients_source$clone() |>
     add_filter(discrete_filter)
   one_filter_in_source <- register_steps_and_filters(filter_in_source)
 
@@ -88,16 +88,16 @@ test_that("Registering steps and filters works for various filter-step combinati
   expect_setequal(unname(one_filter_in_source), unname(one_step_one_filter))
   expect_named(one_filter_in_source, names(one_step_one_filter))
 
-  same_filters_in_source <- patients_source$clone() %>%
-    add_filter(discrete_filter) %>%
+  same_filters_in_source <- patients_source$clone() |>
+    add_filter(discrete_filter) |>
     add_filter(discrete_filter)
   expect_error(
     register_steps_and_filters(same_filters_in_source),
     "Cannot create filters with the same id in a single step."
   )
 
-  filters_in_source <- patients_source$clone() %>%
-    add_filter(discrete_filter) %>%
+  filters_in_source <- patients_source$clone() |>
+    add_filter(discrete_filter) |>
     add_filter(discrete_filter_two)
   two_filters_in_source <- register_steps_and_filters(filters_in_source)
 
@@ -105,9 +105,9 @@ test_that("Registering steps and filters works for various filter-step combinati
   expect_setequal(unname(two_filters_in_source), unname(one_step_two_filters))
   expect_named(two_filters_in_source, names(one_step_two_filters))
 
-  filters_in_two_steps <- patients_source$clone() %>%
-    add_filter(discrete_filter, "1") %>%
-    add_filter(discrete_filter_two, "1") %>%
+  filters_in_two_steps <- patients_source$clone() |>
+    add_filter(discrete_filter, "1") |>
+    add_filter(discrete_filter_two, "1") |>
     add_filter(discrete_filter, "2")
   filters_in_two_sources_reg <- register_steps_and_filters(filters_in_two_steps)
 
@@ -115,7 +115,7 @@ test_that("Registering steps and filters works for various filter-step combinati
   expect_setequal(unname(filters_in_two_sources_reg), unname(two_steps))
   expect_named(filters_in_two_sources_reg, names(two_steps))
 
-  step_in_source <- patients_source$clone() %>%
+  step_in_source <- patients_source$clone() |>
     add_step(step(discrete_filter, discrete_filter_two))
   step_in_source_req <- register_steps_and_filters(step_in_source)
 
@@ -123,8 +123,8 @@ test_that("Registering steps and filters works for various filter-step combinati
   expect_setequal(unname(step_in_source_req), unname(one_step_two_filters))
   expect_named(step_in_source_req, names(one_step_two_filters))
 
-  steps_in_source <- patients_source$clone() %>%
-    add_step(step(discrete_filter, discrete_filter_two)) %>%
+  steps_in_source <- patients_source$clone() |>
+    add_step(step(discrete_filter, discrete_filter_two)) |>
     add_step(step(discrete_filter))
   steps_in_source_req <- register_steps_and_filters(steps_in_source)
 

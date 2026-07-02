@@ -17,6 +17,12 @@ primary keys and relations between stored data.
 \describe{
 \item{\code{dtconn}}{Data connection object the Source if based on.}
 
+\item{\code{dtvalue}}{Evaluated data connection value used for computing stats.}
+
+\item{\code{meta_stats}}{Computed metadata statistics for available filters.}
+
+\item{\code{compute_meta_stats}}{Whether metadata statistics for available filters are pre-computed.}
+
 \item{\code{description}}{Source object description list.}
 
 \item{\code{attributes}}{Extra source parameters passed when source is defined.}
@@ -31,6 +37,13 @@ primary keys and relations between stored data.
 }
 \if{html}{\out{</div>}}
 }
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{available_filters}}{List of filter definitions available for the source.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -42,6 +55,7 @@ primary keys and relations between stored data.
 \item \href{#method-Source-add_filter}{\code{Source$add_filter()}}
 \item \href{#method-Source-rm_filter}{\code{Source$rm_filter()}}
 \item \href{#method-Source-update_filter}{\code{Source$update_filter()}}
+\item \href{#method-Source-calc_meta_stats}{\code{Source$calc_meta_stats()}}
 \item \href{#method-Source-clone}{\code{Source$clone()}}
 }
 }
@@ -58,6 +72,8 @@ Create a new `Source` object.
   binding_keys = NULL,
   source_code = NULL,
   description = NULL,
+  available_filters = NULL,
+  compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE),
   options = list(display_binding = TRUE)
 )}\if{html}{\out{</div>}}
 }
@@ -78,6 +94,12 @@ Used as a part of reproducible code output, see \link{code}.}
 
 \item{\code{description}}{A named list storing the source objects description.
 Can be accessed with \link{description} Cohort method.}
+
+\item{\code{available_filters}}{List of filter definitions available for the source.}
+
+\item{\code{compute_meta_stats}}{Whether to pre-compute metadata statistics for `available_filters`.
+When `FALSE`, `meta_stats` are skipped (and filter domains fall back to live computation).
+Defaults to the `cb.source_filters_meta_stats` option (`TRUE`).}
 
 \item{\code{options}}{List of options affecting methods output. Currently supported only `display_binding`
 specifying whether reproducible code should include bindings definition.}
@@ -208,6 +230,16 @@ Update filter definition.
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Source-calc_meta_stats"></a>}}
+\if{latex}{\out{\hypertarget{method-Source-calc_meta_stats}{}}}
+\subsection{Method \code{calc_meta_stats()}}{
+Calculate metadata statistics for available filters.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Source$calc_meta_stats()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Source-clone"></a>}}

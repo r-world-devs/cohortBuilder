@@ -25,6 +25,7 @@ Cohort object is designed to make operations on source data possible.
 \item \href{#method-Cohort-add_source}{\code{Cohort$add_source()}}
 \item \href{#method-Cohort-update_source}{\code{Cohort$update_source()}}
 \item \href{#method-Cohort-get_source}{\code{Cohort$get_source()}}
+\item \href{#method-Cohort-get_propagate_domains_mode}{\code{Cohort$get_propagate_domains_mode()}}
 \item \href{#method-Cohort-add_step}{\code{Cohort$add_step()}}
 \item \href{#method-Cohort-copy_step}{\code{Cohort$copy_step()}}
 \item \href{#method-Cohort-remove_step}{\code{Cohort$remove_step()}}
@@ -39,7 +40,7 @@ Cohort object is designed to make operations on source data possible.
 \item \href{#method-Cohort-get_data}{\code{Cohort$get_data()}}
 \item \href{#method-Cohort-plot_data}{\code{Cohort$plot_data()}}
 \item \href{#method-Cohort-show_attrition}{\code{Cohort$show_attrition()}}
-\item \href{#method-Cohort-get_stats}{\code{Cohort$get_stats()}}
+\item \href{#method-Cohort-calc_stats}{\code{Cohort$calc_stats()}}
 \item \href{#method-Cohort-show_help}{\code{Cohort$show_help()}}
 \item \href{#method-Cohort-get_code}{\code{Cohort$get_code()}}
 \item \href{#method-Cohort-run_flow}{\code{Cohort$run_flow()}}
@@ -48,11 +49,16 @@ Cohort object is designed to make operations on source data possible.
 \item \href{#method-Cohort-describe_state}{\code{Cohort$describe_state()}}
 \item \href{#method-Cohort-get_step}{\code{Cohort$get_step()}}
 \item \href{#method-Cohort-get_filter}{\code{Cohort$get_filter()}}
-\item \href{#method-Cohort-update_cache}{\code{Cohort$update_cache()}}
-\item \href{#method-Cohort-get_cache}{\code{Cohort$get_cache()}}
+\item \href{#method-Cohort-update_stats}{\code{Cohort$update_stats()}}
+\item \href{#method-Cohort-get_stats}{\code{Cohort$get_stats()}}
 \item \href{#method-Cohort-list_active_filters}{\code{Cohort$list_active_filters()}}
 \item \href{#method-Cohort-last_step_id}{\code{Cohort$last_step_id()}}
 \item \href{#method-Cohort-is_pending}{\code{Cohort$is_pending()}}
+\item \href{#method-Cohort-set_pending}{\code{Cohort$set_pending()}}
+\item \href{#method-Cohort-set_pending_cascade}{\code{Cohort$set_pending_cascade()}}
+\item \href{#method-Cohort-set_domain}{\code{Cohort$set_domain()}}
+\item \href{#method-Cohort-propagate_domains_to}{\code{Cohort$propagate_domains_to()}}
+\item \href{#method-Cohort-propagate_filter_domains}{\code{Cohort$propagate_filter_domains()}}
 \item \href{#method-Cohort-modify}{\code{Cohort$modify()}}
 \item \href{#method-Cohort-clone}{\code{Cohort$clone()}}
 }
@@ -67,6 +73,8 @@ Create Cohort object.
   source,
   ...,
   run_flow = FALSE,
+  compute_stats = TRUE,
+  propagate_domains = c("none", "filter", "stats", "data"),
   hook = list(pre = get_hook("pre_cohort_hook"), post = get_hook("post_cohort_hook"))
 )}\if{html}{\out{</div>}}
 }
@@ -80,6 +88,16 @@ Create Cohort object.
 filters - the filters will be added to the first step.}
 
 \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+
+\item{\code{compute_stats}}{If `TRUE` (default), filter statistics are computed and stored
+after each step. Set to `FALSE` to skip stats computation (useful for metadata-only
+operation).}
+
+\item{\code{propagate_domains}}{Domain propagation mode between steps.
+One of `"none"` (default, no propagation), `"filter"` (derive from
+previous step filter values), `"stats"` (derive from stored statistics),
+or `"data"` (scan filtered data). `"stats"` requires `compute_stats = TRUE`;
+use `"data"` for the stats-free equivalent.}
 
 \item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
 See \link{hooks} for more details.}
@@ -146,6 +164,20 @@ See \link{hooks} for more details.}
 Return Source object attached to Cohort.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Cohort$get_source()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-get_propagate_domains_mode"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_propagate_domains_mode}{}}}
+\subsection{Method \code{get_propagate_domains_mode()}}{
+Return the configured domain propagation mode.
+
+One of `"none"`, `"filter"`, `"stats"` or `"data"`. Read-only; the mode is
+fixed at construction. UI layers can inspect it (e.g. to validate that a
+domain-based rendering strategy is compatible with the cohort).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_propagate_domains_mode()}\if{html}{\out{</div>}}
 }
 
 }
@@ -229,7 +261,13 @@ See \link{hooks} for more details.}
 \subsection{Method \code{add_filter()}}{
 Add filter definition
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$add_filter(filter, step_id, run_flow = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$add_filter(
+  filter,
+  step_id,
+  run_flow = FALSE,
+  hook = list(pre = get_hook("pre_add_filter_hook"), post =
+    get_hook("post_add_filter_hook"))
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -241,6 +279,9 @@ Add filter definition
 If missing, filter is added to the last step.}
 
 \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+
+\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+See \link{hooks} for more details.}
 }
 \if{html}{\out{</div>}}
 }
@@ -251,7 +292,13 @@ If missing, filter is added to the last step.}
 \subsection{Method \code{remove_filter()}}{
 Remove filter definition
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$remove_filter(step_id, filter_id, run_flow = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$remove_filter(
+  step_id,
+  filter_id,
+  run_flow = FALSE,
+  hook = list(pre = get_hook("pre_rm_filter_hook"), post =
+    get_hook("post_rm_filter_hook"))
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -262,6 +309,9 @@ Remove filter definition
 \item{\code{filter_id}}{Id of the filter to be removed.}
 
 \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+
+\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+See \link{hooks} for more details.}
 }
 \if{html}{\out{</div>}}
 }
@@ -272,7 +322,16 @@ Remove filter definition
 \subsection{Method \code{update_filter()}}{
 Update filter definition
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_filter(step_id, filter_id, ..., active, run_flow = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_filter(
+  step_id,
+  filter_id,
+  ...,
+  active,
+  run_flow = FALSE,
+  hook = list(pre = get_hook("pre_update_filter_hook"), post =
+    get_hook("post_update_filter_hook")),
+  hook_args = list(pre = list(), post = list())
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -287,6 +346,11 @@ Update filter definition
 \item{\code{active}}{Mark filter as active (`TRUE`) or inactive (`FALSE`).}
 
 \item{\code{run_flow}}{If `TRUE`, data flow is run after the operation is completed.}
+
+\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+See \link{hooks} for more details.}
+
+\item{\code{hook_args}}{Named list of extra arguments passed to pre/post hooks.}
 }
 \if{html}{\out{</div>}}
 }
@@ -347,7 +411,7 @@ Sum up Cohort configuration - Source, steps definition and evaluated data.
 \subsection{Method \code{get_state()}}{
 Get Cohort configuration state.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_state(step_id, json = FALSE, extra_fields = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_state(step_id, json = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -355,9 +419,7 @@ Get Cohort configuration state.
 \describe{
 \item{\code{step_id}}{If provided, the selected step state is returned.}
 
-\item{\code{json}}{If TRUE, return state in JSON format.}
-
-\item{\code{extra_fields}}{Names of extra fields included in filter to be added to state.
+\item{\code{json}}{If TRUE, return state in JSON format.
 Restore Cohort configuration.}
 }
 \if{html}{\out{</div>}}
@@ -456,12 +518,12 @@ Show attrition plot.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Cohort-get_stats"></a>}}
-\if{latex}{\out{\hypertarget{method-Cohort-get_stats}{}}}
-\subsection{Method \code{get_stats()}}{
+\if{html}{\out{<a id="method-Cohort-calc_stats"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-calc_stats}{}}}
+\subsection{Method \code{calc_stats()}}{
 Get Cohort related statistics.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_stats(step_id, filter_id, ..., state = "post")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$calc_stats(step_id, filter_id, ..., state = "post")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -619,9 +681,17 @@ Run data binding for selected step.
 \subsection{Method \code{describe_state()}}{
 Print defined steps configuration.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$describe_state()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$describe_state(to_string = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{to_string}}{If `TRUE`, return the output as a character string
+instead of printing it. Defaults to `FALSE`.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Cohort-get_step"></a>}}
@@ -662,56 +732,68 @@ Get selected filter configuration.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Cohort-update_cache"></a>}}
-\if{latex}{\out{\hypertarget{method-Cohort-update_cache}{}}}
-\subsection{Method \code{update_cache()}}{
-Update filter or step cache.
-Caching is saving step and filter attached data statistics such as number of
+\if{html}{\out{<a id="method-Cohort-update_stats"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-update_stats}{}}}
+\subsection{Method \code{update_stats()}}{
+Update filter or step statistics.
+Computes and stores step and filter attached data statistics such as number of
 data rows, filter choices or frequencies.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_cache(step_id, filter_id, state = "post")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$update_stats(step_id, filter_id, state = "post", name = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{step_id}}{Id of the step for which caching should be applied.
+\item{\code{step_id}}{Id of the step for which statistics should be computed.
 If `filter_id` is not missing, the parameter describes id of the step where filter should be found.}
 
-\item{\code{filter_id}}{Id of the filter for which caching should be applied.}
+\item{\code{filter_id}}{Id of the filter for which statistics should be computed.}
 
-\item{\code{state}}{Should caching be done on data before ("pre") or after ("post")
+\item{\code{state}}{Should statistics be computed on data before ("pre") or after ("post")
 filtering in specified step.}
+
+\item{\code{name}}{Optional name(s) of the individual filter statistics to
+(re)compute. When supplied (filter-level only), only those statistics are
+computed and merged into the stored entry, leaving any other stored
+statistics untouched. When missing, the full statistics set is computed.}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Cohort-get_cache"></a>}}
-\if{latex}{\out{\hypertarget{method-Cohort-get_cache}{}}}
-\subsection{Method \code{get_cache()}}{
-Return step of filter specific cache.
+\if{html}{\out{<a id="method-Cohort-get_stats"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-get_stats}{}}}
+\subsection{Method \code{get_stats()}}{
+Return step or filter specific statistics.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_cache(
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$get_stats(
   step_id,
   filter_id,
   state = "post",
-  .recalc_when_missing = TRUE
+  .recalc_when_missing = TRUE,
+  name = NULL
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{step_id}}{Id of the step for which cached data should be returned
+\item{\code{step_id}}{Id of the step for which stored statistics should be returned
 If `filter_id` is not missing, the parameter describes id of the step where filter should be found.}
 
-\item{\code{filter_id}}{Id of the filter for which cache data should be returned.}
+\item{\code{filter_id}}{Id of the filter for which stored statistics should be returned.}
 
-\item{\code{state}}{Should cache be returned on data before ("pre") or after ("post")
+\item{\code{state}}{Should statistics be returned on data before ("pre") or after ("post")
 filtering in specified step.}
 
-\item{\code{.recalc_when_missing}}{Should the function compute cache automatically when the one is not computed yet?}
+\item{\code{.recalc_when_missing}}{Should the function compute statistics automatically when not computed yet?}
+
+\item{\code{name}}{Optional name of a single filter statistic to return (e.g.
+"choices", "n_data"). When supplied (filter-level only) the method
+returns just that statistic and, if recomputation is needed, computes
+only it instead of the whole statistics set. When missing, the full
+stored entry (a list of all statistics) is returned.}
 }
 \if{html}{\out{</div>}}
 }
@@ -756,6 +838,134 @@ Check if step is pending.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{step_id}}{Id of the step to be checked.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-set_pending"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-set_pending}{}}}
+\subsection{Method \code{set_pending()}}{
+Mark step as pending or resolved.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$set_pending(
+  step_id,
+  pending = TRUE,
+  hook = list(pre = get_hook("pre_set_pending_hook"), post =
+    get_hook("post_set_pending_hook"))
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step_id}}{Id of the step.}
+
+\item{\code{pending}}{Logical; `TRUE` to mark pending, `FALSE` to resolve.}
+
+\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+See \link{hooks} for more details.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-set_pending_cascade"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-set_pending_cascade}{}}}
+\subsection{Method \code{set_pending_cascade()}}{
+Mark a step and all the steps after it as pending.
+
+A change to step `step_id`'s filters invalidates that step and every step
+downstream (each step's input is the previous step's output). Used by the
+filter/step mutating methods so the GUI greys all affected steps via the
+`post_set_pending_hook`.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$set_pending_cascade(step_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step_id}}{Id of the first step to mark pending.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-set_domain"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-set_domain}{}}}
+\subsection{Method \code{set_domain()}}{
+Silently set a filter's domain.
+
+Internal setter used by domain propagation (\link{.propagate_domains}).
+Writes `filter@domain` directly **without** firing the `update_filter`
+hooks and **without** triggering `run_flow`, which prevents the per-hop
+hook re-entry that would otherwise occur if domains were applied through
+`update_filter`. Does not itself trigger further propagation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$set_domain(step_id, filter_id, domain)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step_id}}{Id of the step where the filter is defined.}
+
+\item{\code{filter_id}}{Id of the filter whose domain should be set.}
+
+\item{\code{domain}}{New domain value to assign.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-propagate_domains_to"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-propagate_domains_to}{}}}
+\subsection{Method \code{propagate_domains_to()}}{
+Recompute a target step's domains from its parent and signal the change.
+
+Thin wrapper around \link{.propagate_domains} that runs propagation for
+`target_id` (computing its filters' domains from step `target_id - 1`) and
+then fires `post_propagate_domains_hook` so UI layers can refresh the
+affected step's inputs. No-op when propagation is disabled or the target
+step is absent / has no parent.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$propagate_domains_to(
+  target_id,
+  hook = get_hook("post_propagate_domains_hook")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{target_id}}{Id of the step whose domains should be recomputed.}
+
+\item{\code{hook}}{List of hooks describing methods before/after the Cohort is created.
+See \link{hooks} for more details.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Cohort-propagate_filter_domains"></a>}}
+\if{latex}{\out{\hypertarget{method-Cohort-propagate_filter_domains}{}}}
+\subsection{Method \code{propagate_filter_domains()}}{
+Eagerly propagate `"filter"`-mode domains to a target step and all steps
+after it.
+
+`"filter"` mode needs no computed data, so domains can be (re)established
+immediately when the step structure changes. Because each step's domain
+depends on every previous step, this recomputes `from_target` and cascades
+downstream ascending. No-op unless the propagation mode is `"filter"`.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cohort$propagate_filter_domains(from_target)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{from_target}}{Id of the first step to recompute.}
 }
 \if{html}{\out{</div>}}
 }

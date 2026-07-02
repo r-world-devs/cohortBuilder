@@ -16,15 +16,25 @@ Source <- R6::R6Class(
     #'   Used as a part of reproducible code output, see \link{code}.
     #' @param description A named list storing the source objects description.
     #'   Can be accessed with \link{description} Cohort method.
+    #' @param available_filters List of filter definitions available for the source.
+    #' @param compute_meta_stats Whether to pre-compute metadata statistics for `available_filters`.
+    #'   When `FALSE`, `meta_stats` are skipped (and filter domains fall back to live computation).
+    #'   Defaults to the `cb.source_filters_meta_stats` option (`TRUE`).
     #' @param options List of options affecting methods output. Currently supported only `display_binding`
     #'   specifying whether reproducible code should include bindings definition.
     #' @return A new `Source` object of class `Source` (and `dtconn` object class appended).
     initialize = function(
       dtconn, ..., primary_keys = NULL, binding_keys = NULL, source_code = NULL,
-      description = NULL,  options = list(display_binding = TRUE)
+      description = NULL, available_filters = NULL,
+      compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE),
+      options = list(display_binding = TRUE)
     ) {
 
       self$dtconn <- dtconn
+      class(self) <- c(class(dtconn), class(self))
+      self$dtvalue <- .init_step(self)
+      self$compute_meta_stats <- compute_meta_stats
+      self$available_filters <- available_filters
       self$attributes <- list(...)
       self$source_code <- source_code
       self$description <- description
@@ -35,7 +45,6 @@ Source <- R6::R6Class(
         self$primary_keys <- primary_keys
       }
       self$options <- options
-      class(self) <- c(class(dtconn), class(self))
     },
     #' @description
     #' Get selected `Source` object `attribute`.
@@ -138,12 +147,24 @@ Source <- R6::R6Class(
         filter_id
       )
 
+      filter_obj <- private$steps[[step_id]]$filters[[to_update_idx]]
       for (param in names(new_params)) {
-        environment(private$steps[[step_id]]$filters[[to_update_idx]])$args[[param]] <- new_params[[param]]
+        if (param %in% names(S7::props(filter_obj))) {
+          S7::prop(filter_obj, param) <- new_params[[param]]
+        } else {
+          filter_obj@extra[[param]] <- new_params[[param]]
+        }
       }
+      private$steps[[step_id]]$filters[[to_update_idx]] <- filter_obj
     },
     #' @field dtconn Data connection object the Source if based on.
     dtconn = NULL,
+    #' @field dtvalue Evaluated data connection value used for computing stats.
+    dtvalue = NULL,
+    #' @field meta_stats Computed metadata statistics for available filters.
+    meta_stats = NULL,
+    #' @field compute_meta_stats Whether metadata statistics for available filters are pre-computed.
+    compute_meta_stats = TRUE,
     #' @field description Source object description list.
     description = NULL,
     #' @field attributes Extra source parameters passed when source is defined.
@@ -155,19 +176,57 @@ Source <- R6::R6Class(
     #' @field primary_keys Source data primary keys expressed as \link{primary_keys}.
     primary_keys = NULL,
     #' @field source_code An expression which allows to recreate basic source structure.
-    source_code = NULL
+    source_code = NULL,
+    #' @description
+    #' Calculate metadata statistics for available filters.
+    calc_meta_stats = function() {
+      if (!is.null(private$meta_filters) && isTRUE(self$compute_meta_stats)) {
+        # Mirror the stats slot layout: data stats under `$source`, filter stats
+        # under `$filters`. This object seeds stats slot "0" in init_source.
+        self$meta_stats <- list(source = .get_stats(self, self$dtvalue))
+        for (filter_obj in self$available_filters) {
+          self$meta_stats$filters[[filter_obj@id]] <- cb_get_filter_stats(filter_obj, self, self$dtvalue)
+        }
+      }
+      return(self$meta_stats)
+    }
+  ),
+  active = list(
+    #' @field available_filters List of filter definitions available for the source.
+    available_filters = function(value) {
+      if (missing(value)) {
+        return(private$meta_filters)
+      }
+      private$meta_filters <- value
+      self$calc_meta_stats()
+    }
   ),
   private = list(
-    steps = NULL
+    steps = NULL,
+    meta_filters = NULL
   )
 )
 
+#' Find the position of a filter by id within a list of filters
+#'
+#' @param filters A list of filter objects.
+#' @param filter_id The filter id to locate.
+#' @return The integer index/indices of matching filters.
+#' @noRd
 match_filter_id <- function(filters, filter_id) {
-  filters_ids <- filters %>%
-    purrr::map_chr(~ environment(.x)$id)
+  filters_ids <- filters |>
+    purrr::map_chr(~ .x@id)
   which(filters_ids == filter_id)
 }
 
+#' Verify a source-type extension exists for a data connection
+#'
+#' Checks that a `set_source` method is registered for the connection's class
+#' (`tblist` is always supported), erroring otherwise.
+#'
+#' @param dtconn A data connection object.
+#' @return Invisibly `TRUE`; errors when no extension is found.
+#' @noRd
 check_layer <- function(dtconn) {
 
   if (inherits(dtconn, "tblist")) {
@@ -205,6 +264,11 @@ check_layer <- function(dtconn) {
 #'     When provided, used as a part of reproducible code output.
 #' @param description A named list storing the source objects description.
 #'     Can be accessed with \link{description} Cohort method.
+#' @param available_filters List of filter definitions available for the source.
+#'     See \link{autofilter} for generating them automatically.
+#' @param compute_meta_stats Whether to pre-compute metadata statistics for the source
+#'     `available_filters`. When `FALSE`, the computation is skipped and filter domains
+#'     fall back to live computation. Defaults to the `cb.source_filters_meta_stats` option (`TRUE`).
 #' @examples
 #' mtcars_source <- set_source(
 #'   tblist(mtcars = mtcars),
@@ -216,7 +280,8 @@ check_layer <- function(dtconn) {
 #' @returns R6 object of class inherited from `dtconn`.
 #' @export
 set_source <- function(dtconn, ..., primary_keys = NULL, binding_keys = NULL,
-                       source_code = NULL, description = NULL) {
+                       source_code = NULL, description = NULL, available_filters = NULL,
+                       compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE)) {
 
   check_layer(dtconn)
   attr(dtconn, "call") <- rlang::call_match()$dtconn
@@ -257,7 +322,7 @@ set_source <- function(dtconn, ..., primary_keys = NULL, binding_keys = NULL,
 #'   argument of \link{code} function. Aims to modify reproducible code into the final format.}
 #' }
 #' Except from the above methods, you may extend the existing or new source with providing
-#' custom filtering methods. See \link{creating-filters}.
+#' custom filtering methods. See `vignette("custom-filters")`.
 #' In order to see more details about how to implement custom source check `vignette("custom-extensions")`.
 #'
 #' @name source-layer
@@ -365,6 +430,40 @@ NULL
   return(data_object)
 }
 
+#' Propagate domains between steps
+#'
+#' Source-layer generic that recomputes the domains of a **target step** from
+#' that step's parent (the previous step). Override to implement dynamic domain
+#' narrowing.
+#'
+#' The default is a no-op. Only called when `propagate_domains != "none"` in the
+#' Cohort.
+#'
+#' Contract: `step_id = N` recomputes the domains of step `N`'s filters using
+#' step `N - 1` as the source of truth. It is a no-op when `N` has no parent
+#' (i.e. `N == "1"`) or when the target step is absent.
+#'
+#' @param source Source object.
+#' @param data_object Filtered data of the **parent** step (the input to the
+#'   target step), used by `mode = "data"`.
+#' @param step_id Target step id whose domains should be recomputed.
+#' @param cohort Cohort object (for accessing the parent step's filters and
+#'   stored statistics).
+#' @param mode Propagation mode: `"filter"` (from upstream filter values, no data
+#'   access), `"stats"` (from the parent's post-step stored stats), or `"data"`
+#'   (scan the parent's filtered data directly).
+#' @param ... Additional arguments.
+#' @export
+.propagate_domains <- function(source, data_object, step_id, cohort, ...) {
+  UseMethod(".propagate_domains", source)
+}
+
+#' @rdname dot-propagate_domains
+#' @export
+.propagate_domains.default <- function(source, data_object, step_id, cohort, ...) {
+  invisible(NULL)
+}
+
 #' @rdname add_step
 #' @export
 add_step.Source <- function(x, step, ...) {
@@ -398,4 +497,93 @@ rm_filter.Source <- function(x, step_id, filter_id, ...) {
 update_filter.Source <- function(x, step_id, filter_id, ...) {
   x$update_filter(step_id, filter_id, ...)
   return(x)
+}
+
+#' Create a description object
+#'
+#' Helper for building structured description entries used in source definition.
+#'
+#' @param description A single string describing the field.
+#' @param label Optional short, human-readable label for the field. When the
+#'   field describes a variable, [autofilter()] reuses the label to fill the
+#'   generated filter's `name`. `NULL` (default) leaves the name untouched.
+#' @param ... Additional named parameters to include in the description object.
+#' @return A named list with `text`, an optional `label`, and any extra
+#'   parameters.
+#' @export
+describe <- function(description, label = NULL, ...) {
+  drop_nulls(
+    list(
+      text = description,
+      label = label,
+      ...
+    )
+  )
+}
+
+#' Describe the structure of a source
+#'
+#' `shape()` is an S3 generic that summarizes a source for programmatic or
+#' LLM-based inspection. Called with only a `source`, it returns a structured
+#' list `list(datasets, filters)` where `datasets` maps each dataset name to its
+#' description text and `filters` is keyed by filter id (each entry describing
+#' the filter's `dataset`, `type`, `description`, `variables`, and `domain`).
+#'
+#' Called with a `field` (and optional `subfield`), it instead performs a
+#' description-text lookup, returning the description stored for that
+#' dataset/variable. This form is used internally by the Cohort `show_help()`
+#' method.
+#'
+#' @param source A `Source` object.
+#' @param field Optional dataset (or description) name to look up.
+#' @param subfield Optional variable name within `field` to look up.
+#' @param domains When `TRUE` (default), each filter entry includes a `domain`
+#'   field (its set of valid values). Set to `FALSE` to omit domains, e.g. when
+#'   only descriptive metadata is needed and computing domains would be wasteful.
+#' @param ... Extra arguments passed to methods.
+#' @return Either a `list(datasets, filters)` metadata structure or, when
+#'   `field` is supplied, the description text for the requested entry.
+#' @seealso [describe()], [autofilter()]
+#' @export
+shape <- function(source, ...) {
+  UseMethod("shape", source)
+}
+
+#' @rdname shape
+#' @export
+shape.default <- function(source, field, subfield, ...) {
+  if (missing(subfield)) {
+    return(source$description[[field]])
+  }
+  return(NULL)
+}
+
+#' Generate filters definition based on the Source data
+#'
+#' The method should analyze source data structure, generate proper filters based on
+#' the data (e.g. column types) and attach them to source.
+#'
+#' @param source Source object.
+#' @param attach_as Choose whether the filters should be attached as a new step,
+#'    or list of available filters (used in filtering panel when `new_step = "configure"`).
+#'    By default in \code{step}.
+#' @param ... Extra arguments passed to a specific method.
+#' @return Source object having step configuration attached.
+#'
+#' @examples
+#' library(cohortBuilder)
+#'
+#' iris_source <- set_source(tblist(iris = iris)) |>
+#'   autofilter()
+#' iris_cohort <- cohort(iris_source)
+#' sum_up(iris_cohort)
+#' @export
+autofilter <- function(source, attach_as = c("step", "meta"), ...) {
+  UseMethod("autofilter", source)
+}
+
+#' @rdname autofilter
+#' @export
+autofilter.default <- function(source, ...) {
+  return(source)
 }

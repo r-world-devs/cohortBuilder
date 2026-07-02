@@ -1,7 +1,7 @@
 Package: cohortBuilder
 Type: Package
 Title: Data Source Agnostic Filtering Tools
-Version: 0.4.0
+Version: 1.0.0
 Authors@R: 
     c(person('Krystian', 'Igras', 
              email = 'krystian8207@gmail.com', 
@@ -14,29 +14,30 @@ Description: Common API for filtering data stored in different data models.
     Works standalone or with 'shinyCohortBuilder' as the GUI for interactive Shiny apps.
 License: MIT + file LICENSE
 Encoding: UTF-8
+Language: en-US
 LazyData: true
 Imports:
     R6,
+    S7 (>= 0.2.0),
     jsonlite,
     purrr,
     tibble,
     dplyr (>= 1.0.0),
     tidyr,
-    magrittr,
     glue,
     ggplot2,
     rlang (>= 1.0),
     formatR,
     collapse
 KeepSource: true
-RoxygenNote: 7.3.3
 Suggests: 
     queryBuilder,
     vdiffr,
     testthat (>= 3.0.0),
-    shiny,
     knitr,
-    rmarkdown
+    rmarkdown,
+    ellmer (>= 0.3.0),
+    withr
 Config/testthat/edition: 3
 Collate:
     'cohortBuilder-package.R'
@@ -44,6 +45,7 @@ Collate:
     'source_methods.R'
     'step.R'
     'filter.R'
+    'ai_tools.R'
     'attrition.R'
     'bind_keys.R'
     'hooks.R'
@@ -53,5 +55,7 @@ Collate:
     'data.R'
 VignetteBuilder: knitr
 URL: https://github.com/r-world-devs/cohortBuilder/,  https://r-world-devs.github.io/cohortBuilder/
-Depends: 
-    R (>= 3.5.0)
+Depends:
+    R (>= 4.1.0)
+Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.3

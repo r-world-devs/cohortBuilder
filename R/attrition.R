@@ -1,3 +1,14 @@
+#' Compute label and arrow coordinates for an attrition plot
+#'
+#' Derives box labels, excluded-count labels, and x/y positions for the boxes
+#' and arrows of the attrition flow chart.
+#'
+#' @param labels Per-step labels.
+#' @param n_included Number of records retained at each step.
+#' @param space Vertical spacing between boxes.
+#' @param percent If `TRUE`, append percentages relative to the initial count.
+#' @return A data frame of plotting coordinates (with a `space` attribute).
+#' @noRd
 get_attrition_coords <- function(labels, n_included, space = 1L, percent = FALSE) {
   n_total <- n_included[1L]
   n_excluded <- stats::na.omit(n_included - dplyr::lead(n_included))
@@ -13,7 +24,7 @@ get_attrition_coords <- function(labels, n_included, space = 1L, percent = FALSE
   dt <- data.frame(
     label = label,
     label_excl = label_excl
-  ) %>%
+  ) |>
     dplyr::mutate(
       label_heights = nchar(label) - nchar(gsub("\n", "", label, fixed = TRUE)),
       label_position_y = dplyr::lag(cumsum(label_heights + space), default = 0L),
@@ -27,6 +38,11 @@ get_attrition_coords <- function(labels, n_included, space = 1L, percent = FALSE
   dt
 }
 
+#' Render the attrition flow chart from coordinates
+#'
+#' @param attrition_coords Coordinates from [get_attrition_coords()].
+#' @return A `ggplot` object showing the attrition flow.
+#' @noRd
 get_attrition_plot <- function(attrition_coords) {
   max_y_lim <- max(attrition_coords$label_position_y) + max(attrition_coords$label_heights)
   space <- attr(attrition_coords, "space")
@@ -63,11 +79,18 @@ get_attrition_plot <- function(attrition_coords) {
     ggplot2::labs(x = NULL, y = NULL)
 }
 
+#' Format a single filter's contribution to an attrition step label
+#'
+#' @param name Filter display name.
+#' @param value_name Name of the value parameter (e.g. `"value"`, `"range"`).
+#' @param value The filter value (vector or named list).
+#' @return A formatted label string.
+#' @noRd
 get_attrition_filter_label <- function(name, value_name, value) {
   if (is.list(value)) {
-    value <- value %>%
-      purrr::map_chr(~paste(., collapse = ",")) %>%
-      purrr::imap(~paste(.y, " = ", .x)) %>%
+    value <- value |>
+      purrr::map_chr(~paste(., collapse = ",")) |>
+      purrr::imap(~paste(.y, " = ", .x)) |>
       paste(collapse = ", ")
   } else if (is.vector(value)) {
     value <- toString(value)
@@ -98,14 +121,14 @@ get_attrition_filter_label <- function(name, value_name, value) {
       return(glue::glue("{dataset}\n primary key: {paste(dataset_pkey, collapse = ', ')}"))
     }
   }
-  filters_section <- step_filters %>%
-    purrr::map(~get_attrition_filter_label(.$name, .$value_name, .$value)) %>%
+  filters_section <- step_filters |>
+    purrr::map(~get_attrition_filter_label(.$name, .$value_name, .$value)) |>
     paste(collapse = "\n")
   bind_keys_section <- ""
   if (!is.null(binding_keys)) {
-    dependent_datasets <- binding_keys %>%
-      purrr::map(~names(.[["data_keys"]])) %>%
-      unlist() %>%
+    dependent_datasets <- binding_keys |>
+      purrr::map(~names(.[["data_keys"]])) |>
+      unlist() |>
       collapse::funique()
     if (length(dependent_datasets) > 0L) {
       bind_keys_section <- glue::glue(
@@ -132,6 +155,6 @@ get_attrition_filter_label <- function(name, value_name, value) {
 #' @rdname source-layer
 #' @export
 .get_attrition_count.default <- function(source, data_stats, ...) {
-  data_stats %>%
+  data_stats |>
     purrr::map_int("n_rows")
 }

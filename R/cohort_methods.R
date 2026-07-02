@@ -12,13 +12,36 @@ Cohort <- R6::R6Class(
     #' Create Cohort object.
     #' @param ... Steps definition (optional). Can be also defined as a sequence of
     #'     filters - the filters will be added to the first step.
+    #' @param compute_stats If `TRUE` (default), filter statistics are computed and stored
+    #'     after each step. Set to `FALSE` to skip stats computation (useful for metadata-only
+    #'     operation).
+    #' @param propagate_domains Domain propagation mode between steps.
+    #'     One of `"none"` (default, no propagation), `"filter"` (derive from
+    #'     previous step filter values), `"stats"` (derive from stored statistics),
+    #'     or `"data"` (scan filtered data). `"stats"` requires `compute_stats = TRUE`;
+    #'     use `"data"` for the stats-free equivalent.
     #' @return The object of class `Cohort`.
-    initialize = function(source, ..., run_flow = FALSE,
+    initialize = function(source, ..., run_flow = FALSE, compute_stats = TRUE,
+                          propagate_domains = c("none", "filter", "stats", "data"),
                           hook = list(
                             pre = get_hook("pre_cohort_hook"),
                             post = get_hook("post_cohort_hook")
                           )) {
       run_hooks(hook$pre, self, private)
+      propagate_domains <- match.arg(propagate_domains)
+      # "stats" propagation derives step domains from stored statistics, which are
+      # only computed when `compute_stats` is enabled. Without stored stats there is
+      # nothing to propagate from (domains would silently stay un-narrowed). Use
+      # propagate_domains = "data" for the stats-free equivalent.
+      if (propagate_domains == "stats" && !compute_stats) {
+        stop(
+          "`propagate_domains = \"stats\"` requires `compute_stats = TRUE`. ",
+          "Use `propagate_domains = \"data\"` for stats-free domain propagation.",
+          call. = FALSE
+        )
+      }
+      private$compute_stats <- compute_stats
+      private$propagate_domains_mode <- propagate_domains
 
       if (!missing(source)) {
         private$init_source(source, ...)
@@ -49,7 +72,7 @@ Cohort <- R6::R6Class(
 
       private$data_objects <- list()
       private$source <- NULL
-      private$cache <- NULL
+      private$stats <- NULL
 
       if (identical(keep_steps, FALSE)) {
         private$steps <- list()
@@ -63,7 +86,7 @@ Cohort <- R6::R6Class(
         for (step_state in state) {
           steps[[step_state$step]] <- do.call(
             step,
-            step_state$filters %>% purrr::map(~do.call(filter, .))
+            step_state$filters |> purrr::map(~do.call(filter, .))
           )
         }
         do.call(private$init_source, append(list(source = source), steps))
@@ -81,6 +104,15 @@ Cohort <- R6::R6Class(
       private$source
     },
     #' @description
+    #' Return the configured domain propagation mode.
+    #'
+    #' One of `"none"`, `"filter"`, `"stats"` or `"data"`. Read-only; the mode is
+    #' fixed at construction. UI layers can inspect it (e.g. to validate that a
+    #' domain-based rendering strategy is compatible with the cohort).
+    get_propagate_domains_mode = function() {
+      private$propagate_domains_mode
+    },
+    #' @description
     #' Add filtering step definition
     #' @param step Step definition created with \link{step}.
     add_step = function(step, run_flow = FALSE,
@@ -93,11 +125,31 @@ Cohort <- R6::R6Class(
 
       run_hooks(hook$pre, self, private, new_step_id)
 
-      private$steps[new_step_id] <- step %>%
-        attach_step_id(new_step_id) %>%
-        list() %>%
-        purrr::map(eval_step_filters, source = private$source)
+      private$steps[new_step_id] <- step |>
+        assign_step_id(new_step_id) |>
+        list() |>
+        purrr::map(assign_filters_to_step)
       names(private$steps[new_step_id]) <- new_step_id
+      self$set_pending(new_step_id)
+      # An un-run step is treated as if it has no filters configured: seed the
+      # new step's data/stats from its parent's snapshot so it is renderable
+      # without running the cohort (run_button mode / compute_stats=FALSE). init_source()
+      # seeds the initial steps the same way, so every step's parent slot is
+      # populated and this single-level copy always finds a snapshot. The seeded
+      # snapshot equals the step's own input until its filters run; a later
+      # run_flow overwrites it.
+      parent_id <- prev_step(new_step_id)
+      if (!is.null(private$data_objects[[parent_id]])) {
+        private$data_objects[[new_step_id]] <- private$data_objects[[parent_id]]
+      }
+      if (!is.null(private$stats[[parent_id]])) {
+        private$stats[[new_step_id]] <- private$stats[[parent_id]]
+      }
+      # "filter" mode: restrict the new (last) step's domain from its parent
+      # eagerly, so it carries a narrowed domain before any flow runs.
+      # "stats"/"data" modes propagate from inside run_step when the new step
+      # runs (it recomputes its own domain from its parent's snapshot).
+      self$propagate_filter_domains(new_step_id)
 
       run_hooks(hook$post, self, private, new_step_id)
 
@@ -118,7 +170,7 @@ Cohort <- R6::R6Class(
         step_id <- self$last_step_id()
         step_config <- list(
           step = next_step(step_id),
-          filters = purrr::map(filters, get_filter_state, extra_fields = NULL)
+          filters = purrr::map(filters, get_filter_params)
         )
       } else {
         step_config <- self$get_state(step_id, json = FALSE)[[1L]]
@@ -128,7 +180,7 @@ Cohort <- R6::R6Class(
       self$add_step(
         do.call(
           step,
-          step_config$filters %>% purrr::map(~do.call(filter, .))
+          step_config$filters |> purrr::map(~do.call(filter, .))
         )
       )
       if (run_flow) {
@@ -152,10 +204,16 @@ Cohort <- R6::R6Class(
       step_id <- as.character(step_id)
       clear_data_ids <- steps_range(step_id, rev(names(private$steps))[1L])
       private$steps[[step_id]] <- NULL
-      private$cache[clear_data_ids] <- NULL
+      private$stats[clear_data_ids] <- NULL
       private$data_objects[clear_data_ids] <- NULL
       private$steps <- adjust_names(private$steps)
       private$steps <- purrr::imodify(private$steps, readjust_step)
+      for (sid in names(private$steps)) {
+        self$set_pending(sid)
+      }
+      # "filter" mode: the step now occupying step_id has a new parent, so its
+      # domain (and those after it) must be recomputed eagerly.
+      self$propagate_filter_domains(step_id)
       if (!is.null(private$steps) && run_flow) {
         self$run_flow(min_step = step_id)
       }
@@ -167,7 +225,11 @@ Cohort <- R6::R6Class(
     #' @param filter Filter definition created with \link{filter}.
     #' @param step_id Id of the step to add the filter to.
     #'     If missing, filter is added to the last step.
-    add_filter = function(filter, step_id, run_flow = FALSE) {
+    add_filter = function(filter, step_id, run_flow = FALSE,
+                          hook = list(
+                            pre = get_hook("pre_add_filter_hook"),
+                            post = get_hook("post_add_filter_hook")
+                          )) {
       if (missing(step_id)) {
         step_id <- self$last_step_id()
         if (step_id == "0") {
@@ -175,10 +237,42 @@ Cohort <- R6::R6Class(
         }
       }
       step_id <- as.character(step_id)
-      evaled_filter <- eval_filter(filter, step_id, private$source)
-      private$steps[[step_id]]$filters[[evaled_filter$id]] <- evaled_filter
+      # Detect whether this call brings the step into existence (it has no
+      # filters yet). A brand-new step needs its data/stats slot seeded from its
+      # parent, the same way add_step()/init_source() seed steps created through
+      # those paths.
+      step_is_new <- is.null(private$steps[[step_id]]) ||
+        length(private$steps[[step_id]]$filters) == 0L
+
+      run_hooks(hook$pre, self, private, step_id = step_id, filter = filter)
+
+      private$steps[[step_id]]$filters[[filter@id]] <- assign_filter_step_id(filter, step_id)
       private$steps[[step_id]]$id <- step_id
-      private$steps[[step_id]]$pending <- TRUE
+      # An un-run step is treated as if it has no filters configured: seed the
+      # new step's data/stats from its parent's snapshot so it is renderable
+      # without running the cohort (run_button mode / compute_stats=FALSE). add_step()
+      # and init_source() seed steps the same way; add_filter() must too when it
+      # is the call that brings the step into existence. The seeded snapshot
+      # equals the step's own input until its filters run; a later run_flow
+      # overwrites it.
+      if (step_is_new) {
+        parent_id <- prev_step(step_id)
+        if (is.null(private$data_objects[[step_id]]) &&
+              !is.null(private$data_objects[[parent_id]])) {
+          private$data_objects[[step_id]] <- private$data_objects[[parent_id]]
+        }
+        if (is.null(private$stats[[step_id]]) &&
+              !is.null(private$stats[[parent_id]])) {
+          private$stats[[step_id]] <- private$stats[[parent_id]]
+        }
+      }
+      # Adding a filter narrows this step and every downstream step.
+      self$set_pending_cascade(step_id)
+      # "filter" mode: this step's domain may now restrict downstream copies.
+      self$propagate_filter_domains(next_step(step_id))
+
+      run_hooks(hook$post, self, private, step_id = step_id, filter = filter)
+
       if (run_flow) {
         self$run_flow(min_step = step_id)
       }
@@ -187,12 +281,24 @@ Cohort <- R6::R6Class(
     #' Remove filter definition
     #' @param step_id Id of the step from which filter should be removed.
     #' @param filter_id Id of the filter to be removed.
-    remove_filter = function(step_id, filter_id, run_flow = FALSE) {
+    remove_filter = function(step_id, filter_id, run_flow = FALSE,
+                             hook = list(
+                               pre = get_hook("pre_rm_filter_hook"),
+                               post = get_hook("post_rm_filter_hook")
+                             )) {
       step_id <- as.character(step_id)
       filter_id <- as.character(filter_id)
 
+      run_hooks(hook$pre, self, private, step_id = step_id, filter_id = filter_id)
+
       private$steps[[step_id]]$filters[[filter_id]] <- NULL
-      private$steps[[step_id]]$pending <- TRUE
+      # Removing a filter widens this step and every downstream step.
+      self$set_pending_cascade(step_id)
+      # "filter" mode: downstream domains may need to widen accordingly.
+      self$propagate_filter_domains(next_step(step_id))
+
+      run_hooks(hook$post, self, private, step_id = step_id, filter_id = filter_id)
+
       if (length(private$steps[[step_id]]$filters) == 0L) {
         self$remove_step(step_id, run_flow)
       } else {
@@ -207,12 +313,26 @@ Cohort <- R6::R6Class(
     #' @param filter_id Id of the filter to be updated.
     #' @param ... Filter parameters that should be updated.
     #' @param active Mark filter as active (`TRUE`) or inactive (`FALSE`).
-    update_filter = function(step_id, filter_id, ..., active, run_flow = FALSE) {
+    #' @param hook_args Named list of extra arguments passed to pre/post hooks.
+    update_filter = function(step_id, filter_id, ..., active, run_flow = FALSE,
+                             hook = list(
+                               pre = get_hook("pre_update_filter_hook"),
+                               post = get_hook("post_update_filter_hook")
+                             ),
+                             hook_args = list(
+                               pre = list(),
+                               post = list()
+                             )) {
       step_id <- as.character(step_id)
       filter_id <- as.character(filter_id)
-
-      filter_env <- environment(private$steps[[step_id]]$filters[[filter_id]]$filter_data)
       new_args <- list(...)
+
+      run_hooks(
+        hook$pre, self, private, step_id = step_id, filter_id = filter_id,
+        ..., active = active, hook_args = hook_args$pre
+      )
+
+      filter_obj <- private$steps[[step_id]]$filters[[filter_id]]
       if (any(static_params %in% names(new_args))) {
         warning(glue::glue("Cannot modify filter {paste(sQuote(static_params), collapse = ', ')} parameters."))
       }
@@ -222,20 +342,41 @@ Cohort <- R6::R6Class(
 
       for (param_name in params_to_change) {
         new_val <- new_args[[param_name]]
-        if (!identical(filter_env[[param_name]], new_val)) {
-          any_changed <- TRUE
-          filter_env[[param_name]] <- new_val
+        if (param_name %in% names(S7::props(filter_obj))) {
+          if (!identical(S7::prop(filter_obj, param_name), new_val)) {
+            any_changed <- TRUE
+            S7::prop(filter_obj, param_name) <- new_val
+          }
+        } else {
+          # Extra parameter stored in filter@extra
+          if (!identical(filter_obj@extra[[param_name]], new_val)) {
+            any_changed <- TRUE
+            filter_obj@extra[[param_name]] <- new_val
+          }
         }
       }
       if (!missing(active)) {
         if (!is.logical(active)) {
           warning("Active accepts only logical values.")
         } else {
-          filter_env[["active"]] <- active
+          filter_obj@active <- active
         }
       }
+      private$steps[[step_id]]$filters[[filter_id]] <- filter_obj
 
-      private$steps[[step_id]]$pending <- TRUE
+      # A change to this step invalidates it and every downstream step.
+      self$set_pending_cascade(step_id)
+
+      # "filter" mode: eagerly recompute downstream domains from the new value
+      # (no data needed). Other modes recompute when run_flow reaches run_step.
+      if (!missing(active) || any_changed) {
+        self$propagate_filter_domains(next_step(step_id))
+      }
+
+      run_hooks(
+        hook$post, self, private, step_id = step_id, filter_id = filter_id,
+        ..., active = active, hook_args = hook_args$post
+      )
 
       if (run_flow && (!missing(active) || any_changed)) {
         self$run_flow(step_id)
@@ -253,9 +394,11 @@ Cohort <- R6::R6Class(
         self$update_filter,
         append(
           list(step_id = step_id, filter_id = filter_id, run_flow = run_flow),
-          self$get_filter(step_id, filter_id)$get_defaults(
+          cb_get_filter_defaults(
+            self$get_filter(step_id, filter_id),
+            private$source,
             self$get_data(step_id, collect = FALSE, state = "pre"),
-            self$get_cache(step_id, filter_id, state = "pre", .recalc_when_missing = TRUE)
+            self$get_stats(step_id, filter_id, state = "pre", .recalc_when_missing = TRUE)
           )
         )
       )
@@ -289,19 +432,22 @@ Cohort <- R6::R6Class(
     #' Get Cohort configuration state.
     #' @param step_id If provided, the selected step state is returned.
     #' @param json If TRUE, return state in JSON format.
-    #' @param extra_fields Names of extra fields included in filter to be added to state.
-    get_state = function(step_id, json = FALSE, extra_fields = NULL) {
+    get_state = function(step_id, json = FALSE) {
 
       if (missing(step_id)) {
         step_id <- names(private$steps)
       }
 
       get_filters_state <- function(filters) {
-        filters %>% purrr::map(get_filter_state, extra_fields = extra_fields) %>% unname()
+        filters |> purrr::map(get_filter_params) |> unname()
       }
 
-      filters_state <- private$steps[step_id] %>%
-        purrr::imap(~ list(step = .y, filters = get_filters_state(.x$filters))) %>%
+      filters_state <- private$steps[step_id] |>
+        purrr::imap(~ list(
+          step = .y,
+          pending = isTRUE(.x$pending),
+          filters = get_filters_state(.x$filters)
+        )) |>
         unname()
 
       if (json) {
@@ -336,11 +482,11 @@ Cohort <- R6::R6Class(
       state <- modifier(self$attributes$pre_restore_state, state)
 
       private$steps <- NULL
-      private$cache <- NULL
+      private$stats <- private$stats["0"]
       private$data_objects <- private$data_objects["0"]
 
       na_fix <- function(params) {
-        params %>%
+        params |>
           purrr::modify_if(~ identical(., "NA"), ~ NA)
       }
       for (step_state in state) {
@@ -360,6 +506,14 @@ Cohort <- R6::R6Class(
             step_id = step_state$step
           )
         }
+      }
+      # Restore each step's saved pending flag (R9). When a state encodes pending
+      # steps (e.g. saved in run_button mode before running), they are restored
+      # as pending rather than silently treated as computed. Defaults to pending
+      # when the flag is absent (older states / safety).
+      for (step_state in state) {
+        pending <- if (is.null(step_state$pending)) TRUE else isTRUE(step_state$pending)
+        self$set_pending(step_state$step, pending = pending)
       }
       if (run_flow) {
         self$run_flow()
@@ -396,7 +550,9 @@ Cohort <- R6::R6Class(
       if (state == "pre") {
         data_id <- prev_step(step_id)
       }
-      private$steps[[step_id]]$filters[[filter_id]]$plot_data(
+      cb_plot_filter_data(
+        private$steps[[step_id]]$filters[[filter_id]],
+        private$source,
         private$data_objects[[data_id]],
         ...
       )
@@ -407,20 +563,18 @@ Cohort <- R6::R6Class(
     #' @param percent Should attrition changes be presented with percentage values.
     show_attrition = function(..., percent = FALSE) {
 
-      keep_active_state <- function(step_state) {
-        step_state$filters <- step_state$filters %>%
-          purrr::keep(~.$active)
-        step_state
+      get_filter_meta <- function(filter) {
+        input_param <- filter@private$input_param
+        params <- get_filter_params(filter)
+        params$name <- params$id
+        params$value_name <- input_param
+        params$value <- params[[input_param]]
+        params
       }
-      get_filter_meta <- function(filter_state) {
-        filter_state$name <- filter_state$id
-        filter_state$value_name <- filter_state$input_param
-        filter_state$value <- filter_state[[filter_state$input_param]]
-
-        return(filter_state)
-      }
-      active_states <- self$get_state(json = FALSE, extra_fields = "input_param") %>%
-        purrr::map(keep_active_state)
+      active_states <- purrr::imap(private$steps, function(step, step_id) {
+        active <- purrr::keep(step$filters, ~ .@active)
+        list(step = step_id, filters = active)
+      })
       attrition_labels <- .get_attrition_label(
         source = self$get_source(),
         step_id = "0",
@@ -438,7 +592,10 @@ Cohort <- R6::R6Class(
 
       attrition_count <- .get_attrition_count(
         source = self$get_source(),
-        data_stats = private$cache,
+        # Pass only the data-stats part of each slot. This keeps the
+        # .get_attrition_count() extension contract stable (it receives per-step
+        # data stats, not the raw stats slot that now also nests filter stats).
+        data_stats = purrr::map(private$stats, "source"),
         ...
       )
 
@@ -458,7 +615,7 @@ Cohort <- R6::R6Class(
     #' @param ... Specific parameters passed to filter related method.
     #' @param state Should the stats be calculated on data before ("pre") or after ("post")
     #'    filtering in specified step.
-    get_stats = function(step_id, filter_id, ..., state = "post") {
+    calc_stats = function(step_id, filter_id, ..., state = "post") {
       data_id <- as.character(step_id)
       if (state == "pre") {
         data_id <- prev_step(step_id)
@@ -473,7 +630,9 @@ Cohort <- R6::R6Class(
           .get_stats(private$source, private$data_objects[[data_id]])
         )
       }
-      private$steps[[step_id]]$filters[[filter_id]]$get_stats(
+      cb_get_filter_stats(
+        private$steps[[step_id]]$filters[[filter_id]],
+        private$source,
         private$data_objects[[data_id]],
         ...
       )
@@ -494,12 +653,20 @@ Cohort <- R6::R6Class(
       description <- NULL
       if (!missing(field)) {
         if (is.null(self$get_source()$description)) return(NULL)
-        description <- self$get_source()$description[[field]]
+        description <- shape(self$get_source(), field)
       }
       if (!missing(step_id) && !missing(filter_id)) {
         filter <- self$get_filter(step_id, filter_id)
-        description <- filter$get_params("description")
+        description <- get_filter_params(filter, "description")
+        if (is.list(description)) {
+          description <- description$text
+        }
+        if (is.null(description) && !missing(field)) {
+          description <- shape(self$get_source(), field, filter_id)
+        }
       }
+
+
       return(modifier(description))
     },
     #' @description
@@ -523,10 +690,10 @@ Cohort <- R6::R6Class(
       source_type <- class(private$source)[1L]
       # todo improve
       fun_args <- environment()
-      code_params <- c(
+      code_param_names <- c(
         "include_source", "include_methods", "include_action", "modifier", "mark_step"
-      ) %>%
-        stats::setNames(nm = .) %>%
+      )
+      code_params <- stats::setNames(code_param_names, code_param_names) |>
         purrr::map(
           ~if (is.null(self$attributes[[.x]]) & !.x %in% names(self$attributes)) {
             fun_args[[.x]]
@@ -540,13 +707,13 @@ Cohort <- R6::R6Class(
       for (extra_method in code_params$include_methods) {
         code_components <- append(
           code_components,
-          type_expr(type = "meta", expr = method_to_expr(extra_method, source_type))
+          type_expr(action = "meta", expr = method_to_expr(extra_method, source_type))
         )
       }
       if (code_params$include_source) {
         code_components <- append(
           code_components,
-          type_expr(type = "source", expr = get_source_expr(source_type, self, private))
+          type_expr(action = "source", expr = get_source_expr(source_type, self, private))
         )
       }
       for (step_id in names(self$get_step())) {
@@ -554,7 +721,7 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "step_init", step = step_id,
+              action = "step_init", step = step_id,
               expr = rlang::expr(step_id <- !!step_id)
             )
           )
@@ -564,7 +731,7 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "run_binding", step = step_id,
+              action = "run_binding", step = step_id,
               expr = rlang::expr(
                 pre_data_object <- data_object
               )
@@ -575,22 +742,22 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "pre_filtering", step = step_id,
+              action = "pre_filtering", step = step_id,
               expr = rlang::expr(
                 data_object <- .pre_filtering(source, data_object, !!step_id)
               )
             )
           )
         }
-        active_filters <- private$steps[[step_id]]$filters %>%
-          purrr::keep(~ .x$get_params("active"))
+        active_filters <- private$steps[[step_id]]$filters |>
+          purrr::keep(~ .x@active)
         for (filter in active_filters) {
-          filter_params <- filter$get_params()
+          filter_params <- get_filter_params(filter)
           code_components <- append(
             code_components,
             type_expr(
-              type = "filtering", step = step_id,
-              expr = parse_filter_expr(filter),
+              action = "filtering", step = step_id,
+              expr = cb_filter_to_expr(filter, private$source),
               !!!filter_params
             )
           )
@@ -599,7 +766,7 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "post_filtering", step = step_id,
+              action = "post_filtering", step = step_id,
               expr = rlang::expr(
                 data_object <- .post_filtering(source, data_object, !!step_id)
               )
@@ -610,7 +777,7 @@ Cohort <- R6::R6Class(
           code_components <- append(
             code_components,
             type_expr(
-              type = "run_binding", step = step_id,
+              action = "run_binding", step = step_id,
               expr = rlang::expr(
                 for (binding_key in binding_keys) {
                   data_object <- .run_binding(
@@ -624,8 +791,8 @@ Cohort <- R6::R6Class(
         }
       }
 
-      code_components_df <- code_components %>%
-        purrr::map_dfr(function(x) x) %>%
+      code_components_df <- code_components |>
+        purrr::map_dfr(function(x) x) |>
         dplyr::filter(purrr::map_lgl(expr, ~!is.null(.)))
 
       code_components_df <- code_params$modifier(private$source, code_components_df)
@@ -663,6 +830,18 @@ Cohort <- R6::R6Class(
       step_id <- as.character(step_id)
 
       run_hooks(hook$pre, self, private, step_id)
+
+      # Data-dependent modes ("stats"/"data") narrow this step's domains from the
+      # parent's already-computed snapshot. Do this *before* filtering, because a
+      # filter's domain feeds its own effective value (e.g. a range filter with
+      # range = NA filters by its domain bounds). Propagating here (step n from
+      # step n-1) also means a freshly added step narrows itself when it runs, so
+      # no separate add_step handling is needed. "filter" mode propagates eagerly
+      # from the structure-changing methods instead.
+      if (private$propagate_domains_mode %in% c("stats", "data")) {
+        self$propagate_domains_to(step_id)
+      }
+
       temp_data_object <- .pre_filtering(
         source = private$source,
         data_object = private$data_objects[[prev_step(step_id)]],
@@ -671,8 +850,7 @@ Cohort <- R6::R6Class(
       active_filters <- self$list_active_filters(step_id)
       for (filter_id in active_filters) {
         data_filter <- self$get_filter(step_id, filter_id)
-        temp_data_object <- temp_data_object %>%
-          data_filter$filter_data()
+        temp_data_object <- cb_filter_data(data_filter, private$source, temp_data_object)
       }
 
       private$data_objects[[step_id]] <- .post_filtering(
@@ -689,19 +867,35 @@ Cohort <- R6::R6Class(
       )
 
       filter_ids <- names(self$get_step(step_id)$filters)
-      is_cached <- !is.null(self$get_cache(step_id, state = "pre", .recalc_when_missing = FALSE))
 
-      # todo make sure is_cached logic is correct
-      if (!is_cached) {
-        self$update_cache(step_id, state = "pre")
-      }
-      self$update_cache(step_id, state = "post")
-      for (filter_id in active_filters) {
-        self$update_cache(step_id, filter_id, state = "pre")
-        self$update_cache(step_id, filter_id, state = "post")
+      if (private$compute_stats) {
+        # The stats slot is shared: stats[N] is both step N's post and step
+        # N+1's pre. The step-level update_stats(state = "pre") overwrites the
+        # whole parent slot (.get_stats carries no $filters), so this guard also
+        # protects the parent's already-computed filter stats from being wiped
+        # during downstream/partial runs. add_step seeds stats[new] from its
+        # parent, but that copy is read as step new's *pre* (= stats[parent]),
+        # never as the value checked here, so it cannot make this guard skip a
+        # needed (re)computation.
+        has_stats <- !is.null(self$get_stats(step_id, state = "pre", .recalc_when_missing = FALSE))
+        if (!has_stats) {
+          self$update_stats(step_id, state = "pre")
+        }
+        if (self$is_pending(step_id)) {
+          self$update_stats(step_id, state = "post")
+        }
+        for (filter_id in active_filters) {
+          has_stats <- !is.null(self$get_stats(step_id, filter_id, state = "pre", .recalc_when_missing = FALSE))
+          if (!has_stats) {
+            self$update_stats(step_id, filter_id, state = "pre")
+          }
+          if (self$is_pending(step_id)) {
+            self$update_stats(step_id, filter_id, state = "post")
+          }
+        }
       }
 
-      private$steps[[step_id]]$pending <- FALSE
+      self$set_pending(step_id, pending = FALSE)
 
       run_hooks(hook$post, self, private, step_id)
     },
@@ -728,12 +922,21 @@ Cohort <- R6::R6Class(
     },
     #' @description
     #' Print defined steps configuration.
-    describe_state = function() {
+    #' @param to_string If `TRUE`, return the output as a character string
+    #'   instead of printing it. Defaults to `FALSE`.
+    describe_state = function(to_string = FALSE) {
       if (length(private$steps) == 0L) {
+        if (to_string) return("No steps configuration found.")
         cat("No steps configuration found.")
-      } else {
-        private$steps %>% purrr::walk(print_step)
+        return(invisible(NULL))
       }
+      if (to_string) {
+        lines <- private$steps |>
+          purrr::map(~ print_step(.x, to_string = TRUE)) |>
+          unlist()
+        return(paste(lines, collapse = "\n"))
+      }
+      private$steps |> purrr::walk(print_step)
     },
     #' @description
     #' Get selected step configuration.
@@ -751,66 +954,112 @@ Cohort <- R6::R6Class(
     #' @param filter_id If of the filter to be returned.
     #' @param method Custom function taking filters list as argument.
     get_filter = function(step_id, filter_id, method = function(x) x) {
+      step_id <- as.character(step_id)
+      filters_container <- private$steps[[as.character(step_id)]]
       if (!missing(filter_id)) {
-        method(private$steps[[as.character(step_id)]]$filters[[filter_id]])
+        method(filters_container$filters[[filter_id]])
       } else {
-        method(private$steps[[as.character(step_id)]]$filters)
+        method(filters_container$filters)
       }
     },
     #' @description
-    #' Update filter or step cache.
-    #' Caching is saving step and filter attached data statistics such as number of
+    #' Update filter or step statistics.
+    #' Computes and stores step and filter attached data statistics such as number of
     #' data rows, filter choices or frequencies.
-    #' @param step_id Id of the step for which caching should be applied.
+    #' @param step_id Id of the step for which statistics should be computed.
     #'   If `filter_id` is not missing, the parameter describes id of the step where filter should be found.
-    #' @param filter_id Id of the filter for which caching should be applied.
-    #' @param state Should caching be done on data before ("pre") or after ("post")
+    #' @param filter_id Id of the filter for which statistics should be computed.
+    #' @param state Should statistics be computed on data before ("pre") or after ("post")
     #'    filtering in specified step.
-    update_cache = function(step_id, filter_id, state = "post") {
-      cache_id <- step_id
+    #' @param name Optional name(s) of the individual filter statistics to
+    #'   (re)compute. When supplied (filter-level only), only those statistics are
+    #'   computed and merged into the stored entry, leaving any other stored
+    #'   statistics untouched. When missing, the full statistics set is computed.
+    update_stats = function(step_id, filter_id, state = "post", name = NULL) {
+      stats_id <- step_id
       if (state == "pre") {
-        cache_id <- prev_step(step_id)
+        stats_id <- prev_step(step_id)
       }
       if (missing(filter_id)) {
-        prev_cache <- private$cache[[cache_id]]
-        cache_changed <- FALSE
-        private$cache[[cache_id]] <- .get_stats(private$source, self$get_data(step_id, state, FALSE))
-        if (!identical(prev_cache, private$cache[[cache_id]])) {
-          cache_changed <- TRUE
-        }
-        private$cache[[cache_id]]$changed <- cache_changed
+        # Data stats live in their own `$source` sub-object, separate from the
+        # filter stats in `$filters`. Writing here therefore no longer wipes any
+        # already-computed filter stats in the same slot, and lets get_stats()
+        # detect absent data stats unambiguously (presence of `$filters` alone no
+        # longer masks missing `$source`).
+        private$stats[[stats_id]]$source <- .get_stats(
+          private$source, self$get_data(step_id, state, FALSE)
+        )
       } else {
         filter <- self$get_filter(step_id, filter_id)
-        prev_cache <- private$cache[[cache_id]]$filters[[filter_id]]
-        cache_changes <- FALSE
-        private$cache[[cache_id]]$filters[[filter_id]] <- filter$get_stats(self$get_data(step_id, state, FALSE))
-        if (!identical(prev_cache, private$cache[[cache_id]]$filters[[filter_id]])) {
-          cache_changed <- TRUE
+        prev_stats <- private$stats[[stats_id]]$filters[[filter_id]]
+        if (is.null(name)) {
+          # Compute the full statistics set for the filter.
+          new_stats <- cb_get_filter_stats(filter, private$source, self$get_data(step_id, state, FALSE))
+        } else {
+          # Compute only the requested statistic(s) and merge them into the
+          # existing entry so unrequested (already stored) stats are preserved.
+          computed <- cb_get_filter_stats(
+            filter, private$source, self$get_data(step_id, state, FALSE), name = name
+          )
+          if (length(name) == 1L) {
+            computed <- stats::setNames(list(computed), name)
+          }
+          new_stats <- utils::modifyList(
+            prev_stats %||% list(), computed
+          )
         }
-        private$cache[[cache_id]]$filters[[filter_id]]$changed <- cache_changed
+        private$stats[[stats_id]]$filters[[filter_id]] <- new_stats
       }
     },
     #' @description
-    #' Return step of filter specific cache.
-    #' @param step_id Id of the step for which cached data should be returned
+    #' Return step or filter specific statistics.
+    #' @param step_id Id of the step for which stored statistics should be returned
     #'   If `filter_id` is not missing, the parameter describes id of the step where filter should be found.
-    #' @param filter_id Id of the filter for which cache data should be returned.
-    #' @param state Should cache be returned on data before ("pre") or after ("post")
+    #' @param filter_id Id of the filter for which stored statistics should be returned.
+    #' @param state Should statistics be returned on data before ("pre") or after ("post")
     #'    filtering in specified step.
-    #' @param .recalc_when_missing Should the function compute cache automatically when the one is not computed yet?
-    get_cache = function(step_id, filter_id, state = "post", .recalc_when_missing = TRUE) {
-      cache_id <- as.character(step_id)
+    #' @param .recalc_when_missing Should the function compute statistics automatically when not computed yet?
+    #' @param name Optional name of a single filter statistic to return (e.g.
+    #'   "choices", "n_data"). When supplied (filter-level only) the method
+    #'   returns just that statistic and, if recomputation is needed, computes
+    #'   only it instead of the whole statistics set. When missing, the full
+    #'   stored entry (a list of all statistics) is returned.
+    get_stats = function(step_id, filter_id, state = "post", .recalc_when_missing = TRUE, name = NULL) {
+      stats_id <- as.character(step_id)
       if (state == "pre") {
-        cache_id <- prev_step(step_id)
+        stats_id <- prev_step(step_id)
       }
       if (missing(filter_id)) {
-        res <- private$cache[[cache_id]]
+        # Data stats live under `$source`. Reading that sub-object (not the whole
+        # slot) means the presence check below is unaffected by any filter stats
+        # already stored in `$filters` of the same slot: a slot that only holds
+        # lazily-computed filter stats (e.g. run_button-pending) is correctly
+        # treated as missing its data stats and recomputed.
+        res <- private$stats[[stats_id]]$source
       } else {
-        res <- private$cache[[cache_id]]$filters[[filter_id]]
+        res <- private$stats[[stats_id]]$filters[[filter_id]]
       }
-      if (is.null(res) && .recalc_when_missing) {
-        self$update_cache(step_id, filter_id, state)
-        res <- self$get_cache(step_id, filter_id, state, FALSE)
+      # When compute_stats is disabled, run_step does not refresh stored stats, so a
+      # value left in private$stats by an earlier lazy get_stats() is stale after
+      # the next run (e.g. post-stats computed before a run_button click stay at
+      # their pre-run values). Recompute on read in that case. Source stats
+      # (stats_id "0") are set once at init and never go stale, so keep them.
+      stale_when_disabled <- !private$compute_stats && stats_id != "0"
+
+      # When a single statistic is requested, only its presence (and freshness)
+      # matters: this lets callers read one stat without computing the rest.
+      missing_value <- if (is.null(name) || missing(filter_id)) {
+        is.null(res)
+      } else {
+        is.null(res[[name]])
+      }
+
+      if ((missing_value || stale_when_disabled) && .recalc_when_missing) {
+        self$update_stats(step_id, filter_id, state, name = name)
+        res <- self$get_stats(step_id, filter_id, state, .recalc_when_missing = FALSE)
+      }
+      if (!is.null(name) && !missing(filter_id)) {
+        return(res[[name]])
       }
       return(res)
     },
@@ -819,15 +1068,15 @@ Cohort <- R6::R6Class(
     #' @param step_id Id of the step where filters should be found.
     list_active_filters = function(step_id) {
       get_active_filters <- function(step_id, self) {
-        active_names <- self$get_filter(step_id) %>%
-          purrr::keep(~ .x$get_params("active")) %>%
+        active_names <- self$get_filter(step_id) |>
+          purrr::keep(~ .x@active) |>
           names()
         active_names
       }
 
       if (missing(step_id)) {
-        names(self$get_step()) %>%
-          purrr::map(get_active_filters, self = self) %>%
+        names(self$get_step()) |>
+          purrr::map(get_active_filters, self = self) |>
           unlist()
       } else {
         step_id <- as.character(step_id)
@@ -844,9 +1093,117 @@ Cohort <- R6::R6Class(
     #' @param step_id Id of the step to be checked.
     is_pending = function(step_id) {
       if (missing(step_id)) {
-        return(private$steps %>% purrr::map_lgl("pending"))
+        return(private$steps |> purrr::map_lgl("pending"))
       }
       private$steps[[step_id]]$pending
+    },
+    #' @description
+    #' Mark step as pending or resolved.
+    #' @param step_id Id of the step.
+    #' @param pending Logical; `TRUE` to mark pending, `FALSE` to resolve.
+    set_pending = function(step_id, pending = TRUE,
+                           hook = list(
+                             pre = get_hook("pre_set_pending_hook"),
+                             post = get_hook("post_set_pending_hook")
+                           )) {
+      step_id <- as.character(step_id)
+      run_hooks(hook$pre, self, private, step_id = step_id, pending = pending)
+      private$steps[[step_id]]$pending <- pending
+      run_hooks(hook$post, self, private, step_id = step_id, pending = pending)
+      invisible(self)
+    },
+    #' @description
+    #' Mark a step and all the steps after it as pending.
+    #'
+    #' A change to step `step_id`'s filters invalidates that step and every step
+    #' downstream (each step's input is the previous step's output). Used by the
+    #' filter/step mutating methods so the GUI greys all affected steps via the
+    #' `post_set_pending_hook`.
+    #' @param step_id Id of the first step to mark pending.
+    set_pending_cascade = function(step_id) {
+      step_id <- as.character(step_id)
+      last_id <- self$last_step_id()
+      for (sid in steps_range(step_id, last_id)) {
+        self$set_pending(sid)
+      }
+      invisible(self)
+    },
+    #' @description
+    #' Silently set a filter's domain.
+    #'
+    #' Internal setter used by domain propagation (\link{.propagate_domains}).
+    #' Writes `filter@domain` directly **without** firing the `update_filter`
+    #' hooks and **without** triggering `run_flow`, which prevents the per-hop
+    #' hook re-entry that would otherwise occur if domains were applied through
+    #' `update_filter`. Does not itself trigger further propagation.
+    #' @param step_id Id of the step where the filter is defined.
+    #' @param filter_id Id of the filter whose domain should be set.
+    #' @param domain New domain value to assign.
+    set_domain = function(step_id, filter_id, domain) {
+      step_id <- as.character(step_id)
+      filter_id <- as.character(filter_id)
+      filter_obj <- private$steps[[step_id]]$filters[[filter_id]]
+      if (is.null(filter_obj)) {
+        return(invisible(self))
+      }
+      filter_obj@domain <- domain
+      private$steps[[step_id]]$filters[[filter_id]] <- filter_obj
+      invisible(self)
+    },
+    #' @description
+    #' Recompute a target step's domains from its parent and signal the change.
+    #'
+    #' Thin wrapper around \link{.propagate_domains} that runs propagation for
+    #' `target_id` (computing its filters' domains from step `target_id - 1`) and
+    #' then fires `post_propagate_domains_hook` so UI layers can refresh the
+    #' affected step's inputs. No-op when propagation is disabled or the target
+    #' step is absent / has no parent.
+    #' @param target_id Id of the step whose domains should be recomputed.
+    propagate_domains_to = function(target_id,
+                                    hook = get_hook("post_propagate_domains_hook")) {
+      if (private$propagate_domains_mode == "none") {
+        return(invisible(self))
+      }
+      target_id <- as.character(target_id)
+      if (as.integer(target_id) <= 1L) {
+        return(invisible(self))
+      }
+      if (is.null(self$get_step(target_id))) {
+        return(invisible(self))
+      }
+      parent_id <- prev_step(target_id)
+      .propagate_domains(
+        source = private$source,
+        data_object = private$data_objects[[parent_id]],
+        step_id = target_id,
+        cohort = self,
+        mode = private$propagate_domains_mode
+      )
+      run_hooks(hook, self, private, step_id = target_id)
+      invisible(self)
+    },
+    #' @description
+    #' Eagerly propagate `"filter"`-mode domains to a target step and all steps
+    #' after it.
+    #'
+    #' `"filter"` mode needs no computed data, so domains can be (re)established
+    #' immediately when the step structure changes. Because each step's domain
+    #' depends on every previous step, this recomputes `from_target` and cascades
+    #' downstream ascending. No-op unless the propagation mode is `"filter"`.
+    #' @param from_target Id of the first step to recompute.
+    propagate_filter_domains = function(from_target) {
+      if (private$propagate_domains_mode != "filter") {
+        return(invisible(self))
+      }
+      from_target <- as.character(from_target)
+      if (as.integer(from_target) < 2L) {
+        from_target <- "2"
+      }
+      last_id <- self$last_step_id()
+      for (sid in steps_range(from_target, last_id)) {
+        self$propagate_domains_to(sid)
+      }
+      invisible(self)
     },
     #' @description
     #' Helper method enabling to run non-standard operation on Cohort object.
@@ -860,7 +1217,9 @@ Cohort <- R6::R6Class(
   private = list(
     source = NULL,
     steps = list(),
-    cache = list(),
+    stats = list(),
+    compute_stats = TRUE,
+    propagate_domains_mode = "none",
     data_objects = list(),
     init_source = function(source, ...,
                            hook = list(
@@ -872,10 +1231,36 @@ Cohort <- R6::R6Class(
 
       private$source <- source
       private$steps <- register_steps_and_filters(source, ...)
+      for (step_id in names(private$steps)) {
+        self$set_pending(step_id)
+      }
+      # "filter" mode establishes domains eagerly (no data needed), so steps
+      # carry narrowed domains immediately after construction.
+      self$propagate_filter_domains("2")
       initial_data <- .init_step(source)
       if (!is.null(initial_data)) {
-        # important note: data objects are indexed from 0, whereas steps and filters from 1
+        # important note: data objects and stats are indexed from 0, whereas steps and filters from 1
         private$data_objects[["0"]] <- initial_data
+      }
+      private$stats[["0"]] <- private$source$meta_stats
+
+      # An un-run step is treated as if it has no filters configured: its data
+      # and stats equal those of the previous step (add_step() follows the same
+      # rule). Seed each initial step's slot from its parent here so steps
+      # created at construction are renderable without a run (run_button mode /
+      # compute_stats=FALSE), exactly like steps added later. The seeded snapshot equals
+      # each step's own input until its filters run; a later run_flow overwrites
+      # it. Stats/data are indexed from 0 (slot "0" is the source), steps from 1.
+      for (step_id in names(private$steps)) {
+        parent_id <- prev_step(step_id)
+        if (is.null(private$data_objects[[step_id]]) &&
+              !is.null(private$data_objects[[parent_id]])) {
+          private$data_objects[[step_id]] <- private$data_objects[[parent_id]]
+        }
+        if (is.null(private$stats[[step_id]]) &&
+              !is.null(private$stats[[parent_id]])) {
+          private$stats[[step_id]] <- private$stats[[parent_id]]
+        }
       }
 
       run_hooks(hook$post, self, private, ...)
@@ -888,6 +1273,13 @@ Cohort <- R6::R6Class(
 #' Cohort object is designed to make operations on source data possible.
 #' @param source Source object created with \link{set_source}.
 #' @param run_flow If `TRUE`, data flow is run after the operation is completed.
+#' @param compute_stats If `TRUE` (default), filter and step statistics are
+#'     computed and stored after each step. Set to `FALSE` for metadata-only
+#'     operation.
+#' @param propagate_domains Domain propagation mode between steps: `"none"`
+#'     (default), `"filter"` (from previous step filter values), `"stats"`
+#'     (from stored statistics; requires `compute_stats = TRUE`), or `"data"`
+#'     (scan filtered data; the stats-free equivalent).
 #' @param hook List of hooks describing methods before/after the Cohort is created.
 #'     See \link{hooks} for more details.
 #' @param ... Steps definition (optional). Can be also defined as a sequence of
@@ -896,12 +1288,17 @@ Cohort <- R6::R6Class(
 #'
 #' @name create-cohort
 #' @export
-cohort <- function(source, ..., run_flow = FALSE,
+cohort <- function(source, ..., run_flow = FALSE, compute_stats = TRUE,
+                   propagate_domains = c("none", "filter", "stats", "data"),
                    hook = list(
                      pre = get_hook("pre_cohort_hook"),
                      post = get_hook("post_cohort_hook")
                    )) {
-  Cohort$new(source, ..., run_flow = run_flow, hook = hook)
+  Cohort$new(
+    source, ...,
+    run_flow = run_flow, compute_stats = compute_stats,
+    propagate_domains = propagate_domains, hook = hook
+  )
 }
 
 #' @title Managing the Cohort object
@@ -1028,9 +1425,15 @@ add_filter <- function(x, filter, step_id, ...) {
 
 #' @rdname add_filter
 #' @param run_flow If `TRUE`, data flow is run after the filter is added.
+#' @param hook List of hooks describing methods to run before/after the filter is added.
+#'     See \link{hooks} for more details.
 #' @export
-add_filter.Cohort <- function(x, filter, step_id, run_flow = FALSE, ...) {
-  x$add_filter(filter, step_id, run_flow)
+add_filter.Cohort <- function(x, filter, step_id, run_flow = FALSE,
+                              hook = list(
+                                pre = get_hook("pre_add_filter_hook"),
+                                post = get_hook("post_add_filter_hook")
+                              ), ...) {
+  x$add_filter(filter, step_id, run_flow = run_flow, hook = hook)
   return(invisible(x))
 }
 
@@ -1050,9 +1453,15 @@ rm_filter <- function(x, step_id, filter_id, ...) {
 
 #' @rdname rm_filter
 #' @param run_flow If `TRUE`, data flow is run after the filter is removed.
+#' @param hook List of hooks describing methods to run before/after the filter is removed.
+#'     See \link{hooks} for more details.
 #' @export
-rm_filter.Cohort <- function(x, step_id, filter_id, run_flow = FALSE, ...) {
-  x$remove_filter(step_id, filter_id, run_flow)
+rm_filter.Cohort <- function(x, step_id, filter_id, run_flow = FALSE,
+                             hook = list(
+                               pre = get_hook("pre_rm_filter_hook"),
+                               post = get_hook("post_rm_filter_hook")
+                             ), ...) {
+  x$remove_filter(step_id, filter_id, run_flow = run_flow, hook = hook)
   return(invisible(x))
 }
 
@@ -1152,7 +1561,7 @@ plot_data <- function(x, step_id, filter_id, ..., state = "post") {
 #' @seealso \link{cohort-methods}
 #' @export
 stat <- function(x, step_id, filter_id, ..., state = "post") {
-  x$get_stats(step_id, filter_id, ..., state = state)
+  x$calc_stats(step_id, filter_id, ..., state = state)
 }
 
 #' Return reproducible data filtering code.
@@ -1198,12 +1607,15 @@ get_data <- function(x, step_id, state = "post", collect = FALSE) {
 #' Sum up Cohort state.
 #'
 #' @param x Cohort object.
-#' @return None (invisible NULL). Printed summary of Cohort state.
+#' @param to_string If `TRUE`, return the output as a character string
+#'   instead of printing it. Defaults to `FALSE`.
+#' @return When `to_string = FALSE` (default), `invisible(NULL)` (prints to console).
+#'   When `to_string = TRUE`, a single character string.
 #'
 #' @seealso \link{cohort-methods}
 #' @export
-sum_up <- function(x) {
-  x$describe_state()
+sum_up <- function(x, to_string = FALSE) {
+  x$describe_state(to_string = to_string)
 }
 
 #' Get Cohort configuration state.
@@ -1211,13 +1623,12 @@ sum_up <- function(x) {
 #' @param x Cohort object.
 #' @param step_id If provided, the selected step state is returned.
 #' @param json If TRUE, return state in JSON format.
-#' @param extra_fields Names of extra fields included in filter to be added to state.
-#' @return List object of character string being the list convertion to JSON format.
+#' @return List object of character string being the list conversion to JSON format.
 #'
 #' @seealso \link{cohort-methods}
 #' @export
-get_state <- function(x, step_id, json = FALSE, extra_fields = NULL) {
-  x$get_state(step_id = step_id, json = json, extra_fields = extra_fields)
+get_state <- function(x, step_id, json = FALSE) {
+  x$get_state(step_id = step_id, json = json)
 }
 #' Restore Cohort object.
 #'

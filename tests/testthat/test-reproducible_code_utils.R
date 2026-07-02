@@ -55,30 +55,16 @@ test_that("combine_expressions merges multiple expressions into a single one", {
   )
 })
 
-test_that("pair_seq handles empty input gracefully", {
-  # Given an empty input, expect empty integer vector
-  result <- pair_seq(integer(0L))
-  expect_type(result, "integer")
-  expect_identical(result, integer(0L))
-  expect_length(result, 0L)
-})
+test_that("cb_filter_to_expr generates expression for S7 filters", {
+  discrete_filter <- filter(
+    type = "discrete", id = "species_filter", name = "Species",
+    variable = "Species", dataset = "iris", value = c("setosa", "virginica")
+  )
+  iris_source <- set_source(tblist(iris = iris))
 
-test_that("pair_seq requires an even number of indexes", {
-  # If odd length input is provided, function should fail
-  expect_error(pair_seq(c(1L, 2L, 3L)), regexp = "The lenght of idxs is not even number")
-})
+  result <- cb_filter_to_expr(discrete_filter, iris_source)
 
-test_that("pair_seq always returns a strictly increasing sequence of integers", {
-  # Check that output is sorted and has no duplicates for a known even-length input
-  input <- c(3L, 1L, 7L, 5L)   # Unsorted input
-  result <- pair_seq(input)
-
-  # Expect numeric output
-  expect_type(result, "integer")
-
-  # Expect output is in strictly ascending order
-  expect_true(all(diff(result) > 0L))
-
+  expect_type(result, "language")
 })
 
 test_that("parse_func_expr returns an empty expression when func is NULL", {
@@ -103,22 +89,15 @@ test_that("func_to_expr returns a language object that includes the specified fu
   expect_identical(as.character(result[2L]), name)
 })
 
-test_that("parse_filter_expr works fine", {
-  discrete_iris_one <- filter(
-    type = "discrete", id = "species_filter", name = "Species",
-    variable = "Species", dataset = "iris", value = c("setosa", "virginica")
+test_that("cb_filter_to_expr returns NULL for no-op filters", {
+  noop_filter <- filter(
+    type = "discrete", id = "noop", name = "Noop",
+    variable = "Species", dataset = "iris", value = NA, keep_na = TRUE
   )
+  iris_source <- set_source(tblist(iris = iris))
 
-  coh <- Cohort$new(
-    set_source(
-      tblist(iris = iris)
-    ),
-    step(discrete_iris_one)
-  )
-
-  result <- parse_filter_expr(coh$get_filter(1L, 1L))
-
-  expect_type(result, "language")
+  result <- cb_filter_to_expr(noop_filter, iris_source)
+  expect_null(result)
 })
 
 test_that("method_to_expr works fine", {
@@ -134,6 +113,162 @@ test_that("method_to_expr return function works fine", {
   expect_type(result, "language")
   expect_identical(formals(eval(result)), formals(paste0(name, ".", namespace)))
 })
+
+# -- type_expr -----------------------------------------------------------------
+
+test_that("type_expr uses action column without conflicting with filter type", {
+  te <- type_expr(action = "filtering", step = "1",
+                  expr = quote(x + 1L), type = "discrete", dataset = "iris")
+  df <- te[[1L]]
+  expect_true("action" %in% names(df))
+  expect_true("type" %in% names(df))
+  expect_identical(df$action, "filtering")
+  expect_identical(df$type[[1L]], "discrete")
+})
+
+# -- exclude_first_pipe --------------------------------------------------------
+
+test_that("exclude_first_pipe handles bare symbols without error", {
+  result <- exclude_first_pipe(quote(x), quote(y))
+  expect_identical(result, quote(x))
+})
+
+test_that("exclude_first_pipe removes first arg from function call", {
+  # Drops the leading data argument so the call becomes pipe-ready.
+  expr <- quote(dplyr::filter(data, x > 1L))
+  result <- exclude_first_pipe(expr, quote(data))
+  expect_identical(result, quote(dplyr::filter(x > 1L)))
+})
+
+test_that("exclude_first_pipe leaves call unchanged when first arg doesn't match", {
+  expr <- quote(dplyr::filter(other, x > 1L))
+  result <- exclude_first_pipe(expr, quote(data))
+  expect_identical(result, expr)
+})
+
+# -- exclude_reassignment -----------------------------------------------------
+
+test_that("exclude_reassignment strips assignment from braced function call expr", {
+  # Input is a braced block assigning a dplyr::filter() call to data[["x"]].
+  expr <- quote({
+    data[["x"]] <- dplyr::filter(data[["x"]], cond)
+  })
+  result <- exclude_reassignment(expr, along_with = "left")
+  # Should strip the <- leaving dplyr::filter(data[["x"]], cond)
+  expect_identical(result[[2L]][[1L]], quote(dplyr::filter))
+  expect_length(result[[2L]], 3L) # dplyr::filter, data[["x"]], cond
+})
+
+test_that("exclude_reassignment with both removes data ref from function call", {
+  expr <- quote({
+    data[["x"]] <- dplyr::filter(data[["x"]], cond)
+  })
+  result <- exclude_reassignment(expr, along_with = "both")
+  # Should strip <- AND remove data[["x"]] from filter args
+  expect_identical(result[[2L]], quote(dplyr::filter(cond)))
+})
+
+# -- pipe_reassignment --------------------------------------------------------
+
+test_that("pipe_reassignment inserts lhs as first argument of rhs", {
+  lhs <- quote(dplyr::filter(data, cond1))
+  rhs <- quote(dplyr::filter(cond2))
+  result <- pipe_reassignment(lhs, rhs)
+  # Result should be dplyr::filter(dplyr::filter(data, cond1), cond2)
+  expect_identical(result[[1L]], quote(dplyr::filter))
+  expect_identical(result[[2L]], lhs)
+  expect_identical(result[[3L]], quote(cond2))
+})
+
+test_that("pipe_reassignment produces evaluable expression (no call to |>)", {
+  lhs <- quote(1L + 2L)
+  rhs <- quote(sum(3L))
+  result <- pipe_reassignment(lhs, rhs)
+  # Should be sum(1L + 2L, 3L), not `|>`(1L + 2L, sum(3L))
+  expect_identical(result[[1L]], quote(sum))
+  val <- eval(result)
+  expect_identical(val, 6L)
+})
+
+# -- pipe_filtering ------------------------------------------------------------
+
+test_that("pipe_filtering combines function-call style filter expressions", {
+  # Simulates two dplyr::filter calls on the same dataset (non-pipe style)
+  e1 <- quote({
+    data[["iris"]] <- dplyr::filter(data[["iris"]], Species == "setosa")
+  })
+  e2 <- quote({
+    data[["iris"]] <- dplyr::filter(data[["iris"]], Sepal.Length > 5L)
+  })
+  result <- pipe_filtering(list(e1, e2))
+  expect_length(result, 1L)
+
+  combined <- result[[1L]]
+  # The result should be evaluable
+  data <- list(iris = iris)
+  eval(combined)
+  expect_true(all(data[["iris"]]$Species == "setosa"))
+  expect_true(all(data[["iris"]]$Sepal.Length > 5L))
+})
+
+test_that("pipe_filtering returns single expression unchanged", {
+  e <- quote({
+    data[["iris"]] <- dplyr::filter(data[["iris"]], Species == "setosa")
+  })
+  result <- pipe_filtering(list(e))
+  expect_identical(result, list(e))
+})
+
+# -- pipe_all_filters (integration) -------------------------------------------
+
+test_that("pipe_all_filters combines filtering rows into single piped expression", {
+  # cb_filter_to_expr() captures code blocks via rlang::expr({ ... }). Under covr
+  # instrumentation the captured block gains a leading covr:::count() call, which
+  # breaks pipe_filtering()'s assumption that the first statement is the
+  # assignment. This affects only the instrumented build, not real usage.
+  skip_on_covr()
+  iris_source <- set_source(tblist(iris = iris))
+  f1 <- filter(
+    type = "discrete", id = "sp", name = "Species",
+    variable = "Species", dataset = "iris",
+    value = c("setosa", "virginica")
+  )
+  f2 <- filter(
+    type = "range", id = "sl", name = "Sepal.Length",
+    variable = "Sepal.Length", dataset = "iris",
+    range = c(5L, 7L)
+  )
+  te1 <- type_expr(
+    action = "filtering", step = "1",
+    expr = cb_filter_to_expr(f1, iris_source),
+    !!!get_filter_params(f1)
+  )
+  te2 <- type_expr(
+    action = "filtering", step = "1",
+    expr = cb_filter_to_expr(f2, iris_source),
+    !!!get_filter_params(f2)
+  )
+  expr_df <- dplyr::bind_rows(te1[[1L]], te2[[1L]])
+
+  result <- pipe_all_filters(expr_df)
+  expect_true("action" %in% names(result))
+  expect_true("expr" %in% names(result))
+  # Should combine two filtering rows into one
+  filtering_rows <- result[result$action == "filtering", ]
+  expect_identical(nrow(filtering_rows), 1L)
+
+  # The combined expression should be evaluable and produce correct results
+  source <- list(dtconn = tblist(iris = iris))
+  data_object <- source$dtconn
+  eval(filtering_rows$expr[[1L]])
+  expect_true(all(data_object[["iris"]]$Species %in% c("setosa", "virginica", NA)))
+  expect_true(all(
+    (data_object[["iris"]]$Sepal.Length <= 7L & data_object[["iris"]]$Sepal.Length >= 5L) |
+      is.na(data_object[["iris"]]$Sepal.Length)
+  ))
+})
+
+# -- assign_expr ---------------------------------------------------------------
 
 test_that("assign_expr works fine", {
   body_of_function <- quote(function(a = 1L, b = 1L) {

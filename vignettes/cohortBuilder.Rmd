@@ -13,7 +13,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 options("tibble.print_min" = 5L, "tibble.print_max" = 5L)
-library(magrittr)
 library(cohortBuilder)
 ```
 
@@ -105,7 +104,7 @@ In the standard workflow we build `Cohort` on top of `Source`.
 We achieve it with `cohort` function:
 
 ```{r}
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort()
 class(librarian_cohort)
 ```
@@ -125,13 +124,15 @@ Filters are responsible for providing necessary logic for performing related dat
 
 The extensive description of filters can be found at `vignette("custom-filters")`.
 
-The current version of `cohortBuilder` provides five types of build-in filters:
+The current version of `cohortBuilder` provides seven types of build-in filters:
 
 - **discrete** - return values (in column) matching provided set,
 - **discrete_text** - return values based on provided comma separated values,
 - **range** - return values within the provided range,
 - **date_range** - range version for Date type data,
-- **multi_discrete** - extended version of discrete filter working with multiple conditions.
+- **datetime_range** - range version for POSIXct (datetime) type data,
+- **multi_discrete** - extended version of discrete filter working with multiple conditions,
+- **query** - filter data using a `dplyr`-style query expression.
 
 Let's define discrete filter that will subset `books` table listing books written by Dan Brown.  
 To do so, we have to define the following parameters calling `filter` function:
@@ -155,7 +156,7 @@ author_filter <- filter(
 In order to add the filter to existing Cohort we may use `add_filter` method:
 
 ```{r}
-librarian_cohort <- librarian_cohort %>%
+librarian_cohort <- librarian_cohort |>
   add_filter(author_filter)
 ```
 
@@ -169,7 +170,7 @@ librarian_cohort <- librarian_cohort %->%
 Or define the filter while creating Cohort:
 
 ```{r}
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     author_filter
   )
@@ -183,7 +184,7 @@ To learn more check `vignette("cohort-configuration")`.
 For example:
 
 ```{r, eval = FALSE}
-librarian_cohort %>%
+librarian_cohort |>
   add_filter(author_filter)
 ```
 
@@ -223,15 +224,15 @@ If you want to run data filtering automatically when the filter is defined you c
 set `run_flow = TRUE`:
 
 ```{r}
-librarian_cohort <- librarian_source %>%
-  cohort() %>%
+librarian_cohort <- librarian_source |>
+  cohort() |>
   add_filter(author_filter, run_flow = TRUE)
 ```
 
 when using `add_filter` or:
 
 ```{r}
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     author_filter,
     run_flow = TRUE
@@ -265,7 +266,7 @@ We'll include filters 1. and 2. in the first step - filter 3. in the second one.
 The below code does the job:
 
 ```{r}
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     step(
       filter(
@@ -389,7 +390,7 @@ librarian_source <- set_source(
   })
 )
 
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     step(
       filter(
@@ -436,7 +437,7 @@ state
 Then, having an empty cohort, use `restore` to apply the configuration:
 
 ```{r}
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort()
 
 restore(librarian_cohort, state = state)
