@@ -12,9 +12,10 @@ You can achieve configuring filtering steps in Source using `add_step`
 method:
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian)
-) %>%
+) |>
   add_step(
     step(
       filter(
@@ -34,6 +35,7 @@ librarian_source <- set_source(
 or with `%->%` pipe operator:
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian)
 ) %->%
@@ -55,9 +57,10 @@ You can also configure filtering steps using `add_filter` methods,
 passing `step_id` inside:
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian)
-) %>%
+) |>
   add_filter(
     filter(
       "discrete",
@@ -65,7 +68,7 @@ librarian_source <- set_source(
       variable = "author", value = "Dan Brown"
     ),
     step_id = 1L
-  ) %>%
+  ) |>
   add_filter(
     filter(
       "discrete",
@@ -82,6 +85,7 @@ existing step (or the first one if no steps exist).
 Or even simpler using `%->%` (to put filters in the last existing step):
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian)
 ) %->%
@@ -100,27 +104,30 @@ librarian_source <- set_source(
 Then, create cohort with:
 
 ``` r
+
 librarian_cohort <- cohort(librarian_source)
 sum_up(librarian_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: program
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: borrowers
 #>      variable: program
 #>      value: premium
 #>      keep_na: FALSE
-#>      description: 
-#>      active: TRUE
 ```
 
 ## Filtering steps in Cohort
@@ -131,11 +138,12 @@ achieve it using `Cohort` methods.
 The standard way is to place steps configuration while creating Cohort:
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian)
 )
 
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     step(
       filter(
@@ -155,7 +163,8 @@ librarian_cohort <- librarian_source %>%
 Or if you want to define only one step, place filters directly:
 
 ``` r
-librarian_cohort <- librarian_source %>%
+
+librarian_cohort <- librarian_source |>
   cohort(
     filter(
       "discrete",
@@ -176,9 +185,10 @@ presented while adding filtering steps to source.
 Using `add_step`:
 
 ``` r
-librarian_cohort <- librarian_source %>% cohort()
 
-librarian_cohort %>%
+librarian_cohort <- librarian_source |> cohort()
+
+librarian_cohort |>
   add_step(
     step(
       filter(
@@ -198,7 +208,8 @@ librarian_cohort %>%
 Using `%->%` pipe operator:
 
 ``` r
-librarian_cohort <- librarian_source %>% cohort()
+
+librarian_cohort <- librarian_source |> cohort()
 
 librarian_cohort %->%
   step(
@@ -219,16 +230,17 @@ You can also configure filtering steps using `add_filter` methods,
 passing `step_id` inside:
 
 ``` r
-librarian_cohort <- librarian_source %>% cohort()
 
-librarian_cohort %>%
+librarian_cohort <- librarian_source |> cohort()
+
+librarian_cohort |>
   add_filter(
     filter(
       "discrete",
       id = "author", dataset = "books",
       variable = "author", value = "Dan Brown"
     )
-  ) %>%
+  ) |>
   add_filter(
     filter(
       "discrete",
@@ -244,7 +256,8 @@ existing step (or the first one if no steps exist).
 Or even simpler using `%->%` (to put filters in the last existing step):
 
 ``` r
-librarian_cohort <- librarian_source %>% cohort()
+
+librarian_cohort <- librarian_source |> cohort()
 
 librarian_cohort %->%
   filter(
@@ -262,24 +275,27 @@ librarian_cohort %->%
 As usual we can verify the configuration with `sum_up`:
 
 ``` r
+
 sum_up(librarian_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: program
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: borrowers
 #>      variable: program
 #>      value: premium
 #>      keep_na: FALSE
-#>      description: 
-#>      active: TRUE
 ```

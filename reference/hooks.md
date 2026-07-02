@@ -64,6 +64,7 @@ The second option can be achieved with usage of \`add_hook\` (and
 \`get_hook\`) function. The default \`hook\` parameter for each method
 is constructed as below:
 
+
     remove_step = function(step_id, run_flow = FALSE,
       hook = list(
         pre = get_hook("pre_rm_step_hook"),
@@ -73,6 +74,7 @@ is constructed as below:
 
 'Pre' hooks are defined with 'pre\_\<method_name\>\_hook' and 'Post'
 ones as 'post\_\<method_name\>\_hook'. As a result calling:
+
 
     add_hook(
       "pre_remove_step_hook",
@@ -84,5 +86,6 @@ will result with specifying a new pre-hook for \`remove_step\` method.
 You may add as many hooks as you want. The order of hooks execution is
 followed by the order or registering process. If you want to check
 currently registered hooks for the specific method, just use:
+
 
     get_hook("pre_<method_name>_hook")

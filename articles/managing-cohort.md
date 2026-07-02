@@ -11,11 +11,12 @@ To present the functionality we’ll be working on the below
 `librarian_cohort` object:
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian)
 )
 
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     step(
       filter(
@@ -52,47 +53,52 @@ methods:
 Updating filter:
 
 ``` r
-librarian_cohort %>%
+
+librarian_cohort |>
   update_filter(
     step_id = 1L, filter_id = "author", value = c("Dan Brown", "Khaled Hosseini")
   )
 
 sum_up(librarian_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown, Khaled Hosseini
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: program
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: borrowers
 #>      variable: program
 #>      value: premium
 #>      keep_na: FALSE
-#>      description: 
-#>      active: TRUE
-#> >> Step ID: 2
+#> >> Step ID: 2 [pending]
 #> -> Filter ID: copies
 #>    Filter Type: range
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: copies
 #>      range: -Inf, 5
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 ```
 
 Adding new filter:
 
 ``` r
-librarian_cohort %>%
+
+librarian_cohort |>
   add_filter(
     filter(
       "date_range",
@@ -103,82 +109,90 @@ librarian_cohort %>%
   )
 
 sum_up(librarian_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown, Khaled Hosseini
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: program
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: borrowers
 #>      variable: program
 #>      value: premium
 #>      keep_na: FALSE
-#>      description: 
-#>      active: TRUE
-#> >> Step ID: 2
+#> >> Step ID: 2 [pending]
 #> -> Filter ID: copies
 #>    Filter Type: range
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: copies
 #>      range: -Inf, 5
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: issue_date
 #>    Filter Type: date_range
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: issues
 #>      variable: date
 #>      range: 2010-01-01, Inf
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 ```
 
 Removing filter:
 
 ``` r
-librarian_cohort %>%
+
+librarian_cohort |>
   rm_filter(step_id = 2L, filter_id = "copies")
 
 sum_up(librarian_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown, Khaled Hosseini
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: program
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: borrowers
 #>      variable: program
 #>      value: premium
 #>      keep_na: FALSE
-#>      description: 
-#>      active: TRUE
-#> >> Step ID: 2
+#> >> Step ID: 2 [pending]
 #> -> Filter ID: issue_date
 #>    Filter Type: date_range
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: issues
 #>      variable: date
 #>      range: 2010-01-01, Inf
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 ```
 
 By default the above configuration doesn’t trigger data recalculation so
@@ -189,6 +203,7 @@ updated only the second step so we can optimize workflow skipping the
 previous steps calculation by specifying `min_step_id` parameter:
 
 ``` r
+
 run(librarian_cohort, min_step_id = 2L)
 
 get_data(librarian_cohort)
@@ -248,27 +263,30 @@ Similar to filter, you can operate on the Cohort to manage steps.
 remove existing step respectively.
 
 ``` r
-librarian_cohort %>%
+
+librarian_cohort |>
   rm_step(step_id = 1L)
 
 sum_up(librarian_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: issue_date
 #>    Filter Type: date_range
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: issues
 #>      variable: date
 #>      range: 2010-01-01, Inf
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 ```
 
 **Note.** Removing not the last step results with renaming all step ids
 (so that we always have steps numbering starting with 1).
 
 ``` r
-librarian_cohort %>%
+
+librarian_cohort |>
   add_step(
     step(
       filter(
@@ -285,35 +303,38 @@ librarian_cohort %>%
   )
 
 sum_up(librarian_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: issue_date
 #>    Filter Type: date_range
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: issues
 #>      variable: date
 #>      range: 2010-01-01, Inf
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
-#> >> Step ID: 2
+#> >> Step ID: 2 [pending]
 #> -> Filter ID: author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: program
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: borrowers
 #>      variable: program
 #>      value: premium
 #>      keep_na: FALSE
-#>      description: 
-#>      active: TRUE
 ```
 
 **Note.** All the methods used for managing steps and filters can be
@@ -332,27 +353,25 @@ definition printed in the reproducible code (you can use it when the
 default method doesn’t print reasonable output).
 
 ``` r
+
 code(librarian_cohort, include_methods = NULL)
 #> source <- list(dtconn = as.tblist(librarian))
 #> data_object <- source$dtconn
 #> step_id <- "1"
 #> pre_data_object <- data_object
 #> data_object <- .pre_filtering(source, data_object, "1")
-#> data_object[["issues"]] <- data_object[["issues"]] %>%
-#>     dplyr::filter((date <= Inf & date >= 14610) | is.na(date))
-#> attr(data_object[["issues"]], "filtered") <- TRUE
+#> data_object[["issues"]] <- dplyr::filter(data_object[["issues"]], (date <= Inf &
+#>     date >= 14610) | is.na(date))
 #> data_object <- .post_filtering(source, data_object, "1")
 #> for (binding_key in binding_keys) {
 #>     data_object <- .run_binding(source, binding_key, pre_data_object, data_object)
 #> }
 #> step_id <- "2"
 #> data_object <- .pre_filtering(source, data_object, "2")
-#> data_object[["books"]] <- data_object[["books"]] %>%
-#>     dplyr::filter(author %in% c("Dan Brown", NA))
-#> attr(data_object[["books"]], "filtered") <- TRUE
-#> data_object[["borrowers"]] <- data_object[["borrowers"]] %>%
-#>     dplyr::filter(program %in% "premium")
-#> attr(data_object[["borrowers"]], "filtered") <- TRUE
+#> data_object[["books"]] <- dplyr::filter(data_object[["books"]], author %in% c("Dan Brown",
+#>     NA))
+#> data_object[["borrowers"]] <- dplyr::filter(data_object[["borrowers"]], program %in%
+#>     "premium")
 #> data_object <- .post_filtering(source, data_object, "2")
 
 new_source <- set_source(
@@ -365,35 +384,38 @@ new_source <- set_source(
 
 update_source(librarian_cohort, new_source)
 sum_up(librarian_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: issue_date
 #>    Filter Type: date_range
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: issues
 #>      variable: date
 #>      range: 2010-01-01, Inf
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
-#> >> Step ID: 2
+#> >> Step ID: 2 [pending]
 #> -> Filter ID: author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: program
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: borrowers
 #>      variable: program
 #>      value: premium
 #>      keep_na: FALSE
-#>      description: 
-#>      active: TRUE
 code(librarian_cohort, include_methods = NULL)
 #> source <- list()
 #> source$dtconn <- as.tblist(librarian)
@@ -401,21 +423,18 @@ code(librarian_cohort, include_methods = NULL)
 #> step_id <- "1"
 #> pre_data_object <- data_object
 #> data_object <- .pre_filtering(source, data_object, "1")
-#> data_object[["issues"]] <- data_object[["issues"]] %>%
-#>     dplyr::filter((date <= Inf & date >= 14610) | is.na(date))
-#> attr(data_object[["issues"]], "filtered") <- TRUE
+#> data_object[["issues"]] <- dplyr::filter(data_object[["issues"]], (date <= Inf &
+#>     date >= 14610) | is.na(date))
 #> data_object <- .post_filtering(source, data_object, "1")
 #> for (binding_key in binding_keys) {
 #>     data_object <- .run_binding(source, binding_key, pre_data_object, data_object)
 #> }
 #> step_id <- "2"
 #> data_object <- .pre_filtering(source, data_object, "2")
-#> data_object[["books"]] <- data_object[["books"]] %>%
-#>     dplyr::filter(author %in% c("Dan Brown", NA))
-#> attr(data_object[["books"]], "filtered") <- TRUE
-#> data_object[["borrowers"]] <- data_object[["borrowers"]] %>%
-#>     dplyr::filter(program %in% "premium")
-#> attr(data_object[["borrowers"]], "filtered") <- TRUE
+#> data_object[["books"]] <- dplyr::filter(data_object[["books"]], author %in% c("Dan Brown",
+#>     NA))
+#> data_object[["borrowers"]] <- dplyr::filter(data_object[["borrowers"]], program %in%
+#>     "premium")
 #> data_object <- .post_filtering(source, data_object, "2")
 ```
 
@@ -424,6 +443,7 @@ filters). If you want to clear the configuration just set
 `keep_steps = FALSE`:
 
 ``` r
+
 update_source(librarian_cohort, new_source, keep_steps = FALSE)
 sum_up(librarian_cohort)
 #> No steps configuration found.
@@ -432,6 +452,7 @@ sum_up(librarian_cohort)
 You can also use `update_source` to add Source to an empty Cohort:
 
 ``` r
+
 new_source <- set_source(
   as.tblist(librarian)
 )
@@ -449,9 +470,10 @@ In this case, the good practice is to keep the configuration directly in
 Source:
 
 ``` r
+
 source_one <- set_source(
   as.tblist(librarian)
-) %>%
+) |>
   add_step(
     step(
       filter(
@@ -469,7 +491,7 @@ source_one <- set_source(
 
 source_two <- set_source(
   as.tblist(librarian)
-) %>%
+) |>
   add_step(
     step(
       filter(
@@ -482,36 +504,131 @@ source_two <- set_source(
 
 my_cohort <- cohort(source_one)
 sum_up(my_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: program
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: borrowers
 #>      variable: program
 #>      value: premium
 #>      keep_na: FALSE
-#>      description: 
-#>      active: TRUE
 
 update_source(my_cohort, source_two)
 sum_up(my_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: copies
 #>    Filter Type: range
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: copies
 #>      range: -Inf, 5
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
+```
+
+## Statistics and domain propagation
+
+Two
+[`cohort()`](https://r-world-devs.github.io/cohortBuilder/reference/create-cohort.md)
+arguments control how much work the cohort does behind the scenes and
+how filter domains evolve across steps.
+
+### `compute_stats`
+
+By default (`compute_stats = TRUE`) the cohort computes and stores
+filter and data statistics after each step. These power
+[`stat()`](https://r-world-devs.github.io/cohortBuilder/reference/stat.md),
+[`attrition()`](https://r-world-devs.github.io/cohortBuilder/reference/attrition.md),
+and the GUI summaries.
+
+If you only need the filtered data (for example in a headless / batch
+context), set `compute_stats = FALSE` to skip statistics computation:
+
+``` r
+
+librarian_source <- set_source(as.tblist(librarian))
+
+fast_cohort <- librarian_source |>
+  cohort(
+    filter(
+      "discrete",
+      id = "author", dataset = "books",
+      variable = "author", value = "Dan Brown"
+    ),
+    compute_stats = FALSE,
+    run_flow = TRUE
+  )
+
+get_data(fast_cohort)$books
+#> # A tibble: 2 × 6
+#>   isbn          title             genre                  publisher author copies
+#>   <chr>         <chr>             <chr>                  <chr>     <chr>   <int>
+#> 1 0-385-50420-9 The Da Vinci Code Crime, Thriller & Adv… Transwor… Dan B…      7
+#> 2 0-671-02735-2 Angels and Demons Crime, Thriller & Adv… Transwor… Dan B…      4
+```
+
+### `propagate_domains`
+
+In multi-step filtering, a later step’s filter may still advertise its
+full domain even though earlier steps have already narrowed the data.
+The `propagate_domains` argument controls whether (and how) a filter’s
+domain is restricted based on upstream steps:
+
+- `"none"` (default) - domains are left untouched,
+- `"filter"` - narrow from the previous step’s filter values,
+- `"stats"` - narrow from stored statistics (requires
+  `compute_stats = TRUE`),
+- `"data"` - narrow by scanning the filtered data (the stats-free
+  equivalent).
+
+Domain propagation only adjusts filters that already declare an initial
+`domain`. Below, step 1 keeps only Dan Brown’s books, so step 2’s
+`genre` filter domain narrows to the genres that actually remain:
+
+``` r
+
+all_genres <- sort(collapse::funique(librarian$books$genre))
+
+propagated_cohort <- librarian_source |>
+  cohort(
+    step(
+      filter(
+        "discrete",
+        id = "author", dataset = "books",
+        variable = "author", value = "Dan Brown"
+      )
+    ),
+    step(
+      filter(
+        "discrete",
+        id = "genre", dataset = "books",
+        variable = "genre", domain = all_genres
+      )
+    ),
+    propagate_domains = "data",
+    run_flow = TRUE
+  )
+
+# Full domain vs. domain after step 1 narrowing
+all_genres
+#> [1] "Crime, Thriller & Adventure" "Food & Drink: General"      
+#> [3] "General & Literary Fiction"  "Popular Science"            
+#> [5] "Young Adult Fiction"
+propagated_cohort$get_step("2")$filters[["genre"]]@domain
+#> [1] "Crime, Thriller & Adventure"
 ```

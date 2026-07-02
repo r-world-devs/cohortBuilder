@@ -26,6 +26,8 @@ Cohort object is designed to make operations on source data possible.
 
 - [`Cohort$get_source()`](#method-Cohort-get_source)
 
+- [`Cohort$get_propagate_domains_mode()`](#method-Cohort-get_propagate_domains_mode)
+
 - [`Cohort$add_step()`](#method-Cohort-add_step)
 
 - [`Cohort$copy_step()`](#method-Cohort-copy_step)
@@ -54,7 +56,7 @@ Cohort object is designed to make operations on source data possible.
 
 - [`Cohort$show_attrition()`](#method-Cohort-show_attrition)
 
-- [`Cohort$get_stats()`](#method-Cohort-get_stats)
+- [`Cohort$calc_stats()`](#method-Cohort-calc_stats)
 
 - [`Cohort$show_help()`](#method-Cohort-show_help)
 
@@ -72,15 +74,25 @@ Cohort object is designed to make operations on source data possible.
 
 - [`Cohort$get_filter()`](#method-Cohort-get_filter)
 
-- [`Cohort$update_cache()`](#method-Cohort-update_cache)
+- [`Cohort$update_stats()`](#method-Cohort-update_stats)
 
-- [`Cohort$get_cache()`](#method-Cohort-get_cache)
+- [`Cohort$get_stats()`](#method-Cohort-get_stats)
 
 - [`Cohort$list_active_filters()`](#method-Cohort-list_active_filters)
 
 - [`Cohort$last_step_id()`](#method-Cohort-last_step_id)
 
 - [`Cohort$is_pending()`](#method-Cohort-is_pending)
+
+- [`Cohort$set_pending()`](#method-Cohort-set_pending)
+
+- [`Cohort$set_pending_cascade()`](#method-Cohort-set_pending_cascade)
+
+- [`Cohort$set_domain()`](#method-Cohort-set_domain)
+
+- [`Cohort$propagate_domains_to()`](#method-Cohort-propagate_domains_to)
+
+- [`Cohort$propagate_filter_domains()`](#method-Cohort-propagate_filter_domains)
 
 - [`Cohort$modify()`](#method-Cohort-modify)
 
@@ -98,6 +110,8 @@ Create Cohort object.
       source,
       ...,
       run_flow = FALSE,
+      compute_stats = TRUE,
+      propagate_domains = c("none", "filter", "stats", "data"),
       hook = list(pre = get_hook("pre_cohort_hook"), post = get_hook("post_cohort_hook"))
     )
 
@@ -116,6 +130,20 @@ Create Cohort object.
 - `run_flow`:
 
   If \`TRUE\`, data flow is run after the operation is completed.
+
+- `compute_stats`:
+
+  If \`TRUE\` (default), filter statistics are computed and stored after
+  each step. Set to \`FALSE\` to skip stats computation (useful for
+  metadata-only operation).
+
+- `propagate_domains`:
+
+  Domain propagation mode between steps. One of \`"none"\` (default, no
+  propagation), \`"filter"\` (derive from previous step filter values),
+  \`"stats"\` (derive from stored statistics), or \`"data"\` (scan
+  filtered data). \`"stats"\` requires \`compute_stats = TRUE\`; use
+  \`"data"\` for the stats-free equivalent.
 
 - `hook`:
 
@@ -194,6 +222,21 @@ Return Source object attached to Cohort.
 #### Usage
 
     Cohort$get_source()
+
+------------------------------------------------------------------------
+
+### Method `get_propagate_domains_mode()`
+
+Return the configured domain propagation mode.
+
+One of \`"none"\`, \`"filter"\`, \`"stats"\` or \`"data"\`. Read-only;
+the mode is fixed at construction. UI layers can inspect it (e.g. to
+validate that a domain-based rendering strategy is compatible with the
+cohort).
+
+#### Usage
+
+    Cohort$get_propagate_domains_mode()
 
 ------------------------------------------------------------------------
 
@@ -291,7 +334,13 @@ Add filter definition
 
 #### Usage
 
-    Cohort$add_filter(filter, step_id, run_flow = FALSE)
+    Cohort$add_filter(
+      filter,
+      step_id,
+      run_flow = FALSE,
+      hook = list(pre = get_hook("pre_add_filter_hook"), post =
+        get_hook("post_add_filter_hook"))
+    )
 
 #### Arguments
 
@@ -309,6 +358,13 @@ Add filter definition
 
   If \`TRUE\`, data flow is run after the operation is completed.
 
+- `hook`:
+
+  List of hooks describing methods before/after the Cohort is created.
+  See
+  [hooks](https://r-world-devs.github.io/cohortBuilder/reference/hooks.md)
+  for more details.
+
 ------------------------------------------------------------------------
 
 ### Method `remove_filter()`
@@ -317,7 +373,13 @@ Remove filter definition
 
 #### Usage
 
-    Cohort$remove_filter(step_id, filter_id, run_flow = FALSE)
+    Cohort$remove_filter(
+      step_id,
+      filter_id,
+      run_flow = FALSE,
+      hook = list(pre = get_hook("pre_rm_filter_hook"), post =
+        get_hook("post_rm_filter_hook"))
+    )
 
 #### Arguments
 
@@ -333,6 +395,13 @@ Remove filter definition
 
   If \`TRUE\`, data flow is run after the operation is completed.
 
+- `hook`:
+
+  List of hooks describing methods before/after the Cohort is created.
+  See
+  [hooks](https://r-world-devs.github.io/cohortBuilder/reference/hooks.md)
+  for more details.
+
 ------------------------------------------------------------------------
 
 ### Method [`update_filter()`](https://r-world-devs.github.io/cohortBuilder/reference/update_filter.md)
@@ -341,7 +410,16 @@ Update filter definition
 
 #### Usage
 
-    Cohort$update_filter(step_id, filter_id, ..., active, run_flow = FALSE)
+    Cohort$update_filter(
+      step_id,
+      filter_id,
+      ...,
+      active,
+      run_flow = FALSE,
+      hook = list(pre = get_hook("pre_update_filter_hook"), post =
+        get_hook("post_update_filter_hook")),
+      hook_args = list(pre = list(), post = list())
+    )
 
 #### Arguments
 
@@ -364,6 +442,17 @@ Update filter definition
 - `run_flow`:
 
   If \`TRUE\`, data flow is run after the operation is completed.
+
+- `hook`:
+
+  List of hooks describing methods before/after the Cohort is created.
+  See
+  [hooks](https://r-world-devs.github.io/cohortBuilder/reference/hooks.md)
+  for more details.
+
+- `hook_args`:
+
+  Named list of extra arguments passed to pre/post hooks.
 
 ------------------------------------------------------------------------
 
@@ -428,7 +517,7 @@ Get Cohort configuration state.
 
 #### Usage
 
-    Cohort$get_state(step_id, json = FALSE, extra_fields = NULL)
+    Cohort$get_state(step_id, json = FALSE)
 
 #### Arguments
 
@@ -438,12 +527,7 @@ Get Cohort configuration state.
 
 - `json`:
 
-  If TRUE, return state in JSON format.
-
-- `extra_fields`:
-
-  Names of extra fields included in filter to be added to state. Restore
-  Cohort configuration.
+  If TRUE, return state in JSON format. Restore Cohort configuration.
 
 ------------------------------------------------------------------------
 
@@ -555,13 +639,13 @@ Show attrition plot.
 
 ------------------------------------------------------------------------
 
-### Method `get_stats()`
+### Method `calc_stats()`
 
 Get Cohort related statistics.
 
 #### Usage
 
-    Cohort$get_stats(step_id, filter_id, ..., state = "post")
+    Cohort$calc_stats(step_id, filter_id, ..., state = "post")
 
 #### Arguments
 
@@ -751,7 +835,14 @@ Print defined steps configuration.
 
 #### Usage
 
-    Cohort$describe_state()
+    Cohort$describe_state(to_string = FALSE)
+
+#### Arguments
+
+- `to_string`:
+
+  If \`TRUE\`, return the output as a character string instead of
+  printing it. Defaults to \`FALSE\`.
 
 ------------------------------------------------------------------------
 
@@ -795,69 +886,85 @@ Get selected filter configuration.
 
 ------------------------------------------------------------------------
 
-### Method `update_cache()`
+### Method `update_stats()`
 
-Update filter or step cache. Caching is saving step and filter attached
-data statistics such as number of data rows, filter choices or
+Update filter or step statistics. Computes and stores step and filter
+attached data statistics such as number of data rows, filter choices or
 frequencies.
 
 #### Usage
 
-    Cohort$update_cache(step_id, filter_id, state = "post")
+    Cohort$update_stats(step_id, filter_id, state = "post", name = NULL)
 
 #### Arguments
 
 - `step_id`:
 
-  Id of the step for which caching should be applied. If \`filter_id\`
-  is not missing, the parameter describes id of the step where filter
-  should be found.
+  Id of the step for which statistics should be computed. If
+  \`filter_id\` is not missing, the parameter describes id of the step
+  where filter should be found.
 
 - `filter_id`:
 
-  Id of the filter for which caching should be applied.
+  Id of the filter for which statistics should be computed.
 
 - `state`:
 
-  Should caching be done on data before ("pre") or after ("post")
+  Should statistics be computed on data before ("pre") or after ("post")
   filtering in specified step.
+
+- `name`:
+
+  Optional name(s) of the individual filter statistics to (re)compute.
+  When supplied (filter-level only), only those statistics are computed
+  and merged into the stored entry, leaving any other stored statistics
+  untouched. When missing, the full statistics set is computed.
 
 ------------------------------------------------------------------------
 
-### Method `get_cache()`
+### Method `get_stats()`
 
-Return step of filter specific cache.
+Return step or filter specific statistics.
 
 #### Usage
 
-    Cohort$get_cache(
+    Cohort$get_stats(
       step_id,
       filter_id,
       state = "post",
-      .recalc_when_missing = TRUE
+      .recalc_when_missing = TRUE,
+      name = NULL
     )
 
 #### Arguments
 
 - `step_id`:
 
-  Id of the step for which cached data should be returned If
+  Id of the step for which stored statistics should be returned If
   \`filter_id\` is not missing, the parameter describes id of the step
   where filter should be found.
 
 - `filter_id`:
 
-  Id of the filter for which cache data should be returned.
+  Id of the filter for which stored statistics should be returned.
 
 - `state`:
 
-  Should cache be returned on data before ("pre") or after ("post")
+  Should statistics be returned on data before ("pre") or after ("post")
   filtering in specified step.
 
 - `.recalc_when_missing`:
 
-  Should the function compute cache automatically when the one is not
-  computed yet?
+  Should the function compute statistics automatically when not computed
+  yet?
+
+- `name`:
+
+  Optional name of a single filter statistic to return (e.g. "choices",
+  "n_data"). When supplied (filter-level only) the method returns just
+  that statistic and, if recomputation is needed, computes only it
+  instead of the whole statistics set. When missing, the full stored
+  entry (a list of all statistics) is returned.
 
 ------------------------------------------------------------------------
 
@@ -900,6 +1007,148 @@ Check if step is pending.
 - `step_id`:
 
   Id of the step to be checked.
+
+------------------------------------------------------------------------
+
+### Method `set_pending()`
+
+Mark step as pending or resolved.
+
+#### Usage
+
+    Cohort$set_pending(
+      step_id,
+      pending = TRUE,
+      hook = list(pre = get_hook("pre_set_pending_hook"), post =
+        get_hook("post_set_pending_hook"))
+    )
+
+#### Arguments
+
+- `step_id`:
+
+  Id of the step.
+
+- `pending`:
+
+  Logical; \`TRUE\` to mark pending, \`FALSE\` to resolve.
+
+- `hook`:
+
+  List of hooks describing methods before/after the Cohort is created.
+  See
+  [hooks](https://r-world-devs.github.io/cohortBuilder/reference/hooks.md)
+  for more details.
+
+------------------------------------------------------------------------
+
+### Method `set_pending_cascade()`
+
+Mark a step and all the steps after it as pending.
+
+A change to step \`step_id\`'s filters invalidates that step and every
+step downstream (each step's input is the previous step's output). Used
+by the filter/step mutating methods so the GUI greys all affected steps
+via the \`post_set_pending_hook\`.
+
+#### Usage
+
+    Cohort$set_pending_cascade(step_id)
+
+#### Arguments
+
+- `step_id`:
+
+  Id of the first step to mark pending.
+
+------------------------------------------------------------------------
+
+### Method `set_domain()`
+
+Silently set a filter's domain.
+
+Internal setter used by domain propagation
+([.propagate_domains](https://r-world-devs.github.io/cohortBuilder/reference/dot-propagate_domains.md)).
+Writes \`filter@domain\` directly \*\*without\*\* firing the
+\`update_filter\` hooks and \*\*without\*\* triggering \`run_flow\`,
+which prevents the per-hop hook re-entry that would otherwise occur if
+domains were applied through \`update_filter\`. Does not itself trigger
+further propagation.
+
+#### Usage
+
+    Cohort$set_domain(step_id, filter_id, domain)
+
+#### Arguments
+
+- `step_id`:
+
+  Id of the step where the filter is defined.
+
+- `filter_id`:
+
+  Id of the filter whose domain should be set.
+
+- `domain`:
+
+  New domain value to assign.
+
+------------------------------------------------------------------------
+
+### Method `propagate_domains_to()`
+
+Recompute a target step's domains from its parent and signal the change.
+
+Thin wrapper around
+[.propagate_domains](https://r-world-devs.github.io/cohortBuilder/reference/dot-propagate_domains.md)
+that runs propagation for \`target_id\` (computing its filters' domains
+from step \`target_id - 1\`) and then fires
+\`post_propagate_domains_hook\` so UI layers can refresh the affected
+step's inputs. No-op when propagation is disabled or the target step is
+absent / has no parent.
+
+#### Usage
+
+    Cohort$propagate_domains_to(
+      target_id,
+      hook = get_hook("post_propagate_domains_hook")
+    )
+
+#### Arguments
+
+- `target_id`:
+
+  Id of the step whose domains should be recomputed.
+
+- `hook`:
+
+  List of hooks describing methods before/after the Cohort is created.
+  See
+  [hooks](https://r-world-devs.github.io/cohortBuilder/reference/hooks.md)
+  for more details.
+
+------------------------------------------------------------------------
+
+### Method `propagate_filter_domains()`
+
+Eagerly propagate \`"filter"\`-mode domains to a target step and all
+steps after it.
+
+\`"filter"\` mode needs no computed data, so domains can be
+(re)established immediately when the step structure changes. Because
+each step's domain depends on every previous step, this recomputes
+\`from_target\` and cascades downstream ascending. No-op unless the
+propagation mode is \`"filter"\`.
+
+#### Usage
+
+    Cohort$propagate_filter_domains(from_target)
+
+#### Arguments
+
+- `from_target`:
+
+  Id of the first step to recompute.
 
 ------------------------------------------------------------------------
 

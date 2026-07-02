@@ -10,6 +10,7 @@ To explain how binding keys work and how to define them we’ll be using
 dataset:
 
 ``` r
+
 str(librarian)
 #> List of 4
 #>  $ books    : tibble [17 × 6] (S3: tbl_df/tbl/data.frame)
@@ -44,11 +45,12 @@ Cohort and configure required filters in it (we choose “Birdsong” book
 as an example):
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian)
 )
 
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     step(
       filter(
@@ -82,12 +84,13 @@ and extend cohort filters, for example we can define a new condition in
 the next filtering step:
 
 ``` r
+
 run(librarian_cohort)
 selected_isbn <- get_data(librarian_cohort)$books$isbn
 librarian_cohort %->%
   step(
     filter("discrete", id = "isbn", dataset = "issues", variable = "isbn", value = selected_isbn)
-  ) %>%
+  ) |>
   run(step_id = 2L)
 ```
 
@@ -96,17 +99,19 @@ book. For the final part we need to filter borrowers based on those
 issues. We’ll do this filtering in the third step:
 
 ``` r
+
 selected_borrower_id <- get_data(librarian_cohort)$issues$borrower_id
 librarian_cohort %->%
   step(
     filter("discrete", id = "borr_id", dataset = "borrowers", variable = "id", value = selected_borrower_id)
-  ) %>%
+  ) |>
   run(step_id = 3L)
 ```
 
 Resulting third-step data should contain desired information:
 
 ``` r
+
 get_data(librarian_cohort)$borrowers
 #> # A tibble: 2 × 6
 #>   id     registered address                           name  phone_number program
@@ -129,6 +134,7 @@ Let’s define relation between books and issues first and then we’ll
 explain the syntax:
 
 ``` r
+
 issue_books_bk <- bind_key(
   update = data_key(dataset = "issues", key = "isbn"),
   data_key(dataset = "books", key = "isbn")
@@ -168,6 +174,7 @@ No we can define full list of binding keys solving our case. We wrap
 multiple keys together using `bind_keys`:
 
 ``` r
+
 case_bks <- bind_keys(
   bind_key(
     update = data_key(dataset = "issues", key = "isbn"),
@@ -183,12 +190,13 @@ case_bks <- bind_keys(
 We define binding keys while creating source, so we need to:
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian),
   binding_keys = case_bks
 )
 
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     step(
       filter(
@@ -208,6 +216,7 @@ librarian_cohort <- librarian_source %>%
 Now:
 
 ``` r
+
 run(librarian_cohort)
 get_data(librarian_cohort)
 #> $books

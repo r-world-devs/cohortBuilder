@@ -14,3 +14,5 @@
   filters](https://r-world-devs.github.io/cohortBuilder/articles/custom-filters.md):
 - [Managing Cohort
   Object](https://r-world-devs.github.io/cohortBuilder/articles/managing-cohort.md):
+- [Source intelligence and AI
+  tools](https://r-world-devs.github.io/cohortBuilder/articles/source-intelligence.md):

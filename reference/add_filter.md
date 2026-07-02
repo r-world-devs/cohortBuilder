@@ -8,7 +8,15 @@ Add filter definition
 add_filter(x, filter, step_id, ...)
 
 # S3 method for class 'Cohort'
-add_filter(x, filter, step_id, run_flow = FALSE, ...)
+add_filter(
+  x,
+  filter,
+  step_id,
+  run_flow = FALSE,
+  hook = list(pre = get_hook("pre_add_filter_hook"), post =
+    get_hook("post_add_filter_hook")),
+  ...
+)
 
 # S3 method for class 'Source'
 add_filter(x, filter, step_id, ...)
@@ -37,6 +45,13 @@ add_filter(x, filter, step_id, ...)
 - run_flow:
 
   If \`TRUE\`, data flow is run after the filter is added.
+
+- hook:
+
+  List of hooks describing methods to run before/after the filter is
+  added. See
+  [hooks](https://r-world-devs.github.io/cohortBuilder/reference/hooks.md)
+  for more details.
 
 ## Value
 

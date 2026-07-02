@@ -9,6 +9,8 @@ cohort(
   source,
   ...,
   run_flow = FALSE,
+  compute_stats = TRUE,
+  propagate_domains = c("none", "filter", "stats", "data"),
   hook = list(pre = get_hook("pre_cohort_hook"), post = get_hook("post_cohort_hook"))
 )
 ```
@@ -28,6 +30,18 @@ cohort(
 - run_flow:
 
   If \`TRUE\`, data flow is run after the operation is completed.
+
+- compute_stats:
+
+  If \`TRUE\` (default), filter and step statistics are computed and
+  stored after each step. Set to \`FALSE\` for metadata-only operation.
+
+- propagate_domains:
+
+  Domain propagation mode between steps: \`"none"\` (default),
+  \`"filter"\` (from previous step filter values), \`"stats"\` (from
+  stored statistics; requires \`compute_stats = TRUE\`), or \`"data"\`
+  (scan filtered data; the stats-free equivalent).
 
 - hook:
 

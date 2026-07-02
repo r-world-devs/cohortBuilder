@@ -1,13 +1,10 @@
 # Define Cohort filter
 
-Define Cohort filter
+Creates an S7 filter object of the specified type.
 
 ## Usage
 
 ``` r
-filter(type, ...)
-
-# S3 method for class 'character'
 filter(type, ...)
 ```
 
@@ -15,15 +12,12 @@ filter(type, ...)
 
 - type:
 
-  Type of filter to use.
+  Type of filter to use (e.g., "discrete", "range", "date_range").
 
 - ...:
 
-  Filter type-specific parameters (see
-  [filter-types](https://r-world-devs.github.io/cohortBuilder/reference/filter-types.md)),
-  and filter source-specific parameters (see
-  [filter-source-types](https://r-world-devs.github.io/cohortBuilder/reference/filter-source-types.md)).
+  Filter type-specific parameters.
 
 ## Value
 
-A function of class \`cb_filter_constructor\`.
+An S7 filter object inheriting from \`CbFilter\`.

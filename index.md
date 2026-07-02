@@ -52,6 +52,7 @@ If you want to learn how to write custom source extension, please check
 ## Installation
 
 ``` r
+
 # CRAN version
 install.packages("cohortBuilder")
 
@@ -62,11 +63,12 @@ remotes::install_github("https://github.com/r-world-devs/cohortBuilder")
 ## Usage
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian)
 )
 
-coh <- librarian_source %>% 
+coh <- librarian_source |> 
   cohort(
     filter(
       "discrete", id = "author", dataset = "books", 
@@ -80,7 +82,7 @@ coh <- librarian_source %>%
       "date_range", id = "registered", dataset = "borrowers", 
       variable = "registered", range = c(as.Date("2010-01-01"), Inf)
     ) 
-  ) %>% 
+  ) |> 
   run()
 
 get_data(coh)
@@ -140,7 +142,8 @@ get_data(coh)
 ```
 
 ``` r
-coh <- librarian_source %>% 
+
+coh <- librarian_source |> 
   cohort() %->% 
   step(
     filter(
@@ -157,11 +160,12 @@ coh <- librarian_source %>%
       "range", id = "copies", dataset = "books", 
       variable = "copies", range = c(5, 10)
     )
-  ) %>% 
+  ) |> 
   run()
 ```
 
 ``` r
+
 get_data(coh, step_id = 1)
 #> $books
 #> # A tibble: 2 × 6
@@ -221,6 +225,7 @@ get_data(coh, step_id = 1)
 ```
 
 ``` r
+
 get_data(coh, step_id = 2)
 #> $books
 #> # A tibble: 1 × 6
@@ -278,6 +283,7 @@ get_data(coh, step_id = 2)
 ```
 
 ``` r
+
 update_filter(
   coh, step_id = 1, filter_id = "author",
   range = c(5, 6)
@@ -341,12 +347,14 @@ get_data(coh, step_id = 2)
 ```
 
 ``` r
+
 attrition(coh, dataset = "books")
 ```
 
 ![](reference/figures/README-attrition-1.png)
 
 ``` r
+
 get_state(coh, json = TRUE)
 #> [{"step":"1","filters":[{"range":[5,6],"type":"discrete","id":"author","name":"author","variable":"author","value":"Dan Brown","dataset":"books","keep_na":true,"description":null,"active":true},{"type":"date_range","id":"registered","name":"registered","variable":"registered","range":["2010-01-01","Inf"],"dataset":"borrowers","keep_na":true,"description":null,"active":true}]},{"step":"2","filters":[{"type":"range","id":"copies","name":"copies","variable":"copies","range":[5,10],"dataset":"books","keep_na":true,"description":null,"active":true}]}]
 ```

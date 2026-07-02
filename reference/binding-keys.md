@@ -12,6 +12,7 @@ table, we way want to return only books for the selected authors.
 With binding keys you could achieve it by providing \`binding_keys\`
 parameter for Source as below:
 
+
       binding_keys = bind_keys(
         bind_key(
           update = data_key('books', 'author_id'),
@@ -20,6 +21,7 @@ parameter for Source as below:
       )
 
 Or if we want to have two-way relation, just define another binding key:
+
 
       binding_keys = bind_keys(
         bind_key(
@@ -90,6 +92,7 @@ filter (in a step).
 
 When having defined binding key, e.g.
 
+
       bind_key(
         update = data_key('books', 'author_id'),
         data_key('authors', 'author_id')
@@ -106,6 +109,7 @@ finish. This allows to build dependency chains between table.
 
 Let's explain this in the below example. Having defined another table in
 Source \`borrowed(book_id, user_id, date)\` and binding key:
+
 
       bind_keys(
         bind_key(
@@ -137,6 +141,7 @@ authors table will also be modified by the second binding key.
 
 To turn off this behavior we just need to:
 
+
       bind_keys(
         bind_key(
           update = data_key('books', 'book_id'),
@@ -152,6 +157,7 @@ To turn off this behavior we just need to:
 **Bind filtered on unfiltered data - \`post\` parameter**
 
 Let's tart with the below binding key example:
+
 
       bind_keys(
         bind_key(
@@ -170,6 +176,7 @@ We can achieve 1 and 2 with defining \`post = TRUE\` (the default) and
 \`post = FALSE\` respectively.
 
 So the following setup:
+
 
       bind_keys(
         bind_key(

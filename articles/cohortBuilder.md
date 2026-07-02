@@ -34,6 +34,7 @@ To present `cohortBuilder`’s functionality we’ll be operating on
 sample of book library management database.
 
 ``` r
+
 cohortBuilder::librarian
 #> $books
 #> # A tibble: 17 × 6
@@ -109,6 +110,7 @@ e.g. `tblist(mtcars, iris)`. **Note.** In order to convert list of data
 frames to ‘tblist’ just use `as.tblist`.
 
 ``` r
+
 str(as.tblist(librarian), max.level = 1L)
 #> List of 4
 #>  $ books    : tibble [17 × 6] (S3: tbl_df/tbl/data.frame)
@@ -121,6 +123,7 @@ str(as.tblist(librarian), max.level = 1L)
 Let’s proceed with creating the source:
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian)
 )
@@ -148,7 +151,8 @@ In the standard workflow we build `Cohort` on top of `Source`. We
 achieve it with `cohort` function:
 
 ``` r
-librarian_cohort <- librarian_source %>%
+
+librarian_cohort <- librarian_source |>
   cohort()
 class(librarian_cohort)
 #> [1] "Cohort" "R6"
@@ -157,6 +161,7 @@ class(librarian_cohort)
 With the existing `Cohort` we may get underlying data with `get_data`:
 
 ``` r
+
 get_data(librarian_cohort)
 #> $books
 #> # A tibble: 17 × 6
@@ -219,7 +224,7 @@ related data filtering.
 The extensive description of filters can be found at
 [`vignette("custom-filters")`](https://r-world-devs.github.io/cohortBuilder/articles/custom-filters.md).
 
-The current version of `cohortBuilder` provides five types of build-in
+The current version of `cohortBuilder` provides seven types of build-in
 filters:
 
 - **discrete** - return values (in column) matching provided set,
@@ -227,8 +232,10 @@ filters:
   values,
 - **range** - return values within the provided range,
 - **date_range** - range version for Date type data,
+- **datetime_range** - range version for POSIXct (datetime) type data,
 - **multi_discrete** - extended version of discrete filter working with
-  multiple conditions.
+  multiple conditions,
+- **query** - filter data using a `dplyr`-style query expression.
 
 Let’s define discrete filter that will subset `books` table listing
 books written by Dan Brown.  
@@ -243,6 +250,7 @@ function:
 So in our case:
 
 ``` r
+
 author_filter <- filter(
   "discrete",
   dataset = "books",
@@ -255,7 +263,8 @@ In order to add the filter to existing Cohort we may use `add_filter`
 method:
 
 ``` r
-librarian_cohort <- librarian_cohort %>%
+
+librarian_cohort <- librarian_cohort |>
   add_filter(author_filter)
 ```
 
@@ -263,6 +272,7 @@ Alternatively we may use `%->%` operator that calls `add_filter`
 underneath:
 
 ``` r
+
 librarian_cohort <- librarian_cohort %->%
   author_filter
 ```
@@ -270,7 +280,8 @@ librarian_cohort <- librarian_cohort %->%
 Or define the filter while creating Cohort:
 
 ``` r
-librarian_cohort <- librarian_source %>%
+
+librarian_cohort <- librarian_source |>
   cohort(
     author_filter
   )
@@ -284,7 +295,8 @@ There are much more options for defining filters. To learn more check
 For example:
 
 ``` r
-librarian_cohort %>%
+
+librarian_cohort |>
   add_filter(author_filter)
 ```
 
@@ -293,17 +305,19 @@ will also work.
 **Note.** To verify if the filter was configured properly just run:
 
 ``` r
+
 sum_up(librarian_cohort)
-#> >> Step ID: 1
-#> -> Filter ID: EEXOM1772118519948
+#> >> Step ID: 1 [pending]
+#> -> Filter ID: books-author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 ```
 
 The output highlights list of configured filters along with their
@@ -323,12 +337,14 @@ first, and run calculation only once.
 If you want to run data filtering, just call `run`:
 
 ``` r
+
 run(librarian_cohort)
 ```
 
 Let’s check if the operation worked fine by checking the resulting data:
 
 ``` r
+
 get_data(librarian_cohort)
 #> $books
 #> # A tibble: 2 × 6
@@ -380,15 +396,17 @@ If you want to run data filtering automatically when the filter is
 defined you can set `run_flow = TRUE`:
 
 ``` r
-librarian_cohort <- librarian_source %>%
-  cohort() %>%
+
+librarian_cohort <- librarian_source |>
+  cohort() |>
   add_filter(author_filter, run_flow = TRUE)
 ```
 
 when using `add_filter` or:
 
 ``` r
-librarian_cohort <- librarian_source %>%
+
+librarian_cohort <- librarian_source |>
   cohort(
     author_filter,
     run_flow = TRUE
@@ -401,6 +419,7 @@ Now when the data filtered, how can we get data state before filtering?
 With `get_data` it’s easy, just set `state = "pre"`:
 
 ``` r
+
 get_data(librarian_cohort, state = "pre")
 #> $books
 #> # A tibble: 17 × 6
@@ -473,7 +492,8 @@ second one.
 The below code does the job:
 
 ``` r
-librarian_cohort <- librarian_source %>%
+
+librarian_cohort <- librarian_source |>
   cohort(
     step(
       filter(
@@ -510,36 +530,40 @@ Let’s note a few parts that occurred above:
 Let’s check the Cohort configuration:,
 
 ``` r
+
 sum_up(librarian_cohort)
-#> >> Step ID: 1
+#> >> Step ID: 1 [pending]
 #> -> Filter ID: author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: program
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: borrowers
 #>      variable: program
 #>      value: premium
 #>      keep_na: FALSE
-#>      description: 
-#>      active: TRUE
-#> >> Step ID: 2
+#> >> Step ID: 2 [pending]
 #> -> Filter ID: copies
 #>    Filter Type: range
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: copies
 #>      range: -Inf, 5
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 ```
 
 We can see filters were correctly assigned to each step.
@@ -549,6 +573,7 @@ resulting data after each step. In order to precise the step we want to
 get data from, just pass its id as `step_id` parameter:
 
 ``` r
+
 run(librarian_cohort)
 get_data(librarian_cohort, step_id = 1L)
 #> $books
@@ -649,6 +674,7 @@ filtering using `state` parameter. Because the proceeding step uses
 result from the previous one, we have:
 
 ``` r
+
 identical(
   get_data(librarian_cohort, step_id = 1L, state = "post"),
   get_data(librarian_cohort, step_id = 2L, state = "pre")
@@ -676,6 +702,7 @@ you can:
 - display data changes across filtering steps.
 
 ``` r
+
 stat(librarian_cohort, step_id = 1L, filter_id = "program")
 #> $n_data
 #> [1] 6
@@ -695,29 +722,39 @@ stat(librarian_cohort, step_id = 2L, filter_id = "copies")
 #>   level count l_bound u_bound
 #> 1     1     1       4       4
 #> 
+#> $min
+#> [1] 4
+#> 
+#> $max
+#> [1] 4
+#> 
 #> $n_missing
 #> [1] 0
 ```
 
 ``` r
+
 plot_data(librarian_cohort, step_id = 1L, filter_id = "program")
 ```
 
 ![](cohortBuilder_files/figure-html/unnamed-chunk-22-1.png)
 
 ``` r
+
 plot_data(librarian_cohort, step_id = 2L, filter_id = "copies")
 ```
 
 ![](cohortBuilder_files/figure-html/unnamed-chunk-23-1.png)
 
 ``` r
+
 attrition(librarian_cohort, dataset = "books")
 ```
 
 ![](cohortBuilder_files/figure-html/unnamed-chunk-24-1.png)
 
 ``` r
+
 attrition(librarian_cohort, dataset = "borrowers")
 ```
 
@@ -733,20 +770,19 @@ operating on specific source (i.e. `dplyr` for `tblist` and `dbplyr` for
 `db` source):
 
 ``` r
+
 code(librarian_cohort)
 #> .pre_filtering <- function(source, data_object, step_id) {
 #>     for (dataset in names(data_object)) {
 #>         attr(data_object[[dataset]], "filtered") <- FALSE
 #>     }
-#>     return(data_object)
+#>     data_object
 #> }
 #> .run_binding <- function(source, binding_key, data_object_pre, data_object_post,
 #>     ...) {
 #>     binding_dataset <- binding_key$update$dataset
 #>     dependent_datasets <- names(binding_key$data_keys)
-#>     active_datasets <- data_object_post %>%
-#>         purrr::keep(~attr(., "filtered")) %>%
-#>         names()
+#>     active_datasets <- names(purrr::keep(data_object_post, ~attr(., "filtered")))
 #>     if (!any(dependent_datasets %in% active_datasets)) {
 #>         return(data_object_post)
 #>     }
@@ -754,9 +790,8 @@ code(librarian_cohort)
 #>     common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))
 #>     for (dependent_dataset in dependent_datasets) {
 #>         key_names <- binding_key$data_keys[[dependent_dataset]]$key
-#>         tmp_key_values <- collapse::funique(data_object_post[[dependent_dataset]][,
-#>             key_names, drop = FALSE]) %>%
-#>             stats::setNames(common_key_names)
+#>         tmp_key_values <- stats::setNames(collapse::funique(data_object_post[[dependent_dataset]][,
+#>             key_names, drop = FALSE]), common_key_names)
 #>         if (is.null(key_values)) {
 #>             key_values <- tmp_key_values
 #>         } else {
@@ -775,28 +810,25 @@ code(librarian_cohort)
 #>     if (binding_key$activate) {
 #>         attr(data_object_post[[binding_dataset]], "filtered") <- TRUE
 #>     }
-#>     return(data_object_post)
+#>     data_object_post
 #> }
 #> source <- list(dtconn = as.tblist(librarian))
 #> data_object <- source$dtconn
 #> step_id <- "1"
 #> pre_data_object <- data_object
 #> data_object <- .pre_filtering(source, data_object, "1")
-#> data_object[["books"]] <- data_object[["books"]] %>%
-#>     dplyr::filter(author %in% c("Dan Brown", NA))
-#> attr(data_object[["books"]], "filtered") <- TRUE
-#> data_object[["borrowers"]] <- data_object[["borrowers"]] %>%
-#>     dplyr::filter(program %in% "premium")
-#> attr(data_object[["borrowers"]], "filtered") <- TRUE
+#> data_object[["books"]] <- dplyr::filter(data_object[["books"]], author %in% c("Dan Brown",
+#>     NA))
+#> data_object[["borrowers"]] <- dplyr::filter(data_object[["borrowers"]], program %in%
+#>     "premium")
 #> data_object <- .post_filtering(source, data_object, "1")
 #> for (binding_key in binding_keys) {
 #>     data_object <- .run_binding(source, binding_key, pre_data_object, data_object)
 #> }
 #> step_id <- "2"
 #> data_object <- .pre_filtering(source, data_object, "2")
-#> data_object[["books"]] <- data_object[["books"]] %>%
-#>     dplyr::filter((copies <= 5 & copies >= -Inf) | is.na(copies))
-#> attr(data_object[["books"]], "filtered") <- TRUE
+#> data_object[["books"]] <- dplyr::filter(data_object[["books"]], (copies <= 5 & copies >=
+#>     -Inf) | is.na(copies))
 #> data_object <- .post_filtering(source, data_object, "2")
 ```
 
@@ -804,6 +836,7 @@ We can see above, the resulting code uses `source` object, which
 creation code can be defined separately while creating it:
 
 ``` r
+
 librarian_source <- set_source(
   as.tblist(librarian),
   source_code = quote({
@@ -812,7 +845,7 @@ librarian_source <- set_source(
   })
 )
 
-librarian_cohort <- librarian_source %>%
+librarian_cohort <- librarian_source |>
   cohort(
     step(
       filter(
@@ -841,15 +874,13 @@ code(librarian_cohort)
 #>     for (dataset in names(data_object)) {
 #>         attr(data_object[[dataset]], "filtered") <- FALSE
 #>     }
-#>     return(data_object)
+#>     data_object
 #> }
 #> .run_binding <- function(source, binding_key, data_object_pre, data_object_post,
 #>     ...) {
 #>     binding_dataset <- binding_key$update$dataset
 #>     dependent_datasets <- names(binding_key$data_keys)
-#>     active_datasets <- data_object_post %>%
-#>         purrr::keep(~attr(., "filtered")) %>%
-#>         names()
+#>     active_datasets <- names(purrr::keep(data_object_post, ~attr(., "filtered")))
 #>     if (!any(dependent_datasets %in% active_datasets)) {
 #>         return(data_object_post)
 #>     }
@@ -857,9 +888,8 @@ code(librarian_cohort)
 #>     common_key_names <- paste0("key_", seq_along(binding_key$data_keys[[1]]$key))
 #>     for (dependent_dataset in dependent_datasets) {
 #>         key_names <- binding_key$data_keys[[dependent_dataset]]$key
-#>         tmp_key_values <- collapse::funique(data_object_post[[dependent_dataset]][,
-#>             key_names, drop = FALSE]) %>%
-#>             stats::setNames(common_key_names)
+#>         tmp_key_values <- stats::setNames(collapse::funique(data_object_post[[dependent_dataset]][,
+#>             key_names, drop = FALSE]), common_key_names)
 #>         if (is.null(key_values)) {
 #>             key_values <- tmp_key_values
 #>         } else {
@@ -878,7 +908,7 @@ code(librarian_cohort)
 #>     if (binding_key$activate) {
 #>         attr(data_object_post[[binding_dataset]], "filtered") <- TRUE
 #>     }
-#>     return(data_object_post)
+#>     data_object_post
 #> }
 #> source <- list()
 #> source$dtconn <- as.tblist(librarian)
@@ -886,21 +916,18 @@ code(librarian_cohort)
 #> step_id <- "1"
 #> pre_data_object <- data_object
 #> data_object <- .pre_filtering(source, data_object, "1")
-#> data_object[["books"]] <- data_object[["books"]] %>%
-#>     dplyr::filter(author %in% c("Dan Brown", NA))
-#> attr(data_object[["books"]], "filtered") <- TRUE
-#> data_object[["borrowers"]] <- data_object[["borrowers"]] %>%
-#>     dplyr::filter(program %in% "premium")
-#> attr(data_object[["borrowers"]], "filtered") <- TRUE
+#> data_object[["books"]] <- dplyr::filter(data_object[["books"]], author %in% c("Dan Brown",
+#>     NA))
+#> data_object[["borrowers"]] <- dplyr::filter(data_object[["borrowers"]], program %in%
+#>     "premium")
 #> data_object <- .post_filtering(source, data_object, "1")
 #> for (binding_key in binding_keys) {
 #>     data_object <- .run_binding(source, binding_key, pre_data_object, data_object)
 #> }
 #> step_id <- "2"
 #> data_object <- .pre_filtering(source, data_object, "2")
-#> data_object[["books"]] <- data_object[["books"]] %>%
-#>     dplyr::filter((copies <= 5 & copies >= -Inf) | is.na(copies))
-#> attr(data_object[["books"]], "filtered") <- TRUE
+#> data_object[["books"]] <- dplyr::filter(data_object[["books"]], (copies <= 5 & copies >=
+#>     -Inf) | is.na(copies))
 #> data_object <- .post_filtering(source, data_object, "2")
 ```
 
@@ -921,15 +948,17 @@ storing information about all the steps and filters configuration.
 You may get the state with `get_state` method:
 
 ``` r
+
 state <- get_state(librarian_cohort, json = TRUE)
 state
-#> [{"step":"1","filters":[{"type":"discrete","id":"author","name":"author","variable":"author","value":"Dan Brown","dataset":"books","keep_na":true,"description":null,"active":true},{"type":"discrete","id":"program","name":"program","variable":"program","value":"premium","dataset":"borrowers","keep_na":false,"description":null,"active":true}]},{"step":"2","filters":[{"type":"range","id":"copies","name":"copies","variable":"copies","range":["-Inf",5],"dataset":"books","keep_na":true,"description":null,"active":true}]}]
+#> [{"step":"1","pending":false,"filters":[{"type":"discrete","id":"author","name":"author","active":true,"description":null,"domain":null,"dataset":"books","variable":"author","value":"Dan Brown","keep_na":true},{"type":"discrete","id":"program","name":"program","active":true,"description":null,"domain":null,"dataset":"borrowers","variable":"program","value":"premium","keep_na":false}]},{"step":"2","pending":false,"filters":[{"type":"range","id":"copies","name":"copies","active":true,"description":null,"domain":null,"dataset":"books","variable":"copies","range":["-Inf",5],"keep_na":true}]}]
 ```
 
 Then, having an empty cohort, use `restore` to apply the configuration:
 
 ``` r
-librarian_cohort <- librarian_source %>%
+
+librarian_cohort <- librarian_source |>
   cohort()
 
 restore(librarian_cohort, state = state)
@@ -939,29 +968,32 @@ sum_up(librarian_cohort)
 #> -> Filter ID: author
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: author
 #>      value: Dan Brown
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 #> -> Filter ID: program
 #>    Filter Type: discrete
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: borrowers
 #>      variable: program
 #>      value: premium
 #>      keep_na: FALSE
-#>      description: 
-#>      active: TRUE
 #> >> Step ID: 2
 #> -> Filter ID: copies
 #>    Filter Type: range
 #>    Filter Parameters:
+#>      active: TRUE
+#>      description: 
+#>      domain: 
 #>      dataset: books
 #>      variable: copies
 #>      range: -Inf, 5
 #>      keep_na: TRUE
-#>      description: 
-#>      active: TRUE
 ```

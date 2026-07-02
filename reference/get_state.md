@@ -5,7 +5,7 @@ Get Cohort configuration state.
 ## Usage
 
 ``` r
-get_state(x, step_id, json = FALSE, extra_fields = NULL)
+get_state(x, step_id, json = FALSE)
 ```
 
 ## Arguments
@@ -22,13 +22,9 @@ get_state(x, step_id, json = FALSE, extra_fields = NULL)
 
   If TRUE, return state in JSON format.
 
-- extra_fields:
-
-  Names of extra fields included in filter to be added to state.
-
 ## Value
 
-List object of character string being the list convertion to JSON
+List object of character string being the list conversion to JSON
 format.
 
 ## See also

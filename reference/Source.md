@@ -15,6 +15,18 @@ type, primary keys and relations between stored data.
 
   Data connection object the Source if based on.
 
+- `dtvalue`:
+
+  Evaluated data connection value used for computing stats.
+
+- `meta_stats`:
+
+  Computed metadata statistics for available filters.
+
+- `compute_meta_stats`:
+
+  Whether metadata statistics for available filters are pre-computed.
+
 - `description`:
 
   Source object description list.
@@ -41,6 +53,12 @@ type, primary keys and relations between stored data.
 
   An expression which allows to recreate basic source structure.
 
+## Active bindings
+
+- `available_filters`:
+
+  List of filter definitions available for the source.
+
 ## Methods
 
 ### Public methods
@@ -61,6 +79,8 @@ type, primary keys and relations between stored data.
 
 - [`Source$update_filter()`](#method-Source-update_filter)
 
+- [`Source$calc_meta_stats()`](#method-Source-calc_meta_stats)
+
 - [`Source$clone()`](#method-Source-clone)
 
 ------------------------------------------------------------------------
@@ -78,6 +98,8 @@ Create a new \`Source\` object.
       binding_keys = NULL,
       source_code = NULL,
       description = NULL,
+      available_filters = NULL,
+      compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE),
       options = list(display_binding = TRUE)
     )
 
@@ -113,6 +135,17 @@ Create a new \`Source\` object.
   with
   [description](https://r-world-devs.github.io/cohortBuilder/reference/description.md)
   Cohort method.
+
+- `available_filters`:
+
+  List of filter definitions available for the source.
+
+- `compute_meta_stats`:
+
+  Whether to pre-compute metadata statistics for \`available_filters\`.
+  When \`FALSE\`, \`meta_stats\` are skipped (and filter domains fall
+  back to live computation). Defaults to the
+  \`cb.source_filters_meta_stats\` option (\`TRUE\`).
 
 - `options`:
 
@@ -249,6 +282,16 @@ Update filter definition.
 - `...`:
 
   Parameters with its new values.
+
+------------------------------------------------------------------------
+
+### Method `calc_meta_stats()`
+
+Calculate metadata statistics for available filters.
+
+#### Usage
+
+    Source$calc_meta_stats()
 
 ------------------------------------------------------------------------
 

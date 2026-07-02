@@ -8,7 +8,15 @@ Remove filter definition
 rm_filter(x, step_id, filter_id, ...)
 
 # S3 method for class 'Cohort'
-rm_filter(x, step_id, filter_id, run_flow = FALSE, ...)
+rm_filter(
+  x,
+  step_id,
+  filter_id,
+  run_flow = FALSE,
+  hook = list(pre = get_hook("pre_rm_filter_hook"), post =
+    get_hook("post_rm_filter_hook")),
+  ...
+)
 
 # S3 method for class 'Source'
 rm_filter(x, step_id, filter_id, ...)
@@ -35,6 +43,13 @@ rm_filter(x, step_id, filter_id, ...)
 - run_flow:
 
   If \`TRUE\`, data flow is run after the filter is removed.
+
+- hook:
+
+  List of hooks describing methods to run before/after the filter is
+  removed. See
+  [hooks](https://r-world-devs.github.io/cohortBuilder/reference/hooks.md)
+  for more details.
 
 ## Value
 

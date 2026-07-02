@@ -12,7 +12,9 @@ set_source(
   primary_keys = NULL,
   binding_keys = NULL,
   source_code = NULL,
-  description = NULL
+  description = NULL,
+  available_filters = NULL,
+  compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE)
 )
 
 # S3 method for class 'tblist'
@@ -22,6 +24,8 @@ set_source(
   binding_keys = NULL,
   source_code = NULL,
   description = NULL,
+  available_filters = NULL,
+  compute_meta_stats = getOption("cb.source_filters_meta_stats", TRUE),
   ...
 )
 ```
@@ -60,6 +64,19 @@ set_source(
   with
   [description](https://r-world-devs.github.io/cohortBuilder/reference/description.md)
   Cohort method.
+
+- available_filters:
+
+  List of filter definitions available for the source. See
+  [autofilter](https://r-world-devs.github.io/cohortBuilder/reference/autofilter.md)
+  for generating them automatically.
+
+- compute_meta_stats:
+
+  Whether to pre-compute metadata statistics for the source
+  \`available_filters\`. When \`FALSE\`, the computation is skipped and
+  filter domains fall back to live computation. Defaults to the
+  \`cb.source_filters_meta_stats\` option (\`TRUE\`).
 
 ## Value
 

@@ -160,6 +160,5 @@ following list of methods should be defined:
 
 Except from the above methods, you may extend the existing or new source
 with providing custom filtering methods. See
-[creating-filters](https://r-world-devs.github.io/cohortBuilder/reference/creating-filters.md).
-In order to see more details about how to implement custom source check
-\`vignette("custom-extensions")\`.
+\`vignette("custom-filters")\`. In order to see more details about how
+to implement custom source check \`vignette("custom-extensions")\`.

@@ -1,347 +1,388 @@
 # Implementing custom filters
 
-`cohortBuilder` itself provides five types of filters that are suitable
-to perform most common filtering tasks:
+`cohortBuilder` provides seven built-in filter types suitable for most
+common filtering tasks:
 
 - discrete,
+- discrete_text,
 - range,
 - date_range,
 - datetime_range,
-- discrete_text,
-- multi_discrete.
+- multi_discrete,
+- query.
 
-If any of the above filters doesn’t meet your need, you may want to
-create a custom one. Below we describe in details how new filters can be
-created and provide an example for creating a new one - logical filter.
+If none of the above filters meets your need, you can create a custom
+one. Below we describe how custom filters work and walk through an
+example: creating a **logical** filter.
 
-## Filter structure
+## Filter architecture
 
-Before we start let’s make a closer look about what R object the filter
-is.
+Filters in `cohortBuilder` are S7 objects that inherit from the
+`CbFilter` base class. Each filter type is an S7 class with properties
+describing its configuration (dataset, variable, value, etc.).
 
-The `filter` function itself is S3 method taking `type` as a first
-argument.
+Filtering logic is implemented via **S7 multi-dispatch generics** that
+dispatch on both the filter class and the source class. This means you
+can define how a filter type behaves for different source backends
+(e.g. `tblist`, database, etc.).
 
-``` r
-filter
-#> function(type, ...) {
-#>   UseMethod("filter", type)
-#> }
-#> <bytecode: 0x557e0a4b63b8>
-#> <environment: namespace:cohortBuilder>
-```
+The key generics are:
 
-So in case of `discrete` filter, the proper used method is:
+| Generic | Purpose |
+|----|----|
+| `cb_filter_data(filter, source, data_object)` | Apply filter to data |
+| `cb_get_filter_stats(filter, source, data_object)` | Compute filter statistics |
+| `cb_plot_filter_data(filter, source, data_object)` | Plot filter data summary |
+| `cb_get_filter_data(filter, source, data_object)` | Get filter-related data subset |
+| `cb_get_filter_defaults(filter, source, data_object, cache_object)` | Get default parameter values |
+| `cb_filter_to_expr(filter, source)` | Generate reproducible code expression |
 
-``` r
-cohortBuilder:::filter.discrete
-#> function(type, id, name, ..., active = getOption("cb_active_filter", default = TRUE)) {
-#>   args <- append(
-#>     environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
-#>     list(...)
-#>   )
-#> 
-#>   .as_constructor(
-#>     function(source) {
-#>       do.call(
-#>         cb_filter.discrete,
-#>         append(list(source = source), args)
-#>       )
-#>     }
-#>   )
-#> }
-#> <bytecode: 0x557e0a9bb650>
-#> <environment: namespace:cohortBuilder>
-```
+### Built-in filter example
 
-that gathers provided parameters and returns function of `source`
-argument:
+Let’s look at a built-in discrete filter to understand the structure:
 
 ``` r
+
 spec_filter <- filter("discrete", value = "setosa", dataset = "iris", variable = "Species")
 spec_filter
-#> function(source) {
-#>       do.call(
-#>         cb_filter.discrete,
-#>         append(list(source = source), args)
-#>       )
-#>     }
-#> <bytecode: 0x557e0a9c43a8>
-#> <environment: 0x557e0abcdf40>
-#> attr(,"class")
-#> [1] "function"              "cb_filter_constructor"
+#> <cohortBuilder::CbFilterDiscrete>
+#>  @ type       : chr "discrete"
+#>  @ id         : chr "iris-Species"
+#>  @ name       : chr "Species"
+#>  @ active     : logi TRUE
+#>  @ description: NULL
+#>  @ domain     : NULL
+#>  @ step_id    : NULL
+#>  @ extra      : list()
+#>  @ private    :List of 1
+#>  .. $ input_param: chr "value"
+#>  @ dataset    : chr "iris"
+#>  @ variable   : chr "Species"
+#>  @ value      : chr "setosa"
+#>  @ keep_na    : logi TRUE
 ```
 
-So whenever we define filter of specific type it returns unevaluated
-function of `source` parameter.
-
-We can realize, the function itself calls another S3 method
-`cb_filter.discrete`, that takes into account type of the provided
-source.
+The filter is an S7 object with properties accessible via `@`:
 
 ``` r
-cb_filter.discrete
-#> function(source, ...) {
-#>   UseMethod("cb_filter.discrete", source)
-#> }
-#> <bytecode: 0x557e0a35bd88>
-#> <environment: namespace:cohortBuilder>
+
+spec_filter@type
+#> [1] "discrete"
+spec_filter@variable
+#> [1] "Species"
+spec_filter@value
+#> [1] "setosa"
+spec_filter@dataset
+#> [1] "iris"
 ```
 
-With such approach for having two layers of S3 methods, we are allowed
-to to build various filter types, for various source types. For example
-discrete filter for tblist source, discrete filter for db source, range
-filter for raw source etc.
-
-Now, let’s check what object stores filter evaluated on source:
+All user-facing parameters can be retrieved as a list:
 
 ``` r
-iris_source <- set_source(
-  tblist(iris = iris)
-)
-str(
-  spec_filter(iris_source),
-  give.attr = FALSE
-)
+
+str(get_filter_params(spec_filter))
 #> List of 10
-#>  $ id          : chr "MWLEF1772118528813"
-#>  $ type        : 'discrete' chr "discrete"
-#>  $ name        : chr "MWLEF1772118528813"
-#>  $ input_param : chr "value"
-#>  $ filter_data :function (data_object)  
-#>  $ get_stats   :function (data_object, name)  
-#>  $ plot_data   :function (data_object, ...)  
-#>  $ get_params  :function (name)  
-#>  $ get_data    :function (data_object)  
-#>  $ get_defaults:function (data_object, cache_object)
+#>  $ type       : chr "discrete"
+#>  $ id         : chr "iris-Species"
+#>  $ name       : chr "Species"
+#>  $ active     : logi TRUE
+#>  $ description: NULL
+#>  $ domain     : NULL
+#>  $ dataset    : chr "iris"
+#>  $ variable   : chr "Species"
+#>  $ value      : chr "setosa"
+#>  $ keep_na    : logi TRUE
 ```
 
-We can see, the evaluated filter is a list of 10 elements:
+## Creating a custom filter: logical filter
 
-- `type` - Filter type.
-- `id` - Filter id.
-- `name` - Filter name.
-- `input_param` - Name of the parameter taking filtering value.
-- `filter_data` - Function of ‘data_object’ parameter defining filtering
-  logic on Source data object.
-- `get_stats` - Function of ‘data_object’ and ‘name’ parameters defining
-  what and how data statistics should be calculated.
-- `plot_data` - Function of ‘data_object’ parameter defining how filter
-  data should be plotted.
-- `get_params` - Function of ‘name’ parameter returning filter parameter
-  (or all parameters when name is missing).
-- `get_data` - Function of ‘data_object’ returning filter related data.
-- `get_defaults` - Function of ‘data_object’ and ‘cache_object’
-  parameters returning default ‘input_param’ parameter value.
+To create a custom filter you need to:
 
-Where:
+1.  Define an S7 class inheriting from `CbFilter`.
+2.  Register the type so `filter("logical", ...)` works.
+3.  Implement S7 methods for each source type you want to support.
 
-- `data_object` is an object passed to and returned from each filtering
-  step (in more details, following the structure returned by
-  `init_source` S3 method).
-- `cache_object` is result of `get_stats` method for the previous step.
-
-## Logical filter
-
-In case you want to create a new filter definition, you may use
-`new_filter` to initialize it from template.
-
-Below we’ll create a new filter that takes logical value and filters
-logical column accordingly. Let’s name type of the filter as ‘logical’.
-The filter will work on ‘tblist’ source data (list of data frames).
-
-To do so, we need to:
-
-1.  Create `filter.logical` S3 method that is called when type of filter
-    is ‘logical’.
-2.  Create generic `cb_filter.logical` that operates based on source
-    type.
+### Step 1: Define the S7 filter class
 
 ``` r
-filter.logical <- function(type, id, name, ..., active = getOption("cb_active_filter", default = TRUE)) {
-  # Skip missing parameters passed and attach `...`
-  args <- append(
-    environment() %>% as.list() %>% purrr::keep(~ !is.symbol(.x)),
-    list(...)
-  )
 
-  # Return function of source parameter calling valid S3 method based on source type
-  function(source) {
-    do.call(
-      cb_filter.logical,
-      append(list(source = source), args)
+CbFilterLogical <- S7::new_class("CbFilterLogical",
+  parent = CbFilter,
+  properties = list(
+    dataset = S7::class_character,
+    variable = S7::class_character,
+    value = S7::class_any,
+    keep_na = S7::class_logical
+  ),
+  constructor = function(id = NULL, name = NULL, variable, value = NA,
+                         dataset, keep_na = TRUE, description = NULL,
+                         active = getOption("cb_active_filter", default = TRUE), ...) {
+    if (is.null(id)) id <- paste(dataset, variable, sep = "-")
+    if (is.null(name)) name <- variable
+    S7::new_object(S7::S7_object(),
+      type = "logical", id = id, name = name, input_param = "value",
+      variable = variable, value = value, dataset = dataset,
+      keep_na = keep_na, active = active, description = description,
+      extra = list(...)
     )
+  }
+)
+```
+
+Key points:
+
+- `parent = CbFilter` makes it part of the filter hierarchy.
+- `input_param = "value"` tells the system which property holds the
+  filtering value.
+- `extra = list(...)` captures any additional parameters
+  (e.g. `gui_input` for shinyCohortBuilder).
+- `value = NA` means no filtering is applied by default.
+
+### Step 2: Register the filter type
+
+``` r
+
+register_filter_type("logical", CbFilterLogical)
+```
+
+Now `filter("logical", ...)` works:
+
+``` r
+
+my_filter <- filter("logical", variable = "is_setosa", dataset = "iris", value = TRUE)
+my_filter@type
+#> [1] "logical"
+my_filter@value
+#> [1] TRUE
+```
+
+### Step 3: Implement methods for tblist source
+
+Each method dispatches on `(filter_class, source_class)`. We use
+`tblist_class` (provided by cohortBuilder) as the source class for the
+built-in list-of-tables backend.
+
+#### filter_data – filtering logic
+
+``` r
+
+S7::method(cb_filter_data, list(CbFilterLogical, tblist_class)) <- function(filter, source, data_object, ...) {
+  dataset <- filter@dataset
+  variable <- filter@variable
+  value <- filter@value
+  keep_na <- filter@keep_na
+
+  if (keep_na && !identical(value, NA)) {
+    data_object[[dataset]] <- data_object[[dataset]] |>
+      dplyr::filter(!!sym(variable) == !!value | is.na(!!sym(variable)))
+  }
+  if (!keep_na && identical(value, NA)) {
+    data_object[[dataset]] <- data_object[[dataset]] |>
+      dplyr::filter(!is.na(!!sym(variable)))
+  }
+  if (!keep_na && !identical(value, NA)) {
+    data_object[[dataset]] <- data_object[[dataset]] |>
+      dplyr::filter(!!sym(variable) == !!value)
+  }
+  attr(data_object[[dataset]], "filtered") <- TRUE
+  data_object
+}
+```
+
+Note:
+
+- When `value = NA`, no filtering is applied (unless `keep_na = FALSE`,
+  which removes `NA` rows).
+- The `filtered` attribute signals to binding logic that this dataset
+  was touched.
+
+#### get_stats – data statistics
+
+``` r
+
+S7::method(cb_get_filter_stats, list(CbFilterLogical, tblist_class)) <- function(
+  filter, source, data_object, name, ...
+) {
+  dataset <- filter@dataset
+  variable <- filter@variable
+  if (missing(name)) {
+    name <- c("n_data", "choices", "n_missing")
+  }
+  column <- data_object[[dataset]][[variable]]
+  stats <- list(
+    choices = if ("choices" %in% name) as.list(table(stats::na.omit(column))),
+    n_data = if ("n_data" %in% name) length(stats::na.omit(column)),
+    n_missing = if ("n_missing" %in% name) sum(is.na(column))
+  )
+  if (length(name) == 1L) stats[[name]] else stats[name]
+}
+```
+
+Tip: evaluating only the requested stat (via the `name` parameter)
+improves performance with large data.
+
+#### plot_data – visualization
+
+``` r
+
+S7::method(cb_plot_filter_data, list(CbFilterLogical, tblist_class)) <- function(filter, source, data_object, ...) {
+  dataset <- filter@dataset
+  variable <- filter@variable
+  if (nrow(data_object[[dataset]])) {
+    data_object[[dataset]][[variable]] |> table() |> prop.table() |> graphics::barplot(...)
+  } else {
+    graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
   }
 }
 ```
 
-Create `cb_filter.logical` generic used in the above method (skip when
-method already exists).
+#### get_data – filter-related data
 
 ``` r
-cb_filter.logical <- function(source, ...) {
-  UseMethod("cb_filter.logical", source)
+
+S7::method(cb_get_filter_data, list(CbFilterLogical, tblist_class)) <- function(filter, source, data_object, ...) {
+  data_object[[filter@dataset]][[filter@variable]]
 }
 ```
 
-Create S3 method for specific source data type (‘tblist’ in this case).
-Here we define list of parameters required by filter.
-
-The obligatory parameters are:
-
-- `source`,
-- `type` - equals filter type by default,
-- `id` - should be randomly generated by default,
-  [`.gen_id()`](https://r-world-devs.github.io/cohortBuilder/reference/dot-gen_id.md),
-- `name` - used only for improving readiness of various outputs. Can be
-  reassigned from id,
-- `active` - the parameter that configures whether filter should be used
-  or not (even if defined).
-
-More to that you should define parameters that allow filter
-configuration related to data.
-
-In our case we need to configure:
-
-- The dataset name to be used - `dataset`.
-- The variable used for filtering - `variable`.
-- Filtering value - `value`. Regarding value, `cohortBuilder` assumes
-  `value = NA` means no filtering is applied. This needs to be handled
-  while writing filtering logic.
-- Extra filter parameters - `...`. Accessible via `get_params` method -
-  see below.
-
-We can also add an extra parameter `keep_na` which determines whether
-`NA` values should be included or not. It’s also worth to add
-`description` parameter, storing helpful information about the defined
-filter.
-
-Now we create source specific S3 method for `cb_filter.logical`. Inside
-of the method we call `def_filter` completing all of the parameters
-based on filter configuration.
+#### get_defaults – default parameter values
 
 ``` r
-cb_filter.logical.tblist <- function(
-    source, type = "logical", id = .gen_id(), name = id, dataset, variable, 
-    value = NA, keep_na = TRUE, description = NULL, ..., active = TRUE) {
-  args <- list(...)
 
-  def_filter(
-    type = type,
-    id = id,
-    name = name,
-    input_param = "value",
-    filter_data = function(data_object) {
-
-      selected_value <- value # code include
-      if (keep_na && !identical(selected_value, NA)) {
-        # keep_na !value_na start
-        data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(!!sym(variable) == !!selected_value | is.na(variable))
-        # keep_na !value_na end
-      }
-      if (!keep_na && identical(selected_value, NA)) {
-        # !keep_na value_na start
-        data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(!is.na(!!sym(variable)))
-        # !keep_na value_na end
-      }
-      if (!keep_na && !identical(selected_value, NA)) {
-        # !keep_na !value_na start
-        data_object[[dataset]] <- data_object[[dataset]] %>%
-          dplyr::filter(!!sym(variable) %in% !!selected_value & !is.na(variable))
-        # !keep_na !value_na end
-      }
-      attr(data_object[[dataset]], "filtered") <- TRUE # code include
-      data_object
-    },
-    get_stats = function(data_object, name) {
-      if (missing(name)) {
-        name <- c("n_data", "choices", "n_missing")
-      }
-      stats <- list(
-        choices = if ("choices" %in% name) data_object[[dataset]][[variable]] %>% 
-          stats::na.omit() %>% 
-          table() %>% 
-          as.list(),
-        n_data = if ("n_data" %in% name)  data_object[[dataset]][[variable]] %>% 
-          stats::na.omit() %>% 
-          length(),
-        n_missing = if ("n_missing" %in% name) data_object[[dataset]][[variable]] %>% 
-          is.na() %>% 
-          sum()
-      )
-      if (length(name) == 1L) {
-        return(stats[[name]])
-      } else {
-        return(stats[name])
-      }
-    },
-    plot_data = function(data_object, ...) {
-      if (nrow(data_object[[dataset]])) {
-        data_object[[dataset]][[variable]] %>% table %>% prop.table() %>% graphics::barplot(...)
-      } else {
-        graphics::barplot(0.0, ylim = c(0.0, 0.1), main = "No data")
-      }
-    },
-    get_params = function(name) {
-      params <- list(
-        dataset = dataset,
-        variable = variable,
-        value = value,
-        description = description,
-        keep_na = keep_na,
-        active = active,
-        ...
-      )
-      if (!missing(name)) return(params[[name]])
-      return(params)
-    },
-    get_data = function(data_object) {
-      data_object[[dataset]][[variable]]
-    },
-    get_defaults = function(data_object, cache_object) {
-      list(value = names(cache_object$choices))
-    }
-  )
+S7::method(cb_get_filter_defaults, list(CbFilterLogical, tblist_class)) <- function(
+  filter, source, data_object, cache_object, ...
+) {
+  list(value = names(cache_object$choices))
 }
 ```
 
-Please note that:
-
-1.  When filter parameter value equals NA, we assume no filtering is
-    done at all (unless we define `keep_na = TRUE`).
-2.  While defining `filter_data` we add a few comment blocks that affect
-    reproducible code output:
-
-- configurations of `(!)keep_na (!)value_na (start|end)` - states which
-  filtering case are we in.
-- inline `code include` comments, or `code include (start|end)`
-  designates which code lines to include in reproducible code. This way
-  we can easily control which parts of filtering logic should
-  reproducible code include. When writing custom filters in a separate
-  package please add `keepSource: true` in the description to preserve
-  comments after compilation.
-
-3.  When defining `get_stats`, we took care to evaluate only the
-    selected stat (if `name` is not missing). Such implementation is not
-    obligatory, but helps to improve performance if we operate with
-    large source data.
-4.  `filter_data` method doesn’t change the structure of `data_object`.
-5.  `filter_data` attaches `filtered` attribute to affected dataset.
-    This way, whenever `filter_data` is called (filter is active), we
-    can handle such information while running bindings. If no bindings
-    are used, this step can be skipped.
-
-Now we can use our filter for building cohort.
-
-For the example we’ll use extended `iris` table:
+#### filter_to_expr – reproducible code
 
 ``` r
+
+S7::method(cb_filter_to_expr, list(CbFilterLogical, tblist_class)) <- function(filter, source, ...) {
+  dataset <- filter@dataset
+  variable <- filter@variable
+  value <- filter@value
+  keep_na <- filter@keep_na
+
+  if (keep_na && !identical(value, NA)) {
+    rlang::expr({
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
+        dplyr::filter(!!sym(variable) == !!value | is.na(!!sym(variable)))
+    })
+  } else if (!keep_na && identical(value, NA)) {
+    rlang::expr({
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
+        dplyr::filter(!is.na(!!sym(variable)))
+    })
+  } else if (!keep_na && !identical(value, NA)) {
+    rlang::expr({
+      data_object[[!!dataset]] <- data_object[[!!dataset]] |>
+        dplyr::filter(!!sym(variable) == !!value)
+    })
+  } else {
+    NULL
+  }
+}
+```
+
+### Using the filter
+
+Now we can use our filter for building a cohort. For the example we’ll
+use an extended `iris` table:
+
+``` r
+
 iris2 <- dplyr::mutate(iris, is_setosa = Species == "setosa")
-coh <- set_source(tblist(iris = iris2)) %>%
+coh <- set_source(tblist(iris = iris2)) |>
   cohort(
     filter("logical", dataset = "iris", variable = "is_setosa", value = TRUE)
-  ) %>%
+  ) |>
   run()
+```
+
+Let’s verify the filtering worked:
+
+``` r
+
+nrow(get_data(coh)$iris)
+#> [1] 50
+collapse::funique(get_data(coh)$iris$is_setosa)
+#> [1] TRUE
+```
+
+We can also check statistics and reproducible code:
+
+``` r
+
+stat(coh, step_id = 1L, filter_id = 1L)
+#> $n_data
+#> [1] 50
+#> 
+#> $choices
+#> $choices$`TRUE`
+#> [1] 50
+#> 
+#> 
+#> $n_missing
+#> [1] 0
+```
+
+``` r
+
+code(coh, include_methods = NULL, include_action = NULL)
+#> source <- list(dtconn = tblist(iris = iris2))
+#> data_object <- source$dtconn
+#> step_id <- "1"
+#> data_object[["iris"]] <- dplyr::filter(data_object[["iris"]], is_setosa == TRUE |
+#>     is.na(is_setosa))
+```
+
+## Extra parameters
+
+Filter constructors accept `...` which is stored in `filter@extra`. This
+is useful for passing additional configuration consumed by other
+packages (e.g. `gui_input` for shinyCohortBuilder):
+
+``` r
+
+my_filter <- filter("logical",
+  dataset = "iris", variable = "is_setosa", value = TRUE,
+  gui_input = "checkbox"
+)
+my_filter@extra$gui_input
+#> [1] "checkbox"
+get_filter_params(my_filter)$gui_input
+#> [1] "checkbox"
+```
+
+Extra parameters are included in
+[`get_filter_params()`](https://r-world-devs.github.io/cohortBuilder/reference/get_filter_params.md)
+output, persisted in
+[`get_state()`](https://r-world-devs.github.io/cohortBuilder/reference/get_state.md),
+and can be updated via
+[`update_filter()`](https://r-world-devs.github.io/cohortBuilder/reference/update_filter.md).
+
+## Implementing filters in a package
+
+When creating custom filters in a separate package:
+
+1.  Define your S7 filter class(es) and export them.
+2.  Call
+    [`register_filter_type()`](https://r-world-devs.github.io/cohortBuilder/reference/register_filter_type.md)
+    in your package’s `.onLoad()`.
+3.  Register S7 methods for your filter × source combinations.
+4.  Add `S7 (>= 0.2.0)` and `cohortBuilder` to `Imports` in DESCRIPTION.
+5.  Call
+    [`S7::methods_register()`](https://rconsortium.github.io/S7/reference/methods_register.html)
+    in your `.onLoad()` to register S7 methods.
+
+``` r
+
+# R/zzz.R
+.onLoad <- function(libname, pkgname) {
+  S7::methods_register()
+  cohortBuilder::register_filter_type("logical", CbFilterLogical)
+}
 ```

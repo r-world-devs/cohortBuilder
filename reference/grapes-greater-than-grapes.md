@@ -21,4 +21,4 @@ x %->% object
 
 ## Value
 
-And object (\`Source\` or \`Cohort\`) having new filter of step added.
+An object (\`Source\` or \`Cohort\`) having new filter or step added.
