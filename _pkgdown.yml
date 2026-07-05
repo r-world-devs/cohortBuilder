@@ -21,6 +21,8 @@ navbar:
         href: articles/cohort-configuration.html
       - text: "Specifying data relations with Binding Keys"
         href: articles/binding-keys.html
+      - text: "Source intelligence and AI tools"
+        href: articles/source-intelligence.html
       - text: "Implementing custom filters"
         href: articles/custom-filters.html
       - text: "Writing custom extensions"
