@@ -2,6 +2,8 @@
 
 ## cohortBuilder 1.0.0
 
+CRAN release: 2026-07-03
+
 ### Breaking changes
 
 - **Filter system rewritten to S7.** Filters are now S7 objects
