@@ -9,7 +9,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/r-world-devs/cohortBuilder/blob/dev/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/r-world-devs/cohortBuilder/blob/v1.0.0/DESCRIPTION)
 
 Igras K (2026). *cohortBuilder: Data Source Agnostic Filtering Tools*. R
 package version 1.0.0, <https://github.com/r-world-devs/cohortBuilder/>.

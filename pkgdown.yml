@@ -1,5 +1,5 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   binding-keys: binding-keys.html
@@ -9,7 +9,7 @@ articles:
   custom-filters: custom-filters.html
   managing-cohort: managing-cohort.html
   source-intelligence: source-intelligence.html
-last_built: 2026-07-05T20:27Z
+last_built: 2026-07-10T11:07Z
 urls:
   reference: https://r-world-devs.github.io/cohortBuilder/reference
   article: https://r-world-devs.github.io/cohortBuilder/articles
