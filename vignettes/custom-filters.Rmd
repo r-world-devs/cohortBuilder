@@ -97,7 +97,7 @@ CbFilterLogical <- S7::new_class("CbFilterLogical",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     if (is.null(id)) id <- paste(dataset, variable, sep = "-")
     if (is.null(name)) name <- variable
-    S7::new_object(S7::S7_object(),
+    S7::new_object(CbFilter(),
       type = "logical", id = id, name = name, input_param = "value",
       variable = variable, value = value, dataset = dataset,
       keep_na = keep_na, active = active, description = description,

@@ -25,7 +25,7 @@ MyCbFilter <- S7::new_class("MyCbFilter",
                          description = NULL, domain = NULL, ...) {
     id <- id \%||\% .default_filter_id(dataset, variable)
     name <- name \%||\% id
-    S7::new_object(S7::S7_object(),
+    S7::new_object(CbFilter(),
       type = "my_filter", id = id, name = name,
       dataset = dataset, variable = variable,
       active = TRUE, description = description, domain = domain,

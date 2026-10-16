@@ -35,7 +35,7 @@ tblist_class <- S7::new_S3_class("tblist")
 #'                          description = NULL, domain = NULL, ...) {
 #'     id <- id %||% .default_filter_id(dataset, variable)
 #'     name <- name %||% id
-#'     S7::new_object(S7::S7_object(),
+#'     S7::new_object(CbFilter(),
 #'       type = "my_filter", id = id, name = name,
 #'       dataset = dataset, variable = variable,
 #'       active = TRUE, description = description, domain = domain,
@@ -122,7 +122,7 @@ CbFilterDiscrete <- S7::new_class("CbFilterDiscrete",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
     name <- name %||% variable
-    S7::new_object(S7::S7_object(),
+    S7::new_object(CbFilter(),
       type = "discrete", id = id, name = name,
       variable = variable, value = value, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
@@ -153,7 +153,7 @@ CbFilterDiscreteText <- S7::new_class("CbFilterDiscreteText",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
     name <- name %||% variable
-    S7::new_object(S7::S7_object(),
+    S7::new_object(CbFilter(),
       type = "discrete_text", id = id, name = name,
       variable = variable, value = value, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
@@ -185,7 +185,7 @@ CbFilterRange <- S7::new_class("CbFilterRange",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
     name <- name %||% variable
-    S7::new_object(S7::S7_object(),
+    S7::new_object(CbFilter(),
       type = "range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
@@ -216,7 +216,7 @@ CbFilterDateRange <- S7::new_class("CbFilterDateRange",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
     name <- name %||% variable
-    S7::new_object(S7::S7_object(),
+    S7::new_object(CbFilter(),
       type = "date_range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
@@ -247,7 +247,7 @@ CbFilterDatetimeRange <- S7::new_class("CbFilterDatetimeRange",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
     name <- name %||% variable
-    S7::new_object(S7::S7_object(),
+    S7::new_object(CbFilter(),
       type = "datetime_range", id = id, name = name,
       variable = variable, range = range, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
@@ -280,7 +280,7 @@ CbFilterMultiDiscrete <- S7::new_class("CbFilterMultiDiscrete",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variables, suffix = "md")
     name <- name %||% .default_filter_name(variables, "multi_discrete")
-    S7::new_object(S7::S7_object(),
+    S7::new_object(CbFilter(),
       type = "multi_discrete", id = id, name = name,
       variables = variables, values = values, dataset = dataset,
       keep_na = keep_na, active = active, description = description,
@@ -313,7 +313,7 @@ CbFilterQuery <- S7::new_class("CbFilterQuery",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variables, suffix = "q")
     name <- name %||% .default_filter_name(variables, "query")
-    S7::new_object(S7::S7_object(),
+    S7::new_object(CbFilter(),
       type = "query", id = id, name = name,
       variables = variables, value = value, dataset = dataset,
       keep_na = keep_na, active = active, description = description,

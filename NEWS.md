@@ -1,3 +1,7 @@
+# cohortBuilder (development version)
+
+* Updates for compatibility with S7 > 0.2.2.
+
 # cohortBuilder 1.0.0
 
 ## Breaking changes

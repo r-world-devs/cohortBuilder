@@ -53,6 +53,7 @@ Collate:
     'repro_code_utils.R'
     'source_tblist.R'
     'data.R'
+    'zzz.R'
 VignetteBuilder: knitr
 URL: https://github.com/r-world-devs/cohortBuilder/,  https://r-world-devs.github.io/cohortBuilder/
 Depends:
