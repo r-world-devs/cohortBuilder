@@ -1,6 +1,7 @@
 #' Create data source cohort
 #'
 #' @name cohortBuilder-package
+#' @importFrom rlang "%||%"
 #' @importFrom dplyr sym
 #' @rawNamespace if (getRversion() < "4.3.0") importFrom("S7", "@")
 NULL
