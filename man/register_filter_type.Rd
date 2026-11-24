@@ -25,11 +25,13 @@ MyCbFilter <- S7::new_class("MyCbFilter",
                          description = NULL, domain = NULL, ...) {
     id <- id \%||\% .default_filter_id(dataset, variable)
     name <- name \%||\% id
-    S7::new_object(S7::S7_object(),
-      type = "my_filter", id = id, name = name,
-      dataset = dataset, variable = variable,
-      active = TRUE, description = description, domain = domain,
-      extra = list(...), private = list(input_param = "value")
+    S7::new_object(
+      CbFilter(
+        type = "my_filter", id = id, name = name,
+        active = TRUE, description = description, domain = domain,
+        extra = list(...), private = list(input_param = "value")
+      ),
+      dataset = dataset, variable = variable
     )
   }
 )
