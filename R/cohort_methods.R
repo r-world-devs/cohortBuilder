@@ -683,9 +683,9 @@ Cohort <- R6::R6Class(
     #' @param mark_step Include information which filtering step is performed.
     #' @param ... Other parameters passed to \link[formatR]{tidy_source}.
     get_code = function(
-        include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
-        include_action = c("pre_filtering", "post_filtering", "run_binding"),
-        modifier = .repro_code_tweak, mark_step = TRUE, ...) {
+      include_source = TRUE, include_methods = c(".pre_filtering", ".post_filtering", ".run_binding"),
+      include_action = c("pre_filtering", "post_filtering", "run_binding"),
+      modifier = .repro_code_tweak, mark_step = TRUE, ...) {
 
       source_type <- class(private$source)[1L]
       # todo improve
