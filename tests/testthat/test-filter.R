@@ -407,11 +407,13 @@ test_that("cb_intersect_domain default method returns raw value for custom filte
     ),
     constructor = function(id = .gen_id(), name = id, variable, value = NA,
                            dataset, domain = NULL, ...) {
-      S7::new_object(S7::S7_object(),
-        type = "custom", id = id, name = name,
-        variable = variable, value = value, dataset = dataset,
-        active = TRUE, description = NULL, domain = domain,
-        extra = list(...), private = list(input_param = "value")
+      S7::new_object(
+        CbFilter(
+          type = "custom", id = id, name = name,
+          active = TRUE, description = NULL, domain = domain,
+          extra = list(...), private = list(input_param = "value")
+        ),
+        dataset = dataset, variable = variable, value = value
       )
     }
   )

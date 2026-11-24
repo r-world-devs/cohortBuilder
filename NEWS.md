@@ -1,3 +1,11 @@
+# cohortBuilder 1.0.1
+
+## Bug fixes
+
+* Fixed CRAN check errors on r-devel: all filter constructors now pass a `CbFilter`
+  instance (not `S7::S7_object()`) as the parent to `S7::new_object()`, satisfying
+  stricter parent-class validation introduced in newer S7.
+
 # cohortBuilder 1.0.0
 
 ## Breaking changes
