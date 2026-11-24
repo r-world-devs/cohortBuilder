@@ -35,11 +35,13 @@ tblist_class <- S7::new_S3_class("tblist")
 #'                          description = NULL, domain = NULL, ...) {
 #'     id <- id %||% .default_filter_id(dataset, variable)
 #'     name <- name %||% id
-#'     S7::new_object(S7::S7_object(),
-#'       type = "my_filter", id = id, name = name,
-#'       dataset = dataset, variable = variable,
-#'       active = TRUE, description = description, domain = domain,
-#'       extra = list(...), private = list(input_param = "value")
+#'     S7::new_object(
+#'       CbFilter(
+#'         type = "my_filter", id = id, name = name,
+#'         active = TRUE, description = description, domain = domain,
+#'         extra = list(...), private = list(input_param = "value")
+#'       ),
+#'       dataset = dataset, variable = variable
 #'     )
 #'   }
 #' )
@@ -122,12 +124,14 @@ CbFilterDiscrete <- S7::new_class("CbFilterDiscrete",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
     name <- name %||% variable
-    S7::new_object(S7::S7_object(),
-      type = "discrete", id = id, name = name,
-      variable = variable, value = value, dataset = dataset,
-      keep_na = keep_na, active = active, description = description,
-      domain = domain,
-      extra = list(...), private = list(input_param = "value")
+    S7::new_object(
+      CbFilter(
+        type = "discrete", id = id, name = name,
+        active = active, description = description,
+        domain = domain,
+        extra = list(...), private = list(input_param = "value")
+      ),
+      dataset = dataset, variable = variable, value = value, keep_na = keep_na
     )
   }
 )
@@ -153,12 +157,14 @@ CbFilterDiscreteText <- S7::new_class("CbFilterDiscreteText",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
     name <- name %||% variable
-    S7::new_object(S7::S7_object(),
-      type = "discrete_text", id = id, name = name,
-      variable = variable, value = value, dataset = dataset,
-      keep_na = keep_na, active = active, description = description,
-      domain = domain,
-      extra = list(...), private = list(input_param = "value")
+    S7::new_object(
+      CbFilter(
+        type = "discrete_text", id = id, name = name,
+        active = active, description = description,
+        domain = domain,
+        extra = list(...), private = list(input_param = "value")
+      ),
+      dataset = dataset, variable = variable, value = value, keep_na = keep_na
     )
   }
 )
@@ -185,12 +191,14 @@ CbFilterRange <- S7::new_class("CbFilterRange",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
     name <- name %||% variable
-    S7::new_object(S7::S7_object(),
-      type = "range", id = id, name = name,
-      variable = variable, range = range, dataset = dataset,
-      keep_na = keep_na, active = active, description = description,
-      domain = domain,
-      extra = list(...), private = list(input_param = "range")
+    S7::new_object(
+      CbFilter(
+        type = "range", id = id, name = name,
+        active = active, description = description,
+        domain = domain,
+        extra = list(...), private = list(input_param = "range")
+      ),
+      dataset = dataset, variable = variable, range = range, keep_na = keep_na
     )
   }
 )
@@ -216,12 +224,14 @@ CbFilterDateRange <- S7::new_class("CbFilterDateRange",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
     name <- name %||% variable
-    S7::new_object(S7::S7_object(),
-      type = "date_range", id = id, name = name,
-      variable = variable, range = range, dataset = dataset,
-      keep_na = keep_na, active = active, description = description,
-      domain = domain,
-      extra = list(...), private = list(input_param = "range")
+    S7::new_object(
+      CbFilter(
+        type = "date_range", id = id, name = name,
+        active = active, description = description,
+        domain = domain,
+        extra = list(...), private = list(input_param = "range")
+      ),
+      dataset = dataset, variable = variable, range = range, keep_na = keep_na
     )
   }
 )
@@ -247,12 +257,14 @@ CbFilterDatetimeRange <- S7::new_class("CbFilterDatetimeRange",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variable)
     name <- name %||% variable
-    S7::new_object(S7::S7_object(),
-      type = "datetime_range", id = id, name = name,
-      variable = variable, range = range, dataset = dataset,
-      keep_na = keep_na, active = active, description = description,
-      domain = domain,
-      extra = list(...), private = list(input_param = "range")
+    S7::new_object(
+      CbFilter(
+        type = "datetime_range", id = id, name = name,
+        active = active, description = description,
+        domain = domain,
+        extra = list(...), private = list(input_param = "range")
+      ),
+      dataset = dataset, variable = variable, range = range, keep_na = keep_na
     )
   }
 )
@@ -280,12 +292,14 @@ CbFilterMultiDiscrete <- S7::new_class("CbFilterMultiDiscrete",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variables, suffix = "md")
     name <- name %||% .default_filter_name(variables, "multi_discrete")
-    S7::new_object(S7::S7_object(),
-      type = "multi_discrete", id = id, name = name,
-      variables = variables, values = values, dataset = dataset,
-      keep_na = keep_na, active = active, description = description,
-      domain = domain,
-      extra = list(...), private = list(input_param = "values")
+    S7::new_object(
+      CbFilter(
+        type = "multi_discrete", id = id, name = name,
+        active = active, description = description,
+        domain = domain,
+        extra = list(...), private = list(input_param = "values")
+      ),
+      dataset = dataset, variables = variables, values = values, keep_na = keep_na
     )
   }
 )
@@ -313,12 +327,14 @@ CbFilterQuery <- S7::new_class("CbFilterQuery",
                          active = getOption("cb_active_filter", default = TRUE), ...) {
     id <- id %||% .default_filter_id(dataset, variables, suffix = "q")
     name <- name %||% .default_filter_name(variables, "query")
-    S7::new_object(S7::S7_object(),
-      type = "query", id = id, name = name,
-      variables = variables, value = value, dataset = dataset,
-      keep_na = keep_na, active = active, description = description,
-      domain = domain,
-      extra = list(...), private = list(input_param = "value")
+    S7::new_object(
+      CbFilter(
+        type = "query", id = id, name = name,
+        active = active, description = description,
+        domain = domain,
+        extra = list(...), private = list(input_param = "value")
+      ),
+      dataset = dataset, variables = variables, value = value, keep_na = keep_na
     )
   }
 )
